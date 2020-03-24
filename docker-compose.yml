@@ -2,7 +2,7 @@ version: '2.4'
 services:
     web:
         build: .
-        command: node server.js
+        command: npm start
         volumes: 
             - ./app:/app
         ports:
@@ -10,13 +10,22 @@ services:
         restart: on-failure
         depends_on: 
             - mongodb
+        environment: 
+            - API_PORT=${API_PORT}
+            - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+            - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
     
     mongodb:
         image: mongo
         ports:
             - ${MONGO_PORT}:27017
+        volumes:
+            - ./mongodb:/data/db
+            - ./backups:/backups
         restart: always
-        environment: 
+        environment:
+            - MONGO_DATA_DIR=/data/db
+            - MONGO_LOG_DIR=/dev/null
             - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
             - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
         command: mongod --auth --logpath=/dev/null

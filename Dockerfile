@@ -1,5 +1,5 @@
 FROM node:12
 WORKDIR /app
-COPY ./app/package*.json ./
+COPY ./app ./
 RUN npm install
 CMD ["node", "server"]

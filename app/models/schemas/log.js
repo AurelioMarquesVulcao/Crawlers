@@ -10,7 +10,7 @@ const LogSchema = new Schema(
         tribunal: String,
         robo: String
     },
-    { versionKey: false, timestamps: {createdAt: 'dataCriacao'}}
+    { versionKey: false, timestamps: {createdAt: 'dataCriacao', updatedAt: 'dataEdicao'}}
 );
 
 const Log = mongoose.model('Log', LogSchema, 'logs');

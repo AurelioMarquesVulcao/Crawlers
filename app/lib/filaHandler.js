@@ -74,7 +74,11 @@ class GerenciadorFila {
       conn.createChannel((err, ch) => {
         if (err) throw new Error(err);
         
-        ch.assertQueue(fila, { durable: true });
+        ch.assertQueue(fila, {
+          durable: true,
+          noAck: false,
+          maxPriority: 9
+        });
         ch.prefetch(this.prefetch);
         
         const texto = `Consumindo de ${this.prefetch} em ${this.prefetch}`;
@@ -99,7 +103,11 @@ class GerenciadorFila {
       conn.createChannel((err, ch) => {
         if (err) throw new Error(err);
         
-        ch.assertQueue(filaOrigem, { durable: true });
+        ch.assertQueue(filaOrigem, {
+          durable: true,
+          noAck: false,
+          maxPriority: 9
+        });
         ch.prefetch(this.prefetch);
         
         const texto = `Consumindo de ${this.prefetch} em ${this.prefetch}`;
@@ -111,7 +119,11 @@ class GerenciadorFila {
           
           const buffer = Buffer.from(mensagem);
           
-          ch.assertQueue(filaDestino, { durable: true });
+          ch.assertQueue(filaDestino, {
+            durable: true,
+            noAck: false,
+            maxPriority: 9
+          });
           ch.sendToQueue(filaDestino, buffer);
           
           console.log(`${filaOrigem}#${mensagem} -> ${filaDestino}`);

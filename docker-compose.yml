@@ -1,15 +1,16 @@
 version: '2.4'
 services:
     web:
-        build: .
+        extends:
+            file: common-services.yml
+            service: base_node
         command: npm start
-        volumes: 
-            - ./app:/app
         ports:
             - ${API_PORT}:3300
         restart: on-failure
         depends_on: 
             - mongodb
+            - rabbitmq
         environment: 
             - API_PORT=${API_PORT}
             - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
@@ -29,3 +30,15 @@ services:
             - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
             - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
         command: mongod --auth --logpath=/dev/null
+
+    rabbitmq:
+        image: rabbitmq:3.8.0-management
+        hostname: crawlers-rabbitmq
+        ports:
+            - 1${RABBITMQ_ADDRESS}:15672
+            - ${RABBITMQ_ADDRESS}:5672
+        restart: always
+        environment:
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+        

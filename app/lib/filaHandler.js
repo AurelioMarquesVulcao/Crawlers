@@ -137,4 +137,4 @@ class GerenciadorFila {
 
 
 // EXPORTS
-module.export.GerenciadorFila = GerenciadorFila;
+module.exports.GerenciadorFila = GerenciadorFila;

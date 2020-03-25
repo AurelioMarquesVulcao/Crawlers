@@ -59,4 +59,4 @@ services:
     depends_on:
       - nginx
       - mongodb
-    command: node bin/js/TJBAPortal/extracaoNovos.js
+    command: node workers/TJBAPortal/extracaoNovos.js

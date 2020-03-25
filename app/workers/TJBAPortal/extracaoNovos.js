@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const { enums } = require('../../../configs/enums');
-const { GerenciadorFila } = require('../../../lib/filaHandler');
+const { enums } = require('../../configs/enums');
+const { GerenciadorFila } = require('../../lib/filaHandler');
 
 (async () => {
   try {

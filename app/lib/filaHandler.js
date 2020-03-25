@@ -115,7 +115,7 @@ class GerenciadorFila {
         const texto = `Consumindo de ${this.prefetch} em ${this.prefetch}`;
 
         console.log(
-          `[*] Observando a fila: ${filaOrigem}\n ${texto}! Para cancelar pressione CTRL+C\n`
+          `[*] Observando a fila: ${filaOrigem} ${texto}! Para cancelar pressione CTRL+C\n`
         );
 
         ch.consume(filaOrigem, msg => {

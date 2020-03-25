@@ -1,15 +1,17 @@
 version: "2.4"
 services:
-    base_node:
-        build: .
-        volumes:
-            - ./app:/app
-        working_dir: /app
-        environment:
-            - API_PORT=${API_PORT}
-            - MONGO_PORT=${MONGO_PORT}
-            - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-            - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-            - RABBITMQ_ADDRESS=${RABBITMQ_ADDRESS}
-            - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
-            - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+  base_node:
+    build: .
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    environment:
+      - API_PORT=${API_PORT}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - RABBITMQ_ADDRESS=${RABBITMQ_ADDRESS}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - MONGO_ADDRESS=${MONGO_ADDRESS}
+      - MONGO_DATABASE=${MONGO_DATABASE}

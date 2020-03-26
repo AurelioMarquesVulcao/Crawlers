@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
+const { ExtratorFactory } = require('../../extratores/extratorFactory');
 
 (async () => {
   try {
@@ -14,12 +15,11 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
       console.log(e);
     });
 
-    new GerenciadorFila().consumir(
-      `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJBAPortal}.extracao.novos`,
-      (ch, msg) => {
-        console.log(msg.content.toString());
-      }
-    );
+    const nomeFila = `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJBAPortal}.extracao.novos`;
+
+    new GerenciadorFila().consumir(nomeFila, (ch, msg) => {
+      ExtratorFactory.getExtrator(nomeFila, true);
+    });
   } catch (e) {
     console.log(e);
   }

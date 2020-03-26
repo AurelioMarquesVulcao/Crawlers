@@ -6,7 +6,6 @@ class GerenciadorFila {
    * @param {number} prefetch int com número de consumidores da fila.
    */
   constructor(prefetch = 1) {
-    console.log(enums.rabbitmq.connString);
     this.host = enums.rabbitmq.connString;
     this.prefetch = prefetch;
   }

@@ -7,7 +7,7 @@ if (!process.env.MONGO_CONNECTION_STRING)
 if (!process.env.RABBITMQ_CONNECTION_STRING)
   throw Error("RABBITMQ_CONNECTION_STRING é uma variável obrigatória");
 
-mongoose.connect(
-  `${process.env.MONGO_CONNECTION_STRING}/${process.env.MONGO_DATABASE}`,
-  { useNewUrlParser: true, useUnifiedTopology: true }
-);
+mongoose.connect(`${process.env.MONGO_CONNECTION_STRING}`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});

@@ -1,9 +1,13 @@
-// TODO Construir extratores
 const cheerio = require('cheerio');
 const moment = require('moment');
 
-//TODO const { Robo } = require("../lib/automation");
-//TODO const { OabTJBAPortalParser } = require("../parsers/TJBAParser");
+const {
+  BaseException,
+  RequestException,
+  ExtracaoException,
+} = require('../models/exception/exception');
+const { Robo } = require('../lib/robo');
+const { OabTJBAPortalParser } = require('../parsers/TJBAParser');
 //  Aqui dentro terei os parsers para qualquer tipo de processo envolvendo o TJBA
 
 class ExtratorBase {
@@ -54,13 +58,10 @@ class OabTJBAPortal extends ExtratorBase {
       //   }
     } catch (e) {
       if (e instanceof RequestException) {
-        //TODO checar RequestException
         throw new RequestException(e.code, e.status, e.message);
       } else if (e instanceof BaseException) {
-        //TODO ?
         throw new BaseException(e.code, e.message);
       } else if (e instanceof ExtracaoException) {
-        //TODO criar extração exception
         if (/ERRO_CAPTCHA/.test(e.code)) {
           //refaz tentativas de captcha (deixar aqui mas portal tjba n usa captcha por enquanto)
           throw new ExtracaoException(e.code, null, e.message);

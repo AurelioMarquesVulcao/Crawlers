@@ -1,3 +1,4 @@
+require('../bootstrap')
 const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila
 
 const gerenciadorFila = new GerenciadorFila()

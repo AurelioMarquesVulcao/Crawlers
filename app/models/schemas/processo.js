@@ -7,8 +7,8 @@ const capaSchema = new Schema(
     comarca: String,
     vara: String,
     fase: String,
-    assunto: String,
-    tipo: String,
+    assunto: [String],
+    classe: String,
     dataDistribuicao: Date,
   },
   { _id: false, versionKey: false }
@@ -40,7 +40,7 @@ const processoSchema = new Schema(
   {
     capa: capaSchema,
     detalhes: detalhesSchema,
-    partes: [parteSchema],
+    envolvidos: [parteSchema],
     oabs: [String],
     status: String, //transformar enums
     isBaixa: Boolean,
@@ -53,6 +53,23 @@ const processoSchema = new Schema(
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },
   }
 );
+
+processoSchema.methods.identificarDetalhes = function identificarDetalhes(cnj) {
+  //TODO identificarDetalhes, construir funcao
+  let detalhes = {};
+  let cnjPartes = cnj.split(/\D/);
+
+  detalhes['tipo'] = 'cnj';
+  detalhes['numeroProcesso'] = cnj.replace(/[-.]/g, '');
+  detalhes['numeroProcessoMascara'] = cnj;
+  detalhes['instancia'] = /.0000$|.9000$/.test(cnj) ? 2 : 1;
+  detalhes['ano'] = parseInt(cnjPartes[1]);
+  detalhes['orgao'] = parseInt(cnjPartes[2]);
+  detalhes['tribunal'] = parseInt(cnjPartes[3]);
+  detalhes['origem'] = parseInt(cnjPartes[4]);
+
+  return detalhes;
+};
 
 const Processo = mongoose.model('Processo', processoSchema, 'processos');
 

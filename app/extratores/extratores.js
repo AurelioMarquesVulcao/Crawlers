@@ -35,7 +35,27 @@ class OabTJBAPortal extends ExtratorBase {
         `${this.url}`,
         'GET',
         'latin1', //TODO verificar validade do LATIN1 como encoder para TJBA
-        true
+        true,
+        false,
+        {
+          tipo: 'NUMOAB',
+          funcao: 'funcOAB',
+          processo: numeroDaOab,
+          'g-recaptcha-response': '',
+        }
+      );
+
+      let $ = cheerio.load(objResponse.responseBody);
+      let codigoBusca = $.html().match(/var busca (.*);/)[1];
+      codigoBusca = codigoBusca.trim();
+
+      objResponse = await this.robo.acessar(
+        `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
+        'GET',
+        'utf-8',
+        true,
+        false,
+        objResponse.responseContent.headers
       );
 
       // Verifica se existe algum tipo extra de validação que deve acontecer

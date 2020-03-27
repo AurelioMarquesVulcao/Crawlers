@@ -132,6 +132,16 @@ class Robo {
     this.headless = true;
   }
 
+  /**
+   * Acessa o site
+   * @param {string} url URL do site
+   * @param {string} method 'GET'ou 'POST'
+   * @param {string} encoding tipo de codificacao
+   * @param {boolean} isPoxied deve usar proxy
+   * @param {boolean} isJson é do tipo querystring
+   * @param {object} params parametros para o form ou querystring
+   * @param {object} rHeaders headers
+   */
   async acessar(
     url,
     method = 'GET',
@@ -144,7 +154,7 @@ class Robo {
     if (!url || url == '') throw new Error('URL vazia!');
 
     const headers = {
-      'User-Agent': '', //TODO Pegar user agent do processo_crawler
+      'User-Agent': '', //TODO Robo Header, pode ser usado o do proadv
       ...rHeaders,
     };
 

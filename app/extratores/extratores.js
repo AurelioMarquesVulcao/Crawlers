@@ -7,7 +7,7 @@ const {
   ExtracaoException,
 } = require('../models/exception/exception');
 const { Robo } = require('../lib/robo');
-const { OabTJBAPortalParser } = require('../parsers/TJBAParser');
+const { TJBAPortalParser } = require('../parsers/TJBAPortalParser');
 //  Aqui dentro terei os parsers para qualquer tipo de processo envolvendo o TJBA
 
 class ExtratorBase {
@@ -26,56 +26,44 @@ class ExtratorBase {
 class OabTJBAPortal extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
-    this.parser = new OabTJBAPortalParser();
+    this.parser = new TJBAPortalParser();
   }
 
   async extrair(numeroDaOab) {
     try {
       let objResponse = await this.robo.acessar(
         `${this.url}`,
-        'GET',
+        'POST',
         'latin1', //TODO verificar validade do LATIN1 como encoder para TJBA
-        true,
+        false,
         false,
         {
           tipo: 'NUMOAB',
           funcao: 'funcOAB',
-          processo: numeroDaOab,
+          processo: numeroDaOab + 'BA',
           'g-recaptcha-response': '',
         }
       );
-
       let $ = cheerio.load(objResponse.responseBody);
-      let codigoBusca = $.html().match(/var busca (.*);/)[1];
+      let codigoBusca = $.html().match(/var busca\s*=\s*'(.*)';/)[1];
       codigoBusca = codigoBusca.trim();
 
+      let cookies = objResponse.responseContent.headers.cookies;
       objResponse = await this.robo.acessar(
         `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
         'GET',
         'utf-8',
         true,
         false,
-        objResponse.responseContent.headers
+        null,
+        cookies
       );
 
-      // Verifica se existe algum tipo extra de validação que deve acontecer
-      // como captchas e etc
-      let preParse = await this.preParse(objResponse.responseBody);
+      let listaProcessos = objResponse.responseBody.lstProcessos;
 
-      if (preParse.response) response = preParse.response;
-
-      if (!preParse.captcha && preParse.inconsistencias.length == 0) {
-        extracao = await this.parser(oab, response);
-      }
-      //O codigo abaixo é relacionado ao uso de captcha no TJBA entre outros.
-      // else {
-      //   if (preParse.captcha) {
-      //     console.log('Tentativa de quebra de captcha!');
-
-      //     //TODO aplicar logica de session apresentada no TJSP do Bruno
-      //     let cookies = objResponse.cookies.join('');
-
-      //   }
+      listaProcessos.map(element => {
+        new TJBAPortalParser().parse(element);
+      });
     } catch (e) {
       if (e instanceof RequestException) {
         throw new RequestException(e.code, e.status, e.message);
@@ -98,3 +86,5 @@ class OabTJBAPortal extends ExtratorBase {
     }
   }
 }
+
+module.exports.OabTJBAPortal = OabTJBAPortal;

@@ -119,3 +119,12 @@ temp/
 
 # Prettier file
 .prettierrc
+
+# eslint
+.eslintrc.json
+
+# pasta do mongo
+mongodb/*
+
+# WebStorm
+.idea/*

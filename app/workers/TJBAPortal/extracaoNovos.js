@@ -5,7 +5,6 @@ const { ExtratorFactory } = require('../../extratores/extratorFactory');
 
 (async () => {
   try {
-    console.log(enums.mongo.address); //TODO remover
     mongoose.connect(enums.mongo.address, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -18,7 +17,9 @@ const { ExtratorFactory } = require('../../extratores/extratorFactory');
     const nomeFila = `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJBAPortal}.extracao.novos`;
 
     new GerenciadorFila().consumir(nomeFila, (ch, msg) => {
-      ExtratorFactory.getExtrator(nomeFila, true);
+      const extrator = ExtratorFactory.getExtrator(nomeFila, true);
+      let message = JSON.parse(msg.content.toString());
+      extrator.extrair(message.NumeroDaOab);
     });
   } catch (e) {
     console.log(e);

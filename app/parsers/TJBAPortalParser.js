@@ -39,7 +39,7 @@ class TJBAPortalParser extends BaseParser {
 
     $.partes.map((element, index) => {
       if (element.tipo) {
-        let nome = element.nome.substitute(/\s[^\w-]\s.+$/, '');
+        let nome = element.nome.replace(/\s[^\w-]\s.+$/, '');
         let tipo = removerAssentos(element.tipo);
         envolvidos.push({
           nome: nome,
@@ -49,14 +49,14 @@ class TJBAPortalParser extends BaseParser {
         if (element.advogado) {
           let advogado = element.advogado;
           let oab = /\d+\w{2}/.exec(advogado);
+          advogado = advogado.replace(/\s.\d+\w{2}.$/, '');
           if (oab) {
-            advogado = advogado.substitute(/\s.\d+\w{2}.$/, '');
-            advogado = `(${oab}) ${advogado}`;
-            envolvidos.push({
-              nome: removerAssentos(texto),
-              tipo: 'Advogado',
-            });
+            advogado = `(${oab[0]}) ${advogado}`;
           }
+          envolvidos.push({
+            nome: removerAssentos(advogado),
+            tipo: 'Advogado',
+          });
         }
       }
     });
@@ -80,7 +80,24 @@ class TJBAPortalParser extends BaseParser {
     return movimentos;
   }
 
-  extrairOabs(envolvidos) {}
+  extrairOabs(envolvidos) {
+    let oabs = [];
+
+    envolvidos.map(element => {
+      if (element.tipo == 'Advogado') {
+        let oab = /\d+\w{2}/.exec(element.nome);
+        if (oab) {
+          oabs.push(oab[0]);
+        }
+      }
+    });
+
+    return oabs;
+  }
+
+  extrairStatus(content) {
+    return 'Não informado.';
+  }
 
   /**
    * Parse
@@ -90,21 +107,22 @@ class TJBAPortalParser extends BaseParser {
     const dataAtual = moment().format('YYYY-MM-DD');
 
     const capa = this.extrairCapa(content);
-    const detalhes = Processo.extrairDetalhes(cnj);
+    const detalhes = new Processo().identificarDetalhes(content.numero);
     const envolvidos = this.extrairEnvolvidos(content);
     const oabs = this.extrairOabs(envolvidos);
     const status = this.extrairStatus(content);
-    const andamentos = this.extrairAndamentos(content);
+    const andamentos = this.extrairAndamentos(content, dataAtual);
 
+    //TODO salvar no banco
     const processo = new Processo({
       capa: capa,
       detalhes: detalhes,
       envolvidos: envolvidos,
       oabs: oabs,
       temAndamentosNovos: false,
-      qtdAndamentosNovos: andamentos.length(),
+      qtdAndamentosNovos: andamentos.length,
       origemExtracao: 'OabTJBAPortal',
-    }).toString();
+    });
 
     return {
       processo: processo,
@@ -112,3 +130,5 @@ class TJBAPortalParser extends BaseParser {
     };
   }
 }
+
+module.exports.TJBAPortalParser = TJBAPortalParser;

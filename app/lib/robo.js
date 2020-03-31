@@ -1,4 +1,5 @@
 const axios = require('axios');
+const FormData = require('form-data');
 
 class Requisicao {
   /**
@@ -26,7 +27,6 @@ class Requisicao {
   async enviarRequest(options) {
     const promise = new Promise((resolve, reject) => {
       let statusCode = 500;
-
       axios(options)
         .then(res => {
           if (res) {
@@ -99,7 +99,6 @@ class Requisicao {
           );
 
           this.contadorTentativas += 1;
-
           response = await this.enviarRequest(options);
         } else {
           throw new RequestException(
@@ -154,7 +153,7 @@ class Robo {
     if (!url || url == '') throw new Error('URL vazia!');
 
     const headers = {
-      'User-Agent': '', //TODO Robo Header, pode ser usado o do proadv
+      'User-Agent': this.requisicao.obterUserAgentAleatorio(),
       ...rHeaders,
     };
 
@@ -162,14 +161,18 @@ class Robo {
       url: url,
       headers: headers,
       method: method,
-      encoding: encoding,
-      followAllRedirect: true,
-      timeout: 100000,
     };
 
     if (params) {
       if (isJson) options.json = params;
-      else options.form = params;
+      else {
+        let form = new FormData();
+        for (let key in params) {
+          form.append(key, params[key]);
+        }
+        options.data = form.getBuffer();
+        options.headers = { ...options.headers, ...form.getHeaders() };
+      }
     }
 
     if (params) {

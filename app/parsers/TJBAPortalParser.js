@@ -3,6 +3,7 @@ const moment = require('moment');
 
 const { BaseParser } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
+const { Andamento } = require('../models/schemas/andamento');
 
 // parser => processo
 
@@ -71,11 +72,14 @@ class TJBAPortalParser extends BaseParser {
       let data = moment(element.dataMovimentacao, 'DD/MM/YYYY').format(
         'YYYY-MM-DD'
       );
-      movimentos.push({
-        numeroDoProcesso: element.numeroProcesso,
-        data: data,
-        dataInclusao: dataAtual,
-      });
+
+      movimentos.push(
+        new Andamento({
+          numeroProcesso: element.numeroProcesso,
+          data: data,
+          dataInclusao: dataAtual
+        })
+      );
     });
     return movimentos;
   }
@@ -113,20 +117,19 @@ class TJBAPortalParser extends BaseParser {
     const status = this.extrairStatus(content);
     const andamentos = this.extrairAndamentos(content, dataAtual);
 
-    //TODO salvar no banco
     const processo = new Processo({
       capa: capa,
       detalhes: detalhes,
       envolvidos: envolvidos,
       oabs: oabs,
-      temAndamentosNovos: false,
+      temAndamentosNovos: true,
       qtdAndamentosNovos: andamentos.length,
       origemExtracao: 'OabTJBAPortal',
     });
 
     return {
       processo: processo,
-      andamento: andamentos,
+      andamentos: andamentos,
     };
   }
 }

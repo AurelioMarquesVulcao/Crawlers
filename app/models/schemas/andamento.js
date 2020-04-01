@@ -10,13 +10,13 @@ const LinkDocumentoSchema = new Schema(
 );
 
 const AndamentoSchema = new Schema({
-  numeroProcesso: String,
+  numeroDoProcesso: String,
   hash: String,
   descricao: String,
   data: Date,
   dataInclusao: Date,
   link: String,
-  linkDocumento: linkDocumentoSchema,
+  linkDocumento: LinkDocumentoSchema,
 });
 
 const Andamento = mongoose.model('Andamento', AndamentoSchema, 'andamentos');

@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
-const {Processo} = require('../models/schemas/processo');
+const { Processo } = require('../models/schemas/processo');
+const { Andamento } = require('../models/schemas/andamento');
 
 const {
   BaseException,
@@ -66,15 +67,9 @@ class OabTJBAPortal extends ExtratorBase {
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;
         let andamentos = extracao.andamentos;
-        Processo.update(
-            {'detalhes.numeroProcesso': processo.detalhes.numeroProcesso},
-            processo,
-            {'upsert': true}
-        )
-        console.log('extracao:', extracao);
+        processo.salvar();
+        Andamento.salvarAndamentos(andamentos);
       });
-
-
     } catch (e) {
       if (e instanceof RequestException) {
         throw new RequestException(e.code, e.status, e.message);

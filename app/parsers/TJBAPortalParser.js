@@ -65,7 +65,7 @@ class TJBAPortalParser extends BaseParser {
     return envolvidos;
   }
 
-  extrairAndamentos($, dataAtual) {
+  extrairAndamentos($, dataAtual, numeroProcesso) {
     let movimentos = [];
 
     $.movimentacoes.map((element, index) => {
@@ -77,7 +77,8 @@ class TJBAPortalParser extends BaseParser {
         new Andamento({
           numeroProcesso: element.numeroProcesso,
           data: data,
-          dataInclusao: dataAtual
+          dataInclusao: dataAtual,
+          descricao: element.descricao,
         })
       );
     });
@@ -115,7 +116,11 @@ class TJBAPortalParser extends BaseParser {
     const envolvidos = this.extrairEnvolvidos(content);
     const oabs = this.extrairOabs(envolvidos);
     const status = this.extrairStatus(content);
-    const andamentos = this.extrairAndamentos(content, dataAtual);
+    const andamentos = this.extrairAndamentos(
+      content,
+      dataAtual,
+      detalhes.numeroProcesso
+    );
 
     const processo = new Processo({
       capa: capa,

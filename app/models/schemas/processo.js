@@ -54,6 +54,23 @@ const processoSchema = new Schema(
   }
 );
 
+processoSchema.methods.salvar = function salvar() {
+  let processoObject = this.toObject();
+  delete processoObject['_id'];
+  Processo.updateOne(
+    { 'detalhes.numeroProcesso': this.detalhes.numeroProcesso },
+    processoObject,
+    { upsert: true },
+    (err, doc) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log(doc);
+    }
+  );
+};
+
 processoSchema.methods.identificarDetalhes = function identificarDetalhes(cnj) {
   //TODO identificarDetalhes, construir funcao
   let detalhes = {};

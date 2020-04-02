@@ -17,7 +17,7 @@ const capaSchema = new Schema(
 const detalhesSchema = new Schema(
   {
     tipo: String,
-    numeroProcesso: String,
+    numeroProcesso: { type: String, unique: true, required: true },
     numeroProcessoMascara: String,
     instancia: Number,
     ano: Number,
@@ -66,7 +66,11 @@ processoSchema.methods.salvar = function salvar() {
         console.log(err);
         return;
       }
-      console.log(doc);
+      if (doc.upserted) {
+        console.log(
+          `Novo processo cadastrado: ${processoObject.detalhes.numeroProcesso}`
+        );
+      }
     }
   );
 };

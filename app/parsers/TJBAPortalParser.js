@@ -88,7 +88,7 @@ class TJBAPortalParser extends BaseParser {
   extrairOabs(envolvidos) {
     let oabs = [];
 
-    envolvidos.map(element => {
+    envolvidos.map((element) => {
       if (element.tipo == 'Advogado') {
         let oab = /\d+\w{2}/.exec(element.nome);
         if (oab) {

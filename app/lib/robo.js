@@ -28,7 +28,7 @@ class Requisicao {
     const promise = new Promise((resolve, reject) => {
       let statusCode = 500;
       axios(options)
-        .then(res => {
+        .then((res) => {
           if (res) {
             statusCode = res.status;
 
@@ -66,7 +66,7 @@ class Requisicao {
             });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           resolve({
             //TODO observar se pode se tornar reject
             code: err.code,
@@ -179,6 +179,8 @@ class Robo {
       if (isProxied) options.proxy = ''; //TODO aplicar o proxy
     }
 
+    options.timeout = 20000;
+    console.log(options);
     return this.requisicao.enviarRequest(options);
   }
 }

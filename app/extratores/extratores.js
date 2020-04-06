@@ -63,12 +63,12 @@ class OabTJBAPortal extends ExtratorBase {
 
       let listaProcessos = objResponse.responseBody.lstProcessos;
 
-      listaProcessos.map(element => {
+      listaProcessos.map((element) => {
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;
         let andamentos = extracao.andamentos;
-        processo.salvar();
         Andamento.salvarAndamentos(andamentos);
+        processo.salvar();
       });
     } catch (e) {
       if (e instanceof RequestException) {

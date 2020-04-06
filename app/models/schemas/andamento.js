@@ -28,31 +28,37 @@ AndamentoSchema.statics.criarHash = function criarHash(obj) {
 };
 
 AndamentoSchema.statics.salvarAndamentos = function salvarAndamentos(objs) {
-  objs.map(element => {
-    element.salvar();
+  console.log('salvar andamentos'); //TODO remover
+  let andamentosNovos = objs.map(async (element) => {
+    return await element.salvar();
+  });
+  return Promise.all(andamentosNovos).then((args) => {
+    return args.filter(Boolean).length;
   });
 };
 
-AndamentoSchema.methods.salvar = function salvar() {
+AndamentoSchema.methods.salvar = async function salvar() {
   this.hash = Andamento.criarHash(this);
   let andamentoObject = this.toObject();
   delete andamentoObject['_id'];
-  Andamento.updateOne(
-    { hash: this.hash },
-    andamentoObject,
-    { upsert: true },
-    (err, doc) => {
-      if (err) {
-        console.log(err);
-        return;
+
+  return new Promise((resolve, reject) => {
+    Andamento.updateOne(
+      { hash: this.hash },
+      andamentoObject,
+      { upsert: true },
+      (err, doc) => {
+        if (err) {
+          console.log(err);
+          reject(err);
+        }
+        if (doc.upserted) {
+          resolve(true);
+        }
+        resolve(false);
       }
-      if (doc.upserted) {
-        console.log(
-          `Novo andamento cadastrado: ${andamentoObject.numeroProcesso} - ${andamentoObject.hash}`
-        );
-      }
-    }
-  );
+    );
+  });
 };
 
 const Andamento = mongoose.model('Andamento', AndamentoSchema, 'andamentos');

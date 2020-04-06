@@ -51,10 +51,12 @@ const processoSchema = new Schema(
   {
     versionKey: false,
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },
+    autoIndex: true,
   }
 );
 
 processoSchema.methods.salvar = function salvar() {
+  console.log('salvar Processo'); //TODO remover
   let processoObject = this.toObject();
   delete processoObject['_id'];
   Processo.updateOne(
@@ -66,6 +68,7 @@ processoSchema.methods.salvar = function salvar() {
         console.log(err);
         return;
       }
+      console.log(doc);
       if (doc.upserted) {
         console.log(
           `Novo processo cadastrado: ${processoObject.detalhes.numeroProcesso}`
@@ -91,6 +94,14 @@ processoSchema.methods.identificarDetalhes = function identificarDetalhes(cnj) {
 
   return detalhes;
 };
+
+processoSchema.index({ 'detalhes.numeroProcesso': 1, type: -1 });
+
+processoSchema.pre('updateOne', function () {
+  if (this.getUpdate().qtdAndamentosNovos) {
+    console.log(this.getUpdate());
+  }
+});
 
 const Processo = mongoose.model('Processo', processoSchema, 'processos');
 

@@ -1,20 +1,45 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const ExtracaoResultado = new Schema({
+  idProcesso: String,
+  numeroProcesso: String,
+  temAndamentosNovos: Boolean,
+  qtdAndamentosNovos: Number,
+});
+
 const ExtracaoSchema = new Schema(
   {
-    processoId: String,
-    cnj: String,
-    instancia: String,
-    uf: String,
+    idLog: { type: String, unique: true, required: true },
     data: Date,
-    temAndamentosNovos: Boolean,
-    qtdAndamentosNovos: Number,
-    status: String,
-    hasAudiencia: Boolean,
+    numeroProcesso: String,
+    oab: String,
+    resultado: [ExtracaoResultado],
+    sucesso: Boolean,
+    detalhes: String,
+    uf: String,
   },
-  { versionKey: false }
+  {
+    versionKey: false,
+    toJSON: {
+      transform: function(doc, ret) {
+        delete ret._id;
+        delete ret.data;
+      },
+    },
+  }
 );
+
+ExtracaoSchema.methods.prepararEnvio = function prepararEnvio() {
+  return {
+    IdLog: this.idLog,
+    NumeroCNJ: this.numeroCNJ,
+    Oab: String,
+    Resultado: this.resultado,
+    Sucesso: this.sucesso,
+    Detalhes: this.detalhes,
+  };
+};
 
 const Extracao = mongoose.model('Extracao', ExtracaoSchema, 'extracoes');
 

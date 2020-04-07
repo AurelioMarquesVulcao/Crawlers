@@ -127,8 +127,7 @@ class TJBAPortalParser extends BaseParser {
       detalhes: detalhes,
       envolvidos: envolvidos,
       oabs: oabs,
-      temAndamentosNovos: true,
-      qtdAndamentosNovos: andamentos.length,
+      qtdAndamentos: andamentos.length,
       origemExtracao: 'OabTJBAPortal',
     });
 

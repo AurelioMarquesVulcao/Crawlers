@@ -1,4 +1,5 @@
 const Crypto = require('crypto-js');
+const { Robo } = require('../lib/robo');
 
 class Helper {
   /**
@@ -8,6 +9,19 @@ class Helper {
   static hash(texto) {
     const cifra = Crypto.SHA1(texto);
     return cifra.toString();
+  }
+
+  static enviarFeedback(msg) {
+    const robo = new Robo();
+    robo.acessar(
+      'bigdata url', //TODO preencher corretamente
+      'POST',
+      '',
+      false,
+      true,
+      msg,
+      {}
+    );
   }
 }
 

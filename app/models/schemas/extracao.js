@@ -1,17 +1,20 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ExtracaoResultado = new Schema({
-  idProcesso: String,
-  numeroProcesso: String,
-  temAndamentosNovos: Boolean,
-  qtdAndamentosNovos: Number,
-});
+const ExtracaoResultado = new Schema(
+  {
+    idProcesso: String,
+    numeroProcesso: String,
+    temAndamentosNovos: Boolean,
+    qtdAndamentosNovos: Number,
+  },
+  { _id: false, versionKey: false }
+);
 
 const ExtracaoSchema = new Schema(
   {
     idLog: { type: String, unique: true, required: true },
-    data: Date,
+    data: { type: Date, default: Date.now },
     numeroProcesso: String,
     oab: String,
     resultado: [ExtracaoResultado],
@@ -22,13 +25,30 @@ const ExtracaoSchema = new Schema(
   {
     versionKey: false,
     toJSON: {
-      transform: function(doc, ret) {
+      transform: function (doc, ret) {
         delete ret._id;
         delete ret.data;
+        delete ret.uf;
       },
     },
   }
 );
+
+ExtracaoSchema.statics.criarExtracao = async function criarExtracao(
+  message,
+  extracao,
+  uf
+) {
+  return await Extracao.create({
+    idLog: message.LogConsultaId,
+    numeroProcesso: message.numeroDoProcesso,
+    oab: message.numeroDaOab,
+    resultado: extracao.resultado,
+    sucesso: extracao.sucesso,
+    detalhes: extracao.detalhes,
+    uf: uf,
+  });
+};
 
 ExtracaoSchema.methods.prepararEnvio = function prepararEnvio() {
   return {

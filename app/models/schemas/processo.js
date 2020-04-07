@@ -45,7 +45,7 @@ const processoSchema = new Schema(
     status: String, //transformar enums
     isBaixa: Boolean,
     temAndamentosNovos: Boolean,
-    qtdAndamentosNovos: Number,
+    qtdAndamentos: Number,
     origemExtracao: String,
   },
   {
@@ -55,31 +55,58 @@ const processoSchema = new Schema(
   }
 );
 
-processoSchema.methods.salvar = function salvar() {
-  console.log('salvar Processo'); //TODO remover
+processoSchema.methods.salvar = async function salvar() {
   let processoObject = this.toObject();
   delete processoObject['_id'];
-  Processo.updateOne(
-    { 'detalhes.numeroProcesso': this.detalhes.numeroProcesso },
-    processoObject,
-    { upsert: true },
-    (err, doc) => {
-      if (err) {
-        console.log(err);
-        return;
+  var pesquisa = await new Promise((resolve, reject) => {
+    Processo.findOne(
+      {
+        'detalhes.numeroProcesso': this.detalhes.numeroProcesso,
+      },
+      (err, doc) => {
+        if (err) {
+          console.log(err);
+          reject(err);
+        }
+        resolve(doc);
       }
-      console.log(doc);
-      if (doc.upserted) {
-        console.log(
-          `Novo processo cadastrado: ${processoObject.detalhes.numeroProcesso}`
-        );
-      }
+    );
+  });
+
+  var doc = await new Promise((resolve, reject) => {
+    processoObject.temAndamentosNovos = true;
+    if (pesquisa && this.qtdAndamentos == pesquisa.qtdAndamentos) {
+      processoObject.temAndamentosNovos = false;
     }
-  );
+    let doc = Processo.updateOne(
+      { 'detalhes.numeroProcesso': this.detalhes.numeroProcesso },
+      processoObject,
+      { upsert: true },
+      (err, doc) => {
+        if (err) {
+          console.log(err);
+          reject(err);
+        }
+        resolve(doc);
+      }
+    );
+  });
+
+  if (doc.upserted) {
+    return {
+      numeroProcesso: processoObject.detalhes.numeroProcesso,
+      temAndamentosNovos: processoObject.temAndamentosNovos,
+      qtdAndamentosNovos: processoObject.qtdAndamentos,
+    };
+  }
+  return {
+    numeroProcesso: processoObject.detalhes.numeroProcesso,
+    temAndamentosNovos: processoObject.temAndamentosNovos,
+    qtdAndamentosNovos: processoObject.qtdAndamentos - pesquisa.qtdAndamentos,
+  };
 };
 
 processoSchema.methods.identificarDetalhes = function identificarDetalhes(cnj) {
-  //TODO identificarDetalhes, construir funcao
   let detalhes = {};
   let cnjPartes = cnj.split(/\D/);
 
@@ -96,12 +123,6 @@ processoSchema.methods.identificarDetalhes = function identificarDetalhes(cnj) {
 };
 
 processoSchema.index({ 'detalhes.numeroProcesso': 1, type: -1 });
-
-processoSchema.pre('updateOne', function () {
-  if (this.getUpdate().qtdAndamentosNovos) {
-    console.log(this.getUpdate());
-  }
-});
 
 const Processo = mongoose.model('Processo', processoSchema, 'processos');
 

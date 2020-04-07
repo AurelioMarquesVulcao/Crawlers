@@ -33,6 +33,7 @@ class OabTJBAPortal extends ExtratorBase {
 
   async extrair(numeroDaOab) {
     try {
+      let resultados = [];
       let objResponse = await this.robo.acessar(
         `${this.url}`,
         'POST',
@@ -63,12 +64,21 @@ class OabTJBAPortal extends ExtratorBase {
 
       let listaProcessos = objResponse.responseBody.lstProcessos;
 
-      listaProcessos.map((element) => {
+      resultados = await listaProcessos.map(async (element) => {
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;
         let andamentos = extracao.andamentos;
         Andamento.salvarAndamentos(andamentos);
-        processo.salvar();
+        let resultado = await processo.salvar();
+        return resultado;
+      });
+
+      return Promise.all(resultados).then((args) => {
+        return {
+          resultado: args,
+          sucesso: true,
+          detalhes: '',
+        };
       });
     } catch (e) {
       if (e instanceof RequestException) {

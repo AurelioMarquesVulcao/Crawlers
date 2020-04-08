@@ -1,5 +1,8 @@
 const axios = require('axios');
 const FormData = require('form-data');
+const moment = require('moment');
+
+const { RequestException } = require('../models/exception/exception');
 
 class Requisicao {
   /**

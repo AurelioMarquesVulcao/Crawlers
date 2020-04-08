@@ -28,8 +28,13 @@ const { Helper } = require('../../lib/util');
         resultadoExtracao,
         'BA'
       );
-      console.log(extracao.toJSON());
-      Helper.enviarFeedback(extracao.prepararEnvio());
+      const resposta = await Helper.enviarFeedback(
+        extracao.prepararEnvio()
+      ).catch((err) => {
+        console.log('Erro detectado', err);
+      });
+      ch.ack(msg);
+      console.log(resposta);
     });
   } catch (e) {
     console.log(e);

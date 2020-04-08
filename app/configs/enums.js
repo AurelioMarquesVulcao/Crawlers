@@ -2,6 +2,9 @@ require('dotenv/config');
 
 const env = 'dev';
 
+const bigdataAddress = process.env.BIG_DATA_ADDRESS;
+console.log('BigData Address', bigdataAddress); //TODO remove
+
 module.exports.enums = Object.freeze({
   mongo: {
     connString: process.env.MONGO_CONNECTION_STRING,
@@ -28,5 +31,8 @@ module.exports.enums = Object.freeze({
   tipoConsulta: {
     Oab: 'Oab',
     Processo: 'Processo',
+  },
+  bigdataUrls: {
+    resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`,
   },
 });

@@ -1,4 +1,6 @@
 const Crypto = require('crypto-js');
+
+const { enums } = require('../configs/enums');
 const { Robo } = require('../lib/robo');
 
 class Helper {
@@ -11,10 +13,10 @@ class Helper {
     return cifra.toString();
   }
 
-  static enviarFeedback(msg) {
+  static async enviarFeedback(msg) {
     const robo = new Robo();
-    robo.acessar(
-      'bigdata url', //TODO preencher corretamente
+    return await robo.acessar(
+      enums.bigdataUrls.resultadoConsulta,
       'POST',
       '',
       false,

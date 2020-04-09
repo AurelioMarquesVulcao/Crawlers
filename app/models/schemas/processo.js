@@ -31,7 +31,7 @@ const detalhesSchema = new Schema(
 const parteSchema = new Schema(
   {
     nome: String,
-    titulo: String,
+    tipo: String,
   },
   { _id: false, versionKey: false }
 );
@@ -52,6 +52,11 @@ const processoSchema = new Schema(
     versionKey: false,
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },
     autoIndex: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+      },
+    },
   }
 );
 

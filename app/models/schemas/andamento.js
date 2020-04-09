@@ -12,15 +12,27 @@ const LinkDocumentoSchema = new Schema(
   { _id: false, versionKey: false }
 );
 
-const AndamentoSchema = new Schema({
-  numeroProcesso: { type: String, required: true },
-  hash: { type: String, unique: true, required: true },
-  descricao: String,
-  data: Date,
-  dataInclusao: Date,
-  link: String,
-  linkDocumento: LinkDocumentoSchema,
-});
+const AndamentoSchema = new Schema(
+  {
+    numeroProcesso: { type: String, required: true },
+    hash: { type: String, unique: true, required: true },
+    descricao: String,
+    data: Date,
+    dataInclusao: Date,
+    link: String,
+    linkDocumento: LinkDocumentoSchema,
+  },
+  {
+    versionKey: false,
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.hash;
+      },
+    },
+    autoIndex: true,
+  }
+);
 
 AndamentoSchema.statics.criarHash = function criarHash(obj) {
   let preHash = `${obj.numeroProcesso}${obj.data}${obj.descricao}`;
@@ -60,6 +72,8 @@ AndamentoSchema.methods.salvar = async function salvar() {
     );
   });
 };
+
+AndamentoSchema.index({ numeroProcesso: 1, type: -1 });
 
 const Andamento = mongoose.model('Andamento', AndamentoSchema, 'andamentos');
 

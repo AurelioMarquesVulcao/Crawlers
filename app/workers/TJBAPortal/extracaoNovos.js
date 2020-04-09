@@ -33,7 +33,7 @@ const { Helper } = require('../../lib/util');
       ).catch((err) => {
         console.log('Erro detectado', err);
       });
-      ch.ack(msg);
+      // ch.ack(msg);
       console.log(resposta);
     });
   } catch (e) {

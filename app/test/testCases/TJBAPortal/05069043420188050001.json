@@ -1,0 +1,83 @@
+{
+  "numero": "0506904-34.2018.8.05.0001",
+  "distribuicao": "1ª Vara de Relações de Consumo - Salvador",
+  "classe": "Execução de Título Extrajudicial",
+  "area": "CÍVEL",
+  "assunto": "Contratos Bancários",
+  "movimentacoes": [
+    {
+      "descricao": "Processo redistribuído por sorteio",
+      "dataMovimentacao": "19/11/2019",
+      "numeroProcesso": "05069043420188050001"
+    },
+    {
+      "descricao": "Remetidos os autos para distribuição",
+      "dataMovimentacao": "19/11/2019",
+      "numeroProcesso": "05069043420188050001"
+    },
+    {
+      "descricao": "Publicado",
+      "dataMovimentacao": "09/05/2018",
+      "numeroProcesso": "05069043420188050001"
+    },
+    {
+      "descricao": "Despacho/Decisão remetido ao Diário de Justiça Eletrônico",
+      "dataMovimentacao": "07/05/2018",
+      "numeroProcesso": "05069043420188050001"
+    },
+    {
+      "descricao": "Declarada incompetência",
+      "dataMovimentacao": "03/05/2018",
+      "numeroProcesso": "05069043420188050001"
+    },
+    {
+      "descricao": "Processo distribuído por sorteio",
+      "dataMovimentacao": "15/02/2018",
+      "numeroProcesso": "05069043420188050001"
+    },
+    {
+      "descricao": "Concluso para despacho",
+      "dataMovimentacao": "15/02/2018",
+      "numeroProcesso": "05069043420188050001"
+    },
+    {
+      "descricao": "Expedição de documento",
+      "dataMovimentacao": "15/02/2018",
+      "numeroProcesso": "05069043420188050001"
+    }
+  ],
+  "partes": [
+    {
+      "nome": "Banco do Brasil SA | Advogado: MARIA AUXILIADORA FREITAS TEIXEIRA (30401BA)",
+      "documento": "191",
+      "tipo": "Exequente",
+      "advogado": "MARIA AUXILIADORA FREITAS TEIXEIRA (30401BA)"
+    },
+    {
+      "nome": "MILA HIPOLITO CASTRO EPP",
+      "documento": "12565825000132",
+      "tipo": "Executado",
+      "advogado": ""
+    },
+    {
+      "nome": "NILZETE DA COSTA CASTRO",
+      "documento": "7499540510",
+      "tipo": "Executado",
+      "advogado": ""
+    },
+    {
+      "nome": "CRISTIANE DA COSTA CASTRO",
+      "documento": "30928753549",
+      "tipo": "Executado",
+      "advogado": ""
+    },
+    {
+      "nome": "RODRIGO HIPOLITO CASTRO",
+      "documento": "2208551532",
+      "tipo": "Executado",
+      "advogado": ""
+    }
+  ],
+  "origemDados": "SAJ Primeiro Grau",
+  "detalhes": []
+}

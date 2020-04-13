@@ -7,9 +7,14 @@ const { Andamento } = require('../models/schemas/andamento');
 
 // parser => processo
 
-function removerAssentos(texto) {
-  //TODO removerAssentos fazer remoção de assentos
-  return texto;
+function removerAcentos(texto) {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+if (typeof String.prototype.strip === 'undefined') {
+  String.prototype.strip = function () {
+    return String(this).replace(/^\s+|\s+$/g, '');
+  };
 }
 
 class TJBAPortalParser extends BaseParser {
@@ -20,28 +25,29 @@ class TJBAPortalParser extends BaseParser {
     super();
   }
 
-  extrairCapa($) {
+  extrairCapa(content) {
     let capa = {};
 
     capa['uf'] = 'BA';
     capa['comarca'] = 'Bahia';
-    capa['assunto'] = this.extrairAssunto($);
-    capa['classse'] = $.classe;
+    capa['assunto'] = [this.extrairAssunto(content)];
+    capa['classe'] = removerAcentos(content.classe);
 
     return capa;
   }
 
-  extrairAssunto($) {
-    return $.assunto;
+  extrairAssunto(content) {
+    return removerAcentos(content.assunto.strip());
   }
 
-  extrairEnvolvidos($) {
+  extrairEnvolvidos(content) {
     let envolvidos = [];
 
-    $.partes.map((element, index) => {
+    content.partes.map((element, index) => {
       if (element.tipo) {
         let nome = element.nome.replace(/\s[^\w-]\s.+$/, '');
-        let tipo = removerAssentos(element.tipo);
+        nome = removerAcentos(nome);
+        let tipo = removerAcentos(element.tipo);
         envolvidos.push({
           nome: nome,
           tipo: tipo,
@@ -55,7 +61,7 @@ class TJBAPortalParser extends BaseParser {
             advogado = `(${oab[0]}) ${advogado}`;
           }
           envolvidos.push({
-            nome: removerAssentos(advogado),
+            nome: removerAcentos(advogado),
             tipo: 'Advogado',
           });
         }
@@ -65,10 +71,10 @@ class TJBAPortalParser extends BaseParser {
     return envolvidos;
   }
 
-  extrairAndamentos($, dataAtual, numeroProcesso) {
+  extrairAndamentos(content, dataAtual, numeroProcesso) {
     let movimentos = [];
 
-    $.movimentacoes.map((element, index) => {
+    content.movimentacoes.map((element, index) => {
       let data = moment(element.dataMovimentacao, 'DD/MM/YYYY').format(
         'YYYY-MM-DD'
       );
@@ -78,7 +84,7 @@ class TJBAPortalParser extends BaseParser {
           numeroProcesso: element.numeroProcesso,
           data: data,
           dataInclusao: dataAtual,
-          descricao: element.descricao,
+          descricao: removerAcentos(element.descricao),
         })
       );
     });
@@ -104,15 +110,20 @@ class TJBAPortalParser extends BaseParser {
     return 'Não informado.';
   }
 
+  extrairDetalhes(content) {
+    return new Processo().identificarDetalhes(content.numero);
+  }
+
   /**
    * Parse
    * @param {JSON} content Conteudo em JSON
    */
   parse(content) {
+    console.log('content', content);
     const dataAtual = moment().format('YYYY-MM-DD');
 
     const capa = this.extrairCapa(content);
-    const detalhes = new Processo().identificarDetalhes(content.numero);
+    const detalhes = this.extrairDetalhes(content);
     const envolvidos = this.extrairEnvolvidos(content);
     const oabs = this.extrairOabs(envolvidos);
     const status = this.extrairStatus(content);

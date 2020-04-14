@@ -38,7 +38,10 @@ class TJBAPortalParser extends BaseParser {
   }
 
   extrairAssunto(content) {
-    return removerAcentos(content.assunto.strip());
+    if (content.assunto) {
+      return removerAcentos(content.assunto.strip());
+    }
+    return 'null';
   }
 
   extrairEnvolvidos(content) {
@@ -120,7 +123,6 @@ class TJBAPortalParser extends BaseParser {
    * @param {JSON} content Conteudo em JSON
    */
   parse(content) {
-    console.log('content', content);
     const dataAtual = moment().format('YYYY-MM-DD');
 
     const capa = this.extrairCapa(content);

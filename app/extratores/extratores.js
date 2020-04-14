@@ -51,19 +51,18 @@ class OabTJBAPortal extends ExtratorBase {
       let codigoBusca = $.html().match(/var busca\s*=\s*'(.*)';/)[1];
       codigoBusca = codigoBusca.trim();
 
-      let cookies = objResponse.responseContent.headers.cookies;
+      let cookies = objResponse.cookies
       objResponse = await this.robo.acessar(
         `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
         'GET',
         'latin1',
-        true, //proxy
+        false, //proxy
         false,
         null,
-        cookies
+        {cookies: cookies}
       );
 
       let listaProcessos = objResponse.responseBody.lstProcessos;
-
       resultados = await listaProcessos.map(async (element) => {
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;

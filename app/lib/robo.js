@@ -28,6 +28,22 @@ class Requisicao {
     return agents[Math.floor(Math.random() * agents.length)];
   }
 
+  /**
+   * Remove os cookies adicionados pelos servidores de proxy. 
+   * 
+   * @param {String[]} cookies 
+   */
+  validarCookies(cookies){
+    if (!cookies) return []
+
+    let reProxy = /SERVERID=.*;\spath=\//g
+    let validos = cookies.filter(x => {
+      return !reProxy.test(x)
+    })
+
+    return validos
+  }
+
   async enviarRequest(options) {
     const promise = new Promise((resolve, reject) => {
       let statusCode = 500;
@@ -44,9 +60,7 @@ class Requisicao {
                 message: `StatusCode: ${statusCode}.`,
                 responseContent: res,
                 responseBody: corpo,
-                cookies: res.headers['set-cookie']
-                  ? res.headers['set-cookie']
-                  : null,
+                cookies: this.validarCookies(res.headers['set-cookie'])
               });
             } else {
               resolve({

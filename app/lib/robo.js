@@ -179,12 +179,15 @@ class Robo {
       }
     }
 
-    if (params) {
-      if (isProxied) options.proxy = enums.proxy.proxiesUrl; //TODO aplicar o proxy
+    if (isProxied) options.proxy = {
+      host: "proxy-proadv.7lan.net",
+      port: 8181,
+      auth: { username: "proadvproxy", password: "C4fMSSjzKR5v9dzg" },
     }
 
     options.timeout = 20000;
-    console.log(options);
+    console.log(isProxied); //TODO remover
+    console.log(options.proxy); //TODO remover
     return this.requisicao.enviarRequest(options);
   }
 }

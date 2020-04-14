@@ -38,8 +38,8 @@ class OabTJBAPortal extends ExtratorBase {
         `${this.url}`,
         'POST',
         'latin1', //TODO verificar validade do LATIN1 como encoder para TJBA
-        true,
-        true,
+        true, //proxy
+        false,
         {
           tipo: 'NUMOAB',
           funcao: 'funcOAB',
@@ -55,10 +55,10 @@ class OabTJBAPortal extends ExtratorBase {
       objResponse = await this.robo.acessar(
         `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
         'GET',
-        'utf-8',
-        true,
+        'latin1',
+        true, //proxy
         false,
-        true,
+        null,
         cookies
       );
 

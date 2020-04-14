@@ -39,7 +39,7 @@ class OabTJBAPortal extends ExtratorBase {
         'POST',
         'latin1', //TODO verificar validade do LATIN1 como encoder para TJBA
         true,
-        false,
+        true,
         {
           tipo: 'NUMOAB',
           funcao: 'funcOAB',
@@ -58,7 +58,7 @@ class OabTJBAPortal extends ExtratorBase {
         'utf-8',
         true,
         false,
-        null,
+        true,
         cookies
       );
 

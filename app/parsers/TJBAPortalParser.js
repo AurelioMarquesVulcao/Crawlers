@@ -8,7 +8,8 @@ const { Andamento } = require('../models/schemas/andamento');
 // parser => processo
 
 function removerAcentos(texto) {
-  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  texto = texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return texto.replace(/N[^\w\s]/gi, 'N');
 }
 
 if (typeof String.prototype.strip === 'undefined') {

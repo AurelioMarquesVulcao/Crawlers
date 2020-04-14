@@ -180,7 +180,7 @@ class Robo {
     }
 
     if (params) {
-      if (isProxied) options.proxy = ''; //TODO aplicar o proxy
+      if (isProxied) options.proxy = enums.proxy.proxiesUrl; //TODO aplicar o proxy
     }
 
     options.timeout = 20000;

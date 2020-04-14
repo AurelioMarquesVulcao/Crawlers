@@ -103,4 +103,10 @@ class OabTJBAPortal extends ExtratorBase {
   }
 }
 
+class OabTJSP extends ExtratorBase {
+  constructor(url, isDebug) {
+    super(url, isDebug);
+    this.parser = new TJSPParser();
+  }
+}
 module.exports.OabTJBAPortal = OabTJBAPortal;

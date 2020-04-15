@@ -1,115 +1,136 @@
 {
-    "oabs": ["257220SP", "265434SP", "277946SP", "285494SP", "126504SP", "212327SP"],
-    "detalhes": {
-        "tipo": "cnj",
+  "oabs": [
+    "257220SP",
+    "265434SP",
+    "277946SP",
+    "285494SP",
+    "126504SP",
+    "212327SP"
+  ],
+  "detalhes": {
+    "tipo": "cnj",
+    "numeroProcesso": "10005173520208260083",
+    "numeroProcessoMascara": "1000517-35.2020.8.26.0083",
+    "instancia": 1,
+    "ano": 2020,
+    "orgao": 35,
+    "tribunal": 8,
+    "origem": 26
+  },
+  "capa": {
+    "classe": "Peticao",
+    "assunto": ["Peticao intermediaria"],
+    "uf": "SP",
+    "comarca": "Sao Paulo",
+    "dataAtualizacao": "${dataFormatada}",
+    "dataCriacao": "${dataFormatada}",
+    "envolvidos": [
+      { "tipo": "Requerente", "nome": "Itau Unibanco Sa" },
+      {
+        "tipo": "Advogado",
+        "nome": "(126504SP) JOSE EDGARD DA CUNHA BUENO FILHO"
+      },
+      {
+        "tipo": "Advogado",
+        "nome": "(257220SP) Reinaldo Luis Tadeu Rondina Mandaliti"
+      },
+      { "tipo": "Requerido", "nome": "Municipio de Aguai" },
+      {
+        "tipo": "Advogado",
+        "nome": "(285494SP) Victor Augusto Avello Correia"
+      },
+      { "tipo": "Advogado", "nome": "(265434SP) Michelle Menezes Lucas" },
+      {
+        "tipo": "Advogado",
+        "nome": "(277946SP) Marilia Sabino Ramires Simoes"
+      },
+      { "tipo": "Perito", "nome": "RODRIGO DAMASIO" },
+      {
+        "tipo": "Advogado",
+        "nome": "(212327SP) Regina Helena Lobao de Magalhaes"
+      }
+    ],
+    "andamentos": [
+      {
+        "data": "2020-04-14T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Certidao de Publicacao Expedida",
         "numeroProcesso": "10005173520208260083",
-        "numeroProcessoMascara": "1000517-35.2020.8.26.0083",
-        "instancia": 1,
-        "ano": 2020,
-        "orgao": 35,
-        "tribunal": 8,
-        "origem": 26
-    },
-    "capa": {
-        "classe": "Peticao",
-        "assunto": ["Peticao intermediaria"],
-        "uf": "SP",
-        "comarca": "Sao Paulo",
-        "dataAtualizacao": "${dataFormatada}",
-        "dataCriacao": "${dataFormatada}",
-        "envolvidos": [
-            {"tipo": "Requerente", "nome": "Itau Unibanco Sa"},
-            {"tipo": "Advogado", "nome": "(126504SP) JOSE EDGARD DA CUNHA BUENO FILHO"},
-            {"tipo": "Advogado", "nome": "(257220SP) Reinaldo Luis Tadeu Rondina Mandaliti"},
-            {"tipo": "Requerido", "nome": "Municipio de Aguai"},
-            {"tipo": "Advogado", "nome": "(285494SP) Victor Augusto Avello Correia"},
-            {"tipo": "Advogado", "nome": "(265434SP) Michelle Menezes Lucas"},
-            {"tipo": "Advogado", "nome": "(277946SP) Marilia Sabino Ramires Simoes"},
-            {"tipo": "Perito", "nome": "RODRIGO DAMASIO"},
-            {"tipo": "Advogado", "nome": "(212327SP) Regina Helena Lobao de Magalhaes"}
-        ],
-        "andamentos": [
-            {
-                "data": "2020-04-14T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao": "Certidao de Publicacao Expedida",
-                "numeroProcesso": "10005173520208260083",
-                "observacao": "Relacao :0217/2020 Data da Disponibilizacao: 14/04/2020 Data da Publicacao: 04/05/2020 Numero do Diario: 3024 Pagina: 27/31"
-            },
-            {
-                "data": "2020-04-14T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao": "Certidao de Publicacao Expedida",
-                "numeroProcesso": "10005173520208260083",
-            },
-            {
-                "data":"2020-04-08T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Remetido ao DJE",
-                "numeroProcesso": "10005173520208260083",
-                "observacao":"Relacao: 0217/2020 Teor do ato: Vistos. Fls. 06/10: Primeiramente, proceda a serventia ao cadastro das partes e procuradores do processo nº 0003828-66.2011.8.26.0083, intimando-as, por seus procuradores, para manifestacao sobre o pedido de levantamento de 50% dos honorarios periciais, nos termos do Art. 465, §4º, do CPC. Apos, tornem-me conclusos. Intime-se. Advogados(s): Regina Helena Lobao de Magalhaes (OAB 212327/SP), Reinaldo Luis Tadeu Rondina Mandaliti (OAB 257220/SP), Michelle Menezes Lucas (OAB 265434/SP), Marilia Sabino Ramires Simoes (OAB 277946/SP), Victor Augusto Avello Correia (OAB 285494/SP), JOSE EDGARD DA CUNHA BUENO FILHO (OAB 126504/SP)"
-            },
-            {
-                "data":"2020-04-08T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao": "Remetido ao DJE",
-                "numeroProcesso": "10005173520208260083",
-                "observacao": "Relacao: 0217/2020 Teor do ato: Vistos. Preleciona o inciso VI do art. 4º do Provimento CSM n° 2549/2020, o qual Estabelece o Sistema Remoto de Trabalho em Primeiro Grau, nos termos da Resolucao CNJ nº 313: "Art. 4º. No periodo do Sistema Remoto de Trabalho, serao apreciadas, exclusivamente, as materias previstas no art. 4º da Resolucao nº 313 do Conselho Nacional de Justica, a saber: (...) VI - pedidos de alvaras, pedidos de levantamento de importancia em dinheiro ou valores, substituicao de garantias e liberacao de bens apreendidos, pagamento de precatorios, Requisicoes de Pequeno Valor RPVs e expedicao de guias de deposito; "(grifei) .Com efeito, o Comunicado Conjunto n° 249/2020, que Regulamenta o Provimento CSM nº 2549/2020, acima mencionado, traz que durante o Sistema Remoto de Trabalho (de 25/03/2020 a 30/04/2020), nos dias uteis, os peticionamentos deverao ser realizados no formato eletronico, observadas, dentre outras, a seguinte regra: Pedidos em processos FISICOS em andamento nas Unidades Judiciais (apenas nas hipoteses previstas na Resolucao nº 313 do CNJ e no Provimento CSM 2549/2020): excepcionalmente por Peticionamento Eletronico INICIAL, no Foro da propria Comarca, utilizando-se uma das seguintes classes (“1727 peticao criminal”, “10979 peticao infracional”, “241 peticao civel”, “11026 peticao infancia e juventude”), conforme o caso, e o assunto 50294 “peticao intermediaria”, apontando-se expressamente o numero do processo fisico na peticao, distribuindo-se por dependencia [..] Ante o exposto, recebo para analise o presente peticionamento eletronico inicial como pedido de levantamento de valores, referente ao processo fisico 0003828-66.2011.8.26.0083. Por ora, INDEFIRO o pedido de levantamento total dos valores depositados junto ao processo 0003828-66.2011.8.26.0083, a titulo de honorarios periciais, pois em consulta ao sistema informatizado, verifiquei que o laudo pericial, naquele processo, foi objeto de impugnacao, sobre a qual nao houve manifestacao do expert ate a presente data. Assim, para o deferimento do levantamento total dos honorarios periciais, devera ser aguardada decisao final acerca da impugnacao oferecida, apos a apresentacao dos esclarecimentos necessarios pelo Sr, Perito. Intime-se o Sr. Perito, por mensagem eletronica, acerca do teor da presente decisao. Fica consignado que, cessado o Sistema Remoto de Trabalho, devera a zelosa serventia imprimir todas as paginas do presente processo digital excepcional juntando-as aos correspondentes autos fisicos, lancando-se na movimentacao unitaria o codigo 61615 para a baixa do processo digital excepcional. Intime-se. Advogados(s): Regina Helena Lobao de Magalhaes (OAB 212327/SP), Reinaldo Luis Tadeu Rondina Mandaliti (OAB 257220/SP), Michelle Menezes Lucas (OAB 265434/SP), Marilia Sabino Ramires Simoes (OAB 277946/SP), Victor Augusto Avello Correia (OAB 285494/SP), JOSE EDGARD DA CUNHA BUENO FILHO (OAB 126504/SP)"
-            },
-            {
-                "data":"2020-04-07T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Certidao de Cartorio Expedida",
-                "numeroProcesso": "10005173520208260083",
-                "observacao": "Certifico e dou fe que fiz as anotacoes no sistema informatizado, passando a constar no polo ativo Itau Unibanco Sa e seus procuradores Reinaldo Luis Tadeu Rondina Mandaliti e Jose Edgard da Cunha Bueno Filho, bem como no polo passivo Municipio de Aguai e seus procuradores Victor Augusto Avello Correia, Michelle Menezes Lucas e Marilia Sabino Ramires Simoes, conforme determinacao judicial constante na r. Decisao de fl. 11."
-            },
-            {
-                "data":"2020-04-07T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Decisao",
-                "numeroProcesso": "10005173520208260083",
-                "observacao": "Vistos. Fls. 06/10: Primeiramente, proceda a serventia ao cadastro das partes e procuradores do processo nº 0003828-66.2011.8.26.0083, intimando-as, por seus procuradores, para manifestacao sobre o pedido de levantamento de 50% dos honorarios periciais, nos termos do Art. 465, §4º, do CPC. Apos, tornem-me conclusos. Intime-se."
-            },
-            {
-                "data":"2020-04-03T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Conclusos para Decisao",
-                "numeroProcesso": "10005173520208260083"
-            },
-            {
-                "data":"2020-04-03T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Conclusos para Despacho",
-                "numeroProcesso": "10005173520208260083",
-            },
-            {
-                "data":"2020-04-03T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Pedido de Expedicao de Mandado de Levantamento Juntado",
-                "numeroProcesso": "10005173520208260083",
-                "observacao": "Nº Protocolo: WAAI.20.70004080-3 Tipo da Peticao: Pedido de Expedicao de Guia de Levantamento Data: 03/04/2020 07:54"
-            },
-            {
-                "data":"2020-04-02T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Decisao",
-                "numeroProcesso": "10005173520208260083",
-                "observacao": "Vistos. Preleciona o inciso VI do art. 4º do Provimento CSM n° 2549/2020, o qual Estabelece o Sistema Remoto de Trabalho em Primeiro Grau, nos termos da Resolucao CNJ nº 313: "Art. 4º. No periodo do Sistema Remoto de Trabalho, serao apreciadas, exclusivamente, as materias previstas no art. 4º da Resolucao nº 313 do Conselho Nacional de Justica, a saber: (...) VI - pedidos de alvaras, pedidos de levantamento de importancia em dinheiro ou valores, substituicao de garantias e liberacao de bens apreendidos, pagamento de precatorios, Requisicoes de Pequeno Valor RPVs e expedicao de guias de deposito; "(grifei) .Com efeito, o Comunicado Conjunto n° 249/2020, que Regulamenta o Provimento CSM nº 2549/2020, acima mencionado, traz que durante o Sistema Remoto de Trabalho (de 25/03/2020 a 30/04/2020), nos dias uteis, os peticionamentos deverao ser realizados no formato eletronico, observadas, dentre outras, a seguinte regra: Pedidos em processos FISICOS em andamento nas Unidades Judiciais (apenas nas hipoteses previstas na Resolucao nº 313 do CNJ e no Provimento CSM 2549/2020): excepcionalmente por Peticionamento Eletronico INICIAL, no Foro da propria Comarca, utilizando-se uma das seguintes classes (“1727 peticao criminal”, “10979 peticao infracional”, “241 peticao civel”, “11026 peticao infancia e juventude”), conforme o caso, e o assunto 50294 “peticao intermediaria”, apontando-se expressamente o numero do processo fisico na peticao, distribuindo-se por dependencia [..] Ante o exposto, recebo para analise o presente peticionamento eletronico inicial como pedido de levantamento de valores, referente ao processo fisico 0003828-66.2011.8.26.0083. Por ora, INDEFIRO o pedido de levantamento total dos valores depositados junto ao processo 0003828-66.2011.8.26.0083, a titulo de honorarios periciais, pois em consulta ao sistema informatizado, verifiquei que o laudo pericial, naquele processo, foi objeto de impugnacao, sobre a qual nao houve manifestacao do expert ate a presente data. Assim, para o deferimento do levantamento total dos honorarios periciais, devera ser aguardada decisao final acerca da impugnacao oferecida, apos a apresentacao dos esclarecimentos necessarios pelo Sr, Perito. Intime-se o Sr. Perito, por mensagem eletronica, acerca do teor da presente decisao. Fica consignado que, cessado o Sistema Remoto de Trabalho, devera a zelosa serventia imprimir todas as paginas do presente processo digital excepcional juntando-as aos correspondentes autos fisicos, lancando-se na movimentacao unitaria o codigo 61615 para a baixa do processo digital excepcional. Intime-se."
-            },
-            {
-                "data":"2020-04-01T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Conclusos para Decisao",
-                "numeroProcesso": "10005173520208260083"
-            },
-            {
-                "data":"2020-03-31T00:00:00.000Z",
-                "dataInclusao": "${dataFormatada}",
-                "descricao":"Distribuido por Dependencia (movimentacao do distribuidor)",
-                "numeroProcesso": "10005173520208260083",
-                "observacao": "De acordo com o Comunicado Conjunto n. 249/2020 (regulamenta o Provimento CSM N. 2549/2020 - https://www.tjsp.jus.br/Download/Portal/Coronavirus/Comunicados/ComunicadoConjunto249-20.pdf), paragrafo ‘1’ letra ‘c’ (Pedidos em processos FISICOS em andamento nas Unidades Judiciais (apenas nas hipoteses previstas na Resolucao nº 313 do CNJ e no Provimento CSM 2549/2020): excepcionalmente por Peticionamento Eletronico INICIAL, no Foro da propria Comarca, utilizando-se uma das seguintes classes (“1727 – peticao criminal”, “10979 – peticao infracional”, “241 – peticao civel”, “11026 – peticao infancia e juventude”), conforme o caso, e o assunto 50294 “peticao intermediaria”, apontando-se expressamente o numero do processo fisico na peticao, distribuindo-se por dependencia), em conjunto a Resolucao CNJ n. 313, art. 4º - VI, assim dispoem: “Art. 4º No periodo de Plantao Extraordinario, fica garantida a apreciacao das seguintes materias: VI – pedidos de alvaras, pedidos de levantamento de importancia em dinheiro ou valores, substituicao de garantias e liberacao de bens apreendidos, pagamento de precatorios, Requisicoes de Pequeno Valor – RPVs e expedicao de guias de deposito; ...”"
-            },
-        ]
-
-    }
+        "observacao": "Relacao :0217/2020 Data da Disponibilizacao: 14/04/2020 Data da Publicacao: 04/05/2020 Numero do Diario: 3024 Pagina: 27/31"
+      },
+      {
+        "data": "2020-04-14T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Certidao de Publicacao Expedida",
+        "numeroProcesso": "10005173520208260083"
+      },
+      {
+        "data": "2020-04-08T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Remetido ao DJE",
+        "numeroProcesso": "10005173520208260083",
+        "observacao": "Relacao: 0217/2020 Teor do ato: Vistos. Fls. 06/10: Primeiramente, proceda a serventia ao cadastro das partes e procuradores do processo nº 0003828-66.2011.8.26.0083, intimando-as, por seus procuradores, para manifestacao sobre o pedido de levantamento de 50% dos honorarios periciais, nos termos do Art. 465, §4º, do CPC. Apos, tornem-me conclusos. Intime-se. Advogados(s): Regina Helena Lobao de Magalhaes (OAB 212327/SP), Reinaldo Luis Tadeu Rondina Mandaliti (OAB 257220/SP), Michelle Menezes Lucas (OAB 265434/SP), Marilia Sabino Ramires Simoes (OAB 277946/SP), Victor Augusto Avello Correia (OAB 285494/SP), JOSE EDGARD DA CUNHA BUENO FILHO (OAB 126504/SP)"
+      },
+      {
+        "data": "2020-04-08T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Remetido ao DJE",
+        "numeroProcesso": "10005173520208260083",
+        "observacao": "Relacao: 0217/2020 Teor do ato: Vistos. Preleciona o inciso VI do art. 4º do Provimento CSM n° 2549/2020, o qual Estabelece o Sistema Remoto de Trabalho em Primeiro Grau, nos termos da Resolucao CNJ nº 313: Art. 4º. No periodo do Sistema Remoto de Trabalho, serao apreciadas, exclusivamente, as materias previstas no art. 4º da Resolucao nº 313 do Conselho Nacional de Justica, a saber: (...) VI - pedidos de alvaras, pedidos de levantamento de importancia em dinheiro ou valores, substituicao de garantias e liberacao de bens apreendidos, pagamento de precatorios, Requisicoes de Pequeno Valor RPVs e expedicao de guias de deposito; (grifei) .Com efeito, o Comunicado Conjunto n° 249/2020, que Regulamenta o Provimento CSM nº 2549/2020, acima mencionado, traz que durante o Sistema Remoto de Trabalho (de 25/03/2020 a 30/04/2020), nos dias uteis, os peticionamentos deverao ser realizados no formato eletronico, observadas, dentre outras, a seguinte regra: Pedidos em processos FISICOS em andamento nas Unidades Judiciais (apenas nas hipoteses previstas na Resolucao nº 313 do CNJ e no Provimento CSM 2549/2020): excepcionalmente por Peticionamento Eletronico INICIAL, no Foro da propria Comarca, utilizando-se uma das seguintes classes (“1727 peticao criminal”, “10979 peticao infracional”, “241 peticao civel”, “11026 peticao infancia e juventude”), conforme o caso, e o assunto 50294 “peticao intermediaria”, apontando-se expressamente o numero do processo fisico na peticao, distribuindo-se por dependencia [..] Ante o exposto, recebo para analise o presente peticionamento eletronico inicial como pedido de levantamento de valores, referente ao processo fisico 0003828-66.2011.8.26.0083. Por ora, INDEFIRO o pedido de levantamento total dos valores depositados junto ao processo 0003828-66.2011.8.26.0083, a titulo de honorarios periciais, pois em consulta ao sistema informatizado, verifiquei que o laudo pericial, naquele processo, foi objeto de impugnacao, sobre a qual nao houve manifestacao do expert ate a presente data. Assim, para o deferimento do levantamento total dos honorarios periciais, devera ser aguardada decisao final acerca da impugnacao oferecida, apos a apresentacao dos esclarecimentos necessarios pelo Sr, Perito. Intime-se o Sr. Perito, por mensagem eletronica, acerca do teor da presente decisao. Fica consignado que, cessado o Sistema Remoto de Trabalho, devera a zelosa serventia imprimir todas as paginas do presente processo digital excepcional juntando-as aos correspondentes autos fisicos, lancando-se na movimentacao unitaria o codigo 61615 para a baixa do processo digital excepcional. Intime-se. Advogados(s): Regina Helena Lobao de Magalhaes (OAB 212327/SP), Reinaldo Luis Tadeu Rondina Mandaliti (OAB 257220/SP), Michelle Menezes Lucas (OAB 265434/SP), Marilia Sabino Ramires Simoes (OAB 277946/SP), Victor Augusto Avello Correia (OAB 285494/SP), JOSE EDGARD DA CUNHA BUENO FILHO (OAB 126504/SP)"
+      },
+      {
+        "data": "2020-04-07T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Certidao de Cartorio Expedida",
+        "numeroProcesso": "10005173520208260083",
+        "observacao": "Certifico e dou fe que fiz as anotacoes no sistema informatizado, passando a constar no polo ativo Itau Unibanco Sa e seus procuradores Reinaldo Luis Tadeu Rondina Mandaliti e Jose Edgard da Cunha Bueno Filho, bem como no polo passivo Municipio de Aguai e seus procuradores Victor Augusto Avello Correia, Michelle Menezes Lucas e Marilia Sabino Ramires Simoes, conforme determinacao judicial constante na r. Decisao de fl. 11."
+      },
+      {
+        "data": "2020-04-07T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Decisao",
+        "numeroProcesso": "10005173520208260083",
+        "observacao": "Vistos. Fls. 06/10: Primeiramente, proceda a serventia ao cadastro das partes e procuradores do processo nº 0003828-66.2011.8.26.0083, intimando-as, por seus procuradores, para manifestacao sobre o pedido de levantamento de 50% dos honorarios periciais, nos termos do Art. 465, §4º, do CPC. Apos, tornem-me conclusos. Intime-se."
+      },
+      {
+        "data": "2020-04-03T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Conclusos para Decisao",
+        "numeroProcesso": "10005173520208260083"
+      },
+      {
+        "data": "2020-04-03T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Conclusos para Despacho",
+        "numeroProcesso": "10005173520208260083"
+      },
+      {
+        "data": "2020-04-03T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Pedido de Expedicao de Mandado de Levantamento Juntado",
+        "numeroProcesso": "10005173520208260083",
+        "observacao": "Nº Protocolo: WAAI.20.70004080-3 Tipo da Peticao: Pedido de Expedicao de Guia de Levantamento Data: 03/04/2020 07:54"
+      },
+      {
+        "data": "2020-04-02T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Decisao",
+        "numeroProcesso": "10005173520208260083",
+        "observacao": "Vistos. Preleciona o inciso VI do art. 4º do Provimento CSM n° 2549/2020, o qual Estabelece o Sistema Remoto de Trabalho em Primeiro Grau, nos termos da Resolucao CNJ nº 313: Art. 4º. No periodo do Sistema Remoto de Trabalho, serao apreciadas, exclusivamente, as materias previstas no art. 4º da Resolucao nº 313 do Conselho Nacional de Justica, a saber: (...) VI - pedidos de alvaras, pedidos de levantamento de importancia em dinheiro ou valores, substituicao de garantias e liberacao de bens apreendidos, pagamento de precatorios, Requisicoes de Pequeno Valor RPVs e expedicao de guias de deposito; (grifei) .Com efeito, o Comunicado Conjunto n° 249/2020, que Regulamenta o Provimento CSM nº 2549/2020, acima mencionado, traz que durante o Sistema Remoto de Trabalho (de 25/03/2020 a 30/04/2020), nos dias uteis, os peticionamentos deverao ser realizados no formato eletronico, observadas, dentre outras, a seguinte regra: Pedidos em processos FISICOS em andamento nas Unidades Judiciais (apenas nas hipoteses previstas na Resolucao nº 313 do CNJ e no Provimento CSM 2549/2020): excepcionalmente por Peticionamento Eletronico INICIAL, no Foro da propria Comarca, utilizando-se uma das seguintes classes (“1727 peticao criminal”, “10979 peticao infracional”, “241 peticao civel”, “11026 peticao infancia e juventude”), conforme o caso, e o assunto 50294 “peticao intermediaria”, apontando-se expressamente o numero do processo fisico na peticao, distribuindo-se por dependencia [..] Ante o exposto, recebo para analise o presente peticionamento eletronico inicial como pedido de levantamento de valores, referente ao processo fisico 0003828-66.2011.8.26.0083. Por ora, INDEFIRO o pedido de levantamento total dos valores depositados junto ao processo 0003828-66.2011.8.26.0083, a titulo de honorarios periciais, pois em consulta ao sistema informatizado, verifiquei que o laudo pericial, naquele processo, foi objeto de impugnacao, sobre a qual nao houve manifestacao do expert ate a presente data. Assim, para o deferimento do levantamento total dos honorarios periciais, devera ser aguardada decisao final acerca da impugnacao oferecida, apos a apresentacao dos esclarecimentos necessarios pelo Sr, Perito. Intime-se o Sr. Perito, por mensagem eletronica, acerca do teor da presente decisao. Fica consignado que, cessado o Sistema Remoto de Trabalho, devera a zelosa serventia imprimir todas as paginas do presente processo digital excepcional juntando-as aos correspondentes autos fisicos, lancando-se na movimentacao unitaria o codigo 61615 para a baixa do processo digital excepcional. Intime-se."
+      },
+      {
+        "data": "2020-04-01T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Conclusos para Decisao",
+        "numeroProcesso": "10005173520208260083"
+      },
+      {
+        "data": "2020-03-31T00:00:00.000Z",
+        "dataInclusao": "${dataFormatada}",
+        "descricao": "Distribuido por Dependencia (movimentacao do distribuidor)",
+        "numeroProcesso": "10005173520208260083",
+        "observacao": "De acordo com o Comunicado Conjunto n. 249/2020 (regulamenta o Provimento CSM N. 2549/2020 - https://www.tjsp.jus.br/Download/Portal/Coronavirus/Comunicados/ComunicadoConjunto249-20.pdf), paragrafo ‘1’ letra ‘c’ (Pedidos em processos FISICOS em andamento nas Unidades Judiciais (apenas nas hipoteses previstas na Resolucao nº 313 do CNJ e no Provimento CSM 2549/2020): excepcionalmente por Peticionamento Eletronico INICIAL, no Foro da propria Comarca, utilizando-se uma das seguintes classes (“1727 – peticao criminal”, “10979 – peticao infracional”, “241 – peticao civel”, “11026 – peticao infancia e juventude”), conforme o caso, e o assunto 50294 “peticao intermediaria”, apontando-se expressamente o numero do processo fisico na peticao, distribuindo-se por dependencia), em conjunto a Resolucao CNJ n. 313, art. 4º - VI, assim dispoem: “Art. 4º No periodo de Plantao Extraordinario, fica garantida a apreciacao das seguintes materias: VI – pedidos de alvaras, pedidos de levantamento de importancia em dinheiro ou valores, substituicao de garantias e liberacao de bens apreendidos, pagamento de precatorios, Requisicoes de Pequeno Valor – RPVs e expedicao de guias de deposito; ...”"
+      }
+    ]
+  }
 }

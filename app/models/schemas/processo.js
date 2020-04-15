@@ -111,7 +111,7 @@ processoSchema.methods.salvar = async function salvar() {
   };
 };
 
-processoSchema.methods.identificarDetalhes = function identificarDetalhes(cnj) {
+processoSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
   let detalhes = {};
   let cnjPartes = cnj.split(/\D/);
 

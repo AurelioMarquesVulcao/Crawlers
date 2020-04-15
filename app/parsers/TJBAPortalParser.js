@@ -2,21 +2,11 @@ const cheerio = require('cheerio');
 const moment = require('moment');
 
 const { BaseParser } = require('./BaseParser');
+const { removerAcentos } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 
 // parser => processo
-
-function removerAcentos(texto) {
-  texto = texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return texto.replace(/N[^\w\s]/gi, 'N');
-}
-
-if (typeof String.prototype.strip === 'undefined') {
-  String.prototype.strip = function () {
-    return String(this).replace(/^\s+|\s+$/g, '');
-  };
-}
 
 class TJBAPortalParser extends BaseParser {
   /**

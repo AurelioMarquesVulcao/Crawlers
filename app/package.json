@@ -22,7 +22,8 @@
     "http-proxy-agent": "^4.0.1",
     "mocha": "^7.1.1",
     "moment": "^2.24.0",
-    "mongoose": "^5.9.6"
+    "mongoose": "^5.9.6",
+    "xregexp": "^4.3.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",

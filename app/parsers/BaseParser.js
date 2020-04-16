@@ -21,3 +21,36 @@ module.exports.BaseParser = class BaseParser {
     this.jsonAndamentos = [];
   }
 };
+
+const tradutor = {
+  AUTOR: 'Autor',
+  REU: 'Reu',
+  AGTE: 'Agravante',
+  AGDO: 'Agravado',
+  REQUERIDO: 'Requerido',
+  REQUERENTE: 'Requerente',
+  SUSCTE: 'Suscitante',
+  SUSCDO: 'Suscitado',
+  APELANTE: 'Apelante',
+  APELADO: 'Apelado',
+  ADVOGADO: 'Advogado',
+  Advogada: 'Advogado',
+  ADVOGADO_MIGRACAO: 'Advogado',
+  PROCURADOR: 'Procurador',
+  IMPETRANTE: 'Impetrante',
+  IMPETRADO: 'Impetrado',
+  INTERESSADO: 'Interessado',
+  MPF: 'mpf',
+  'PROC/S/OAB': 'Procurador',
+  Exeqte: 'Exequente',
+  Exectdo: 'Executado',
+  Reqte: 'Requerente',
+  Reqdo: 'Requerido',
+  'Nº Guia': 'NGuia',
+  'Situação da guia': 'SituacaoDaGuia',
+  'Valor Pago': 'ValorPago',
+  'Data Pagamento': 'DataPagamento',
+  'FASE ATUAL': 'FaseAtual',
+  'Data do Movimento': 'DataDoMovimento',
+};
+module.exports.tradutor = tradutor;

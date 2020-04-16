@@ -1,8 +1,8 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
+const re = require('xregexp');
 
-const { BaseParser } = require('./BaseParser');
-const { removerAcentos } = require('./BaseParser');
+const { BaseParser, removerAcentos, tradutor } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 
@@ -38,22 +38,66 @@ class TJSPParser extends BaseParser {
   }
 
   extrairEnvolvidos($) {
-    let rawEnvolvidos = $('#tablePartesPrincipais > tbody').text();
+    let rawEnvolvidosString = '';
+    let rawEnvolvidosList = [];
+    let envolvidos = [];
 
-    let newRawEnvolvidos = rawEnvolvidos.replace(/\s\s\s+/g, 'xa0');
-    let lista = newRawEnvolvidos.split('xa0');
-    lista = lista.filter(Boolean); //["Reqte:", "Itaú Unibanco Sa", "Advogado:", "Reinaldo Luis Tadeu Rondina Mandaliti", "Advogado:", "JOSE EDGARD DA CUNHA BUENO FILHO", "Reqdo:", "Município de Aguaí", …]
-    // TODO fazer um regex que pegue o elemento com ":" e todo texto posterior até cada elemento
-    // if (!tbody) {
-    //   tbody = table;
-    // } else {
-    //   tbody = tbody[0];
-    // }
+    rawEnvolvidosString = $('#tablePartesPrincipais > tbody').text().strip();
+    rawEnvolvidosString = re.replace(rawEnvolvidosString, re(/\s\s\s+/g), ' ');
+    rawEnvolvidosString = re.replace(
+      rawEnvolvidosString,
+      re(/(\s)(\w+\:)/g),
+      'xa0$2'
+    );
 
-    // trs.each(function (index, element) {
-    //   console.log('elemento', index, element);
-    // });
+    rawEnvolvidosList = rawEnvolvidosString.split('xa0');
+
+    envolvidos = rawEnvolvidosList.map((element, index) => {
+      const match = re.exec(element, re(/(?<tipo>\w+)\:\s(?<nome>.*)/));
+      if (tradutor[match.groups.tipo]) {
+        return { tipo: tradutor[match.groups.tipo], nome: match.groups.nome };
+      }
+      return match.groups;
+    });
+
+    envolvidos = this.preencherOabs($, envolvidos);
+    return envolvidos;
   }
+
+  preencherOabs($, envolvidos) {
+    let movimentosString = '';
+    movimentosString = $('#tabelaUltimasMovimentacoes').text();
+
+    return envolvidos.map((element) => {
+      if (element.tipo == 'Advogado') {
+        let regex = re(
+          `(${element.nome})\\s(\\(OAB\\s(?<oab>\\d+)\\/SP\\))`,
+          'gm'
+        );
+        let oab = re.exec(movimentosString, regex);
+        element.nome = removerAcentos(`(${oab[3]}SP) ${element.nome}`);
+      } else {
+        element.nome = removerAcentos(element.nome);
+      }
+      return element;
+    });
+  }
+
+  extrairOabs(envolvidos) {
+    let oabs = envolvidos.map((element) => {
+      if (element.tipo == 'Advogado') {
+        return re.exec(element.nome, re(/\((?<oab>\d+\w+)\)/)).groups.oab;
+      }
+    });
+
+    return oabs.filter(Boolean);
+  }
+
+  extrairStatus(content) {
+    return 'Não informado.';
+  }
+
+  andamentos($) {}
 
   parse(content) {
     content = cheerio.load(content);
@@ -62,9 +106,9 @@ class TJSPParser extends BaseParser {
     const capa = this.extrairCapa(content);
     const detalhes = this.extrairDetalhes(content);
     const envolvidos = this.extrairEnvolvidos(content);
-    // const oabs = this.extrairOabs(envolvidos);
-    // const status = this.extrairStatus(content);
-    // const andamentos = this.extrairAndamentos(
+    const oabs = this.extrairOabs(envolvidos);
+    const status = this.extrairStatus(content);
+    //const andamentos = this.extrairAndamentos(
     //   content,
     //   dataAtual,
     //   detalhes.numeroProcesso

@@ -6,6 +6,16 @@ const { BaseParser, removerAcentos, tradutor } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 
+function getTds(content) {
+  const tds = content.each((element, index) => {
+    if (element.name == 'td') {
+      return element;
+    }
+  });
+
+  return tds.filter(Boolean);
+}
+
 class TJSPParser extends BaseParser {
   /**
    * TJSPParser
@@ -25,7 +35,9 @@ class TJSPParser extends BaseParser {
   }
 
   extrairAssunto($) {
-    return $('td:contains("Assunto:")').next('td').text().strip();
+    return removerAcentos(
+      $('td:contains("Assunto:")').next('td').text().strip()
+    );
   }
 
   extrairClasse($) {
@@ -97,7 +109,43 @@ class TJSPParser extends BaseParser {
     return 'Não informado.';
   }
 
-  andamentos($) {}
+  extrairAndamentos($, dataAtual, numeroProcesso) {
+    let andamentos = [];
+    const table = $('#tabelaTodasMovimentacoes');
+    const tdsList = table.find('tr');
+
+    tdsList.each((index, element) => {
+      let data = $(
+        `#tabelaTodasMovimentacoes > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(1)`
+      );
+      data = moment(data.text().strip(), 'DD/MM/YYYY').format('YYYY-MM-DD');
+      let descricaoRaw = $(
+        `#tabelaTodasMovimentacoes > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(3)`
+      );
+
+      let observacao = descricaoRaw.find('span')[0].children[0].data.strip();
+      let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
+      observacao = re.replace(observacao, re(/\s\s+/g), ' ');
+      observacao = removerAcentos(observacao);
+
+      let andamento = {
+        numeroProcesso: numeroProcesso,
+        data: data,
+        dataInclusao: dataAtual,
+        descricao: removerAcentos(descricao),
+      };
+      if (observacao) {
+        andamento['observacao'] = observacao;
+      }
+      andamentos.push(new Andamento(andamento));
+    });
+
+    return andamentos;
+  }
 
   parse(content) {
     content = cheerio.load(content);
@@ -108,25 +156,25 @@ class TJSPParser extends BaseParser {
     const envolvidos = this.extrairEnvolvidos(content);
     const oabs = this.extrairOabs(envolvidos);
     const status = this.extrairStatus(content);
-    //const andamentos = this.extrairAndamentos(
-    //   content,
-    //   dataAtual,
-    //   detalhes.numeroProcesso
-    // );
+    const andamentos = this.extrairAndamentos(
+      content,
+      dataAtual,
+      detalhes.numeroProcesso
+    );
 
-    // const processo = new Processo({
-    //   capa: capa,
-    //   detalhes: detalhes,
-    //   envolvidos: envolvidos,
-    //   oabs: oabs,
-    //   qtdAndamentos: andamentos.length,
-    //   origemExtracao: 'OabTJBAPortal',
-    // });
+    const processo = new Processo({
+      capa: capa,
+      detalhes: detalhes,
+      envolvidos: envolvidos,
+      oabs: oabs,
+      qtdAndamentos: andamentos.length,
+      origemExtracao: 'TJSP',
+    });
 
-    // return {
-    //   processo: processo,
-    //   andamentos: andamentos,
-    // };
+    return {
+      processo: processo,
+      andamentos: andamentos,
+    };
   }
 }
 

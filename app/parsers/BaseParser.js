@@ -1,6 +1,11 @@
 module.exports.removerAcentos = function removerAcentos(texto) {
-  texto = texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return texto.replace(/N[^\w\s]/gi, 'N');
+  texto = texto.normalize('NFKD');
+  // texto = Buffer.from(texto, 'ascii');
+  texto = texto.toString('utf8');
+  texto = texto.replace(/[\u0300-\u036f]/g, '');
+  texto = texto.replace(/['"”“‘’º]+/g, '');
+  texto = texto.replace(/N[^\w\s]/gi, 'N');
+  return texto;
 };
 
 if (typeof String.prototype.strip === 'undefined') {

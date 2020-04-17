@@ -20,6 +20,7 @@ const AndamentoSchema = new Schema(
     data: Date,
     dataInclusao: Date,
     link: String,
+    observacao: String,
     linkDocumento: LinkDocumentoSchema,
   },
   {

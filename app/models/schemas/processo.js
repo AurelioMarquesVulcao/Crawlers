@@ -113,7 +113,8 @@ processoSchema.methods.salvar = async function salvar() {
 
 processoSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
   let detalhes = {};
-  let cnjPartes = cnj.split(/\D/);
+
+  let cnjPartes = cnj.replace('-', '').split(/\D/);
 
   detalhes['tipo'] = 'cnj';
   detalhes['numeroProcesso'] = cnj.replace(/[-.]/g, '');

@@ -54,6 +54,22 @@ class RequestException extends Error {
   }
 }
 
+class AntiCaptchaResponseException extends BaseException {
+  /**
+   * AntiCaptchaResponseException
+   * @param {string} code Codigo de erro da excessão
+   * @param {any} params dados da excessao
+   */
+  constructor(code = 'GENERIC', message = '', ...params) {
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, AntiCaptchaResponseException);
+    }
+
+    this.code = code;
+  }
+}
+
 module.exports.BaseException = BaseException;
 module.exports.ExtracaoException = ExtracaoException;
 module.exports.RequestException = RequestException;
+module.exports.AntiCaptchaResponseException = AntiCaptchaResponseException;

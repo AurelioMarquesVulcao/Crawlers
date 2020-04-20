@@ -56,7 +56,7 @@ class OabTJBAPortal extends ExtratorBase {
         `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
         'GET',
         'latin1',
-        false, //proxy
+        true, //proxy
         false,
         null,
         {cookies: cookies}

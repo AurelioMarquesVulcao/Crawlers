@@ -1,3 +1,4 @@
+require('./bootstrap')
 const OabTJBAPortal = require("./extratores/extratores").OabTJBAPortal;
 
 let extrator = new OabTJBAPortal(

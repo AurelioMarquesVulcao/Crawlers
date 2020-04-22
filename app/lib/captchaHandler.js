@@ -1,5 +1,5 @@
 const { enums } = require('../configs/enums');
-const Anticaptcha = require('../bin/js/anticaptcha');
+const { Anticaptcha } = require('../bin/js/anticaptcha');
 
 module.exports.antiCaptchaHandler = (website, websiteKey, pageAction) => {
   return new Promise((resolve, reject) => {

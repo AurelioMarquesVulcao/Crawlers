@@ -127,8 +127,9 @@ class OabTJSP extends ExtratorBase {
       let objResponse = {}; // Objeto cujo valor é o retorno do robô
 
       // Primeira parte: para pegar cookies e uuidcaptcha
-      objResponse = this.robo.acessar(
-        'https://esaj.tjsp.jus.br/cpopg/open.do',
+      console.log('teste'); //TODO retirar
+      objResponse = await this.robo.acessar(
+        `${this.url}`,
         'GET',
         'latin1',
         false,
@@ -137,11 +138,13 @@ class OabTJSP extends ExtratorBase {
       );
       cookies = objResponse.responseContent.headers.cookies;
 
-      preParse = this.preParse(objResponse.responseBody);
+      preParse = await this.preParse(objResponse.responseBody, cookies);
       uuidCaptcha = preParse.captcha.uuidCaptcha;
       gResponse = await this.getCaptcha();
 
       // Segunda parte: pegar a lista de processos
+      console.log('teste'); //TODO retirar
+
       listaProcessos = this.getListaProcessos(
         numeroDaOab,
         cookies,
@@ -151,8 +154,10 @@ class OabTJSP extends ExtratorBase {
 
       // Terceira parte: passar a lista, pegar cada um dos codigos
       // resultantes e mandar para o parser
+      console.log('teste'); //TODO retirar
+
       if (listaProcessos) {
-        this.extrairProcessos(listaProcessos, cookies);
+        resultados = this.extrairProcessos(listaProcessos, cookies);
         return Promise.all(resultados).then((args) => {
           return {
             resultado: args,
@@ -168,9 +173,11 @@ class OabTJSP extends ExtratorBase {
         detalhes: 'Lista de processos vazia',
       };
     } catch (error) {
-      if (e instanceof AntiCaptchaResponseException) {
+      if (error instanceof AntiCaptchaResponseException) {
         throw new AntiCaptchaResponseException(error.code, error.message);
       }
+
+      throw error;
     }
   }
 
@@ -178,7 +185,7 @@ class OabTJSP extends ExtratorBase {
    * Pré-processador da pagina a ser extraida
    * @param {string} content Página resultade de uma consulta do co Axios
    */
-  preParse(content) {
+  async preParse(content, cookies) {
     const $ = cheerio.load(content);
 
     let preParse = {
@@ -189,29 +196,41 @@ class OabTJSP extends ExtratorBase {
     };
 
     preParse.captcha.hasCaptcha = $('#rc-anchor-content');
-    preParse.captcha.uuidCaptcha = $('#uuidCaptcha').val();
+    preParse.captcha.uuidCaptcha = await this.getCaptchaUuid(cookies);
 
     return preParse;
   }
 
-  getCaptcha() {
-    return new Promise((resolve, reject) => {
-      esponseAntiCaptcha = {};
-      responseAntiCaptcha = antiCaptchaHandler(
-        'https://esaj.tjsp.jus.br/cpopg/open.do',
-        this.dataSiteKey,
-        '/'
+  async getCaptcha() {
+    let responseAntiCaptcha = {};
+    responseAntiCaptcha = await antiCaptchaHandler(
+      'https://esaj.tjsp.jus.br/cpopg/open.do',
+      this.dataSiteKey,
+      '/'
+    );
+
+    if (!responseAntiCaptcha) {
+      throw new AntiCaptchaResponseException(
+        'CAPTCHA',
+        'Nao foi possivel recuperar a resposta para o captcha'
       );
+    }
 
-      if (!responseAntiCaptcha) {
-        throw new AntiCaptchaResponseException(
-          'CAPTCHA',
-          'Nao foi possivel recuperar a resposta para o captcha'
-        );
-      }
+    return responseAntiCaptcha.gResponse;
+  }
 
-      resolve(responseAntiCaptcha.gResponse);
-    });
+  async getCaptchaUuid(cookies) {
+    let objResponse = await this.robo.acessar(
+      'https://esaj.tjsp.jus.br/cpopg/captchaControleAcesso.do',
+      'POST',
+      'latin1',
+      false,
+      false,
+      null,
+      cookies
+    );
+    let uuid = objResponse.responseBody.uuidCaptcha;
+    return uuid;
   }
 
   async getListaProcessos(numeroDaOab, cookies, uuidCaptcha, gResponse) {
@@ -287,4 +306,6 @@ class OabTJSP extends ExtratorBase {
     return resultados;
   }
 }
+
+module.exports.OabTJSP = OabTJSP;
 module.exports.OabTJBAPortal = OabTJBAPortal;

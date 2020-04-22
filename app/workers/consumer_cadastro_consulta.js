@@ -1,4 +1,5 @@
 require("../bootstrap");
+const axios = require("axios").default;
 const GerenciadorFila = require("../lib/filaHandler").GerenciadorFila;
 const ConsultasCadastradas = require("../models/schemas/consultas_cadastradas")
   .ConsultasCadastradas;
@@ -13,7 +14,7 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
       NumeroOab: mensagemObj.NumeroOab,
       NumeroProcesso: mensagemObj.NumeroProcesso,
       TipoConsulta: mensagemObj.TipoConsulta,
-      SeccionalOab: mensagemObj.SeccionalOab
+      SeccionalOab: mensagemObj.SeccionalOab,
     };
 
     const consulta = await ConsultasCadastradas.findOne(query);
@@ -25,10 +26,20 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
     }
 
     ConsultasCadastradas.create(mensagemObj)
-      .then(doc => {
+      .then((doc) => {
         console.log(`Criado documento com _id ${doc._id}`);
+        console.log(
+          `Confirmando cadastro da consulta ${mensagemObj.CadastroConsultaId}`
+        );
+
+        axios
+          .get(
+            `http://192.168.99.100:8083/consultaPublica/confirmarCadastro/${mensagemObj.CadastroConsultaId}`
+          )
+          .then((res) => console.log(res.data))
+          .catch((err) => console.error("Erro: ", err));
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(`Consulta não registrada com sucesso: ${err}`);
       })
       .finally(() => ch.ack(mensagem));

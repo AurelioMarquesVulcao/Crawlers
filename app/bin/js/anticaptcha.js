@@ -1,4 +1,4 @@
-const Anticaptcha = function (clientKey) {
+var Anticaptcha = function (clientKey) {
   return new (function (clientKey) {
     this.params = {
       host: 'api.anti-captcha.com',
@@ -517,4 +517,7 @@ const Anticaptcha = function (clientKey) {
   })(clientKey);
 };
 
-module.exports.Anticaptcha = Anticaptcha;
+if (typeof process === 'object' && typeof require === 'function') {
+  // NodeJS
+  module.exports = Anticaptcha;
+}

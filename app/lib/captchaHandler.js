@@ -1,5 +1,7 @@
 const { enums } = require('../configs/enums');
-const { Anticaptcha } = require('../bin/js/anticaptcha');
+let Anticaptcha = require('../bin/js/anticaptcha')(
+  '4b93beb6fe87d3bf3cfd92966ec841a6'
+);
 
 module.exports.antiCaptchaHandler = (website, websiteKey, pageAction) => {
   return new Promise((resolve, reject) => {
@@ -24,7 +26,7 @@ module.exports.antiCaptchaHandler = (website, websiteKey, pageAction) => {
             console.log(err);
             return reject(false);
           }
-          console.log(taskId);
+          console.log('AntiCaptcha TaskId', taskId);
           Anticaptcha.getTaskSolution(taskId, (err, gResponse) => {
             if (err) {
               console.log(err);

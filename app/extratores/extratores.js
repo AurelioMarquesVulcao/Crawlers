@@ -129,14 +129,18 @@ class OabTJSP extends ExtratorBase {
       // Primeira parte: para pegar cookies e uuidcaptcha
       console.log('teste'); //TODO retirar
       objResponse = await this.robo.acessar(
-        `${this.url}`,
+        'https://esaj.tjsp.jus.br/cpopg/open.do',
         'GET',
         'latin1',
         false,
         false,
         null
       );
-      cookies = objResponse.responseContent.headers.cookies;
+      cookies = objResponse.cookies;
+      cookies = cookies.map((element) => {
+        return element.replace(/\;.*/, '');
+      });
+      cookies = cookies.join('; ');
 
       preParse = await this.preParse(objResponse.responseBody, cookies);
       uuidCaptcha = preParse.captcha.uuidCaptcha;
@@ -156,8 +160,8 @@ class OabTJSP extends ExtratorBase {
       // resultantes e mandar para o parser
       console.log('teste'); //TODO retirar
 
-      if (listaProcessos) {
-        resultados = this.extrairProcessos(listaProcessos, cookies);
+      if (listaProcessos.length > 0) {
+        resultados = await this.extrairProcessos(listaProcessos, cookies);
         return Promise.all(resultados).then((args) => {
           return {
             resultado: args,
@@ -227,7 +231,9 @@ class OabTJSP extends ExtratorBase {
       false,
       false,
       null,
-      cookies
+      {
+        Cookie: cookies,
+      }
     );
     let uuid = objResponse.responseBody.uuidCaptcha;
     return uuid;
@@ -246,13 +252,27 @@ class OabTJSP extends ExtratorBase {
         false,
         false,
         null,
-        cookies
+        {
+          Host: 'esaj.tjsp.jus.br',
+          Connection: 'keep-alive',
+          'Upgrade-Insecure-Requests': '1',
+          'User-Agent':
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36',
+          'Sec-Fetch-User': '?1',
+          Accept:
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+          'Sec-Fetch-Site': 'same-origin',
+          'Sec-Fetch-Mode': 'navigate',
+          Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
+          'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+          Cookie: cookies,
+        }
       );
 
       const $ = cheerio.load(objResponse.responseBody);
 
       try {
-        processos = [processos, ...this.extrairLinksProcessos($)];
+        processos = [...processos, ...this.extrairLinksProcessos($)];
         const proximaPagina = $('[title|="Próxima página"]').first();
 
         if (!proximaPagina.text()) return processos;

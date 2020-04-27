@@ -78,7 +78,7 @@ class TJSPParser extends BaseParser {
 
   preencherOabs($, envolvidos) {
     let movimentosString = '';
-    movimentosString = $('#tabelaUltimasMovimentacoes').text();
+    movimentosString = $('#tabelaTodasMovimentacoes').text();
 
     return envolvidos.map((element) => {
       if (element.tipo == 'Advogado') {

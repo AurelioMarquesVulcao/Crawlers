@@ -1,4 +1,6 @@
-const { OabTJBAPortal, OabTJSP } = require('./extratores');
+const { OabTJBAPortal } = require('./extratores');
+const { OabTJSP } = require('./OabTJSP');
+
 class ExtratorFactory {
   static getExtrator(fila, isDebug) {
     let extrator;

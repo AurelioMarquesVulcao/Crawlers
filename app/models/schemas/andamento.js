@@ -36,7 +36,7 @@ const AndamentoSchema = new Schema(
 );
 
 AndamentoSchema.statics.criarHash = function criarHash(obj) {
-  let preHash = `${obj.numeroProcesso}${obj.data}${obj.descricao}`;
+  let preHash = `${obj.numeroProcesso}${obj.data}${obj.descricao}${obj.observacao}`;
   return Helper.hash(preHash);
 };
 

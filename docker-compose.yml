@@ -60,3 +60,12 @@ services:
       - nginx
       - mongodb
     command: node workers/TJBAPortal/extracaoNovos.js
+
+  worker-tjsp-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    depends_on:
+      - nginx
+      - mongodb
+    command: node workers/TJSP/extracao.js

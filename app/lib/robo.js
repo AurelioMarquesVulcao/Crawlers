@@ -93,9 +93,9 @@ class Requisicao {
           response.code
         )
       ) {
-        const mensagem = `Parando script|(ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT)|${
+        const mensagem = `Parando script|(ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT) | ${
           response.code
-        }|${moment().format('DD/MM/YYYY HH:mm:ss')}`;
+        } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
         throw new RequestException(response.code, response.status, mensagem);
       } else if (/HTTP_STATUS_NOT_200|HTTP_REPONSE_FAIL/.test(response.code)) {
         if (this.contadorTentativas < 1) {

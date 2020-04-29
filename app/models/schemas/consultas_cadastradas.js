@@ -34,7 +34,8 @@ const ConsultaCadastroSchema = new mongoose.Schema({
   },
   DataUltimaConsultaTribunal: {
     type: Date,
-    required: false
+    required: false,
+    default: null
   },
   Instancia: {
     type: String,

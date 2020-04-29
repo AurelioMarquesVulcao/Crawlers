@@ -1,5 +1,5 @@
-const amqp = require('amqplib/callback_api');
-const { enums } = require('../configs/enums');
+const amqp = require("amqplib/callback_api");
+const { enums } = require("../configs/enums");
 
 class GerenciadorFila {
   /** Handler que envia e consome mensagens de uma fila do RabbitMq.
@@ -26,13 +26,19 @@ class GerenciadorFila {
    * @param {any} mensagem    Mensagem a ser enviada.
    */
   enviar(fila, mensagem) {
-    if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
+    if (typeof mensagem === "object") mensagem = JSON.stringify(mensagem);
 
     amqp.connect(this.host, (err, conn) => {
       if (err) throw new Error(err);
 
       conn.createChannel((err, ch) => {
         if (err) throw new Error(err);
+
+        ch.assertQueue(fila, {
+          durable: true,
+          noAck: false,
+          maxPriority: 9
+        });
 
         this.enviarMensagem(ch, fila, mensagem);
       });
@@ -76,7 +82,7 @@ class GerenciadorFila {
         ch.assertQueue(fila, {
           durable: true,
           noAck: false,
-          maxPriority: 9,
+          maxPriority: 9
         });
         ch.prefetch(this.prefetch);
 
@@ -86,7 +92,7 @@ class GerenciadorFila {
           `[*] Observando a fila: ${fila} ${texto}! Para cancelar pressione CTRL+C\n`
         );
 
-        ch.consume(fila, async msg => {
+        ch.consume(fila, async (msg) => {
           await callback(ch, msg);
         });
       });
@@ -107,7 +113,7 @@ class GerenciadorFila {
         ch.assertQueue(filaOrigem, {
           durable: true,
           noAck: false,
-          maxPriority: 9,
+          maxPriority: 9
         });
         ch.prefetch(this.prefetch);
 
@@ -117,7 +123,7 @@ class GerenciadorFila {
           `[*] Observando a fila: ${filaOrigem} ${texto}! Para cancelar pressione CTRL+C\n`
         );
 
-        ch.consume(filaOrigem, msg => {
+        ch.consume(filaOrigem, (msg) => {
           const mensagem = msg.content.toString();
 
           const buffer = Buffer.from(mensagem);
@@ -125,7 +131,7 @@ class GerenciadorFila {
           ch.assertQueue(filaDestino, {
             durable: true,
             noAck: false,
-            maxPriority: 9,
+            maxPriority: 9
           });
           ch.sendToQueue(filaDestino, buffer);
 

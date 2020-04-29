@@ -87,7 +87,11 @@ class TJSPParser extends BaseParser {
           'gm'
         );
         let oab = re.exec(movimentosString, regex);
-        element.nome = removerAcentos(`(${oab[3]}SP) ${element.nome}`);
+        if (oab) {
+          element.nome = removerAcentos(`(${oab[3]}SP) ${element.nome}`);
+        } else {
+          element.nome = removerAcentos(element.nome);
+        }
       } else {
         element.nome = removerAcentos(element.nome);
       }
@@ -96,9 +100,15 @@ class TJSPParser extends BaseParser {
   }
 
   extrairOabs(envolvidos) {
+    let oab = '';
     let oabs = envolvidos.map((element) => {
       if (element.tipo == 'Advogado') {
-        return re.exec(element.nome, re(/\((?<oab>\d+\w+)\)/)).groups.oab;
+        oab = re.exec(element.nome, re(/\((?<oab>\d+\w+)\)/));
+        if (oab) {
+          return oab.groups.oab;
+        } else {
+          return null;
+        }
       }
     });
 

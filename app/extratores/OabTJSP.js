@@ -213,9 +213,49 @@ class OabTJSP extends ExtratorBase {
   }
 
   async extrairProcessos(listaProcessos, cookies) {
-    let resultados = await listaProcessos.map(async (element) => {
-      let resultado = '';
-      let objResponse = await this.robo.acessar(
+    let n = 0;
+    // let resultados = await listaProcessos.map(async (element) => {
+    //   n = n + 1;
+    //   console.log(n);
+    //   let resultado = '';
+    //   let objResponse = await this.robo.acessar(
+    //     'https://esaj.tjsp.jus.br' + element,
+    //     'GET',
+    //     'latin1',
+    //     false,
+    //     false,
+    //     null,
+    //     {
+    //       Host: 'esaj.tjsp.jus.br',
+    //       Connection: 'keep-alive',
+    //       'Upgrade-Insecure-Requests': '1',
+    //       'User-Agent':
+    //         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36',
+    //       'Sec-Fetch-User': '?1',
+    //       Accept:
+    //         'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    //       'Sec-Fetch-Site': 'same-origin',
+    //       'Sec-Fetch-Mode': 'navigate',
+    //       Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
+    //       'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+    //       Cookie: cookies,
+    //     }
+    //   );
+    //   const $ = cheerio.load(objResponse.responseBody);
+    //   if ($('#tabelaTodasMovimentacoes').length == 0) {
+    //     return Promise.resolve(false);
+    //   }
+    //   let extracao = await new TJSPParser().parse(objResponse.responseBody);
+    //   let processo = extracao.processo;
+    //   let andamentos = extracao.andamentos;
+    //   await Andamento.salvarAndamentos(andamentos);
+    //   resultado = await processo.salvar();
+    //   console.log('resultado', resultado);
+    //   return resultado;
+    // });
+
+    let resultados = await listaProcessos.map((element) => {
+      return this.robo.acessar(
         'https://esaj.tjsp.jus.br' + element,
         'GET',
         'latin1',
@@ -238,19 +278,27 @@ class OabTJSP extends ExtratorBase {
           Cookie: cookies,
         }
       );
-      const $ = cheerio.load(objResponse.responseBody);
-      if ($('#tabelaTodasMovimentacoes').length == 0) {
-        return Promise.resolve(false);
-      }
-      let extracao = await new TJSPParser().parse(objResponse.responseBody);
-      let processo = extracao.processo;
-      let andamentos = extracao.andamentos;
-      Andamento.salvarAndamentos(andamentos);
-      resultado = await processo.salvar();
-      console.log('resultado', resultado);
-      return resultado;
     });
-    return resultados;
+
+    return Promise.all(resultados).then(async (args) => {
+      return args.map(async (element) => {
+        const $ = cheerio.load(element.responseBody);
+        if ($('#tabelaTodasMovimentacoes').length == 0) {
+          return Promise.resolve(false);
+        }
+        let extracao = await new TJSPParser().parse(element.responseBody);
+        let processo = extracao.processo;
+        let andamentos = extracao.andamentos;
+        await Andamento.salvarAndamentos(andamentos);
+        let resultado = await processo.salvar();
+        console.log('resultado', resultado);
+        return Promise.resolve(resultado);
+      });
+    });
+
+    return Promise.all(resultados).then((args) => {
+      return args.filter(Boolean);
+    });
   }
 }
 

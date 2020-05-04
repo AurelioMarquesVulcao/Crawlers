@@ -26,7 +26,7 @@ const { Helper } = require('../../lib/util');
       let extracao = await Extracao.criarExtracao(
         message,
         resultadoExtracao,
-        'BA'
+        'SP'
       );
       const resposta = await Helper.enviarFeedback(
         extracao.prepararEnvio()

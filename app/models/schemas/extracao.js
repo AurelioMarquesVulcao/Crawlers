@@ -53,8 +53,8 @@ ExtracaoSchema.statics.criarExtracao = async function criarExtracao(
 ExtracaoSchema.methods.prepararEnvio = function prepararEnvio() {
   return {
     IdLog: this.idLog,
-    NumeroCNJ: this.numeroCNJ,
-    Oab: String,
+    NumeroDoProcesso: this.numeroCNJ,
+    NumeroDaOab: this.numeroDaOab,
     Resultado: this.resultado,
     Sucesso: this.sucesso,
     Detalhes: this.detalhes,

@@ -39,6 +39,7 @@ const tradutor = {
   APELANTE: 'Apelante',
   APELADO: 'Apelado',
   ADVOGADO: 'Advogado',
+  Advogado: 'Advogado',
   Advogada: 'Advogado',
   ADVOGADO_MIGRACAO: 'Advogado',
   PROCURADOR: 'Procurador',
@@ -51,11 +52,14 @@ const tradutor = {
   Exectdo: 'Executado',
   Reqte: 'Requerente',
   Reqdo: 'Requerido',
+  Embargte: 'Embargante',
+  Embargdo: 'Embargado',
   'Nº Guia': 'NGuia',
   'Situação da guia': 'SituacaoDaGuia',
   'Valor Pago': 'ValorPago',
   'Data Pagamento': 'DataPagamento',
   'FASE ATUAL': 'FaseAtual',
   'Data do Movimento': 'DataDoMovimento',
+  Perito: 'Perito',
 };
 module.exports.tradutor = tradutor;

@@ -45,7 +45,11 @@ class TJSPParser extends BaseParser {
   }
 
   extrairDetalhes($) {
-    const numero = $('td:contains("Processo:")').next('td').text().strip();
+    let numero = $('td:contains("Processo:")').next('td').text().strip();
+    numero = re.exec(
+      numero,
+      re(/\d{7}\W{0,1}\d{2}\W{0,1}\d{4}\W{0,1}\d\W{0,1}\d{2}\W{0,1}\d{4}/)
+    )[0];
     return Processo.identificarDetalhes(numero);
   }
 
@@ -67,9 +71,16 @@ class TJSPParser extends BaseParser {
     envolvidos = rawEnvolvidosList.map((element, index) => {
       const match = re.exec(element, re(/(?<tipo>\w+)\:\s(?<nome>.*)/));
       if (tradutor[match.groups.tipo]) {
-        return { tipo: tradutor[match.groups.tipo], nome: match.groups.nome };
+        let envolvido = {
+          tipo: tradutor[match.groups.tipo],
+          nome: match.groups.nome,
+        };
+        return JSON.parse(JSON.stringify(envolvido));
+      } else {
+        console.log('novo envolvido', match.groups.tipo);
       }
-      return match.groups;
+      console.log('envolvido', match.groups);
+      return JSON.parse(JSON.stringify(match.groups));
     });
 
     envolvidos = this.preencherOabs($, envolvidos);
@@ -178,7 +189,7 @@ class TJSPParser extends BaseParser {
       envolvidos: envolvidos,
       oabs: oabs,
       qtdAndamentos: andamentos.length,
-      origemExtracao: 'TJSP',
+      origemExtracao: 'OabTJSP',
     });
 
     return {

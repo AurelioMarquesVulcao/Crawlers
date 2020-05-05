@@ -57,6 +57,10 @@ Projeto que abrange todos os crawlers de acesso e extração de processos.
   }
   ```
 
-  
+## Endpoints
 
-* 
+### /getProcessos
+**METHOD: GET**
+#### Params
+|Campo|Tipo| Descrição|
+|numeroProcesso|String|Numero do processo|

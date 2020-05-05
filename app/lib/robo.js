@@ -194,8 +194,6 @@ class Robo {
       };
 
     options.timeout = 60000;
-    console.log(isProxied); //TODO remover
-    console.log(options.proxy); //TODO remover
     return this.requisicao.enviarRequest(options);
   }
 }

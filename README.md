@@ -42,11 +42,11 @@ Projeto que abrange todos os crawlers de acesso e extração de processos.
 | IdLog            | String       | _id do Log de COnsulta que foi previamente enviado pelo BigData |
 | NumeroDoProcesso | String       | Numero do processo em que foi realizado a extração           |
 | NumeroDaOab      | String       | Numero da Oab em que foi realizado a extração                |
-| Resultado        | List[Object] | Lista de Objetos do tipo Extração Resultados*                |
+| Resultado        | Array[obj] | Lista de Objetos do tipo ExtracaoResultados*                |
 | Sucesso          | Boolean      | Indicador se houve sucesso ao realizar a extração            |
 | Detalhes         | String       | Caso houve algum erro aqui entra a *message* do erro.        |
 
-* Extração Resultados
+* ExtracaoResultado
 
   ```javascript
   {

@@ -1,4 +1,4 @@
-const { OabTJBAPortal } = require('./extratores');
+const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJSP } = require('./OabTJSP');
 
 class ExtratorFactory {

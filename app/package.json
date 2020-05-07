@@ -23,6 +23,7 @@
     "mocha": "^7.1.1",
     "moment": "^2.24.0",
     "mongoose": "^5.9.6",
+    "winston": "^3.2.1",
     "xregexp": "^4.3.0"
   },
   "devDependencies": {

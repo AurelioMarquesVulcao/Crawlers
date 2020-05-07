@@ -1,0 +1,1705 @@
+{
+  "oabs": [
+    "91357NMG",
+    "167430NRJ",
+    "127131NRJ",
+    "111202NMG",
+    "3122EMG",
+    "20548NMG",
+    "3122EMG",
+    "20548NMG",
+    "3122EMG",
+    "20548NMG"
+  ],
+  "detalhes": {
+    "tipo": "cnj",
+    "numeroProcesso": "84570266920028130024",
+    "numeroProcessoMascara": "8457026-69.2002.8.13.0024",
+    "instancia": 1,
+    "ano": 2002,
+    "orgao": 8,
+    "tribunal": 13,
+    "origem": 24
+  },
+  "capa": {
+    "classe": "Execução de Título Extrajudicial",
+    "assunto": [],
+    "uf": "MG",
+    "comarca": "Belo Horizonte"
+  },
+  "dataAtualizacao": "",
+  "dataCriacao": "",
+  "envolvidos": [
+    {
+      "tipo": "Exequente",
+      "nome": "TEXACO DO BRASIL S/A PRODUTOS DE PETRÓLEO"
+    },
+    { "tipo": "Advogado", "nome": "(91357NMG) Andre Myssior" },
+    { "tipo": "Advogado", "nome": "(167430NRJ) Bruna Carneiro Da Silva Ramos" },
+    { "tipo": "Advogado", "nome": "(127131NRJ) Cristina Mariano Pereira Lima" },
+    { "tipo": "Advogado", "nome": "(111202NMG) Loyanna De Andrade Miranda" },
+    { "tipo": "Executado", "nome": "POSTO UIRAPURU LTDA" },
+    {
+      "tipo": "Advogado",
+      "nome": "(3122EMG) Agnaldo Roberto Andrade Da Silva"
+    },
+    { "tipo": "Advogado", "nome": "(20548NMG) Mauricio Rezende Azzi" },
+    { "tipo": "Executado", "nome": "RICARDO REGIS DIAS SILVEIRA" },
+    {
+      "tipo": "Advogado",
+      "nome": "(3122EMG) Agnaldo Roberto Andrade Da Silva"
+    },
+    { "tipo": "Advogado", "nome": "(20548NMG) Mauricio Rezende Azzi" },
+    { "tipo": "Executado", "nome": "MARIA GORETTI VILELA SANTOS VIEIRA" },
+    {
+      "tipo": "Advogado",
+      "nome": "(3122EMG) Agnaldo Roberto Andrade Da Silva"
+    },
+    { "tipo": "Advogado", "nome": "(20548NMG) Mauricio Rezende Azzi" }
+  ],
+  "andamentos": [
+    {
+      "descricao": "EXPEDIÇÃO DE ALVARÁ JUDICIAL",
+      "observacao": "",
+      "data": "19/05/2020"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "29/04/2020"
+    },
+
+    {
+      "descricao": "JUNTADA DE COMPROVANTE ENVIO DE OF.-MALOTE",
+      "observacao": "",
+      "data": "07/04/2020"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE OFÍCIO",
+      "observacao": "",
+      "data": "07/04/2020"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO CITAÇÃO/INTIMAÇÃO/NOTIFICAÇÃO",
+      "observacao": "",
+      "data": "05/05/2020"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "07/04/2020"
+    },
+
+    {
+      "descricao": "PROFERIDO DESPACHO - CUMPRA-SE",
+      "observacao": "",
+      "data": "07/04/2020"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) SUBSTITUTO LEGAL 23192 ",
+      "data": "03/04/2020"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO (OUTRAS)",
+      "observacao": "",
+      "data": "03/04/2020"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "04/03/2020"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "04/03/2020"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "17/10/2019"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO VISTA PARTES",
+      "observacao": "",
+      "data": "10/10/2019"
+    },
+
+    {
+      "descricao": "JUNTADA DE CARTA PRECATÓRIA",
+      "observacao": "CUMPRIDA ",
+      "data": "08/10/2019"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE OFÍCIO",
+      "observacao": "",
+      "data": "30/04/2019"
+    },
+
+    {
+      "descricao": "PROFERIDO DESPACHO - CUMPRA-SE",
+      "observacao": "",
+      "data": "30/04/2019"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 23739 ",
+      "data": "26/04/2019"
+    },
+
+    {
+      "descricao": "JUNTADA DE CARTA PRECATÓRIA",
+      "observacao": "LEILÃO CUMPRIDO ",
+      "data": "26/04/2019"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "26/04/2019"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "11/03/2019"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "09/01/2019"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CARTA PRECATÓRIA .",
+      "observacao": "",
+      "data": "03/01/2019"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "03/01/2019"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "28/12/2018"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO INTIMAÇÃO",
+      "observacao": "",
+      "data": "06/12/2018"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "23/11/2018"
+    },
+
+    {
+      "descricao": "PROFERIDO DESPACHO - EXPEÇA-SE",
+      "observacao": "",
+      "data": "26/07/2018"
+    },
+
+    {
+      "descricao": "PROFERIDO DESPACHO - MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "10/05/2018"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 23739 ",
+      "data": "06/04/2018"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "05/04/2018"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "03/04/2018"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "02/04/2018"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "111202/MG",
+      "data": "27/03/2018"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "111202/MG ",
+      "data": "28/02/2018"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA ÀS PARTES EM",
+      "observacao": "",
+      "data": "23/02/2018"
+    },
+
+    {
+      "descricao": "PROFERIDO DESPACHO - MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "05/02/2018"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 23739 ",
+      "data": "29/01/2018"
+    },
+
+    {
+      "descricao": "JUNTADA DE CARTA PRECATÓRIA",
+      "observacao": "CAXAMBU ",
+      "data": "29/01/2018"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "29/01/2018"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "10/01/2018"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "21/11/2017"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO VISTA AUTOR",
+      "observacao": "",
+      "data": "07/11/2017"
+    },
+
+    {
+      "descricao": "JUNTADA DE CARTA PRECATÓRIA",
+      "observacao": "NC ",
+      "data": "01/11/2017"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "19/10/2017"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS AO SETOR DA OAB",
+      "observacao": "",
+      "data": "18/10/2017"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "18/10/2017"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "09/08/2017"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO CITAÇÃO/INTIMAÇÃO/NOTIFICAÇÃO",
+      "observacao": "",
+      "data": "07/08/2017"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "03/08/2017"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "27/07/2017"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "20/07/2017"
+    },
+
+    {
+      "descricao": "JUNTADA DE COMPROVANTE GUIA DE CUSTAS E TAX",
+      "observacao": "",
+      "data": "02/06/2017"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO INTIMAÇÃO",
+      "observacao": "",
+      "data": "17/05/2017"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "04/05/2017"
+    },
+
+    {
+      "descricao": "PROFERIDO DESPACHO - EXPEÇA-SE",
+      "observacao": "",
+      "data": "05/12/2016"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 23739 ",
+      "data": "21/11/2016"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "056543/MG ",
+      "data": "21/11/2016"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO",
+      "observacao": "056543/MG ",
+      "data": "16/11/2016"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO (OUTRAS)",
+      "observacao": "",
+      "data": "16/11/2016"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "18/08/2016"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "09/08/2016"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIADE JUÍZO",
+      "observacao": "",
+      "data": "09/08/2016"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "056543/MG ",
+      "data": "08/08/2016"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "056543/MG ",
+      "data": "03/08/2016"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO INTIMAÇÃO",
+      "observacao": "",
+      "data": "03/08/2016"
+    },
+
+    {
+      "descricao": "PROFERIDO DESPACHO - MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "06/04/2016"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 23739 ",
+      "data": "25/01/2016"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) SUBSTITUTO(A) 33415 ",
+      "data": "26/10/2015"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "26/10/2015"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "01/09/2015"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "26/08/2015"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "26/08/2015"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "042437E/MG ",
+      "data": "26/08/2015"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "042437E/MG ",
+      "data": "19/06/2015"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO CITAÇÃO/INTIMAÇÃO/NOTIFICAÇÃO",
+      "observacao": "",
+      "data": "19/06/2015"
+    },
+
+    {
+      "descricao": "DOCUMENTO ENTREGUE",
+      "observacao": ". ",
+      "data": "15/06/2015"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CERTIDÃO DE .",
+      "observacao": "",
+      "data": "15/06/2015"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) SUBSTITUTO(A) 33415 ",
+      "data": "10/06/2015"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO (OUTRAS)",
+      "observacao": "",
+      "data": "10/06/2015"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO INTIMAÇÃO",
+      "observacao": "",
+      "data": "12/06/2015"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "29/04/2015"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS AO ÓRGÃO PÚBLICO SEAJUR- 24A.V.CIVEL",
+      "observacao": "",
+      "data": "29/04/2015"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "11/12/2014"
+    },
+
+    {
+      "descricao": "REDISTRIBUÍDO POR CRIAÇÃO/EXTINÇÃO/ALTERAÇÃO DE COMPETÊNCIA DE VARA",
+      "observacao": "00240125 ",
+      "data": "25/04/2015"
+    },
+
+    {
+      "descricao": "JUNTADA DE COMPROVANTE TAXA CERTIDÃO",
+      "observacao": "",
+      "data": "11/12/2014"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "11/12/2014"
+    },
+
+    {
+      "descricao": "DOCUMENTO ENTREGUE",
+      "observacao": "CERTIDÃO ",
+      "data": "10/12/2014"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CERTIDÃO DE FATOS",
+      "observacao": "",
+      "data": "04/12/2014"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO EXPEÇA-SE",
+      "observacao": "",
+      "data": "10/11/2014"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "10/11/2014"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "07/11/2014"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "07/11/2011"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "041306E/MG ",
+      "data": "07/11/2014"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "041306E/MG ",
+      "data": "03/11/2014"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "03/11/2014"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "02/09/2014"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO INTIMAÇÃO",
+      "observacao": "",
+      "data": "27/08/2014"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "25/08/2014"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "22/08/2014"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "22/08/2014"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "041306E/MG ",
+      "data": "22/08/2014"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "041306E/MG ",
+      "data": "07/08/2014"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE-15 DIAS EM",
+      "observacao": "",
+      "data": "06/08/2014"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 26807 ",
+      "data": "30/07/2014"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "09/05/2014"
+    },
+
+    {
+      "descricao": "DECORRIDO PRAZO DO(A) PARTES",
+      "observacao": "",
+      "data": "09/05/2014"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "09/05/2014"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXECUTADOS EM",
+      "observacao": "",
+      "data": "12/03/2014"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "10/03/2014"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "14/02/2014"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "10/02/2014"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "07/02/2014"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "07/02/2014"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "032320E/MG ",
+      "data": "07/02/2014"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "032320E/MG ",
+      "data": "17/12/2013"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "12/12/2013"
+    },
+
+    {
+      "descricao": "DECORRIDO PRAZO DO(A) 09122013",
+      "observacao": "",
+      "data": "09/12/2013"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXECUTADOS-15DIAS EM",
+      "observacao": "",
+      "data": "20/09/2013"
+    },
+
+    {
+      "descricao": "DECORRIDO PRAZO DO(A) 17092013",
+      "observacao": "",
+      "data": "17/09/2013"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA ÀS PARTES EM",
+      "observacao": "",
+      "data": "30/08/2013"
+    },
+
+    {
+      "descricao": "JUNTADA DE CARTA PRECATÓRIA",
+      "observacao": ". ",
+      "data": "28/08/2013"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "15/07/2013"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "15/07/2013"
+    },
+
+    {
+      "descricao": "DOCUMENTO ENTREGUE",
+      "observacao": "PRECATÓRIA AG.DEV. ",
+      "data": "28/05/2013"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "28/05/2013"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CARTA PRECATÓRIA .",
+      "observacao": "",
+      "data": "23/05/2013"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "23/05/2013"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "23/05/2013"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "23/05/2013"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "038331E/MG ",
+      "data": "22/05/2013"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "038331E/MG ",
+      "data": "17/05/2013"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "16/05/2013"
+    },
+
+    {
+      "descricao": "DECORRIDO PRAZO DO(A) EXECUTADO",
+      "observacao": "",
+      "data": "14/05/2013"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "14/05/2013"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXECUTADO EM",
+      "observacao": "",
+      "data": "21/03/2013"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "18/03/2013"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO LAVRAR TERMO PENHORA EM",
+      "observacao": "",
+      "data": "12/03/2013"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 26807 ",
+      "data": "06/03/2013"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO (OUTRAS)",
+      "observacao": "",
+      "data": "06/03/2013"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "05/03/2013"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "05/03/2013"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "033137E/MG ",
+      "data": "05/03/2013"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "033137E/MG ",
+      "data": "26/02/2013"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO INTIMAÇÃO",
+      "observacao": "",
+      "data": "11/01/2013"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "08/01/2013"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "08/01/2013"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "07/01/2013"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "138637/MG ",
+      "data": "07/01/2013"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "138637/MG ",
+      "data": "12/12/2012"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "14/12/2012"
+    },
+
+    {
+      "descricao": "JUNTADA DE CARTA PRECATÓRIA",
+      "observacao": "PARC. CUMPRIDA ",
+      "data": "12/12/2012"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "12/12/2012"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO (OUTRAS)",
+      "observacao": "",
+      "data": "10/12/2012"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "09/10/2012"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "02/10/2012"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "02/10/2012"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "028474E/MG ",
+      "data": "02/10/2012"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "028474E/MG ",
+      "data": "21/09/2012"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "21/09/2012"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 26807 ",
+      "data": "06/09/2012"
+    },
+
+    {
+      "descricao": "DECORRIDO PRAZO DO(A) 05092012",
+      "observacao": "",
+      "data": "05/09/2012"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA ÀS PARTES EM",
+      "observacao": "",
+      "data": "02/08/2012"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "31/07/2012"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "11/06/2012"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS",
+      "observacao": "",
+      "data": "06/06/2012"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA DE JUÍZO",
+      "observacao": "",
+      "data": "06/06/2012"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS",
+      "observacao": "032320E/MG ",
+      "data": "06/06/2012"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "032320E/MG ",
+      "data": "04/06/2012"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "04/06/2012"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 26807 ",
+      "data": "29/03/2012"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "29/03/2012"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "28/02/2012"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA ÀS PARTES EM",
+      "observacao": "",
+      "data": "13/02/2012"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "09/02/2012"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA ÀS PARTES EM",
+      "observacao": "",
+      "data": "09/02/2012"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "07/02/2012"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "024618E/MG ",
+      "data": "25/01/2012"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "024618E/MG ",
+      "data": "13/01/2012"
+    },
+
+    {
+      "descricao": "DOCUMENTO ENTREGUE",
+      "observacao": "PRECATÓRIA ",
+      "data": "13/01/2012"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CARTA PRECATÓRIA CAXAMBU",
+      "observacao": "",
+      "data": "13/01/2012"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "09/01/2012"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CARTA PRECATÓRIA .",
+      "observacao": "",
+      "data": "01/12/2011"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "05/12/2011"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CARTA PRECATÓRIA .",
+      "observacao": "",
+      "data": "01/12/2011"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "01/12/2011"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "01/12/2011"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "024618E/MG ",
+      "data": "24/11/2011"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO",
+      "observacao": "024618E/MG ",
+      "data": "18/11/2011"
+    },
+
+    {
+      "descricao": "JUNTADA DE CARTA PRECATÓRIA",
+      "observacao": "NAO CUMPRIDA ",
+      "data": "18/11/2011"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "05/10/2011"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "10/06/2011"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO (OUTRAS)",
+      "observacao": "",
+      "data": "10/06/2011"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "10/05/2011"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA EXEQUENTE EM",
+      "observacao": "",
+      "data": "29/04/2011"
+    },
+
+    {
+      "descricao": "DECORRIDO PRAZO DO(A) 25042011",
+      "observacao": "",
+      "data": "25/04/2011"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "23/11/2010"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO (OUTRAS)",
+      "observacao": "",
+      "data": "23/11/2010"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "28/10/2010"
+    },
+
+    {
+      "descricao": "PUBLICADO DESPACHO VISTA ÀS PARTES EM",
+      "observacao": "",
+      "data": "15/09/2010"
+    },
+
+    {
+      "descricao": "JUNTADA DE OFÍCIO",
+      "observacao": "",
+      "data": "13/09/2010"
+    },
+
+    {
+      "descricao": "DOCUMENTO ENTREGUE",
+      "observacao": "CARTA PRECATÓRIA ",
+      "data": "17/08/2010"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "020803E/MG ",
+      "data": "17/08/2010"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "020803E/MG ",
+      "data": "09/08/2010"
+    },
+
+    {
+      "descricao": "DOCUMENTO ENTREGUE",
+      "observacao": "CARTA PRECATÓRIA ",
+      "data": "09/08/2010"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CARTA PRECATÓRIA CAXAMBU",
+      "observacao": "",
+      "data": "11/08/2010"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CARTA PRECATÓRIA AVALIAÇÃO",
+      "observacao": "",
+      "data": "04/08/2010"
+    },
+
+    {
+      "descricao": "EXPEDIÇÃO DE CARTA PRECATÓRIA .",
+      "observacao": "",
+      "data": "11/12/2009"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "04/12/2009"
+    },
+
+    {
+      "descricao": "ATO ORDINATÓRIO MERO EXPEDIENTE",
+      "observacao": "",
+      "data": "17/11/2009"
+    },
+
+    {
+      "descricao": "JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO",
+      "observacao": "",
+      "data": "17/11/2009"
+    },
+
+    {
+      "descricao": "PROTOCOLIZADA PETIÇÃO",
+      "observacao": "",
+      "data": "27/10/2009"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO TRIBUNAL DE JUSTIÇA",
+      "observacao": "",
+      "data": "19/10/2009"
+    },
+
+    {
+      "descricao": "REMETIDOS OS AUTOS AO TRIBUNAL DE JUSTIÇA",
+      "observacao": "",
+      "data": "17/09/2008"
+    },
+
+    {
+      "descricao": "AGUARDA JULGAMENTO DE EMBARGOS ",
+      "observacao": "",
+      "data": "09/02/2004"
+    },
+
+    {
+      "descricao": "APENSAMENTO - EFETIVADO(A)",
+      "observacao": "024042578781 ",
+      "data": "09/02/2004"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "020548/MG ",
+      "data": "05/02/2004"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO RÉU ",
+      "observacao": "020548/MG ",
+      "data": "29/12/2003"
+    },
+
+    {
+      "descricao": "DILIGÊNCIA - DEFERIDO(A)",
+      "observacao": "DEVOLUCAO PRAZO ",
+      "data": "31/12/2003"
+    },
+
+    {
+      "descricao": "DILIGÊNCIA - DEFERIDO(A)",
+      "observacao": "DEVOLUCAO PRAZO ",
+      "data": "31/12/2003"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) SUBSTITUTO(A) 10801 ",
+      "data": "29/12/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "PETIÇÀO ",
+      "data": "29/12/2003"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "001891E/MG ",
+      "data": "23/12/2003"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "001891E/MG ",
+      "data": "18/12/2003"
+    },
+
+    {
+      "descricao": "AUTOS VISTA ",
+      "observacao": "EXEQUENTE ",
+      "data": "18/12/2003"
+    },
+
+    {
+      "descricao": "AGUARDA CUMPRIR DILIGÊNCIA ",
+      "observacao": "AG. PUBLICAR ",
+      "data": "15/12/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "CARTA PRECATÓRIA ",
+      "data": "15/12/2003"
+    },
+
+    {
+      "descricao": "AGUARDA JUNTADA DE ",
+      "observacao": "PET ",
+      "data": "10/12/2003"
+    },
+
+    {
+      "descricao": "AGUARDA DEVOLUÇÃO PRECATÓRIA ",
+      "observacao": "",
+      "data": "21/11/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "PETICAO ",
+      "data": "21/11/2003"
+    },
+
+    {
+      "descricao": "AGUARDA JUNTADA DE ",
+      "observacao": "PET ",
+      "data": "18/11/2003"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "083916/MG ",
+      "data": "18/11/2003"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "083916/MG ",
+      "data": "14/11/2003"
+    },
+
+    {
+      "descricao": "AUTOS VISTA ",
+      "observacao": "EXEQUENTE ",
+      "data": "13/11/2003"
+    },
+
+    {
+      "descricao": "AGUARDA CUMPRIR DILIGÊNCIA ",
+      "observacao": "AG PUBLICACAO ",
+      "data": "10/11/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "PETICAO ",
+      "data": "10/11/2003"
+    },
+
+    {
+      "descricao": "AGUARDA JUNTADA DE ",
+      "observacao": "PET ",
+      "data": "06/11/2003"
+    },
+
+    {
+      "descricao": "PROCESSO SUSPENSO ",
+      "observacao": "30 DIAS ",
+      "data": "30/10/2003"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) SUBSTITUTO(A) 10801 ",
+      "data": "29/10/2003"
+    },
+
+    {
+      "descricao": "AGUARDA CUMPRIR DILIGÊNCIA ",
+      "observacao": "AG DESPACHO ",
+      "data": "22/10/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "PETICAO ",
+      "data": "22/10/2003"
+    },
+
+    {
+      "descricao": "AGUARDA JUNTADA DE ",
+      "observacao": "PET ",
+      "data": "20/10/2003"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "083916/MG ",
+      "data": "17/10/2003"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "083916/MG ",
+      "data": "14/10/2003"
+    },
+
+    {
+      "descricao": "AUTOS VISTA ",
+      "observacao": "EXEQUENTE ",
+      "data": "10/10/2003"
+    },
+
+    {
+      "descricao": "AGUARDA CUMPRIR DILIGÊNCIA ",
+      "observacao": "AG.PUBLICAR ",
+      "data": "07/10/2003"
+    },
+
+    {
+      "descricao": "AGUARDA DECURSO PRAZO ",
+      "observacao": "M-004 ",
+      "data": "29/09/2003"
+    },
+
+    {
+      "descricao": "AGUARDA CUMPRIR PRECATÓRIA ",
+      "observacao": "CARTA PRECATÓRIA ",
+      "data": "23/07/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "PETIÇÃO ",
+      "data": "23/07/2003"
+    },
+
+    {
+      "descricao": "AGUARDA JUNTADA DE ",
+      "observacao": "PETICAO ",
+      "data": "15/07/2003"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "",
+      "data": "15/07/2003"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "083916/MG ",
+      "data": "10/07/2003"
+    },
+
+    {
+      "descricao": "AUTOS VISTA ",
+      "observacao": "EXEQUENTE ",
+      "data": "10/07/2003"
+    },
+
+    {
+      "descricao": "AGUARDA CUMPRIR DILIGÊNCIA ",
+      "observacao": "AG. PUBLICAÇÃO ",
+      "data": "07/07/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "PETIÇÃO ",
+      "data": "07/07/2003"
+    },
+
+    {
+      "descricao": "AGUARDA JUNTADA DE ",
+      "observacao": "PETICAO ",
+      "data": "02/07/2003"
+    },
+
+    {
+      "descricao": "AGUARDA DEVOLUÇÃO PRECATÓRIA ",
+      "observacao": "",
+      "data": "09/05/2003"
+    },
+
+    {
+      "descricao": "INTIMAÇÃO - ORDENADO(A)",
+      "observacao": "AG.DEVOL.PRECATORIA ",
+      "data": "09/05/2003"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 22417822 ",
+      "data": "05/05/2003"
+    },
+
+    {
+      "descricao": "AGUARDA CUMPRIR DILIGÊNCIA ",
+      "observacao": "AG DESPACHO ",
+      "data": "05/05/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "PETICAO ",
+      "data": "05/05/2003"
+    },
+
+    {
+      "descricao": "AGUARDA JUNTADA DE ",
+      "observacao": "PETICAO ",
+      "data": "02/05/2003"
+    },
+
+    {
+      "descricao": "RECEBIDOS OS AUTOS DO ADVOGADO",
+      "observacao": "083916/MG ",
+      "data": "30/04/2003"
+    },
+
+    {
+      "descricao": "AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR ",
+      "observacao": "083916/MG ",
+      "data": "29/04/2003"
+    },
+
+    {
+      "descricao": "AUTOS VISTA ",
+      "observacao": "EXEQUENTE ",
+      "data": "25/04/2003"
+    },
+
+    {
+      "descricao": "AGUARDA CUMPRIR DILIGÊNCIA ",
+      "observacao": "AG PUBLICACAO ",
+      "data": "22/04/2003"
+    },
+
+    {
+      "descricao": "JUNTADA EFETIVADA DE ",
+      "observacao": "OFICIO ",
+      "data": "22/04/2003"
+    },
+
+    {
+      "descricao": "AGUARDA JUNTADA DE ",
+      "observacao": "PETICAO ",
+      "data": "10/04/2003"
+    },
+
+    {
+      "descricao": "AGUARDA DECURSO PRAZO ",
+      "observacao": "DIVERSOS 10/04 ",
+      "data": "10/04/2003"
+    },
+
+    {
+      "descricao": "AGUARDA DEVOLUÇÃO DE ",
+      "observacao": "CARTA PRECATORIA ",
+      "data": "25/11/2002"
+    },
+
+    {
+      "descricao": "DOCUMENTO À DISPOSIÇÃO: ",
+      "observacao": "CARTA PRECATORIA ",
+      "data": "22/11/2002"
+    },
+
+    {
+      "descricao": "DILIGÊNCIA - ORDENADO(A)",
+      "observacao": "ASSINAR ",
+      "data": "18/11/2002"
+    },
+
+    {
+      "descricao": "INTIMAÇÃO - ORDENADO(A)",
+      "observacao": "EXPEDIR C.PRECATORIA ",
+      "data": "09/11/2002"
+    },
+
+    {
+      "descricao": "CONCLUSOS PARA DESPACHO",
+      "observacao": "JUIZ(A) TITULAR 22417822 ",
+      "data": "01/11/2002"
+    },
+
+    {
+      "descricao": "DISTRIBUÍDO POR SORTEIO",
+      "observacao": "",
+      "data": "30/10/2002"
+    }
+  ]
+}

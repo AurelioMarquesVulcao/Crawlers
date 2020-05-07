@@ -5,6 +5,9 @@ const moment = require('moment');
 const { RequestException } = require('../models/exception/exception');
 const { enums } = require('../configs/enums');
 
+const chromeUserAgent =
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
+
 class Requisicao {
   /**
    * Request
@@ -104,9 +107,9 @@ class Requisicao {
           response.code
         )
       ) {
-        const mensagem = `Parando script|(ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT)|${
+        const mensagem = `Parando script|(ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT) | ${
           response.code
-        }|${moment().format('DD/MM/YYYY HH:mm:ss')}`;
+        } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
         throw new RequestException(response.code, response.status, mensagem);
       } else if (/HTTP_STATUS_NOT_200|HTTP_REPONSE_FAIL/.test(response.code)) {
         if (this.contadorTentativas < 1) {
@@ -158,6 +161,7 @@ class Robo {
    * @param {boolean} isJson é do tipo querystring
    * @param {object} params parametros para o form ou querystring
    * @param {object} rHeaders headers
+   * @param {boolean} randomUserAgent deve utilizar um user agent aleatorio?
    */
   async acessar(
     url,
@@ -166,14 +170,17 @@ class Robo {
     isProxied = false,
     isJson = false,
     params = null,
-    rHeaders = {}
+    rHeaders = {},
+    randomUserAgent = false
   ) {
+    let headers = rHeaders;
     if (!url || url == '') throw new Error('URL vazia!');
 
-    const headers = {
-      'User-Agent': this.requisicao.obterUserAgentAleatorio(),
-      ...rHeaders,
-    };
+    if (randomUserAgent) {
+      headers['User-Agent'] = this.requisicao.obterUserAgentAleatorio();
+    } else {
+      headers['User-Agent'] = chromeUserAgent;
+    }
 
     const options = {
       url: url,
@@ -193,15 +200,14 @@ class Robo {
       }
     }
 
-    if (isProxied) options.proxy = {
-      host: "proxy-proadv.7lan.net",
-      port: 8181,
-      auth: { username: "proadvproxy", password: "C4fMSSjzKR5v9dzg" },
-    }
+    if (isProxied)
+      options.proxy = {
+        host: 'proxy-proadv.7lan.net',
+        port: 8181,
+        auth: { username: 'proadvproxy', password: 'C4fMSSjzKR5v9dzg' },
+      };
 
-    options.timeout = 20000;
-    console.log(isProxied); //TODO remover
-    console.log(options.proxy); //TODO remover
+    options.timeout = 60000;
     return this.requisicao.enviarRequest(options);
   }
 }

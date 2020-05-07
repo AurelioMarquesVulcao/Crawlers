@@ -20,6 +20,7 @@ const AndamentoSchema = new Schema(
     data: Date,
     dataInclusao: Date,
     link: String,
+    observacao: String,
     linkDocumento: LinkDocumentoSchema,
   },
   {
@@ -35,7 +36,7 @@ const AndamentoSchema = new Schema(
 );
 
 AndamentoSchema.statics.criarHash = function criarHash(obj) {
-  let preHash = `${obj.numeroProcesso}${obj.data}${obj.descricao}`;
+  let preHash = `${obj.numeroProcesso}${obj.data}${obj.descricao}${obj.observacao}`;
   return Helper.hash(preHash);
 };
 
@@ -45,6 +46,7 @@ AndamentoSchema.statics.salvarAndamentos = function salvarAndamentos(objs) {
     return await element.salvar();
   });
   return Promise.all(andamentosNovos).then((args) => {
+    console.log('Andamentos Salvos', args.filter(Boolean).length);
     return args.filter(Boolean).length;
   });
 };
@@ -62,14 +64,16 @@ AndamentoSchema.methods.salvar = async function salvar() {
       (err, doc) => {
         if (err) {
           console.log(err);
-          reject(err);
+          return reject(err);
         }
         if (doc.upserted) {
-          resolve(true);
+          return resolve(true);
         }
-        resolve(false);
+        return resolve(false);
       }
     );
+  }).catch((err) => {
+    throw err;
   });
 };
 

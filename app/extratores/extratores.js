@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
+const { antiCaptchaHandler } = require('../lib/captchaHandler');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 
@@ -7,6 +8,7 @@ const {
   BaseException,
   RequestException,
   ExtracaoException,
+  AntiCaptchaResponseException,
 } = require('../models/exception/exception');
 const { Robo } = require('../lib/robo');
 const { TJBAPortalParser } = require('../parsers/TJBAPortalParser');
@@ -51,7 +53,7 @@ class OabTJBAPortal extends ExtratorBase {
       let codigoBusca = $.html().match(/var busca\s*=\s*'(.*)';/)[1];
       codigoBusca = codigoBusca.trim();
 
-      let cookies = objResponse.cookies
+      let cookies = objResponse.cookies;
       objResponse = await this.robo.acessar(
         `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
         'GET',
@@ -59,7 +61,7 @@ class OabTJBAPortal extends ExtratorBase {
         true, //proxy
         false,
         null,
-        {cookies: cookies}
+        { cookies: cookies }
       );
 
       let listaProcessos = objResponse.responseBody.lstProcessos;
@@ -101,5 +103,5 @@ class OabTJBAPortal extends ExtratorBase {
     }
   }
 }
-
 module.exports.OabTJBAPortal = OabTJBAPortal;
+module.exports.ExtratorBase = ExtratorBase;

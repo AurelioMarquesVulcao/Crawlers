@@ -16,7 +16,7 @@ const { Helper } = require('../../lib/util');
       console.log(e);
     });
 
-    const nomeFila = `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJBAPortal}.extracao.novos`;
+    const nomeFila = `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJSP}.extracao.novos`;
 
     new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
@@ -26,14 +26,14 @@ const { Helper } = require('../../lib/util');
       let extracao = await Extracao.criarExtracao(
         message,
         resultadoExtracao,
-        'BA'
+        'SP'
       );
       const resposta = await Helper.enviarFeedback(
         extracao.prepararEnvio()
       ).catch((err) => {
         console.log('Erro detectado', err);
       });
-      ch.ack(msg);
+      // ch.ack(msg);
       console.log(resposta);
     });
   } catch (e) {

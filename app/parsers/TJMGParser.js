@@ -56,9 +56,115 @@ class TJMGParser extends BaseParser {
     return Processo.identificarDetalhes(numero);
   }
 
+  extrairPartes(partesList) {
+    // TIPO | NOME | IGNORA
+    let partes = [];
+    let tipo = null;
+    let nome = null;
+    for (let i = 0; i < partesList.length / 3; i++) {
+      nome = null;
+
+      if (partesList[(i + 1) * 3 - 3]) {
+        tipo = partesList[(i + 1) * 3 - 3];
+      }
+      nome = partesList[(i + 1) * 3 - 2];
+
+      nome = nome.match(/^(.*)$/m)[0].strip();
+
+      if (tipo && nome)
+        partes.push({ tipo: removerAcentos(tipo), nome: removerAcentos(nome) });
+    }
+
+    return partes;
+  }
+
+  extrairAdvogados(advogadosList) {
+    let advogados = [];
+    let tipo = null;
+    let nome = null;
+    let oab = null;
+
+    for (let i = 0; i < advogadosList.length / 2; i++) {
+      nome = null;
+      tipo = null;
+
+      tipo = advogadosList[(i + 1) * 2 - 2].replace(/\(s\)\W/, '');
+      let advogadosValues = advogadosList[(i + 1) * 2 - 1];
+      advogadosValues = re.match(
+        advogadosValues,
+        re(/(\d+[A-Z]\/\w{2})\s*\-\s*(.+)/),
+        'all'
+      );
+
+      advogadosValues = advogadosValues.map((element, index) => {
+        return element.replace(/\s\s+/, ' ').strip();
+      });
+
+      advogadosValues = advogadosValues.map((element, index) => {
+        let nome = re.exec(element, re(/(.+)\s\-.(.+)/));
+        return `(${nome[1]}) ${nome[2]}`;
+      });
+
+      advogadosValues.map((element, index) => {
+        advogados.push({
+          tipo: tipo,
+          nome: removerAcentos(element),
+        });
+      });
+    }
+    return advogados;
+  }
+
   extrairEnvolvidos($) {
-    let rawEnvolvidos = $('b:contains("PARTE(S) DO PROCESSO")')[0];
-    return rawEnvolvidos;
+    let tableEnvolvidos = $('table:contains("PARTE(S) DO PROCESSO")')
+      .next()
+      .next(); //table
+
+    const rawPartes = tableEnvolvidos
+      .children()
+      .children()
+      .children()
+      .toArray()
+      .map((element, index) => {
+        return $(element).text().strip();
+      });
+    const rawAdvogados = tableEnvolvidos
+      .children()
+      .children()
+      .children()
+      .children()
+      .children()
+      .children()
+      .children()
+      .children()
+      .toArray()
+      .map((element, index) => {
+        return $(element).text().strip();
+      });
+
+    let envolvidos = this.extrairPartes(rawPartes);
+    envolvidos = [...envolvidos, ...this.extrairAdvogados(rawAdvogados)];
+    envolvidos = [
+      ...new Set(
+        envolvidos.map((element) => {
+          return JSON.stringify(element);
+        })
+      ),
+    ];
+    envolvidos = envolvidos.map((element) => {
+      return JSON.parse(element);
+    });
+    return envolvidos;
+  }
+
+  extrairOabs(envolvidos) {
+    let oabs = envolvidos.map((element, index) => {
+      if (element.tipo == 'Advogado') {
+        return re.exec(element.nome, re(/\d+\w\/{0,1}\w{2}/));
+      }
+      return false;
+    });
+    return oabs.filter(Boolean);
   }
 
   parse(rawProcesso, rawAndamentos) {

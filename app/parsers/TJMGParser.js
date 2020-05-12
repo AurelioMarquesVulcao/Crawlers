@@ -180,6 +180,42 @@ class TJMGParser extends BaseParser {
 
   extrairAndamentos($, dataAtual, numeroProcesso) {
     let andamentos = [];
+    const tds = $('body > table.corpo').find('tr');
+
+    tds.each((index, element) => {
+      let data = $(
+        `body > table.corpo > tbody > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(4)`
+      );
+      let descricao = $(
+        `body > table.corpo > tbody > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(2)`
+      );
+      let observacao = $(
+        `body > table.corpo > tbody > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(3)`
+      );
+
+      data = moment(data.text().strip(), 'DD/MM/YYYY').format('YYYY-MM-DD');
+      descricao = removerAcentos(descricao.text().strip());
+      observacao = removerAcentos(observacao.text().strip());
+
+      let andamento = {
+        numeroProcesso: numeroProcesso,
+        data: data,
+        dataInclusao: dataAtual,
+        descricao: descricao,
+      };
+
+      if (observacao) {
+        andamento['observacao'] = observacao;
+      }
+
+      andamentos.push(new Andamento(andamento));
+    });
 
     return andamentos;
   }

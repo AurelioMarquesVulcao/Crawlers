@@ -5,6 +5,7 @@ module.exports.removerAcentos = function removerAcentos(texto) {
   texto = texto.replace(/[\u0300-\u036f]/g, '');
   texto = texto.replace(/['"”“‘’º]+/g, '');
   texto = texto.replace(/N[^\w\s]/gi, 'N');
+  texto = texto.replace(/(\d+\w{0,1})\W{0,1}(\w{2})/, '$1$2');
   return texto;
 };
 

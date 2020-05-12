@@ -167,6 +167,23 @@ class TJMGParser extends BaseParser {
     return oabs.filter(Boolean);
   }
 
+  extrairStatus($) {
+    let status = null;
+    const rawStatus = $(
+      $(
+        // body > table.tabela_formulario > tbody > tr:nth-child(2)
+        $('body > table.tabela_formulario').children().children()[1]
+      ).children()[1] // td:nth-child(2)
+    ).text();
+    return removerAcentos(rawStatus.strip());
+  }
+
+  extrairAndamentos($, dataAtual, numeroProcesso) {
+    let andamentos = [];
+
+    return andamentos;
+  }
+
   parse(rawProcesso, rawAndamentos) {
     const dataAtual = moment().format('YYYY-MM-DD');
 
@@ -191,6 +208,7 @@ class TJMGParser extends BaseParser {
       oabs: oabs,
       qtdAndamentos: andamentos.length,
       origemExtracao: 'OabTJMG',
+      status: status,
     });
 
     return {

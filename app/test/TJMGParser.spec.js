@@ -35,8 +35,39 @@ describe('TESTE DO TJMG', () => {
 
     const extracao = new TJMGParser().parse(rawProcesso, rawAndamentos);
     it('capa', () => {
-      const capa = extracao.processo.capa.toJON();
+      const capa = extracao.processo.capa.toJSON();
       chai.expect(resultado.capa).to.eql(capa);
+    });
+
+    it('detalhes', () => {
+      const detalhes = extracao.processo.detalhes.toJSON();
+      chai.expect(resultado.detalhes).to.eql(detalhes);
+    });
+
+    it('oabs', () => {
+      const oabs = extracao.processo.oabs.toObject();
+      chai.expect(resultado.oabs).to.eql(oabs);
+    });
+
+    it('envolvidos', () => {
+      const envolvidos = extracao.processo.envolvidos.toObject();
+      chai.expect(resultado.envolvidos).to.eql(envolvidos);
+    });
+
+    it('andamentos', () => {
+      let andamentos = extracao.andamentos;
+      andamentos = andamentos.map((element) => {
+        element = JSON.stringify(element);
+        return JSON.parse(element);
+      });
+
+      resultado.andamentos = resultado.andamentos.map((element) => {
+        element['numeroProcesso'] = extracao.processo.detalhes.numeroProcesso;
+        element['dataInclusao'] = dataFormatada;
+        return element;
+      });
+
+      chai.expect(resultado.andamentos).to.eql(andamentos);
     });
   });
 });

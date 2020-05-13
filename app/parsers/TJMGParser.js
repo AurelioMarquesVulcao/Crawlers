@@ -71,8 +71,11 @@ class TJMGParser extends BaseParser {
 
       nome = nome.match(/^(.*)$/m)[0].strip();
 
-      if (tipo && nome)
-        partes.push({ tipo: removerAcentos(tipo), nome: removerAcentos(nome) });
+      if (tipo && nome) {
+        tipo = removerAcentos(tipo);
+        tipo = tipo.replace(/\W/g, '');
+        partes.push({ tipo: tipo, nome: removerAcentos(nome) });
+      }
     }
 
     return partes;
@@ -160,7 +163,7 @@ class TJMGParser extends BaseParser {
   extrairOabs(envolvidos) {
     let oabs = envolvidos.map((element, index) => {
       if (element.tipo == 'Advogado') {
-        return re.exec(element.nome, re(/\d+\w\/{0,1}\w{2}/));
+        return re.exec(element.nome, re(/\d+\w\/{0,1}\w{2}/))[0];
       }
       return false;
     });
@@ -201,7 +204,9 @@ class TJMGParser extends BaseParser {
 
       data = moment(data.text().strip(), 'DD/MM/YYYY').format('YYYY-MM-DD');
       descricao = removerAcentos(descricao.text().strip());
+      descricao = re.replace(descricao, re(/\n*\s\s+/g), ' ');
       observacao = removerAcentos(observacao.text().strip());
+      //observacao = re.replace(observacao, re(/\n*\s\s+/g), ' ');
 
       let andamento = {
         numeroProcesso: numeroProcesso,

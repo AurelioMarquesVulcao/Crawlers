@@ -1,5 +1,6 @@
 const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJSP } = require('./OabTJSP');
+const { OabTJMG } = require('./OabTJMG');
 
 class ExtratorFactory {
   static getExtrator(fila, isDebug) {
@@ -16,6 +17,12 @@ class ExtratorFactory {
       extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg/open.do', isDebug);
     }
 
+    if (/OabTJMG/.test(fila)) {
+      extrator = new OabTJMG(
+        'https://www4.tjmg.jus.br/juridico/sf/index_oab.jsp',
+        isDebug
+      );
+    }
     return extrator;
   }
 }

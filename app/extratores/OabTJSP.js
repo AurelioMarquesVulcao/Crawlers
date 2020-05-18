@@ -218,7 +218,7 @@ class OabTJSP extends ExtratorBase {
     let resultados = listaProcessos.map(async (element) => {
       console.log('PROCESSOS', count);
       count = count + 1;
-      let body = await this.extrairProcessoHtml(element, cookies)
+      let body = await this.extrairProcessoHtml(element, cookies);
       if (body) {
         let extracao = await new TJSPParser().parse(body);
         let processo = extracao.processo;
@@ -241,8 +241,11 @@ class OabTJSP extends ExtratorBase {
     return new Promise(async (resolve, reject) => {
       let retry = false; //Se o processo já foi tratado com outro captcha
       let gResponse = await this.getCaptcha();
-      do{
-        let url = linkProcesso.replace(/(?<key>g-recaptcha-response=)(?<value>.+)&/, `$1${gResponse}&`);
+      do {
+        let url = linkProcesso.replace(
+          /(?<key>g-recaptcha-response=)(?<value>.+)&/,
+          `$1${gResponse}&`
+        );
         let objResponse = await this.robo.acessar(
           'https://esaj.tjsp.jus.br' + url,
           'GET',
@@ -272,16 +275,14 @@ class OabTJSP extends ExtratorBase {
             console.log('not retry');
             gResponse = await this.getCaptcha();
             retry = !retry;
-          }
-          else {
-            return resolve(false)
+          } else {
+            return resolve(false);
           }
           retry = true;
         } else {
           return resolve(objResponse.responseBody);
         }
-      }
-      while(!retry)
+      } while (!retry);
     });
   }
 }

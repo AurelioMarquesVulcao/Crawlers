@@ -32,19 +32,19 @@ class Requisicao {
   }
 
   /**
-   * Remove os cookies adicionados pelos servidores de proxy. 
-   * 
-   * @param {String[]} cookies 
+   * Remove os cookies adicionados pelos servidores de proxy.
+   *
+   * @param {String[]} cookies
    */
-  validarCookies(cookies){
-    if (!cookies) return []
+  validarCookies(cookies) {
+    if (!cookies) return [];
 
-    let reProxy = /SERVERID=.*;\spath=\//g
-    let validos = cookies.filter(x => {
-      return !reProxy.test(x)
-    })
+    let reProxy = /SERVERID=.*;\spath=\//g;
+    let validos = cookies.filter((x) => {
+      return !reProxy.test(x);
+    });
 
-    return validos
+    return validos;
   }
 
   async enviarRequest(options) {
@@ -54,16 +54,16 @@ class Requisicao {
         .then((res) => {
           if (res) {
             statusCode = res.status;
-
+            const corpo = res.data ? res.data : true;
+            console.log(corpo); // TODO retirar
             if (statusCode == 200) {
-              const corpo = res.data ? res.data : true;
               resolve({
                 code: 'HTTP_200',
                 status: statusCode,
                 message: `StatusCode: ${statusCode}.`,
                 responseContent: res,
                 responseBody: corpo,
-                cookies: this.validarCookies(res.headers['set-cookie'])
+                cookies: this.validarCookies(res.headers['set-cookie']),
               });
             } else {
               resolve({

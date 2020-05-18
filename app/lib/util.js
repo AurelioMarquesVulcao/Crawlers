@@ -1,6 +1,7 @@
 const Crypto = require('crypto-js');
 
 const { enums } = require('../configs/enums');
+const Axios = require('axios');
 const { Robo } = require('../lib/robo');
 
 class Helper {
@@ -24,6 +25,14 @@ class Helper {
       msg,
       {}
     );
+  }
+
+  static async downloadImage(url) {
+    const response = await Axios({
+      url,
+      method: 'GET',
+    });
+    return response.data;
   }
 }
 

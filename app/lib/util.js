@@ -28,11 +28,14 @@ class Helper {
   }
 
   static async downloadImage(url) {
-    const response = await Axios({
+    return await Axios({
       url,
       method: 'GET',
+      responseType: 'arraybuffer',
+    }).then((response) => {
+      let image = Buffer.from(response.data).toString('base64');
+      return image;
     });
-    return response.data;
   }
 }
 

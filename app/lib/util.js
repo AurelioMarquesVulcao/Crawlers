@@ -15,8 +15,7 @@ class Helper {
   }
 
   static async enviarFeedback(msg) {
-    const robo = new Robo();
-    return await robo.acessar(
+    return await new Robo().acessar(
       enums.bigdataUrls.resultadoConsulta,
       'POST',
       '',
@@ -36,6 +35,18 @@ class Helper {
       let image = Buffer.from(response.data).toString('base64');
       return image;
     });
+  }
+
+  static async decodeCaptcha(captchaString) {
+    return await new Robo().acessar(
+      enums.bigdataUrls.captchaDecoder,
+      'POST',
+      '',
+      false,
+      true,
+      captchaString,
+      {}
+    );
   }
 }
 

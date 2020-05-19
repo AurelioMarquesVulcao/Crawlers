@@ -43,7 +43,9 @@ class OabTJMG extends ExtratorBase {
 
     let $ = cheerio.load(objResponse.responseBody);
     const captchaImageUrl = $('#captcha_image').attr('src'); // https://www4.tjmg.jus.br/juridico/sf/
-    const captchaStream = await Helper.downloadImage(captchaImageUrl);
+    const captchaStream = await Helper.downloadImage(
+      'https://www4.tjmg.jus.br/juridico/sf/' + captchaImageUrl
+    );
     return; // TODO fazer chamadas para o sites com as comarcas
   }
 

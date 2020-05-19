@@ -55,7 +55,6 @@ class Requisicao {
           if (res) {
             statusCode = res.status;
             const corpo = res.data ? res.data : true;
-            console.log(corpo); // TODO retirar
             if (statusCode == 200) {
               resolve({
                 code: 'HTTP_200',
@@ -94,7 +93,7 @@ class Requisicao {
             status: 502,
             message: err.message,
             responseContent: null,
-            responseBody: '',
+            responseBody: err.response.data ? err.response.data : '',
           });
         });
     });

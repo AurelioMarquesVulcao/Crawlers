@@ -1,4 +1,6 @@
 const Crypto = require('crypto-js');
+const winston = require('winston');
+const moment = require('moment');
 
 const { enums } = require('../configs/enums');
 const { Robo } = require('../lib/robo');
@@ -27,4 +29,28 @@ class Helper {
   }
 }
 
+class Logger {
+  constructor(logLevel = 'info', nomeArquivo) {
+    this.logger = winston.createLogger({
+      level: logLevel,
+      format: winston.format.simple(),
+      transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({
+          filename: nomeArquivo,
+        }),
+      ],
+    });
+  }
+
+  info(log) {
+    return this.logger.info(`[${moment().format()}] ${log}`);
+  }
+
+  log(level, log) {
+    return this.logger.log(level, `[${moment().format()}] ${log}`);
+  }
+}
+
+module.exports.Logger = Logger;
 module.exports.Helper = Helper;

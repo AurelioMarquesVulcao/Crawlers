@@ -5,7 +5,11 @@ services:
     volumes:
       - ./app:/app
     working_dir: /app
+    extra_hosts:
+      - "bigrj01mon01:10.21.0.86"
+      - "bigrj01mon02:10.21.0.139"
     environment:
+      - TZ=America/Cuiaba
       - API_PORT=${API_PORT}
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}

@@ -19,7 +19,7 @@ class Requisicao {
   /**
    * Obter um UserAgent para ser usado
    */
-  obterUserAgentAleatorio() {
+  obterUserAgent(aleatorio = true) {
     //TODO checar viabilidade dessa função ao manter o session de um robo (preservar captchas)
     const agents = [
       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36', // Chrome
@@ -27,8 +27,9 @@ class Requisicao {
       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41', //Opera
       'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1', //Safari
     ];
+    if (aleatorio) return agents[Math.floor(Math.random() * agents.length)];
 
-    return agents[Math.floor(Math.random() * agents.length)];
+    return agents[0];
   }
 
   /**
@@ -106,7 +107,7 @@ class Requisicao {
           response.code
         )
       ) {
-        const mensagem = `Parando script|(ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT) | ${
+        const mensagem = `Parando script CODE: ${
           response.code
         } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
         throw new RequestException(response.code, response.status, mensagem);
@@ -156,30 +157,25 @@ class Robo {
    * @param {string} url URL do site
    * @param {string} method 'GET'ou 'POST'
    * @param {string} encoding tipo de codificacao
-   * @param {boolean} isPoxied deve usar proxy
-   * @param {boolean} isJson é do tipo querystring
+   * @param {boolean} usaProxy deve usar proxy
+   * @param {boolean} usaJson é do tipo querystring
    * @param {object} params parametros para o form ou querystring
-   * @param {object} rHeaders headers
+   * @param {object} headers headers
    * @param {boolean} randomUserAgent deve utilizar um user agent aleatorio?
    */
-  async acessar(
+  async acessar({
     url,
     method = 'GET',
     encoding = null,
-    isProxied = false,
-    isJson = false,
+    usaProxy = false,
+    usaJson = false,
     params = null,
-    rHeaders = {},
-    randomUserAgent = false
-  ) {
-    let headers = rHeaders;
+    headers = {},
+    randomUserAgent = false,
+  } = {}) {
     if (!url || url == '') throw new Error('URL vazia!');
 
-    if (randomUserAgent) {
-      headers['User-Agent'] = this.requisicao.obterUserAgentAleatorio();
-    } else {
-      headers['User-Agent'] = chromeUserAgent;
-    }
+    headers['User-Agent'] = this.requisicao.obterUserAgent(randomUserAgent);
 
     const options = {
       url: url,
@@ -188,8 +184,10 @@ class Robo {
     };
 
     if (params) {
-      if (isJson) options.json = params;
+      if (usaJson) options.json = params;
+      // Json
       else {
+        // FormData
         let form = new FormData();
         for (let key in params) {
           form.append(key, params[key]);
@@ -199,7 +197,7 @@ class Robo {
       }
     }
 
-    if (isProxied)
+    if (usaProxy)
       options.proxy = {
         host: 'proxy-proadv.7lan.net',
         port: 8181,

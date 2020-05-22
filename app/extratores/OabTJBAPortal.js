@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const { Andamento } = require('../models/schemas/andamento');
+const { Logger } = require('../lib/util');
 
 const {
   BaseException,
@@ -18,41 +19,51 @@ class OabTJBAPortal extends ExtratorBase {
   async extrair(numeroDaOab) {
     try {
       let resultados = [];
-      let objResponse = await this.robo.acessar(
-        `${this.url}`,
-        'POST',
-        'latin1', //TODO verificar validade do LATIN1 como encoder para TJBA
-        true, //proxy
-        false,
-        {
+      console.log('1'); // TODO remover
+      let objResponse = await this.robo.acessar({
+        url: `${this.url}`,
+        method: 'POST',
+        encoding: 'latin1', //TODO verificar validade do LATIN1 como encoder para TJBA
+        usaProxy: false, //proxy
+        usaJson: false,
+        params: {
           tipo: 'NUMOAB',
           funcao: 'funcOAB',
           processo: numeroDaOab + 'BA',
           'g-recaptcha-response': '',
-        }
-      );
+        },
+      });
+      console.log('2'); // TODO remover
       let $ = cheerio.load(objResponse.responseBody);
       let codigoBusca = $.html().match(/var busca\s*=\s*'(.*)';/)[1];
       codigoBusca = codigoBusca.trim();
 
       let cookies = objResponse.cookies;
-      objResponse = await this.robo.acessar(
-        `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
-        'GET',
-        'latin1',
-        true, //proxy
-        false,
-        null,
-        { cookies: cookies }
-      );
+      objResponse = await this.robo.acessar({
+        url: `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
+        method: 'GET',
+        encoding: 'latin1',
+        usaProxy: false, //proxy
+        usaJson: false,
+        headers: { cookies: cookies },
+      });
 
       let listaProcessos = objResponse.responseBody.lstProcessos;
       resultados = await listaProcessos.map(async (element) => {
+        const logger = new Logger(
+          'info',
+          'logs/OabTJBAPortal/OabTJBAPortalInfo.log'
+        );
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;
         let andamentos = extracao.andamentos;
         Andamento.salvarAndamentos(andamentos);
         let resultado = await processo.salvar();
+        logger.info(
+          `Processo: ${
+            processo.toObject().detalhes.numeroProcesso
+          } salvo | Quantidade de andamentos: ${andamentos.length}`
+        );
         return resultado;
       });
 
@@ -64,6 +75,11 @@ class OabTJBAPortal extends ExtratorBase {
         };
       });
     } catch (e) {
+      const logger = new Logger(
+        'error',
+        `logs/OabTJBAPortal/OabTJBAPortal.log`
+      );
+      logger.log('error', e.message);
       if (e instanceof RequestException) {
         throw new RequestException(e.code, e.status, e.message);
       } else if (e instanceof BaseException) {

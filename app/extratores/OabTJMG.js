@@ -21,14 +21,14 @@ class OabTJMG extends ExtratorBase {
   }
 
   async acessarComarca(numeroOab, tipoOab, comarcaCode, cookies) {
-    let objResponse = await this.robo.acessar(
-      `https://www4.tjmg.jus.br/juridico/sf/proc_resultado_oab.jsp?nomeAdvogado=&codigoOAB=${numeroOab}&tipoOAB=${tipoOab}&ufOAB=MG&tipoConsulta=1&natureza=0&ativoBaixado=X&dataAudienciaFinal=&comrCodigo=${comarcaCode}&numero=1`,
-      'GET',
-      'latin1',
-      false,
-      false,
-      null,
-      {
+    let objResponse = await this.robo.acessar({
+      url: `https://www4.tjmg.jus.br/juridico/sf/proc_resultado_oab.jsp?nomeAdvogado=&codigoOAB=${numeroOab}&tipoOAB=${tipoOab}&ufOAB=MG&tipoConsulta=1&natureza=0&ativoBaixado=X&dataAudienciaFinal=&comrCodigo=${comarcaCode}&numero=1`,
+      mothod: 'GET',
+      encoding: 'latin1',
+      usaProxy: false,
+      usaJson: false,
+      params: null,
+      headers: {
         Host: ' www4.tjmg.jus.br',
         Connection: 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
@@ -39,7 +39,7 @@ class OabTJMG extends ExtratorBase {
         'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,la;q=0.6',
         Cookie: cookies,
       }
-    );
+    });
 
     let $ = cheerio.load(objResponse.responseBody);
     const captchaImageUrl = $('#captcha_image').attr('src'); // https://www4.tjmg.jus.br/juridico/sf/
@@ -61,14 +61,14 @@ class OabTJMG extends ExtratorBase {
       let objResponse = {};
 
       // Primeira parte: pegar cookies e ids de sessao
-      objResponse = await this.robo.acessar(
-        this.url,
-        'GET',
-        'latin1',
-        false,
-        false,
-        null
-      );
+      objResponse = await this.robo.acessar({
+        url: this.url,
+        method: 'GET',
+        encoding: 'latin1',
+        usaProxy: false,
+        usaJson: false,
+        params: null
+      });
       console.log('finalizado request');
       cookies = objResponse.cookies;
       cookies = cookies.map((element) => {
@@ -86,7 +86,7 @@ class OabTJMG extends ExtratorBase {
       // }
       // comarcasDisponiveis = comarcasDisponiveis.filter(Number);
       // const promessas = comarcasDisponiveis.map((comarcaCode) => {});
-      await this.acessarComarca(numeroDaOab, 'N', '24', cookies);
+      await this.acessarComarca(numeroDaOab, tipo, '24', cookies); // teste com a comarca de Belo Horizonte
 
       return {
         resultado: [],

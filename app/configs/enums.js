@@ -1,9 +1,9 @@
-require('dotenv/config');
+require("dotenv/config");
 
-const env = 'dev';
+const env = "dev";
 
 const bigdataAddress = process.env.BIG_DATA_ADDRESS;
-console.log('BigData Address', bigdataAddress); //TODO remove
+console.log("BigData Address", bigdataAddress); //TODO remove
 
 module.exports.enums = Object.freeze({
   mongo: {
@@ -11,32 +11,32 @@ module.exports.enums = Object.freeze({
     address: `mongodb://${process.env.MONGO_ROOT_USERNAME}:${process.env.MONGO_ROOT_PASSWORD}@${process.env.MONGO_ADDRESS}/${process.env.MONGO_DATABASE}`,
     databse: process.env.MONGO_DATABASE,
     username: process.env.MONGO_ROOT_USERNAME,
-    password: process.env.MONGO_ROOT_PASSWORD,
+    password: process.env.MONGO_ROOT_PASSWORD
   },
   rabbitmq: {
     connString: process.env.RABBITMQ_CONNECTION_STRING,
     address:
-      'amqp://' +
+      "amqp://" +
       process.env.RABBITMQ_USERNAME +
-      ':' +
+      ":" +
       process.env.RABBITMQ_PASSWORD +
-      '@' +
+      "@" +
       process.env.RABBITMQ_ADDRESS,
     username: process.env.RABBITMQ_USERNAME,
-    password: process.env.RABBITMQ_PASSWORD,
+    password: process.env.RABBITMQ_PASSWORD
   },
   nomesRobos: {
-    TJBAPortal: 'TJBAPortal',
-    TJSP: 'TJSP',
+    TJBAPortal: "TJBAPortal",
+    TJSP: "TJSP"
   },
   tipoConsulta: {
-    Oab: 'Oab',
-    Processo: 'Processo',
+    Oab: "oab",
+    Processo: "processo"
   },
   bigdataUrls: {
-    resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`,
+    resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`
   },
   proxy: {
-    proxiesUrl: process.env.PROXY_ADDRESS,
-  },
+    proxiesUrl: process.env.PROXY_ADDRESS
+  }
 });

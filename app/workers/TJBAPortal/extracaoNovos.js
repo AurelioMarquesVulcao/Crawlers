@@ -1,22 +1,22 @@
-const mongoose = require('mongoose');
-const { enums } = require('../../configs/enums');
-const { GerenciadorFila } = require('../../lib/filaHandler');
-const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Extracao } = require('../../models/schemas/extracao');
-const { Helper } = require('../../lib/util');
+const mongoose = require("mongoose");
+const { enums } = require("../../configs/enums");
+const { GerenciadorFila } = require("../../lib/filaHandler");
+const { ExtratorFactory } = require("../../extratores/extratorFactory");
+const { Extracao } = require("../../models/schemas/extracao");
+const { Helper } = require("../../lib/util");
 
 (async () => {
   try {
     mongoose.connect(enums.mongo.address, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
+      useUnifiedTopology: true
     });
 
-    mongoose.connection.on('error', (e) => {
+    mongoose.connection.on("error", (e) => {
       console.log(e);
     });
 
-    const nomeFila = `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJBAPortal}.extracao.novos`;
+    const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
 
     new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
@@ -26,12 +26,12 @@ const { Helper } = require('../../lib/util');
       let extracao = await Extracao.criarExtracao(
         message,
         resultadoExtracao,
-        'BA'
+        "BA"
       );
       const resposta = await Helper.enviarFeedback(
         extracao.prepararEnvio()
       ).catch((err) => {
-        console.log('Erro detectado', err);
+        console.log("Erro detectado", err);
       });
       ch.ack(msg);
       console.log(resposta);

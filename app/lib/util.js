@@ -34,21 +34,29 @@ class Helper {
       method: 'GET',
       responseType: 'arraybuffer',
     }).then((response) => {
-      let image = Buffer.from(response.data).toString('base64');
-      return image;
+      return Buffer.from(response.data).toString('base64');
     });
   }
 
-  static async decodeCaptcha(captchaString) {
-    return await new Robo().acessar(
-      enums.bigdataUrls.captchaDecoder,
-      'POST',
-      '',
-      false,
-      true,
-      captchaString,
-      {}
-    );
+  static async downloadAudio(url, headers) {
+    return await Axios({
+      url,
+      method: 'GET',
+      responseType: 'arraybuffer',
+      headers: headers,
+    }).then((response) => {
+      return Buffer.from(response.data).toString('base64');
+    });
+  }
+
+  static async quebrarCaptcha(captchaString, tipo) {
+    return await new Robo().acessar({
+      url: enums.bigdataUrls.captchaDecoder,
+      method: 'POST',
+      usaProxy: false,
+      usaJson: true,
+      params: { captcha: captchaString, tipp: tipo },
+    });
   }
 }
 

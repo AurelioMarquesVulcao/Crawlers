@@ -34,17 +34,24 @@ class OabTJMG extends ExtratorBase {
         'Upgrade-Insecure-Requests': '1',
         'Sec-Fetch-Site': 'same-origin',
         'Sec-Fetch-Mode': 'navigate',
-        Referer:
-          'https://www4.tjmg.jus.br/juridico/sf/proc_oab.jsp?comrCodigo=0024&cbo_nome_comarca=24&numero=1',
+        Referer: `https://www4.tjmg.jus.br/juridico/sf/proc_oab.jsp?comrCodigo=00${comarcaCode}&cbo_nome_comarca=${comarcaCode}&numero=1`,
+        'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,la;q=0.6',
+        Cookie: cookies,
+      },
+    });
+
+    let captchaStream = Helper.downloadAudio(
+      'https://www4.tjmg.jus.br/juridico/sf/captchaAudio.svl',
+      {
+        Host: ' www4.tjmg.jus.br',
+        Connection: 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-Mode': 'navigate',
+        Referer: `https://www4.tjmg.jus.br/juridico/sf/proc_oab.jsp?comrCodigo=00${comarcaCode}&cbo_nome_comarca=${comarcaCode}&numero=1`,
         'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,la;q=0.6',
         Cookie: cookies,
       }
-    });
-
-    let $ = cheerio.load(objResponse.responseBody);
-    const captchaImageUrl = $('#captcha_image').attr('src'); // https://www4.tjmg.jus.br/juridico/sf/
-    const captchaStream = await Helper.downloadImage(
-      'https://www4.tjmg.jus.br/juridico/sf/' + captchaImageUrl
     );
     return; // TODO fazer chamadas para o sites com as comarcas
   }
@@ -67,7 +74,7 @@ class OabTJMG extends ExtratorBase {
         encoding: 'latin1',
         usaProxy: false,
         usaJson: false,
-        params: null
+        params: null,
       });
       console.log('finalizado request');
       cookies = objResponse.cookies;

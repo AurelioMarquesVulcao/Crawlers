@@ -44,7 +44,7 @@ class Enfileirador {
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
 
     if (nomeRobo) {
-      const nomeFila = `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos1`;
+      const nomeFila = `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
       const execucao = {
         ConsultaCadastradaId: consultaPendente.id,
         NomeRobo: nomeRobo,

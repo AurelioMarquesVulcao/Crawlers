@@ -46,9 +46,9 @@ class Enfileirador {
     if (nomeRobo) {
       const nomeFila = `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
       const execucao = {
-        ConsultaCadastradaId: consultaPendente.id,
+        ConsultaCadastradaId: consultaPendente._id,
         NomeRobo: nomeRobo,
-        Log: [{descricao: `Execução do robô ${nomeRobo} cadastrada com sucesso!`}]
+        Log: [{status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`}]
       };
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();

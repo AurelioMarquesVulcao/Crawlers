@@ -4,25 +4,33 @@ const { GerenciadorFila } = require("../../lib/filaHandler");
 const { ExtratorFactory } = require("../../extratores/extratorFactory");
 const { Extracao } = require("../../models/schemas/extracao");
 const { Helper } = require("../../lib/util");
+const { LogExecucao } = require('../../lib/logExecucao');
+
+const logarExecucao = async (execucao) => {
+  await LogExecucao.salvar(execucao);
+}
 
 (async () => {
-  try {
-    mongoose.connect(enums.mongo.address, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+  mongoose.connect(enums.mongo.address, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }); 
 
-    mongoose.connection.on("error", (e) => {
-      console.log(e);
-    });
+  mongoose.connection.on("error", (e) => {
+    console.log(e);
+  });
 
-    const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
+  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
 
-    new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+  new GerenciadorFila()
+    .consumir(nomeFila, async (ch, msg) => {
+    
+    const mensagem = JSON.parse(msg.content.toString());
+
+    try {
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-      let message = JSON.parse(msg.content.toString());
-      console.log(message);
-      const resultadoExtracao = await extrator.extrair(message.NumeroDaOab);
+      const resultadoExtracao = await extrator.extrair(mensagem.NumeroDaOab);
+
       let extracao = await Extracao.criarExtracao(
         message,
         resultadoExtracao,
@@ -35,8 +43,11 @@ const { Helper } = require("../../lib/util");
       });
       ch.ack(msg);
       console.log(resposta);
-    });
-  } catch (e) {
-    console.log(e);
-  }
+      
+      await logarExecucao({ ...mensagem, status: 'OK' });
+    } catch (e) {
+      await logarExecucao({ ...mensagem, status: e.message, error: e.stack.replace(/\n+/,' ').trim() });
+    }
+  });
+  
 })();

@@ -5,7 +5,7 @@ class ExtratorFactory {
   static getExtrator(fila, isDebug) {
     let extrator;
 
-    if (/OabTJBAPortal/.test(fila)) {
+    if (/TJBAPortal/.test(fila)) {
       extrator = new OabTJBAPortal(
         'http://www5.tjba.jus.br/portal/busca-resultado',
         isDebug

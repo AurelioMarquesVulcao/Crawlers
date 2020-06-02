@@ -7,7 +7,7 @@ const { Helper, Logger } = require('../../lib/util');
 
 (async () => {
   try {
-    mongoose.connect(enums.mongo.address, {
+    mongoose.connect(enums.mongo.connString, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -16,7 +16,7 @@ const { Helper, Logger } = require('../../lib/util');
       console.log(e);
     });
 
-    const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos.teste`;
+    const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
 
     new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
       let message = JSON.parse(msg.content.toString());

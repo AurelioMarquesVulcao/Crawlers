@@ -112,10 +112,10 @@ class OabTJBAPortal extends ExtratorBase {
           throw new BaseException(e.code, e.message);
         }
       } else {
-        if (
-          /ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT/.test(e.code)
-        ) {
+        if (/ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT/.test(e.code)) {
           throw new RequestException(e.code, e.status, e.message);
+        } else {
+          throw e;
         }
       }
     }

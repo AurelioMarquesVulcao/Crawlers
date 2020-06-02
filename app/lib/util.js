@@ -15,6 +15,19 @@ class Helper {
     return cifra.toString();
   }
 
+  static exit(signal = 0) {
+    process.exit(signal);
+  }
+
+  static pre(param) {
+    console.log(param);
+  }
+
+  static pred(param, signal = 0) {
+    this.pre(param);
+    this.exit(signal);
+  }
+
   static async enviarFeedback(msg) {
     const robo = new Robo();
     return await robo.acessar(

@@ -1,24 +1,29 @@
-const mongoose = require('mongoose');
-const { enums } = require('../../configs/enums');
-const { GerenciadorFila } = require('../../lib/filaHandler');
-const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Extracao } = require('../../models/schemas/extracao');
-const { Helper, Logger } = require('../../lib/util');
+const mongoose = require("mongoose");
+const { enums } = require("../../configs/enums");
+const { GerenciadorFila } = require("../../lib/filaHandler");
+const { ExtratorFactory } = require("../../extratores/extratorFactory");
+const { Extracao } = require("../../models/schemas/extracao");
+const { Helper, Logger } = require("../../lib/util");
+const { LogExecucao } = require('../../lib/logExecucao');
+
+const logarExecucao = async (execucao) => {
+  await LogExecucao.salvar(execucao);
+}
 
 (async () => {
-  try {
-    mongoose.connect(enums.mongo.connString, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+  mongoose.connect(enums.mongo.connString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }); 
 
-    mongoose.connection.on('error', (e) => {
-      console.log(e);
-    });
+  mongoose.connection.on("error", (e) => {
+    console.log(e);
+  });
 
-    const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
+  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
 
     new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+      try{
       let message = JSON.parse(msg.content.toString());
       let logger = new Logger(
         'info',
@@ -34,6 +39,7 @@ const { Helper, Logger } = require('../../lib/util');
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(message.NumeroDaOab);
 
+      //TODO check this part
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(
         message,
@@ -49,6 +55,7 @@ const { Helper, Logger } = require('../../lib/util');
         console.log(
           `TJBAPortal - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroDaOab}`
         );
+        throw new Error(`TJBAPortal - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroDaOab}`)
         console.log(err);
       });
       logger.info('Resposta enviada ao BigData');
@@ -56,8 +63,11 @@ const { Helper, Logger } = require('../../lib/util');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
-    });
-  } catch (e) {
-    console.log(e);
-  }
+      
+      await logarExecucao({ ...message, status: 'OK' });
+    } catch (e) {
+      await logarExecucao({ ...msg, status: e.message, error: e.stack.replace(/\n+/,' ').trim() });
+    }
+  });
+  
 })();

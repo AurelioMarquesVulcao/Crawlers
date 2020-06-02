@@ -18,8 +18,16 @@ class OabTJBAPortal extends ExtratorBase {
 
   async extrair(numeroDaOab) {
     try {
+      const logger = new Logger(
+        'info',
+        'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
+        {
+          nomeRobo: enums.nomesRobos.TJBAPortal,
+          NumeroDaOab: message.NumeroDaOab,
+        }
+      );
       let resultados = [];
-      console.log('1'); // TODO remover
+      logger.info('Fazendo primeira conexão ao website');
       let objResponse = await this.robo.acessar({
         url: `${this.url}`,
         method: 'POST',
@@ -33,12 +41,14 @@ class OabTJBAPortal extends ExtratorBase {
           'g-recaptcha-response': '',
         },
       });
-      console.log('2'); // TODO remover
+      logger.info('Conexão ao website concluida.');
+      logger.info('Recuperando codigo de busca');
       let $ = cheerio.load(objResponse.responseBody);
       let codigoBusca = $.html().match(/var busca\s*=\s*'(.*)';/)[1];
       codigoBusca = codigoBusca.trim();
-
+      logger.info('Codigo de busca recuperado');
       let cookies = objResponse.cookies;
+      logger.info('Fazendo request de captura de processos');
       objResponse = await this.robo.acessar({
         url: `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
         method: 'GET',
@@ -47,13 +57,10 @@ class OabTJBAPortal extends ExtratorBase {
         usaJson: false,
         headers: { cookies: cookies },
       });
-
+      logger.info('Request de captura de processos concluido.');
       let listaProcessos = objResponse.responseBody.lstProcessos;
+      logger.info('Iniciando processamento da lista de processos');
       resultados = await listaProcessos.map(async (element) => {
-        const logger = new Logger(
-          'info',
-          'logs/OabTJBAPortal/OabTJBAPortalInfo.log'
-        );
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;
         let andamentos = extracao.andamentos;
@@ -68,6 +75,7 @@ class OabTJBAPortal extends ExtratorBase {
       });
 
       return Promise.all(resultados).then((args) => {
+        logger.info('Processos extraidos com sucesso');
         return {
           resultado: args,
           sucesso: true,
@@ -75,10 +83,6 @@ class OabTJBAPortal extends ExtratorBase {
         };
       });
     } catch (e) {
-      const logger = new Logger(
-        'error',
-        `logs/OabTJBAPortal/OabTJBAPortal.log`
-      );
       logger.log('error', e.message);
       if (e instanceof RequestException) {
         throw new RequestException(e.code, e.status, e.message);

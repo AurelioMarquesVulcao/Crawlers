@@ -30,12 +30,23 @@ class Helper {
 }
 
 class Logger {
-  constructor(logLevel = 'info', nomeArquivo) {
-    this.logger = winston.createLogger({
+  constructor(
+    logLevel = 'info',
+    nomeArquivo = '',
+    { nomeRobo, NumeroDoProcesso = null, NumeroDaOab = null } = {}
+  ) {
+    this.nomeRobo = nomeRobo;
+    this.numeroDoProcesso = NumeroDoProcesso;
+    this.numeroDaOab = NumeroDaOab;
+    this.consoleLogger = winston.createLogger({
+      level: 'info',
+      format: winston.format.simple(),
+      transports: [new winston.transports.Console()],
+    });
+    this.fileLogger = winston.createLogger({
       level: logLevel,
       format: winston.format.simple(),
       transports: [
-        new winston.transports.Console(),
         new winston.transports.File({
           filename: nomeArquivo,
         }),
@@ -43,12 +54,27 @@ class Logger {
     });
   }
 
+  /**
+   * Faz um print no console
+   * @param {string} log mensagem
+   */
   info(log) {
-    return this.logger.info(`[${moment().format()}] ${log}`);
+    let identificador = this.numeroDoProcesso
+      ? `CNJ: ${this.numeroDoProcesso}`
+      : `OAB: ${this.numeroDaOab}`;
+    return this.consoleLogger.info(
+      `${this.nomeRobo} - ${identificador} - ${log}`
+    );
   }
 
+  /**
+   * Faz um print no console e salva o log em arquivo
+   * @param {string} level nivel de importancia do log
+   * @param {string} log mensagem
+   */
   log(level, log) {
-    return this.logger.log(level, `[${moment().format()}] ${log}`);
+    this.info(log);
+    return this.fileLogger.log(level, `[${moment().format()}] ${log}`);
   }
 }
 

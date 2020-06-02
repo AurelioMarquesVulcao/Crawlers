@@ -9,21 +9,29 @@ const {
 } = require('../models/exception/exception');
 const { ExtratorBase } = require('./extratores');
 const { TJBAPortalParser } = require('../parsers/TJBAPortalParser');
+const enums = require('../configs/enums').enums;
+
+/**
+ * Logger para console e arquivo
+ */
+let logger;
 
 class OabTJBAPortal extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
     this.parser = new TJBAPortalParser();
+    this.numeroDaOab = '';
   }
 
   async extrair(numeroDaOab) {
     try {
-      const logger = new Logger(
+      this.numeroDaOab = numeroDaOab;
+      logger = new Logger(
         'info',
         'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
         {
           nomeRobo: enums.nomesRobos.TJBAPortal,
-          NumeroDaOab: message.NumeroDaOab,
+          NumeroDaOab:numeroDaOab,
         }
       );
       let resultados = [];
@@ -83,7 +91,15 @@ class OabTJBAPortal extends ExtratorBase {
         };
       });
     } catch (e) {
-      logger.log('error', e.message);
+      let logger = new Logger(
+        'info',
+        'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
+        {
+          nomeRobo: enums.nomesRobos.TJBAPortal,
+          NumeroDaOab: numeroDaOab,
+        }
+      );
+      logger.log('error', e);
       if (e instanceof RequestException) {
         throw new RequestException(e.code, e.status, e.message);
       } else if (e instanceof BaseException) {

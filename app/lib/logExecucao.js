@@ -12,14 +12,25 @@ module.exports.LogExecucao = class LogExecucao {
       status: execucao.status,
       error: execucao.error
     };
-    await ExecucaoConsulta
-      .updateOne({_id: execucao.ExecucaoConsultaId}, {
-        $addToSet: {
-          Log: log
-        }
-    });
+    // await ExecucaoConsulta
+    //   .updateOne({_id: execucao.ExecucaoConsultaId}, {
+    //     $addToSet: {
+    //       Log: log
+    //     }
+    // });
 
-    mongoose.connection.close();
+    delete execucao['status'];
+    delete execucao['error'];
+    console.log('Execucao', execucao);
+    await ExecucaoConsulta.updateOne(
+      {_id: execucao.LogConsultaId},
+      {
+        ...execucao,
+        Log: log,
+        DataEnfileiramento: execucao.Mensagem.DataHoraEnfileiramento
+      },
+      { upsert: true }
+    );
   }
   
 }

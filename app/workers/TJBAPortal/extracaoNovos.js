@@ -23,8 +23,11 @@ const logarExecucao = async (execucao) => {
   const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
 
     new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
-      try{
+      dataInicio = new Date();
       let message = JSON.parse(msg.content.toString());
+      try{
+      const dataInicio = new Date();
+      //let message = JSON.parse(msg.content.toString());
       let logger = new Logger(
         'info',
         'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
@@ -64,9 +67,28 @@ const logarExecucao = async (execucao) => {
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
       
-      await logarExecucao({ ...message, status: 'OK' });
+      await logarExecucao(
+        {
+          ...message,
+          dataInicio: dataInicio,
+          dataTermino: new Date(),
+          status: 'OK',
+          NomeRobo: enums.nomesRobos.TJBAPortal
+        }
+      );
     } catch (e) {
-      await logarExecucao({ ...msg, status: e.message, error: e.stack.replace(/\n+/,' ').trim() });
+      await logarExecucao(
+        {
+          LogConsultaId: message.LogConsultaId,
+          Mensagem: message, 
+          DataInicio: dataInicio,
+          DataTermino: new Date(),
+          status: e.message, 
+          error: e.stack.replace(/\n+/,' ').trim(),
+          NomeRobo: enums.nomesRobos.TJBAPortal
+        }
+      );
+      console.log(e);
     }
   });
   

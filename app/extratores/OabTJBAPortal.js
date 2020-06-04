@@ -39,8 +39,8 @@ class OabTJBAPortal extends ExtratorBase {
       let objResponse = await this.robo.acessar({
         url: `${this.url}`,
         method: 'POST',
-        encoding: 'latin1', //TODO verificar validade do LATIN1 como encoder para TJBA
-        usaProxy: false, //proxy
+        encoding: 'latin1',
+        usaProxy: false,
         usaJson: false,
         params: {
           tipo: 'NUMOAB',

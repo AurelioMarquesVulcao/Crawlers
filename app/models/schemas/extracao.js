@@ -42,7 +42,7 @@ ExtracaoSchema.statics.criarExtracao = async function criarExtracao(
   return await Extracao.create({
     idLog: message.ExecucaoConsultaId,
     numeroProcesso: message.NumeroProcesso,
-    oab: message.numeroOab,
+    oab: message.NumeroOab,
     resultado: extracao.resultado,
     sucesso: extracao.sucesso,
     detalhes: extracao.detalhes,
@@ -53,8 +53,8 @@ ExtracaoSchema.statics.criarExtracao = async function criarExtracao(
 ExtracaoSchema.methods.prepararEnvio = function prepararEnvio() {
   return {
     IdLog: this.idLog,
-    NumeroDoProcesso: this.numeroCNJ,
-    NumeroOab: this.numeroOab,
+    NumeroDoProcesso: this.NumeroProcesso,
+    NumeroOab: this.NumeroOab,
     Resultado: this.resultado,
     Sucesso: this.sucesso,
     Detalhes: this.detalhes,

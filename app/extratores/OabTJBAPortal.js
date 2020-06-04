@@ -68,7 +68,7 @@ class OabTJBAPortal extends ExtratorBase {
       logger.info('Request de captura de processos concluido.');
       let listaProcessos = objResponse.responseBody.lstProcessos;
       logger.info('Iniciando processamento da lista de processos');
-      resultados = await listaProcessos.map(async (element) => {
+      resultados = listaProcessos.map(async (element) => {
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;
         let andamentos = extracao.andamentos;

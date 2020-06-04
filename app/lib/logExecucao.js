@@ -18,13 +18,14 @@ module.exports.LogExecucao = class LogExecucao {
     delete execucao['error'];
     delete execucao['logs'];
     await ExecucaoConsulta.updateOne(
-      {_id: execucao.LogConsultaId},
+      {_id: execucao.Mensagem.ExecucaoConsultaId},
       {
         ...execucao,
         Log: log,
         DataEnfileiramento: execucao.Mensagem.DataEnfileiramento
       },
-      { upsert: true }
+      // upsert true, caso precise de um jeito de criar a consulta na hora
+      { upsert: true } 
     );
   }
   

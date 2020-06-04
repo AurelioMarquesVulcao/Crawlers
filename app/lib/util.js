@@ -30,15 +30,14 @@ class Helper {
 
   static async enviarFeedback(msg) {
     const robo = new Robo();
-    return await robo.acessar(
-      enums.bigdataUrls.resultadoConsulta,
-      'POST',
-      '',
-      false,
-      true,
-      msg,
-      {}
-    );
+    return await robo.acessar({
+      url: enums.bigdataUrls.resultadoConsulta,
+      method: 'POST',
+      encoding: '',
+      usaProxy: false,
+      usaJson: true,
+      params: msg,
+    });
   }
 }
 
@@ -51,6 +50,7 @@ class Logger {
     this.nomeRobo = nomeRobo;
     this.numeroDoProcesso = NumeroDoProcesso;
     this.numeroDaOab = NumeroDaOab;
+    this.logs = [];
     this.consoleLogger = winston.createLogger({
       level: 'info',
       format: winston.format.simple(),
@@ -75,6 +75,7 @@ class Logger {
     let identificador = this.numeroDoProcesso
       ? `CNJ: ${this.numeroDoProcesso}`
       : `OAB: ${this.numeroDaOab}`;
+    this.logs.push(`${this.nomeRobo} - ${identificador} - ${log}`);
     return this.consoleLogger.info(
       `${this.nomeRobo} - ${identificador} - ${log}`
     );

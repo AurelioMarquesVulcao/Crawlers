@@ -41,12 +41,10 @@ AndamentoSchema.statics.criarHash = function criarHash(obj) {
 };
 
 AndamentoSchema.statics.salvarAndamentos = function salvarAndamentos(objs) {
-  console.log('salvar andamentos'); //TODO remover
   let andamentosNovos = objs.map(async (element) => {
     return await element.salvar();
   });
   return Promise.all(andamentosNovos).then((args) => {
-    console.log('Andamentos Salvos', args.filter(Boolean).length);
     return args.filter(Boolean).length;
   });
 };

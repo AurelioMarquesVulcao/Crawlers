@@ -41,7 +41,6 @@ const logarExecucao = async (execucao) => {
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(message.NumeroDaOab);
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
-      //TODO check this part
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(
         message,
@@ -55,9 +54,6 @@ const logarExecucao = async (execucao) => {
         extracao.prepararEnvio()
       ).catch((err) => {
         console.log(err);
-        console.log(
-          `TJBAPortal - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroDaOab}`
-        );
         throw new Error(`TJBAPortal - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroDaOab}`)
       });
       logger.info('Resposta enviada ao BigData');

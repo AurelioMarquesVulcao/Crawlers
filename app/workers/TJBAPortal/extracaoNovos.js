@@ -23,7 +23,7 @@ const logarExecucao = async (execucao) => {
   const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
 
     new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
-      dataInicio = new Date();
+      const dataInicio = new Date();
       let message = JSON.parse(msg.content.toString());
       let logger = new Logger(
         'info',
@@ -34,7 +34,6 @@ const logarExecucao = async (execucao) => {
         }
       );
       try{
-      const dataInicio = new Date();
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
@@ -64,8 +63,8 @@ const logarExecucao = async (execucao) => {
       await logarExecucao(
         {
           Mensagem: message,
-          dataInicio: dataInicio,
-          dataTermino: new Date(),
+          DataInicio: dataInicio,
+          DataTermino: new Date(),
           status: 'OK',
           logs: logger.logs,
           NomeRobo: enums.nomesRobos.TJBAPortal

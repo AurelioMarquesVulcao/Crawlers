@@ -88,6 +88,7 @@ class OabTJBAPortal extends ExtratorBase {
           resultado: args,
           sucesso: true,
           detalhes: '',
+          logs: logger.logs
         };
       });
     } catch (e) {

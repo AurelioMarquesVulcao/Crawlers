@@ -30,7 +30,7 @@ const logarExecucao = async (execucao) => {
         'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
         {
           nomeRobo: enums.nomesRobos.TJBAPortal,
-          NumeroDaOab: message.NumeroDaOab,
+          NumeroOab: message.NumeroOab,
         }
       );
       try{
@@ -39,13 +39,13 @@ const logarExecucao = async (execucao) => {
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
       logger.info('Iniciando processo de extração');
-      const resultadoExtracao = await extrator.extrair(message.NumeroDaOab);
+      const resultadoExtracao = await extrator.extrair(message.NumeroOab);
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(
         message,
         resultadoExtracao,
-        'BA'
+        message.SeccionalOab
       );
       logger.info('Resultado da extracao salva');
 
@@ -54,7 +54,7 @@ const logarExecucao = async (execucao) => {
         extracao.prepararEnvio()
       ).catch((err) => {
         console.log(err);
-        throw new Error(`TJBAPortal - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroDaOab}`)
+        throw new Error(`TJBAPortal - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`)
       });
       logger.info('Resposta enviada ao BigData');
       logger.info('Reconhecendo mensagem ao RabbitMQ');

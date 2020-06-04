@@ -20,18 +20,18 @@ class OabTJBAPortal extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
     this.parser = new TJBAPortalParser();
-    this.numeroDaOab = '';
+    this.numeroOab = '';
   }
 
-  async extrair(numeroDaOab) {
+  async extrair(numeroOab) {
     try {
-      this.numeroDaOab = numeroDaOab;
+      this.numeroOab = numeroOab;
       logger = new Logger(
         'info',
         'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
         {
           nomeRobo: enums.nomesRobos.TJBAPortal,
-          NumeroDaOab:numeroDaOab,
+          NumeroOab:numeroOab,
         }
       );
       let resultados = [];
@@ -45,7 +45,7 @@ class OabTJBAPortal extends ExtratorBase {
         params: {
           tipo: 'NUMOAB',
           funcao: 'funcOAB',
-          processo: numeroDaOab + 'BA',
+          processo: numeroOab + 'BA',
           'g-recaptcha-response': '',
         },
       });
@@ -97,7 +97,7 @@ class OabTJBAPortal extends ExtratorBase {
         'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
         {
           nomeRobo: enums.nomesRobos.TJBAPortal,
-          NumeroDaOab: numeroDaOab,
+          NumeroOab: numeroOab,
         }
       );
       logger.log('error', e);

@@ -45,11 +45,11 @@ class Logger {
   constructor(
     logLevel = 'info',
     nomeArquivo = '',
-    { nomeRobo, NumeroDoProcesso = null, NumeroDaOab = null } = {}
+    { nomeRobo, NumeroDoProcesso = null, NumeroOab = null } = {}
   ) {
     this.nomeRobo = nomeRobo;
-    this.numeroDoProcesso = NumeroDoProcesso;
-    this.numeroDaOab = NumeroDaOab;
+    this.NumeroProcesso = NumeroDoProcesso;
+    this.numeroOab = NumeroOab;
     this.logs = [];
     this.consoleLogger = winston.createLogger({
       level: 'info',
@@ -72,9 +72,9 @@ class Logger {
    * @param {string} log mensagem
    */
   info(log) {
-    let identificador = this.numeroDoProcesso
-      ? `CNJ: ${this.numeroDoProcesso}`
-      : `OAB: ${this.numeroDaOab}`;
+    let identificador = this.NumeroProcesso
+      ? `CNJ: ${this.NumeroProcesso}`
+      : `OAB: ${this.numeroOab}`;
     this.logs.push(`${this.nomeRobo} - ${identificador} - ${log}`);
     return this.consoleLogger.info(
       `${this.nomeRobo} - ${identificador} - ${log}`

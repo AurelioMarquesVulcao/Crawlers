@@ -40,9 +40,9 @@ ExtracaoSchema.statics.criarExtracao = async function criarExtracao(
   uf
 ) {
   return await Extracao.create({
-    idLog: message.LogConsultaId,
-    numeroProcesso: message.numeroDoProcesso,
-    oab: message.numeroDaOab,
+    idLog: message.ExecucaoConsultaId,
+    numeroProcesso: message.NumeroProcesso,
+    oab: message.numeroOab,
     resultado: extracao.resultado,
     sucesso: extracao.sucesso,
     detalhes: extracao.detalhes,
@@ -54,7 +54,7 @@ ExtracaoSchema.methods.prepararEnvio = function prepararEnvio() {
   return {
     IdLog: this.idLog,
     NumeroDoProcesso: this.numeroCNJ,
-    NumeroDaOab: this.numeroDaOab,
+    NumeroOab: this.numeroOab,
     Resultado: this.resultado,
     Sucesso: this.sucesso,
     Detalhes: this.detalhes,

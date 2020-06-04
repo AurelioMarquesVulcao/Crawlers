@@ -22,7 +22,7 @@ module.exports.LogExecucao = class LogExecucao {
       {
         ...execucao,
         Log: log,
-        DataEnfileiramento: execucao.Mensagem.DataHoraEnfileiramento
+        DataEnfileiramento: execucao.Mensagem.DataEnfileiramento
       },
       { upsert: true }
     );

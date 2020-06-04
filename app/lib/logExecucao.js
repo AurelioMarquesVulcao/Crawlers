@@ -10,18 +10,13 @@ module.exports.LogExecucao = class LogExecucao {
   static async salvar(execucao) {
     const log = { 
       status: execucao.status,
-      error: execucao.error
+      error: execucao.error,
+      logs: execucao.logs
     };
-    // await ExecucaoConsulta
-    //   .updateOne({_id: execucao.ExecucaoConsultaId}, {
-    //     $addToSet: {
-    //       Log: log
-    //     }
-    // });
 
     delete execucao['status'];
     delete execucao['error'];
-    console.log('Execucao', execucao);
+    delete execucao['logs'];
     await ExecucaoConsulta.updateOne(
       {_id: execucao.LogConsultaId},
       {

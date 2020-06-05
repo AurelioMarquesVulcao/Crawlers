@@ -60,3 +60,9 @@ services:
       file: common-services.yml
       service: base_node
     command: node workers/TJSP/extracao.js
+
+  cadastro-consulta:
+    extends: 
+      file: common-services.yml
+      service: base_node
+    command: node workers/consumer_cadastro_consulta.js

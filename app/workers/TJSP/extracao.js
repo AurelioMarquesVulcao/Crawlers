@@ -22,11 +22,11 @@ const { Helper } = require('../../lib/util');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
       let message = JSON.parse(msg.content.toString());
       console.log(message);
-      const resultadoExtracao = await extrator.extrair(message.NumeroDaOab);
+      const resultadoExtracao = await extrator.extrair(message.NumeroOab);
       let extracao = await Extracao.criarExtracao(
         message,
         resultadoExtracao,
-        'SP'
+        message.SeccionalOab
       );
       const resposta = await Helper.enviarFeedback(
         extracao.prepararEnvio()

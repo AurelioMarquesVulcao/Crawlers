@@ -7,6 +7,7 @@ const ExecucaoConsulta = require("../models/schemas/execucao_consulta")
 const GerenciadorFila = require("../lib/filaHandler").GerenciadorFila;
 const moment = require("moment");
 const enums = require("../configs/enums").enums;
+const cron = require("node-cron");
 
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
@@ -17,23 +18,22 @@ let gf = new GerenciadorFila();
 
 const exit = (signal = 0) => {
   process.exit(signal);
-}
+};
 
 const pretty = (obj, replacer = null) => {
   return JSON.stringify(obj, replacer, 2);
-}
+};
 
 const pre = (param) => {
   console.log(param);
-}
+};
 
 const pred = (param) => {
   pre(param);
   exit();
-}
+};
 
 class Enfileirador {
-
   /**
    * Callback do método executar. Recebe uma consulta de execução pendente e a envia para
    * as filas de seus respectivos robos.
@@ -48,7 +48,11 @@ class Enfileirador {
       const execucao = {
         ConsultaCadastradaId: consultaPendente._id,
         NomeRobo: nomeRobo,
-        Log: [{status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`}]
+        Log: [
+          {
+            status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`
+          }
+        ]
       };
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();
@@ -62,7 +66,7 @@ class Enfileirador {
       };
       gf.enviar(nomeFila, mensagem);
     }
-  };
+  }
 
   /**
    * Realiza a query das consultas pendentes de execução.
@@ -76,10 +80,10 @@ class Enfileirador {
           { DataUltimaConsultaTribunal: null }
         ]
       };
-      
+
       const lista = await ConsultasCadastradas.find(busca);
 
-      for(let i =0, si = lista.length; i < si; i++) {
+      for (let i = 0, si = lista.length; i < si; i++) {
         await Enfileirador.cadastrarConsultaPendente(lista[i]);
       }
 
@@ -87,9 +91,10 @@ class Enfileirador {
     } catch (e) {
       console.log(e);
     }
-  };
+  }
 }
 
-(async () => {
-  await Enfileirador.executar();
-})();
+cron.schedule("0 * * * *", () => {
+  console.log("Executando enfileirador.");
+  Enfileirador.executar();
+});

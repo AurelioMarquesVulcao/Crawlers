@@ -7,6 +7,7 @@ const ExecucaoConsulta = require("../models/schemas/execucao_consulta")
 const GerenciadorFila = require("../lib/filaHandler").GerenciadorFila;
 const moment = require("moment");
 const enums = require("../configs/enums").enums;
+const cron = require("node-cron");
 
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
@@ -75,4 +76,7 @@ class Enfileirador {
   };
 }
 
-Enfileirador.executar();
+cron.schedule("0 * * * *", () => {
+  console.log("Executando enfileirador.");
+  Enfileirador.executar();
+});

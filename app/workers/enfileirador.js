@@ -94,6 +94,9 @@ class Enfileirador {
   }
 }
 
+console.log("Realizando execução ao iniciar o container.");
+Enfileirador.executar();
+
 cron.schedule("0 * * * *", () => {
   console.log("Executando enfileirador.");
   Enfileirador.executar();

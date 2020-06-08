@@ -1,5 +1,6 @@
 const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJSP } = require('./OabTJSP');
+const { OabTJSC } = require('./OabTJSC');
 
 class ExtratorFactory {
   static getExtrator(fila, isDebug) {
@@ -14,6 +15,10 @@ class ExtratorFactory {
 
     if (/oab.TJSP/.test(fila)) {
       extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg/open.do', isDebug);
+    }
+
+    if (/oab.TJSC/.test(fila)) {
+      extrator = new OabTJSC('https://esaj.tjsc.jus.br/cposgtj/open.do', isDebug);
     }
 
     return extrator;

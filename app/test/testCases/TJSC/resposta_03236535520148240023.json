@@ -1,0 +1,40 @@
+{
+  "capa": {
+    "assunto": ["Divida Ativa"],
+    "uf": "SC",
+    "comarca": "Capital",
+    "classe": "Apelacao Civel"
+  },
+  "detalhes":{
+    "tipo": "cnj",
+    "numeroProcesso": "03236535520148240023",
+    "numeroProcessoMascara": "0323653-55.2014.8.24.0023",
+    "instancia": 1,
+    "ano": 2014,
+    "orgao": 8,
+    "tribunal": 24,
+    "origem": 23
+  },
+  "envolvidos": [
+    {
+      "tipo": "Apelante",
+      "nome": "Estado de Santa Catarina"
+    },
+    {
+      "tipo": "Procurador",
+      "nome": "(32408SC) Francisco Jose Guardini Nogueira"
+    },
+    {
+      "tipo": "Procurador",
+      "nome": "Ederson Pires"
+    },
+    {
+      "tipo": "Apelado",
+      "nome": "Banco Itauleasing S/A"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "(71318SP) Marcelo Tesheiner Cavassani"
+    }
+  ]
+}

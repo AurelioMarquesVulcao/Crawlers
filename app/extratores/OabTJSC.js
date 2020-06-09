@@ -17,6 +17,8 @@ const { ExtratorBase } = require("./extratores");
 class OabTJSC extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
+    // TODO remover declaracao abaixo e descomentar uso do parser
+    this.parser = () => ({ processo: {}, listaAndamento: [] });
     // this.parser = new TJSCParser();
     this.dataSiteKey = "6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL";
     this.numeroOab = "";
@@ -58,13 +60,37 @@ class OabTJSC extends ExtratorBase {
       gResponse = await this.getCaptcha();
       this.logger.info("Processo de resolução do captcha concluido");
 
-      this.logger.info("Iniciando recuperação dos processos");
+      this.logger.info("Iniciando recuperação da lista de processos");
       listaProcessos = await this.getListaProcessos(
         cookies,
         uuidCaptcha,
         gResponse
       );
-      this.logger.info("Processos recuperados");
+      this.logger.info("Lista de processos recuperada");
+
+      if (listaProcessos.length > 0) {
+        this.logger.info(
+          "Iniciando recuperação de processos a partir da lista"
+        );
+        resultado = this.processarListaProcessos(listaProcessos, cookies);
+        return Promise.all(resultado).then((args) => {
+          this.logger.info("Processos recupeados.");
+          return {
+            resultado: args,
+            sucesso: true,
+            detalhes: "",
+            logs: this.logger.logs
+          };
+        });
+      }
+
+      this.logger.info("Lista de processo vazia");
+      return {
+        resultado: [],
+        sucesso: false,
+        detalhes: "Lista de processo vazia",
+        logs: this.logger.logs
+      };
     } catch (e) {
       this.logger.log("error", e);
       if (e instanceof RequestException) {
@@ -90,6 +116,12 @@ class OabTJSC extends ExtratorBase {
     }
   }
 
+  /**
+   * Verifica a existencia de captchas e recupera o uuid caso exista
+   * @param {string} content Pagina recuperada pelo robo para ser usada com o cheerio
+   * @param {array} cookies Cookies da pagina
+   * @returns {Promise<{captcha: {hasCaptcha: boolean, uuidCaptcha: string}}>}
+   */
   async preParse(content, cookies) {
     const $ = cheerio.load(content);
     let preParse = {
@@ -105,6 +137,11 @@ class OabTJSC extends ExtratorBase {
     return preParse;
   }
 
+  /**
+   * Recupera o uuid por meio de requisição a pagina de controle de acesso
+   * @param {array} cookies Cookies da pagina
+   * @returns {Promise<string>}
+   */
   async getCaptchaUuid(cookies) {
     let objResponse;
 
@@ -118,6 +155,10 @@ class OabTJSC extends ExtratorBase {
     return objResponse.responseBody.uuid; // TODO verificar se é necessário transformar isso em json primeiro
   }
 
+  /**
+   * Captura o captcha por uso do AntiCaptcha
+   * @returns {Promise<string>}
+   */
   async getCaptcha() {
     let response;
 
@@ -133,10 +174,17 @@ class OabTJSC extends ExtratorBase {
     return response;
   }
 
+  /**
+   * Retorna lista com os links dos processos
+   * @param {array} cookies Cookies da pagina
+   * @param {string} uuidCaptcha Codigio de identificação da sessao (?)
+   * @param {string} gResponse resposta do captcha
+   * @returns {Promise<[string]>}
+   */
   async getListaProcessos(cookies, uuidCaptcha, gResponse) {
     let condition = false;
     let processos = [];
-    let url =(
+    let url =
       this.url +
       `?conversationId=` +
       `&paginaConsultada=0` +
@@ -144,7 +192,6 @@ class OabTJSC extends ExtratorBase {
       `&dePesquisa=${this.numeroOab}` +
       `&uuidCaptcha=${uuidCaptcha}` +
       `&g-captcha-response=${gResponse}`;
-    )
 
     do {
       let objResponse = this.robo.acessar({
@@ -159,16 +206,78 @@ class OabTJSC extends ExtratorBase {
 
       try {
         processos: [...processos, this.extrairLinkProcessos($)];
-        const proximaPagina = $("a[title='Próxima página']").attr("href");
+        const proximaPagina = $('a[title|="Próxima página"]').first();
 
-        if (proximaPagina == null) return processos;
+        if (!proximaPagina.text()) return processos;
 
         condition = true;
-        url = this.url +'?'+ proximaPagina
+        url = this.url + "?" + proximaPagina.attr("href");
       } catch (e) {
-        this.logger.info('Erro ao tentar adquirir a lista de processos');
+        this.logger.info("Erro ao tentar adquirir a lista de processos");
       }
     } while (condition);
+  }
+
+  /**
+   * Extrai da lista de processos os processos
+   * @param {array} listaProcessos
+   * @param {string} cookies
+   * @returns {Promise<[Object]>}
+   */
+  async processarListaProcessos(listaProcessos, cookies) {
+    let resultado;
+
+    // FIXME delimitador para checar o gasto de captcha
+    // TODO remover
+    listaProcessos = listaProcessos.slice(0, 5);
+
+    resultados = listaProcessos.map(async (element) => {
+      let extracao;
+      let processo;
+      let andamentos;
+      let resultado;
+
+      let body = await this.extrairProcesso(element, cookie);
+
+      if (body) {
+        extracao = await this.parser.parse(body);
+        processo = extracao.processo;
+        andamentos = extracao.andamentos;
+
+        await Andamento.salvarAndamentos(andamentos);
+        resultado = await processo.salvar();
+        logger.info(
+          `Processo: ${
+            processo.toObject().detalhes.numeroProcesso
+          } salvo | Quantidade de andamentos: ${andamentos.length}`
+        );
+        return Promise.resolve(resultado);
+      } else {
+        return Promise.resolve(false);
+      }
+    });
+    return Promise.all(resultados).then((args) => {
+      this.logger(
+        `Extração de ${args.filter(Boolean).length} processos feito com sucesso`
+      );
+      return args.filter(Boolean);
+    });
+  }
+
+  async extrairProcesso(urlProcesso, cookies) {
+    let objResponse;
+
+    objResponse = await this.robo.acessar({
+      url: urlProcesso,
+      method: "GET",
+      encoding: "latin1",
+      usaProxy: false,
+      usaJson: false,
+      headers: { Cookie: cookies },
+      randomUserAgent: false
+    });
+
+    return objResponse.responseBody;
   }
 }
 

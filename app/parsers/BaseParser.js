@@ -50,6 +50,8 @@ const tradutor = {
   ADVOGADO_MIGRACAO: 'Advogado',
   Apelte: 'Apelante',
   Apeldo: 'Apelado',
+  Apte: 'Apelante',
+  Apdo: 'Apelado',
   PROCURADOR: 'Procurador',
   IMPETRANTE: 'Impetrante',
   IMPETRADO: 'Impetrado',

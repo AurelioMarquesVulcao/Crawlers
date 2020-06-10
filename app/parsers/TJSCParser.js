@@ -112,11 +112,85 @@ class TJSCParser extends BaseParser {
 
   extrairEnvolvidos($) {
     let envolvidos = [];
-    const tableSelector = $("#tablePartesPrincipais > tbody");
+    const table = $("#tablePartesPrincipais > tbody > tr");
 
-    let tableEnvolvidos = $(tableSelector);
+    // pegar personagens
+    table.map((index, linha) => {
+      let envolvido = { tipo: "", nome: "" };
+      let advogados;
+
+      // Extracao
+      envolvido.tipo = $(
+        `#tablePartesPrincipais > tbody > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(1).label > span`
+      )[0].children[0].data.strip();
+      envolvido.nome = $(
+        `#tablePartesPrincipais > tbody > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(2)`
+      )[0].children[0].data.strip();
+      advogados = this.recuperaAdvogados(index, $);
+
+      // Tratamento
+      envolvido.tipo = envolvido.tipo.replace(":", "").split(/\W/)[0];
+      if (tradutor[envolvido.tipo]) envolvido.tipo = tradutor[envolvido.tipo];
+      envolvido.nome = removerAcentos(envolvido.nome);
+
+      // Atribuição
+      envolvidos.push(envolvido);
+
+      if (advogados) envolvidos = [...envolvidos, ...advogados];
+    });
+
+    // pegar os advogados
 
     return envolvidos;
+  }
+
+  recuperaAdvogados(upperIndex, $) {
+    let advogados = [];
+    let linha;
+
+    // 1 transformar tudo em linhas
+    linha = $(
+      `#tablePartesPrincipais > tbody > tr:nth-child(${
+        upperIndex + 1
+      }) > td:nth-child(2)`
+    )
+      .text() // pega o texto
+      .strip() // tira os espacos vazios
+      .split(/\s\s+/) // list feita a partir das quebras de linha
+      .splice(1); // remove primeiro elemento que normalmente é o nome do envolvido
+
+    linha.map((element, index) => {
+      let adv = {
+        tipo: "",
+        nome: ""
+      };
+      let oab = "";
+
+      // Extracao
+      adv.tipo = re
+        .exec(element, re(`(?<tipo>.+):\\s(?<nome>.+)`))
+        .tipo.strip();
+      adv.nome = re
+        .exec(element, re(`(?<tipo>.+):\\s(?<nome>.+)`))
+        .nome.strip();
+      oab = $(
+        `#tablePartesPrincipais > tbody > tr:nth-child(${
+          upperIndex + 1
+        }) > td:nth-child(2) > input`
+      )[index].attribs.value;
+
+      // Tratamento
+      adv.nome = removerAcentos(adv.nome);
+      if (oab) adv.nome = `(${oab}) ${adv.nome}`;
+
+      advogados.push(adv);
+    });
+
+    return advogados;
   }
 }
 

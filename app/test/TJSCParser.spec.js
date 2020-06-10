@@ -29,7 +29,7 @@ const teste = (numeroProcesso) => {
 
   it("ENVOLVIDOS", () => {
     const envolvidos = extracao.processo.envolvidos.toObject();
-    chai.expect(resultado.envolvidos).to.eql(envolvidos);
+    chai.expect(resposta.envolvidos).to.eql(envolvidos);
   });
 
   it("ANDAMENTOS", () => {

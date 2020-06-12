@@ -23,6 +23,9 @@ class TJSCParser extends BaseParser {
     const capa = this.extrairCapa($);
     const detalhes = this.extrairDetalhes($);
     const envolvidos = this.extrairEnvolvidos($);
+    const oabs = this.extrairOabs(envolvidos);
+    // #tabelaTodasMovimentacoes
+    const andamentos = this.extrairAndamentos($);
 
     const processo = new Processo({
       capa: capa,
@@ -191,6 +194,25 @@ class TJSCParser extends BaseParser {
     });
 
     return advogados;
+  }
+
+  extrairOabs(envolvidos) {
+    let oabs = envolvidos.map((element) => {
+      let oab = re.exec(element.nome, re(/\((?<oab>\d+\w+)\)/));
+      if (oab) {
+        return oab.oab;
+      } else {
+        return null;
+      }
+    });
+
+    return oabs.filter(Boolean);
+  }
+
+  extrairAndamentos($) {
+    let andamentos = [];
+
+    return andamentos;
   }
 }
 

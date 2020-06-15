@@ -62,6 +62,7 @@ const processoSchema = new Schema(
 
 processoSchema.methods.salvar = async function salvar() {
   let processoObject = this.toObject();
+  let pesquisaAndamentos = 0;
   delete processoObject['_id'];
   var pesquisa = await new Promise((resolve, reject) => {
     Processo.findOne(
@@ -104,10 +105,15 @@ processoSchema.methods.salvar = async function salvar() {
       qtdAndamentosNovos: processoObject.qtdAndamentos,
     };
   }
+
+  if (pesquisa) {
+    pesquisaAndamentos = pesquisa.qtdAndamentos;
+  }
+
   return {
     numeroProcesso: processoObject.detalhes.numeroProcesso,
     temAndamentosNovos: processoObject.temAndamentosNovos,
-    qtdAndamentosNovos: processoObject.qtdAndamentos - pesquisa.qtdAndamentos,
+    qtdAndamentosNovos: processoObject.qtdAndamentos - pesquisaAndamentos,
   };
 };
 

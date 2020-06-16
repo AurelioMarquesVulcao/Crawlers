@@ -77,7 +77,6 @@ class Requisicao {
           } else {
             resolve({
               code: 'HTTP_RESPONSE_FAIL',
-              message: 'Não houve resposta do servidor!',
               status: statusCode,
               message: `StatusCode: ${statusCode}.`,
               responseContent: null,

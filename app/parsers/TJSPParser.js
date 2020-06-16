@@ -2,7 +2,7 @@ const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
 
-const { BaseParser, removerAcentos, tradutor } = require('./BaseParser');
+const { BaseParser, removerAcentos, traduzir } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 
@@ -28,10 +28,19 @@ class TJSPParser extends BaseParser {
     let capa = {};
 
     capa['uf'] = 'SP';
-    capa['comarca'] = 'Sao Paulo';
+    capa['comarca'] = this.extrairComarca($); // TODO realizar extração da capa, NO HARD CODE
     capa['assunto'] = this.extrairAssunto($);
     capa['classe'] = removerAcentos(this.extrairClasse($));
     return capa;
+  }
+
+  extrairComarca($) {
+    let comarca = '';
+
+    comarca = $('tr:contains("Distribuição:")').next('tr').text().strip();
+    comarca = comarca.replace(/.*\s\-\s/g, '');
+
+    return removerAcentos(comarca);
   }
 
   extrairAssunto($) {
@@ -70,20 +79,23 @@ class TJSPParser extends BaseParser {
 
     envolvidos = rawEnvolvidosList.map((element, index) => {
       const match = re.exec(element, re(/(?<tipo>\w+)\:\s(?<nome>.*)/));
-      if (tradutor[match.groups.tipo]) {
-        let envolvido = {
-          tipo: tradutor[match.groups.tipo],
-          nome: match.groups.nome,
-        };
-        return JSON.parse(JSON.stringify(envolvido));
-      } else {
-        console.log('novo envolvido', match.groups.tipo);
-      }
-      console.log('envolvido', match.groups);
-      return JSON.parse(JSON.stringify(match.groups));
+      let envolvido = {
+        tipo: traduzir(match.groups.tipo),
+        nome: match.groups.nome,
+      };
+      return JSON.parse(JSON.stringify(envolvido));
+      console.log('novo envolvido', match.groups.tipo);
     });
 
     envolvidos = this.preencherOabs($, envolvidos);
+
+    envolvidos = envolvidos.map((element) => {
+      return {
+        tipo: element.tipo,
+        nome: removerAcentos(element.nome)
+      }
+    });
+
     return envolvidos;
   }
 

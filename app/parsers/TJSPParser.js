@@ -57,7 +57,7 @@ class TJSPParser extends BaseParser {
     let numero = $('td:contains("Processo:")').next('td').text().strip();
     numero = re.exec(
       numero,
-      re(/\d{7}\W{0,1}\d{2}\W{0,1}\d{4}\W{0,1}\d\W{0,1}\d{2}\W{0,1}\d{4}/)
+      re(/\d{7}\W?\d{2}\W?\d{4}\W?\d\W?\d{2}\W?\d{4}/)
     )[0];
     return Processo.identificarDetalhes(numero);
   }

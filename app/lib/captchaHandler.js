@@ -3,6 +3,8 @@ let Anticaptcha = require('../bin/js/anticaptcha')(
   '4b93beb6fe87d3bf3cfd92966ec841a6'
 );
 
+const { AntiCaptchaResponseException } = require('../models/exception/exception');
+
 module.exports.antiCaptchaHandler = (website, websiteKey, pageAction) => {
   return new Promise((resolve, reject) => {
     Anticaptcha.setWebsiteURL(website);
@@ -16,25 +18,23 @@ module.exports.antiCaptchaHandler = (website, websiteKey, pageAction) => {
     );
     Anticaptcha.getBalance((err, balance) => {
       if (err) {
-        console.log(err);
-        return reject(false);
+        return reject(new AntiCaptchaResponseException('NOT_AVALIABLE', err.message))
       }
       console.log('balance', balance);
       if (balance > 0) {
         Anticaptcha.createTaskProxyless((err, taskId) => {
           if (err) {
-            console.log(err);
-            return reject(false);
+            return reject(new AntiCaptchaResponseException('CREATE_PROXYLESS_TASK', err.message))
           }
-          console.log('AntiCaptcha TaskId', taskId);
           Anticaptcha.getTaskSolution(taskId, (err, gResponse) => {
             if (err) {
-              console.log(err);
-              return reject(false);
+              return reject(new AntiCaptchaResponseException('GET_CAPTCHA_SOLUTION', err.message));
             }
             return resolve({ gResponse, balance });
           });
         });
+      } else {
+        return reject(new AntiCaptchaResponseException('NO_FOUNDS', 'Not enough founds to start the operation.'))
       }
     });
   });

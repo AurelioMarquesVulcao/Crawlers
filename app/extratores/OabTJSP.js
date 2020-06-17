@@ -119,21 +119,28 @@ class OabTJSP extends ExtratorBase {
   }
 
   async getCaptcha() {
-    let responseAntiCaptcha = {};
-    responseAntiCaptcha = await antiCaptchaHandler(
-      'https://esaj.tjsp.jus.br/cpopg/open.do',
-      this.dataSiteKey,
-      '/'
-    );
+    try {
+      let responseAntiCaptcha = {};
+      responseAntiCaptcha = await antiCaptchaHandler(
+        'https://esaj.tjsp.jus.br/cpopg/open.do',
+        this.dataSiteKey,
+        '/'
+      ).catch(error => {throw error});
 
-    if (!responseAntiCaptcha) {
-      throw new AntiCaptchaResponseException(
-        'CAPTCHA',
-        'Nao foi possivel recuperar a resposta para o captcha'
-      );
+      if (!responseAntiCaptcha) {
+        throw new AntiCaptchaResponseException(
+          'Falha na resposta',
+          'Nao foi possivel recuperar a resposta para o captcha'
+        );
+      }
+
+      return responseAntiCaptcha.gResponse;
+    } catch (error) {
+      if (error instanceof AntiCaptchaResponseException) {
+        throw new AntiCaptchaResponseException(error.code, error.message);
+      }
+      throw e;
     }
-
-    return responseAntiCaptcha.gResponse;
   }
 
   async getCaptchaUuid(cookies) {

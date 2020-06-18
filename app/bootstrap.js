@@ -1,4 +1,5 @@
 require("dotenv").config();
+const enums = require("./configs/enums").enums;
 const mongoose = require("mongoose");
 
 if (!process.env.MONGO_CONNECTION_STRING)
@@ -6,8 +7,8 @@ if (!process.env.MONGO_CONNECTION_STRING)
 
 if (!process.env.RABBITMQ_CONNECTION_STRING)
   throw Error("RABBITMQ_CONNECTION_STRING é uma variável obrigatória");
-
-mongoose.connect(`${process.env.MONGO_CONNECTION_STRING}`, {
+  
+mongoose.connect(enums.mongo.connString, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 });

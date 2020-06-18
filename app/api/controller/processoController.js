@@ -5,9 +5,9 @@ const GerenciadorFila = require('../../lib/filaHandler');
 const context = {
   LogConsultaId: '5e5d7b8b09219b50a2edae31',
   NumeroDoProcesso: null,
-  NumeroDaOab: 54768,
+  NumeroOab: 54768,
   Tribunal: 'TJBA',
-  DataHoraEnfileiramento: '2020-03-02T18:32:59.417685',
+  DataEnfileiramento: '2020-03-02T18:32:59.417685',
 };
 
 class ProcessoController {
@@ -20,7 +20,7 @@ class ProcessoController {
 
       if (!tribunal) throw new Error('Tribunal não encontrado');
 
-      if (!context.NumeroDaOab) throw new Error('Campo NumeroDaOab vazio');
+      if (!context.NumeroOab) throw new Error('Campo NumeroOab vazio');
 
       let fila = `${tribunal.sigla}.extracao`;
 

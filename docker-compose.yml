@@ -69,3 +69,9 @@ services:
       - nginx
       - mongodb
     command: node workers/TJMG/extracaoNovos.js
+
+  cadastro-consulta:
+    extends: 
+      file: common-services.yml
+      service: base_node
+    command: node workers/consumer_cadastro_consulta.js

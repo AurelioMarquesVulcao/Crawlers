@@ -1,23 +1,26 @@
 module.exports.removerAcentos = function removerAcentos(texto) {
-  texto = texto.normalize('NFKD');
-  // texto = Buffer.from(texto, 'ascii');
-  texto = texto.toString('utf8');
-  texto = texto.replace(/[\u0300-\u036f]/g, '');
-  texto = texto.replace(/['"”“‘’º]+/g, '');
-  texto = texto.replace(/N[^\w\s]/gi, 'N');
-  texto = texto.replace(/(\d+\w{0,1})\/([A-Z]{2})/, '$1$2');
-  return texto;
+  if (texto) {
+    texto = texto.normalize("NFKD");
+    // texto = Buffer.from(texto, 'ascii');
+    texto = texto.toString("utf8");
+    texto = texto.replace(/[\u0300-\u036f]/g, "");
+    texto = texto.replace(/['"”“‘’º]+/g, "");
+    texto = texto.replace(/N[^\w\s]/gi, "N");
+    return texto;
+  } else {
+    return "";
+  }
 };
 
-if (typeof String.prototype.strip === 'undefined') {
+if (typeof String.prototype.strip === "undefined") {
   String.prototype.strip = function () {
-    return String(this).replace(/^\s+|\s+$/g, '');
+    return String(this).replace(/^\s+|\s+$/g, "");
   };
 }
 
 module.exports.BaseParser = class BaseParser {
   constructor() {
-    this.cnj = '';
+    this.cnj = "";
     this.isBaixa = false;
     this.hasAudiencia = false;
     this.jsonCapa = {};
@@ -29,7 +32,9 @@ module.exports.BaseParser = class BaseParser {
 };
 
 const tradutor = {
+  A: 'Autor',
   AUTOR: 'Autor',
+  R: 'Reu',
   REU: 'Reu',
   AGTE: 'Agravante',
   AGDO: 'Agravado',

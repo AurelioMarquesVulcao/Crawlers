@@ -7,6 +7,7 @@ const ExecucaoConsulta = require("../models/schemas/execucao_consulta")
 const GerenciadorFila = require("../lib/filaHandler").GerenciadorFila;
 const moment = require("moment");
 const enums = require("../configs/enums").enums;
+const cron = require("node-cron");
 
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
@@ -15,6 +16,23 @@ let mapaEstadoRobo = {
 
 let gf = new GerenciadorFila();
 
+const exit = (signal = 0) => {
+  process.exit(signal);
+};
+
+const pretty = (obj, replacer = null) => {
+  return JSON.stringify(obj, replacer, 2);
+};
+
+const pre = (param) => {
+  console.log(param);
+};
+
+const pred = (param) => {
+  pre(param);
+  exit();
+};
+
 class Enfileirador {
   /**
    * Callback do método executar. Recebe uma consulta de execução pendente e a envia para
@@ -22,57 +40,64 @@ class Enfileirador {
    *
    * @param {Array} docs Consultas pendentes de execução.
    */
-  static cadastrarPendente = (doc) => {
-    return new Promise((resolve, reject) => {
-      let consulta = new ConsultasCadastradas(doc);
+  static async cadastrarConsultaPendente(consultaPendente) {
+    const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
 
-      let nomeRobo = mapaEstadoRobo[consulta.SeccionalOab];
-      let nomeFila = `${consulta.TipoConsulta}.${nomeRobo}.extracao.novos`;
-
-      let execucao = new ExecucaoConsulta({
-        ConsultaCadastradaId: consulta.id,
-        NomeRobo: nomeRobo
-      });
-
-      execucao.save((err, docExecucao) => {
-        let mensagem = {
-          ExecucaoConsultaId: docExecucao.id,
-          ConsultaCadastradaId: consulta.id,
-          DataEnfileiramento: new Date(),
-          NumeroProcesso: consulta.NumeroProcesso,
-          NumeroOab: consulta.NumeroOab,
-          SeccionalOab: consulta.SeccionalOab
-        };
-        gf.enviar(nomeFila, mensagem);
-        return resolve(mensagem);
-      });
-    });
-  };
+    if (nomeRobo) {
+      const nomeFila = `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
+      const execucao = {
+        ConsultaCadastradaId: consultaPendente._id,
+        NomeRobo: nomeRobo,
+        Log: [
+          {
+            status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`
+          }
+        ]
+      };
+      const execucaoConsulta = new ExecucaoConsulta(execucao);
+      const ex = await execucaoConsulta.save();
+      const mensagem = {
+        ExecucaoConsultaId: ex._id,
+        ConsultaCadastradaId: consultaPendente._id,
+        DataEnfileiramento: new Date(),
+        NumeroProcesso: consultaPendente.NumeroProcesso,
+        NumeroOab: consultaPendente.NumeroOab,
+        SeccionalOab: consultaPendente.SeccionalOab
+      };
+      gf.enviar(nomeFila, mensagem);
+    }
+  }
 
   /**
    * Realiza a query das consultas pendentes de execução.
    */
-  static executar = () => {
-    let dataCorte = new moment().subtract(7, "days");
-    let busca = {
-      $or: [
-        { DataUltimaConsultaTribunal: { $lte: dataCorte } },
-        { DataUltimaConsultaTribunal: null }
-      ]
-    };
+  static async executar() {
+    try {
+      const dataCorte = new moment().subtract(7, "days");
+      const busca = {
+        $or: [
+          { DataUltimaConsultaTribunal: { $lte: dataCorte } },
+          { DataUltimaConsultaTribunal: null }
+        ]
+      };
 
-    ConsultasCadastradas.find(busca, (err, docs) => {
-      if (err) throw err;
-      let promises = [];
-      docs.forEach((doc) => {
-        promises.push(Enfileirador.cadastrarPendente(doc));
-      });
+      const lista = await ConsultasCadastradas.find(busca);
 
-      Promise.all(promises).then((_) => {
-        mongoose.connection.close();
-      });
-    });
-  };
+      for (let i = 0, si = lista.length; i < si; i++) {
+        await Enfileirador.cadastrarConsultaPendente(lista[i]);
+      }
+
+      mongoose.connection.close();
+    } catch (e) {
+      console.log(e);
+    }
+  }
 }
 
+console.log("Realizando execução ao iniciar o container.");
 Enfileirador.executar();
+
+cron.schedule("0 * * * *", () => {
+  console.log("Executando enfileirador.");
+  Enfileirador.executar();
+});

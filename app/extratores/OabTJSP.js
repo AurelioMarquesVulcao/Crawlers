@@ -21,7 +21,7 @@ class OabTJSP extends ExtratorBase {
     this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
   }
 
-  async extrair(numeroDaOab) {
+  async extrair(numeroOab) {
     try {
       let resultados = [];
       let preParse = {};
@@ -56,7 +56,7 @@ class OabTJSP extends ExtratorBase {
       // Segunda parte: pegar a lista de processos
 
       listaProcessos = await this.getListaProcessos(
-        numeroDaOab,
+        numeroOab,
         cookies,
         uuidCaptcha,
         gResponse
@@ -144,10 +144,10 @@ class OabTJSP extends ExtratorBase {
     return uuid;
   }
 
-  async getListaProcessos(numeroDaOab, cookies, uuidCaptcha, gResponse) {
+  async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
     let condition = false;
     let processos = [];
-    let url = `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroDaOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    let url = `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
 
     do {
       let objResponse = await this.robo.acessar(

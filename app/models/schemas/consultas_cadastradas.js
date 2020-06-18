@@ -20,7 +20,7 @@ const ConsultaCadastroSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  DataHoraEnfileiramento: {
+  DataEnfileiramento: {
     type: Date,
     required: false
   },

@@ -61,8 +61,10 @@ app.get('/getProcesso', (req, res) => {
   );
 });
 
-mongoose.connect(
-  `mongodb://${process.env.MONGO_ROOT_USERNAME}:${process.env.MONGO_ROOT_PASSWORD}@mongodb/admin`,
+// `mongodb://${process.env.MONGO_ROOT_USERNAME}:${process.env.MONGO_ROOT_PASSWORD}@mongodb/admin`,
+
+mongoose.connect(  
+  `mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData`,
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
 

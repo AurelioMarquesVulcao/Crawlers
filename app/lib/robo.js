@@ -20,7 +20,6 @@ class Requisicao {
    * Obter um UserAgent para ser usado
    */
   obterUserAgent(aleatorio = true) {
-    //TODO checar viabilidade dessa função ao manter o session de um robo (preservar captchas)
     const agents = [
       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36', // Chrome
       'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0', // Mozila
@@ -67,7 +66,6 @@ class Requisicao {
               });
             } else {
               resolve({
-                //TODO observar se pode se tornar reject
                 code: 'HTTP_STATUS_NOT_200',
                 status: statusCode,
                 message: `StatusCode: ${statusCode}.`,
@@ -77,7 +75,6 @@ class Requisicao {
             }
           } else {
             resolve({
-              //TODO observar se pode se tornar reject
               code: 'HTTP_RESPONSE_FAIL',
               message: 'Não houve resposta do servidor!',
               status: statusCode,
@@ -89,7 +86,6 @@ class Requisicao {
         })
         .catch((err) => {
           resolve({
-            //TODO observar se pode se tornar reject
             code: err.code,
             status: 502,
             message: err.message,

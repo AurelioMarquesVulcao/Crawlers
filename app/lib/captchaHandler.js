@@ -1,4 +1,6 @@
 const { enums } = require('../configs/enums');
+const { Robo } = require('../lib/robo');
+const axios = require('axios');
 let Anticaptcha = require('../bin/js/anticaptcha')(
   '4b93beb6fe87d3bf3cfd92966ec841a6'
 );
@@ -39,3 +41,22 @@ module.exports.antiCaptchaHandler = (website, websiteKey, pageAction) => {
     });
   });
 };
+
+module.exports.audioCaptchaHandler = async (b64String) => {
+
+  const data = JSON.stringify({"audio": b64String});
+
+  var config = {
+    method: 'post',
+    url: 'http://172.16.16.8:5000/api/solve',
+    headers: {
+      'Accept-Encoding': 'utf8',
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+
+  let response = await axios(config);
+
+  return response.data;
+}

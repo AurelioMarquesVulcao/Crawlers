@@ -41,11 +41,12 @@ class Helper {
     });
   }
 
-  static async downloadImage(url) {
+  static async downloadImage(url, headers) {
     return await Axios({
       url,
       method: 'GET',
       responseType: 'arraybuffer',
+      headers: headers
     }).then((response) => {
       return Buffer.from(response.data).toString('base64');
     });

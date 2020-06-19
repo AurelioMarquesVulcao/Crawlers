@@ -87,10 +87,11 @@ class Requisicao {
         .catch((err) => {
           resolve({
             code: err.code,
-            status: 502,
+            status: err.response.status,
             message: err.message,
             responseContent: null,
             responseBody: err.response.data ? err.response.data : '',
+            headers: err.response.headers
           });
         });
     });
@@ -180,7 +181,7 @@ class Robo {
     };
 
     if (params) {
-      if (usaJson) options.json = params;
+      if (usaJson) options.data = JSON.stringify(params);
       // Json
       else {
         // FormData

@@ -2,6 +2,9 @@ const { enums } = require('../configs/enums');
 let Anticaptcha = require('../bin/js/anticaptcha')(
   '4b93beb6fe87d3bf3cfd92966ec841a6'
 );
+const CAPTCHAIO_KEY = 'aa2ecb19-5ef113a38b5931.24355257';
+
+const { Robo } = require('../lib/robo');
 
 const { AntiCaptchaResponseException } = require('../models/exception/exception');
 
@@ -39,3 +42,53 @@ module.exports.antiCaptchaHandler = (website, websiteKey, pageAction) => {
     });
   });
 };
+
+module.exports.captchasIOHandler = async (website, websiteKey, pageAction) => {
+  console.log(website, websiteKey, pageAction);
+  const robo = new Robo();
+  let captchaIn;
+  let captchaRes;
+  let url;
+  let tentativas = 0;
+
+  do {
+    captchaIn = await robo.acessar(
+      {
+        url: "https://api.captchas.io/in.php",
+        method: "post",
+        params: {
+          method: "userrecaptcha",
+          key: CAPTCHAIO_KEY,
+          googlekey: websiteKey,
+          pageurl: website,
+          json: 1
+        }
+      }
+    );
+  } while (tentativas < 5);
+
+  if (tentativas => 5) {}
+
+  console.log(captchaIn);
+
+  if (captchaIn.responseBody.test('OK')) {
+    //TODO remover futuramente
+    //console.log('----- CAPTCHAIN', captchaIn);
+    captchaIn.responseBody.replace(/OK\|/g, '')
+    let captchaId = captchaIn.responseBody.replace(/OK\|/g, '');
+    url = `?key=${CAPTCHAIO_KEY}&action=get&id=${captchaId}&json=1`
+
+    captchaRes = await robo.acessar(
+      {
+        url: 'https://api.captchas.io/res.php'+url,
+        method: 'get',
+      }
+    )
+
+
+    console.log(captchaRes.responseBody);
+  }
+
+
+
+}

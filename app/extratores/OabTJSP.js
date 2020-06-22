@@ -1,9 +1,12 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
-const { antiCaptchaHandler } = require('../lib/captchaHandler');
+const re = require('xregexp');
+const { enums } = require('../configs/enums');
+const { antiCaptchaHandler, captchasIOHandler } = require('../lib/captchaHandler');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
-const re = require('xregexp');
+const { Logger } = require('../lib/util');
+
 
 const {
   BaseException,
@@ -19,11 +22,20 @@ class OabTJSP extends ExtratorBase {
     super(url, isDebug);
     this.parser = new TJSPParser();
     this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
+    this.logger = null;
   }
 
   async extrair(numeroOab) {
+    const nomeRobo = `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJSP}`
+    this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`,
+      {
+        nomeRobo: nomeRobo,
+        NumeroOab: numeroOab
+      }
+    )
+
     try {
-      let resultados = [];
+      let extracoes = [];
       let preParse = {};
       let uuidCaptcha = '';
       let gResponse = '';
@@ -44,6 +56,8 @@ class OabTJSP extends ExtratorBase {
       //   false,
       //   null
       // );
+
+      this.logger.info('Fazendo primeira conexão ao website');
       objResponse = await this.robo.acessar({
         url: this.url,
         method: 'GET',
@@ -57,43 +71,81 @@ class OabTJSP extends ExtratorBase {
       });
       cookies = cookies.join('; ');
 
+      this.logger.info('Fazendo pré-analise do website em busca de captchas');
       preParse = await this.preParse(objResponse.responseBody, cookies);
       uuidCaptcha = preParse.captcha.uuidCaptcha;
+      this.logger.info('Analise do website concluida.');
+      this.logger.info('Fazendo chamada para resolução do captcha.');
       gResponse = await this.getCaptcha();
+      this.logger.info('Captcha resolvido');
 
       // Segunda parte: pegar a lista de processos
-
+      this.logger.info('Recuperando lista de processos');
       listaProcessos = await this.getListaProcessos(
         numeroOab,
         cookies,
         uuidCaptcha,
         gResponse
       );
+      this.logger.info('Lista de processos recuperada');
 
       // Terceira parte: passar a lista, pegar cada um dos codigos
       // resultantes e mandar para o parser
-
       if (listaProcessos.length > 0) {
-        resultados = await this.extrairProcessos(listaProcessos, cookies);
-        return Promise.all(resultados).then((args) => {
-          return {
-            resultado: args,
-            sucesso: true,
-            detalhes: '',
-          };
+        this.logger.info('Inicio do processo de extração de processos')
+
+        listaProcessos.forEach((element, index) => {
+          extracoes.push(new ProcessoTJSP(element, numeroOab).extrair());
+        })
+
+        //resultados = await this.extrairProcessos(listaProcessos, cookies);
+        return Promise.all(extracoes).then((resultado) => {
+          this.logger.info('Terminada extração de processos.');
+          let logs = [];
+          let sucessos = resultados.filter(element => element.sucesso);
+          let falhas = resultado.filter(element => !element.sucesso);
+
+          if (sucessos.length > 0) {
+            this.logger.info(`${sucessos.length} processos extraidos com sucesso`)
+
+            if (falhas.length > 0) {
+              this.logger.info(`${falhas.length} processos com falhas de extração.`);
+            }
+            resultados.forEach((element, index) => {
+              logs = [ ...this.logger.logs, ...element.logs ];
+            });
+            return {
+              resultado: sucessos,
+              sucesso: true,
+              detalhes: '',
+              logs: this.logger.logs
+            }
+          }
+          this.logger.ingo('Não houve processos bem sucedidos');
+          resultados.forEach((element, index) => {
+            logs = [ ...this.logger.logs, ...element.logs ];
+          });
+          return  {
+            resultado: [],
+            sucesso: false,
+            detalhes: 'Extração encontrou problemas',
+            logs: this.logger.logs
+          }
+
         });
       }
 
+      this.logger.info('Lista de processos vazia;')
       return {
         resultado: [],
         sucesso: false,
         detalhes: 'Lista de processos vazia',
       };
     } catch (error) {
+      this.logger.log('error', e);
       if (error instanceof AntiCaptchaResponseException) {
         throw new AntiCaptchaResponseException(error.code, error.message);
       }
-
       throw error;
     }
   }
@@ -121,7 +173,7 @@ class OabTJSP extends ExtratorBase {
   async getCaptcha() {
     try {
       let responseAntiCaptcha = {};
-      responseAntiCaptcha = await antiCaptchaHandler(
+      responseAntiCaptcha = await captchasIOHandler(
         'https://esaj.tjsp.jus.br/cpopg/open.do',
         this.dataSiteKey,
         '/'
@@ -226,7 +278,8 @@ class OabTJSP extends ExtratorBase {
       const $ = cheerio.load(objResponse.responseBody);
 
       try {
-        processos = [...processos, ...this.extrairLinksProcessos($)];
+        //processos = [...processos, ...this.extrairLinksProcessos($)];
+        processos = [ ...processos, ...this.extrairNumeroProcessos($)];
         const proximaPagina = $('[title|="Próxima página"]').first();
 
         if (!proximaPagina.text()) return processos;
@@ -258,6 +311,25 @@ class OabTJSP extends ExtratorBase {
 
     return listaLinks;
   }
+
+
+  extrairNumeroProcesso($) {
+    const rawProcessos = $('div.nuProcesso');
+    const listaNumeros = [];
+
+    if (rawProcessos.length) {
+      // TODO console.log com logger
+      return [];
+    }
+
+    rawProcessos.each((index, element) => {
+      let numero = $(element).text();
+      listaNumeros.push(numero);
+    })
+
+    return listaNumeros;
+  }
+
 
   async extrairProcessos(listaProcessos, cookies) {
     // TODO teste de captcha em quantidade limitada, remover posteriormente

@@ -50,44 +50,45 @@ module.exports.captchasIOHandler = async (website, websiteKey, pageAction) => {
   let captchaRes;
   let url;
   let tentativas = 0;
+  console.log(website, websiteKey, pageAction);
 
-  do {
-    captchaIn = await robo.acessar(
-      {
-        url: "https://api.captchas.io/in.php",
-        method: "post",
-        params: {
-          method: "userrecaptcha",
-          key: CAPTCHAIO_KEY,
-          googlekey: websiteKey,
-          pageurl: website,
-          json: 1
-        }
-      }
-    );
-  } while (tentativas < 5);
-
-  if (tentativas => 5) {}
-
-  console.log(captchaIn);
-
-  if (captchaIn.responseBody.test('OK')) {
-    //TODO remover futuramente
-    //console.log('----- CAPTCHAIN', captchaIn);
-    captchaIn.responseBody.replace(/OK\|/g, '')
-    let captchaId = captchaIn.responseBody.replace(/OK\|/g, '');
-    url = `?key=${CAPTCHAIO_KEY}&action=get&id=${captchaId}&json=1`
-
-    captchaRes = await robo.acessar(
-      {
-        url: 'https://api.captchas.io/res.php'+url,
-        method: 'get',
-      }
-    )
-
-
-    console.log(captchaRes.responseBody);
-  }
+  // do {
+  //   captchaIn = await robo.acessar(
+  //     {
+  //       url: "https://api.captchas.io/in.php",
+  //       method: "post",
+  //       params: {
+  //         method: "userrecaptcha",
+  //         key: CAPTCHAIO_KEY,
+  //         googlekey: websiteKey,
+  //         pageurl: website,
+  //         json: 1
+  //       }
+  //     }
+  //   );
+  // } while (tentativas < 5);
+  //
+  // if (tentativas => 5) {}
+  //
+  // console.log(captchaIn);
+  //
+  // if (captchaIn.responseBody.test('OK')) {
+  //   //TODO remover futuramente
+  //   //console.log('----- CAPTCHAIN', captchaIn);
+  //   captchaIn.responseBody.replace(/OK\|/g, '')
+  //   let captchaId = captchaIn.responseBody.replace(/OK\|/g, '');
+  //   url = `?key=${CAPTCHAIO_KEY}&action=get&id=${captchaId}&json=1`
+  //
+  //   captchaRes = await robo.acessar(
+  //     {
+  //       url: 'https://api.captchas.io/res.php'+url,
+  //       method: 'get',
+  //     }
+  //   )
+  //
+  //
+  //   console.log(captchaRes.responseBody);
+  // }
 
 
 

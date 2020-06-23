@@ -77,6 +77,7 @@ class OabTJSP extends ExtratorBase {
       this.logger.info('Analise do website concluida.');
       this.logger.info('Fazendo chamada para resolução do captcha.');
       gResponse = await this.getCaptcha();
+      // gResponse = '03AGdBq27q2l_2WrptTO5a8Zluw3pUBSLS9nq1-dnzlxn2CJb_GGQpVI-1r_GdNwXmt84Rnd9QLy9_RwuPg0HuIRdMcu7Ey4tbYr-x0lyzjebu1SKnT2g0Md3mlA1tmGBDlRwh7J2yirglJmne3apSbfqZ3jsDPkrY9BA3NclmyQTckK1zilNlFUqMmuxgTwy9y-yyj_AWze30iuxAfvisgwu_NYfpApkQQML5GYlWBwe0BYyO_BzDIgZe6LwfB-N2csIhf3TK_f9yWPeVfjIq3IwT8OV-d2pn8bkZuPlPFxBJGyMfDupQvqoiBZ8ubigdZCnXmyHrkByg6UfWQLOfB7sgMxrcLk0GjTK59n1ttSl_vBb2DGNg6ZKLQNMOUcO8hlesI0hU970S1tNdz_DrBfSiBUPWubwm8RDv6AjkJgAbGo7nGGW5vMy3QbR0yO4u2CqVrF9qasoG'
       this.logger.info('Captcha resolvido');
 
       // Segunda parte: pegar a lista de processos
@@ -140,12 +141,10 @@ class OabTJSP extends ExtratorBase {
         resultado: [],
         sucesso: false,
         detalhes: 'Lista de processos vazia',
+        logs: this.logger.logs
       };
     } catch (error) {
-      this.logger.log('error', e);
-      if (error instanceof AntiCaptchaResponseException) {
-        throw new AntiCaptchaResponseException(error.code, error.message);
-      }
+      this.logger.log('error', error);
       throw error;
     }
   }
@@ -173,11 +172,14 @@ class OabTJSP extends ExtratorBase {
   async getCaptcha() {
     try {
       let responseAntiCaptcha = {};
-      responseAntiCaptcha = await captchasIOHandler(
+      responseAntiCaptcha = await antiCaptchaHandler(
         'https://esaj.tjsp.jus.br/cpopg/open.do',
         this.dataSiteKey,
         '/'
       ).catch(error => {throw error});
+
+      //TODO retirar
+      console.log(responseAntiCaptcha)
 
       if (!responseAntiCaptcha) {
         throw new AntiCaptchaResponseException(
@@ -191,7 +193,7 @@ class OabTJSP extends ExtratorBase {
       if (error instanceof AntiCaptchaResponseException) {
         throw new AntiCaptchaResponseException(error.code, error.message);
       }
-      throw e;
+      throw error;
     }
   }
 
@@ -226,7 +228,7 @@ class OabTJSP extends ExtratorBase {
     let condition = false;
     let processos = [];
     let url = `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-
+    let problema;
     do {
       let objResponse = {};
       // TODO remover caso o codigo funfe
@@ -276,6 +278,7 @@ class OabTJSP extends ExtratorBase {
       })
 
       const $ = cheerio.load(objResponse.responseBody);
+      console.log($('span.resultadoPaginacao'));
 
       try {
         //processos = [...processos, ...this.extrairLinksProcessos($)];
@@ -288,6 +291,7 @@ class OabTJSP extends ExtratorBase {
         url = 'https://esaj.tjsp.jus.br' + proximaPagina.attr('href');
       } catch (error) {
         console.log('Problema ao pegar processos da página');
+        console.log(error);
         condition = false;
       }
     } while (condition);
@@ -313,7 +317,7 @@ class OabTJSP extends ExtratorBase {
   }
 
 
-  extrairNumeroProcesso($) {
+  extrairNumeroProcessos($) {
     const rawProcessos = $('div.nuProcesso');
     const listaNumeros = [];
 

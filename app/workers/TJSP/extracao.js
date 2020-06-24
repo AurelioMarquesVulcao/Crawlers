@@ -29,7 +29,7 @@ const logarExecucao = async (execucao) => {
         'info',
         'logs/OabTJSP/OabTJSPInfo.log',
         {
-          nomeRobo: enums.nomesRobos.TJSP,
+          nomeRobo: `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}`,
           NumeroOab: message.NumeroOab,
         }
       );

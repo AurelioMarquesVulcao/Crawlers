@@ -2,7 +2,7 @@ const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
 const { enums } = require('../configs/enums');
-const { antiCaptchaHandler, captchasIOHandler } = require('../lib/captchaHandler');
+const { antiCaptchaHandler, xcaptchasIOHandler, CaptchaHandler } = require('../lib/captchaHandler');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
@@ -26,7 +26,7 @@ class OabTJSP extends ExtratorBase {
   }
 
   async extrair(numeroOab) {
-    const nomeRobo = `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJSP}`
+    const nomeRobo = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}`
     this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`,
       {
         nomeRobo: nomeRobo,
@@ -47,15 +47,6 @@ class OabTJSP extends ExtratorBase {
       let objResponse = {}; // Objeto cujo valor é o retorno do robô
 
       // Primeira parte: para pegar cookies e uuidcaptcha
-      // TODO apagar codigo comentado abaixo caso nao funfe
-      // objResponse = await this.robo.acessar(
-      //   'https://esaj.tjsp.jus.br/cpopg/open.do',
-      //   'GET',
-      //   'latin1',
-      //   false,
-      //   false,
-      //   null
-      // );
 
       this.logger.info('Fazendo primeira conexão ao website');
       objResponse = await this.robo.acessar({
@@ -170,25 +161,27 @@ class OabTJSP extends ExtratorBase {
   }
 
   async getCaptcha() {
+    const captchaHandler = new CaptchaHandler();
     try {
-      let responseAntiCaptcha = {};
-      responseAntiCaptcha = await antiCaptchaHandler(
+      let captcha = {};
+      captcha = await captchaHandler.resolveRecaptchaV2(
+      // captcha = await antiCaptchaHandler(
         'https://esaj.tjsp.jus.br/cpopg/open.do',
         this.dataSiteKey,
         '/'
       ).catch(error => {throw error});
 
       //TODO retirar
-      console.log(responseAntiCaptcha)
+      // console.log(responseAntiCaptcha)
 
-      if (!responseAntiCaptcha) {
+      if (!captcha.sucesso) {
         throw new AntiCaptchaResponseException(
           'Falha na resposta',
           'Nao foi possivel recuperar a resposta para o captcha'
         );
       }
 
-      return responseAntiCaptcha.gResponse;
+      return captcha.gResponse;
     } catch (error) {
       if (error instanceof AntiCaptchaResponseException) {
         throw new AntiCaptchaResponseException(error.code, error.message);
@@ -200,24 +193,20 @@ class OabTJSP extends ExtratorBase {
   async getCaptchaUuid(cookies) {
     let objResponse = {};
     // TODO remover comentario caso funfe
-    // objResponse = await this.robo.acessar(
-    //   'https://esaj.tjsp.jus.br/cpopg/captchaControleAcesso.do',
-    //   'POST',
-    //   'latin1',
-    //   false,
-    //   false,
-    //   null,
-    //   {
-    //     Cookie: cookies,
-    //   }
-    // );
     objResponse = await this.robo.acessar({
       url: 'https://esaj.tjsp.jus.br/cpopg/captchaControleAcesso.do',
       method: 'POST',
       encoding: 'latin1',
       usaProxy: false,
       headers: {
-        Cookie: cookies
+        'Cookie': cookies,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Referer': 'https://esaj.tjsp.jus.br/cpopg/search.do',
+        'Upgrade-Insecure-Requests': '1'
       }
     });
     let uuid = objResponse.responseBody.uuidCaptcha;
@@ -225,60 +214,48 @@ class OabTJSP extends ExtratorBase {
   }
 
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
+    await this.robo.acessar({
+      url: 'https://esaj.tjsp.jus.br/cpopg/manterSessao.do?conversationId=',
+      headers: {
+        'Cookie': cookies,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Referer': 'https://esaj.tjsp.jus.br/cpopg/search.do',
+        'Upgrade-Insecure-Requests': '1'
+      }
+    })
+
     let condition = false;
     let processos = [];
     let url = `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    console.log('cookies', cookies);
+    console.log(url);
     let problema;
     do {
       let objResponse = {};
       // TODO remover caso o codigo funfe
-      // objResponse = await this.robo.acessar(
-      //   url,
-      //   'GET',
-      //   'latin1',
-      //   false,
-      //   false,
-      //   null,
-      //   {
-      //     Host: 'esaj.tjsp.jus.br',
-      //     Connection: 'keep-alive',
-      //     'Upgrade-Insecure-Requests': '1',
-      //     'User-Agent':
-      //       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36',
-      //     'Sec-Fetch-User': '?1',
-      //     Accept:
-      //       'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-      //     'Sec-Fetch-Site': 'same-origin',
-      //     'Sec-Fetch-Mode': 'navigate',
-      //     Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
-      //     'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-      //     Cookie: cookies,
-      //   }
-      // );
       objResponse = await this.robo.acessar({
         url: url,
         method: 'GET',
         enconding: 'latin1',
         usaProxy: false,
         headers: {
-          Host: 'esaj.tjsp.jus.br',
-          Connection: 'keep-alive',
-          'Upgrade-Insecure-Requests': '1',
-          'User-Agent':
-            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36',
-          'Sec-Fetch-User': '?1',
-          Accept:
-            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-          'Sec-Fetch-Site': 'same-origin',
-          'Sec-Fetch-Mode': 'navigate',
-          Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
-          'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-          Cookie: cookies,
+          'Cookie': cookies,
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'DNT': '1',
+          'Connection': 'keep-alive',
+          'Referer': 'https://esaj.tjsp.jus.br/cpopg/search.do',
+          'Upgrade-Insecure-Requests': '1'
         }
       })
 
       const $ = cheerio.load(objResponse.responseBody);
-      console.log($('span.resultadoPaginacao'));
+      // console.log($('span.resultadoPaginacao'));
 
       try {
         //processos = [...processos, ...this.extrairLinksProcessos($)];
@@ -366,51 +343,23 @@ class OabTJSP extends ExtratorBase {
     return new Promise(async (resolve, reject) => {
       let retry = false; //Se o processo já foi tratado com outro captcha
       let gResponse = await this.getCaptcha();
+      console.log(gResponse);
       do{
         let url = linkProcesso.replace(/(?<key>g-recaptcha-response=)(?<value>.+)&/, `$1${gResponse}&`);
         let objResponse = {};
-        // TODO apagar comentario caso funfe
-        // let objResponse = await this.robo.acessar(
-        //   'https://esaj.tjsp.jus.br' + url,
-        //   'GET',
-        //   'latin1',
-        //   false,
-        //   false,
-        //   null,
-        //   {
-        //     Host: 'esaj.tjsp.jus.br',
-        //     Connection: 'keep-alive',
-        //     'Upgrade-Insecure-Requests': '1',
-        //     'User-Agent':
-        //       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36',
-        //     'Sec-Fetch-User': '?1',
-        //     Accept:
-        //       'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        //     'Sec-Fetch-Site': 'same-origin',
-        //     'Sec-Fetch-Mode': 'navigate',
-        //     Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
-        //     'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-        //     Cookie: cookies,
-        //   }
-        // );
         objResponse = await this.robo.acessar({
           url: 'https://esaj.tjsp.jus.br' + url,
           method: 'GET',
           encoding: 'latin1',
           headers: {
-            Host: 'esaj.tjsp.jus.br',
-            Connection: 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent':
-              'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36',
-            'Sec-Fetch-User': '?1',
-            Accept:
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Sec-Fetch-Site': 'same-origin',
-            'Sec-Fetch-Mode': 'navigate',
-            Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
-            'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-            Cookie: cookies,
+            'Cookie': cookies,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Referer': 'https://esaj.tjsp.jus.br/cpopg/search.do',
+            'Upgrade-Insecure-Requests': '1'
           }
         })
         const $ = cheerio.load(objResponse.responseBody);

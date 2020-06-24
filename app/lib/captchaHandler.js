@@ -213,6 +213,11 @@ class CaptchaIOHandler {
       valido: true
     }
 
+    if (!body) {
+      resposta.detalhes = 'VAZIO';
+      resposta.valido = false;
+    }
+
     if (/ERROR_PROXY_BANNED/.test(body)) {
       resposta.detalhes = 'ERROR_PROXY_BANNED',
         resposta.valido = false;

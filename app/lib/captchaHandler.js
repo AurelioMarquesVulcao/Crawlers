@@ -45,87 +45,24 @@ const antiCaptchaHandler = async (website, websiteKey, pageAction, userAgent) =>
   });
 };
 
-const xcaptchasIOHandler = async (website, websiteKey, pageAction) => {
-  console.log(website, websiteKey, pageAction);
-  const robo = new Robo();
-  let objResponse;
-  let url;
-  let tentativas = 0;
-  console.log(website, websiteKey, pageAction);
+class AntiCaptchaHandler {
+  static async resolver (website, websiteKey, pageAction) {
+    Anticaptcha.setWebsiteURL(website);
+    Anticaptcha.setWebsiteKey(websiteKey);
+    Anticaptcha.setMinScore(0.3);
+    Anticaptcha.setPageAction(pageAction);
 
-  objResponse = await robo.acessar(
-    {
-      url: "https://api.captchas.io/in.php",
-      method: "post",
-      params: {
-        method: "userrecaptcha",
-        key: CAPTCHAIO_KEY,
-        googlekey: websiteKey,
-        pageurl: website,
-        json: 1
-      }
-    }
-  );
-  
-  if (objResponse.responseBody.test('ERROR_DAILY_SOLVES_LIMIT_REACHED')) {
-    resposta.detalhes = 'ERROR_DAILY_SOLVES_LIMIT_REACHED';
+    Anticaptcha.setUserAgent(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 ' +
+      '(KHTML, like Gecko) Chrome/52.0.2743.116'
+    );
   }
-
-  if (objResponse.responseBody.test('ERROR_NO_AVAILABLE_THREADS')) {
-    resposta.detalhes = 'ERROR_NO_AVAILABLE_THREADS';
-  }
-
-  if (objResponse.responseBody.test('ERROR_CAPTCHA_UNSOLVABLE')) {
-    resposta.detalhes = 'ERROR_CAPTCHA_UNSOLVABLE';
-  }
-
-  if (objResponse.responseBody.test('ERROR_API_KEY_NOT_FOUND')) {
-    resposta.detalhes = 'ERROR_API_KEY_NOT_FOUND';
-  }
-
-  if (objResponse.responseBody.test('ERROR_ACCESS_DENIED')) {
-    resposta.detalhes = 'ERROR_ACCESS_DENIED';
-  }
-  if (objResponse.responseBody.test('OK')) {
-    url = `?key=${CAPTCHAIO_KEY}&action=get&id=${captchaId}&json=1`;
-
-    setTimeout(() => {
-
-      do {
-
-        setTimeout(() => {
-
-        }, 3000);
-
-      } while (true);
-    }, 5000)
-  }
-  if (objResponse.responseBody.test('OK')) {
-    //TODO remover futuramente
-    //console.log('----- objResponse', objResponse);
-    objResponse.responseBody.replace(/OK\|/g, '')
-    let captchaId = objResponse.responseBody.replace(/OK\|/g, '');
-    url = `?key=${CAPTCHAIO_KEY}&action=get&id=${captchaId}&json=1`
-
-    objResponse = await robo.acessar(
-      {
-        url: 'https://api.captchas.io/res.php'+url,
-        method: 'get',
-      }
-    )
-
-
-    console.log(objResponse.responseBody);
-  }
-
-
-
 }
 
 class CaptchaIOHandler {
   constructor() {}
 
-  static async resolver(website, websiteKey, pageAction) {
+  static async resolverV2(website, websiteKey, pageAction) {
     const robo = new Robo();
     let objResponse;
     let captchaId;
@@ -166,6 +103,7 @@ class CaptchaIOHandler {
       if (!this.testaErro(objResponse.responseBody.request).valido) {
 
         do {
+          console.log(tentativas + 1);
           objResponse = await robo.acessar(
             {
               url: 'https://api.captchas.io/res.php' + url,
@@ -179,9 +117,9 @@ class CaptchaIOHandler {
               gResponse: objResponse.responseBody.request
             }
           }
-          await sleep(3000);
+          await sleep(5000);
           tentativas++;
-        } while (tentativas < 20);
+        } while (tentativas < 23);
 
       }
 
@@ -287,7 +225,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     let captcha;
 
     do {
-      
+      console.log('Tentativa', tentativas);
       resultado = await this.getCaptcha(website, websiteKey, pageAction, CaptchaIOHandler)
       await sleep(5000);
       if (resultado.sucesso) return resultado;
@@ -319,7 +257,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
       sucesso: false,
       detalhes: []
     };
-    let captcha = await tipoCaptcha.resolver(website, websiteKey, pageAction);
+    let captcha = await tipoCaptcha.resolverV2(website, websiteKey, pageAction);
 
     if (captcha.sucesso) {
       resultado.sucesso = true;
@@ -334,4 +272,3 @@ module.exports.CaptchaHandler = class CaptchaHandler {
 }
 
 module.exports.antiCaptchaHandler = antiCaptchaHandler;
-module.exports.xcaptchasIOHandler = xcaptchasIOHandler

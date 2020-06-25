@@ -1,11 +1,13 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
+const async = require('async');
 const { enums } = require('../configs/enums');
 const { antiCaptchaHandler, xcaptchasIOHandler, CaptchaHandler } = require('../lib/captchaHandler');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
+const { ProcessoTJSP } = require('./ProcessoTJSP');
 
 
 const {
@@ -79,6 +81,7 @@ class OabTJSP extends ExtratorBase {
         uuidCaptcha,
         gResponse
       );
+      console.log(listaProcessos)
       this.logger.info('Lista de processos recuperada');
 
       // Terceira parte: passar a lista, pegar cada um dos codigos
@@ -86,9 +89,15 @@ class OabTJSP extends ExtratorBase {
       if (listaProcessos.length > 0) {
         this.logger.info('Inicio do processo de extração de processos')
 
-        listaProcessos.forEach((element, index) => {
-          extracoes.push(new ProcessoTJSP(element, numeroOab).extrair());
-        })
+        // listaProcessos.forEach((element, index) => {
+        //   extracoes.push(new ProcessoTJSP(element, numeroOab, {uuidCaptcha: uuidCaptcha, gResponse: gResponse, cookies: cookies}).extrair());
+        // })
+
+        listaProcessos = listaProcessos.slice(0, 5);//TODO remover posteriormente
+
+        async.mapLimit(listaProcessos, 1, async element => {
+          extracoes.push(await new ProcessoTJSP(element, numeroOab).extrair())
+        });
 
         //resultados = await this.extrairProcessos(listaProcessos, cookies);
         return Promise.all(extracoes).then((resultado) => {
@@ -255,8 +264,6 @@ class OabTJSP extends ExtratorBase {
       })
 
       const $ = cheerio.load(objResponse.responseBody);
-      // console.log($('span.resultadoPaginacao'));
-
       try {
         //processos = [...processos, ...this.extrairLinksProcessos($)];
         processos = [ ...processos, ...this.extrairNumeroProcessos($)];
@@ -272,7 +279,6 @@ class OabTJSP extends ExtratorBase {
         condition = false;
       }
     } while (condition);
-
     return processos;
   }
 
@@ -295,17 +301,17 @@ class OabTJSP extends ExtratorBase {
 
 
   extrairNumeroProcessos($) {
-    const rawProcessos = $('div.nuProcesso');
+    const rawProcessos = $('a.linkProcesso');
     const listaNumeros = [];
 
-    if (rawProcessos.length) {
-      // TODO console.log com logger
-      return [];
-    }
+    // if (rawProcessos.length) {
+    //   // TODO console.log com logger
+    //   return [];
+    // }
 
     rawProcessos.each((index, element) => {
       let numero = $(element).text();
-      listaNumeros.push(numero);
+      listaNumeros.push(numero.trim());
     })
 
     return listaNumeros;

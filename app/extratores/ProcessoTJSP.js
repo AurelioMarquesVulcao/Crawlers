@@ -23,13 +23,12 @@ function adicionarMascara(numero) {
 }
 
 class ProcessoTJSP extends ExtratorBase {
-  constructor(numeroDoProcesso, numeroDaOab = '', oabExtratorParam) {
+  constructor(numeroDoProcesso, numeroDaOab = '') {
     super();
     this.parser = new TJSPParser();
     this.robo = new Robo();
     this.dataSiteKey = "6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft";
     this.logger = null;
-    this.oabExtratorParam = oabExtratorParam;
     this.numeroDoProcesso = numeroDoProcesso;
     this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
 
@@ -80,35 +79,28 @@ class ProcessoTJSP extends ExtratorBase {
     let limite = 5;
 
     try {
+      this.logger.info("Fazendo primeira conexão.");
+      objResponse = await this.robo.acessar({ url: `https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}` });
+      this.logger.info("Conexão ao website concluido.");
+      cookies = objResponse.cookies;
+      cookies = cookies.map((element) => {
+        return element.replace(/\;.*/, "");
+      });
+      cookies = cookies.join("; ");
+      headers["Cookie"] = cookies;
+
       //TODO uuidCaptcha
+      this.logger.info("Consultando uuid.");
+      uuidCaptcha = await this.getCaptchaUuid(cookies);
+      this.logger.info("Uuid recuperado.");
 
       do {
-        if (this.oabExtratorParam) { // se vier parametros do oabTJSP n
-          cookies = this.oabExtratorParam.cookies;
-          uuidCaptcha = this.oabExtratorParam.uuidCaptcha;
-          gResponse = this.oabExtratorParam.gResponse;
-        } else {
-          this.logger.info("Fazendo primeira conexão.");
-          objResponse = await this.robo.acessar({ url: `https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}` });
-          this.logger.info("Conexão ao website concluido.");
-          cookies = objResponse.cookies;
-          cookies = cookies.map((element) => {
-            return element.replace(/\;.*/, "");
-          });
-          cookies = cookies.join("; ");
+        this.logger.info("Preparando para resolver captcha");
+        gResponse = await this.getCaptcha();
+        this.logger.info("Captcha resolvido");
 
-          this.logger.info("Consultando uuid.");
-          uuidCaptcha = await this.getCaptchaUuid(cookies);
-          this.logger.info("Uuid recuperado.");
+        this.logger.info("Preparando para acessar site do processo.");
 
-          this.logger.info("Preparando para resolver captcha");
-          gResponse = await this.getCaptcha();
-          this.logger.info("Captcha resolvido");
-
-          this.logger.info("Preparando para acessar site do processo.");
-        }
-
-        headers["Cookie"] = cookies;
         url = `https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=2B0000W8N0000&processo.foro=${this.detalhes.origem}&processo.numero=${this.detalhes.numeroProcessoMascara}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`
         this.logger.info(`Acessando o site. [Tentativa: ${tentativas + 1}]`);
         objResponse = await this.robo.acessar({
@@ -119,9 +111,10 @@ class ProcessoTJSP extends ExtratorBase {
         });
         const $ = cheerio.load(objResponse.responseBody);
         // verifica se há uma tabela de movimentação dentro da pagina.
+        console.log(objReponse.responseBody);
+        process.exit(1); //TODO retirar
         if ($("#tabelaTodasMovimentacoes").length == 0) {
           this.logger.info(`Não foi possivel acessar a pagina do processo [Tentativas: ${tentativas + 1}]`);
-          gResponse = await this.getCaptcha();
           tentativas = tentativas++;
         } else {
           this.logger.info(`Pagina capturada com sucesso. [Tentativas: ${tentativas + 1}]`);
@@ -169,30 +162,32 @@ class ProcessoTJSP extends ExtratorBase {
   }
 
   async getCaptcha() {
-    let captchaResponse;
-    let resposta;
-
+    const captchaHandler = new CaptchaHandler();
     try {
-
-      captchaResponse = await captchaIOhandler(
-        this.website = 'https://esaj.tjsp.jus.br/cpopg/open.do',
+      let captcha = {};
+      captcha = await captchaHandler.resolveRecaptchaV2(
+        // captcha = await antiCaptchaHandler(
+        'https://esaj.tjsp.jus.br/cpopg/open.do',
         this.dataSiteKey,
         '/'
-      );
+      ).catch(error => {throw error});
 
-      if (!captchaResponse) {
-        throw new CaptchaIOException('Falha na resposta', 'Não foi possivel recuperar o captcha');
+      if (!captcha.sucesso) {
+        throw new AntiCaptchaResponseException(
+          'Falha na resposta',
+          'Nao foi possivel recuperar a resposta para o captcha'
+        );
       }
 
-      this.logger.info('Captcha recuperado com sucesso.');
-      resposta = { sucesso: true, captchaResponse: captchaResponse }
-    } catch(e) {
-      this.logger.log('Falha ao recuperar o captcha', e);
-      resposta = { sucesso: false }
-    } finally {
-      return resposta;
+      return captcha.gResponse;
+    } catch (error) {
+      if (error instanceof AntiCaptchaResponseException) {
+        throw new AntiCaptchaResponseException(error.code, error.message);
+      }
+      throw error;
     }
   }
+
 }
 
 module.exports.ProcessoTJSP = ProcessoTJSP;

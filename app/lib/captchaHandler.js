@@ -470,16 +470,16 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     };
     let captcha;
 
-    // console.log("Captchas.IO");
-    // do {
-    //   console.log("Tentativa", tentativas);
-    //   resultado = await this.getCaptcha(website, websiteKey, pageAction, CaptchaIOHandler);
-    //   await sleep(5000);
-    //   if (resultado.sucesso) return resultado;
-    //   tentativas++;
-    // } while (tentativas < maxTentativas);
-    //
-    // tentativas = 0;
+    console.log("Captchas.IO");
+    do {
+      console.log("Tentativa", tentativas);
+      resultado = await this.getCaptcha(website, websiteKey, pageAction, CaptchaIOHandler);
+      await sleep(5000);
+      if (resultado.sucesso) return resultado;
+      tentativas++;
+    } while (tentativas < maxTentativas);
+
+    tentativas = 0;
     console.log('AntiCaptcha');
 
     do {
@@ -493,8 +493,8 @@ module.exports.CaptchaHandler = class CaptchaHandler {
       if (resultado.sucesso) return resultado;
       tentativas++;
       await sleep(5000);
-    // } while (tentativas < maxTentativas);
-    } while(true)
+    } while (tentativas < maxTentativas);
+    // } while(true)
     console.log('1', resultado);
     return resultado;
   }

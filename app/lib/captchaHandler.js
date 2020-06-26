@@ -68,6 +68,8 @@ class CaptchaIOHandler {
     let captchaId;
     let url;
     let tentativas = 0;
+    let espera = 20000;
+    let data
 
 
     // Realiza o pedido a api do captchas.io
@@ -82,58 +84,35 @@ class CaptchaIOHandler {
         json: 1
       }
     });
-
-    
-    // Se resposta valida continua o procedimento
-    if (this.testaErro(objResponse.responseBody).valido) {
-
-      let jsonBody = objResponse.responseBody;
-      captchaId = jsonBody.request;
-
-      // Espera 5 segundos para fazer a chamada a resposta
-      await sleep(5000);
-      url = `?key=${CAPTCHAIO_KEY}&action=get&id=${captchaId}&json=1`
-      objResponse = await robo.acessar(
-        {
+    console.log(objResponse.responseBody);
+    console.log(this.testaErro(objResponse.responseBody.request));
+    if (this.testaErro(objResponse.responseBody.request).valido) {
+      captchaId = objResponse.responseBody.request;
+      url = `?key=${CAPTCHAIO_KEY}&action=get&id=${captchaId}&json=1`;
+      console.log('\tID: ', captchaId);
+      do {
+        await sleep(espera)
+        objResponse = await robo.acessar({
           url: 'https://api.captchas.io/res.php' + url,
           method: 'get',
+        });
+        //TODO remover console
+        data = new Date()
+        console.log('\tResponse',objResponse.responseBody, `${data.getHours()}:${data.getMinutes()}:${data.getSeconds()}`);
+
+        if (!this.testaErro(objResponse.responseBody.request).valido) {
+          break;
         }
-      )
-      await sleep(3000);
-      if (!this.testaErro(objResponse.responseBody.request).valido) {
 
-        do {
-          console.log(tentativas + 1);
-          objResponse = await robo.acessar(
-            {
-              url: 'https://api.captchas.io/res.php' + url,
-              method: 'get',
-            }
-          )
-
-          if (this.testaErro(objResponse.responseBody.request).valido) {
-            return {
-              sucesso: true,
-              gResponse: objResponse.responseBody.request
-            }
-          }
-          await sleep(5000);
-          tentativas++;
-        } while (tentativas < 23);
-
-      }
-
-      // se nao houver erro retorna sucesso
-
-      if (this.testaErro(objResponse.responseBody.request).valido){
-        console.log('3', objResponse.responseBody);
-        return {
-          sucesso: true,
-          gResponse: objResponse.responseBody.request
+        if (objResponse.responseBody & objResponse.responseBody.request != 'CAPCHA_NOT_READY') {
+          return {
+            sucesso: true,
+            gResponse: objResponse.responseBody.request
+          };
         }
-      }
+        tentativas++;
+      } while(tentativas < 5);
     }
-    console.log('4', objResponse.responseBody);
     return {
       sucesso: false,
       detalhes: objResponse.responseBody
@@ -149,11 +128,6 @@ class CaptchaIOHandler {
     
     let resposta = {
       valido: true
-    }
-
-    if (!body) {
-      resposta.detalhes = 'VAZIO';
-      resposta.valido = false;
     }
 
     if (/ERROR_PROXY_BANNED/.test(body)) {
@@ -186,10 +160,10 @@ class CaptchaIOHandler {
       resposta.valido = false;
     }
 
-    if (/CAPCHA_NOT_READY/.test(body)) {
-      resposta.detalhes = 'CAPCHA_NOT_READY';
-      resposta.valido = false;
-    }
+    // if (/CAPCHA_NOT_READY/.test(body)) {
+    //   resposta.detalhes = 'CAPCHA_NOT_READY';
+    //   resposta.valido = false;
+    // }
 
     if (/ERROR_RECAPTCHA_TIMEOUT/.test(body)) {
       resposta.detalhes = 'ERROR_RECAPTCHA_TIMEOUT';

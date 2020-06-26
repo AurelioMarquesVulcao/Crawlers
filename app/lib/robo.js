@@ -180,7 +180,7 @@ class Robo {
     };
 
     if (params) {
-      if (usaJson) options.json = params;
+      if (usaJson) options.data = params;
       // Json
       else {
         // FormData

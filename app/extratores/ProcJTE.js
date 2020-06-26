@@ -1,7 +1,11 @@
 const cheerio = require('cheerio');
-const { Logger } = require('../lib/util');
+const {
+  Logger
+} = require('../lib/util');
 const moment = require('moment');
-const { Andamento } = require('../models/schemas/andamento');
+const {
+  Andamento
+} = require('../models/schemas/andamento');
 const re = require('xregexp');
 const fs = require('fs');
 const querystring = require('querystring');
@@ -14,8 +18,12 @@ const {
   ExtracaoException,
   AntiCaptchaResponseException,
 } = require('../models/exception/exception');
-const { ExtratorBase } = require('./extratores');
-const { TJPRParser } = require('../parsers/TJPRParser');
+const {
+  ExtratorBase
+} = require('./extratores');
+const {
+  JTEParser
+} = require('../parsers/JTEParser');
 
 /**
  * Logger para console e arquivo
@@ -23,82 +31,86 @@ const { TJPRParser } = require('../parsers/TJPRParser');
 let logger;
 
 
-class OabTJPR extends ExtratorBase {
+class ProcJTE extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
-    this.parser = new TJPRParser();
+    this.parser = new JTEParser();
     this.dataSiteKey = '6LfDrDsUAAAAAOpZjoH4CP7G3_NJR1ogyeRFlOzR';
   }
 
-  async extrair(numeroDaOab) {
+
+  async extrair(numeroProcesso) {
     let resultado = [];
-    // Call a page already with the captchas resolved from a local directory.
-    var OAB13619p9
-    fs.readFile(`test/testCases/TJPR/oab_${numeroDaOab}.html`, 'utf8', (err, data) => {
-      console.log(!!data)
-      //console.log(err)
-      OAB13619p9 = data
-    });
+
+
 
     try {
-      logger = new Logger(
-        'info',
-        'logs/OabTJPR/OabTJPRInfo.log',
-        {
-          nomeRobo: enums.nomesRobos.TJPR,
-          NumeroOab:numeroDaOab,
-        }
-      );
-
-      // Codigo para validar entrada
-      // --- Em testes ---
-
+      // Call a page already with the captchas resolved from a local directory.
+      var responseDev
+      fs.readFile(`app/test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
+        console.log(!!data)
+        //console.log(err)
+        // console.log(data);
+        responseDev = data
+        
+      });
+      // logger = new Logger(
+      //   'info',
+      //   'logs/OabTJPR/OabTJPRInfo.log', {
+      //     nomeRobo: enums.nomesRobos.JTE,
+      //     numeroProcesso: numeroProcesso,
+      //   }
+      // );
       let objResponse = await this.robo.acessar({
-        url: 'http://portal.tjpr.jus.br/civel/publico/consulta/processo.do?actionType=consultar',
+        url: 'https://jte.csjt.jus.br/',
         method: 'GET',
         encoding: 'utf8',
         usaProxy: false, //proxy
         usaJson: false,
       });
 
-      //Estou carregando paginas locais até resolver o capcha.
-      let $ = cheerio.load(OAB13619p9);
-      let links = this.parser.extrairOab($)
-      let envolvidos = this.parser.extraiEnvolvidos($)
+      //Estou carregando paginas locais até resolver o Puppeteer.
+      let $ = cheerio.load(responseDev);
+
+      let dadosProcesso = this.parser.extrairCapa($)
+      console.log(dadosProcesso);
+      
+      // let envolvidos = this.parser.extraiEnvolvidos($)
       var Processos = []
-      let i = 0;
-      for (i in links) {
-        resultado.push(
-          await new OabTJPR().extrairProcesso(links[i], envolvidos[i], numeroDaOab)
-          )
-        Processos.push(
-          await resultado[i].processo.salvar()
-        )
-        await resultado[i].processo.salvar()
-        await Andamento.salvarAndamentos(resultado[i].andamentos)
-        
-      }
-    } catch (e) { console.log(e); }
-    //console.log(resultado[1].andamentos)
-    // console.log(resultado[0].processo)
-    console.log('extraido o ' + numeroDaOab);
-    
-    return Promise.all(Processos).then((args) => {
-      logger.info('Processos extraidos com sucesso');
-      return {
-        resultado: args,
-        sucesso: true,
-        detalhes: '',
-        logs: logger.logs
-      };
-    });
+      // let i = 0;
+      // for (i in links) {
+      //   // resultado.push(
+      //   //   await new OabTJPR().extrairProcesso(links[i], envolvidos[i], numeroProcesso)
+      //   //   )
+      //   // Processos.push(
+      //   //   await resultado[i].processo.salvar()
+      //   // )
+      //   // await resultado[i].processo.salvar()
+      //   // await Andamento.salvarAndamentos(resultado[i].andamentos)
+
+      // }
+    } catch (e) {
+      console.log(e);
+    }
+    console.log('extraido o ' + numeroProcesso);
+    //  usar return simples apenas para dev
+    return Processos
+    // return Promise.all(Processos).then((args) => {
+    //   logger.info('Processos extraidos com sucesso');
+    //   return {
+    //     resultado: args,
+    //     sucesso: true,
+    //     detalhes: '',
+    //     logs: logger.logs
+    //   };
+    // });
   } // End extrair function
 
 
 } // End  class TJPR
-module.exports.OabTJPR = OabTJPR;
+module.exports.ProcJTE = ProcJTE;
 
 // DEV START'S FOR PROJECT TEST and development
-// (async () => {
-//   await new OabTJPR().extrair("44400")
-// })()
+(async () => {
+  await new ProcJTE().extrair("0000004-63.2019.5.21.0001")
+})()

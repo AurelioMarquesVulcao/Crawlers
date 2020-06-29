@@ -31,11 +31,7 @@ class JTEParser extends BaseParser {
   parse($) {
 
     let dadosProcesso = new Processo({
-      uf: '',
-      comarca: '',
-      assunto: '',
-      classe: '',
-      distribuicao: '',
+      capa: this.extrairCapa($),
       oabs: this.removeVazios(this.Oabs($)),
       qtdAndamentos: '',
       origemExtracao: '',
@@ -57,16 +53,20 @@ class JTEParser extends BaseParser {
     return 'detalhes'
   }
 
-  advogados($){
+  advogados($) {
     let resultado = [];
     for (let i in this.extraiAdvogadoOab($)) {
       let advogado = {
         nome: this.extraiAdvogadoOab($)[i][1],
         tipo: "Advogado",
-        oab: this.extraiAdvogadoOab($)[i][0]
+        oab: {
+          uf: this.extraiAdvogadoOab($)[i][0].split('-')[1],
+          numero: this.extraiAdvogadoOab($)[i][0].split('-')[0],
+          oab: this.extraiAdvogadoOab($)[i][0]
+        }
       }
       resultado.push(advogado)
-    }   
+    }
     return resultado
   }
 
@@ -104,18 +104,46 @@ class JTEParser extends BaseParser {
 
   }
 
-
+  // dividir em mais funções...
+  // ajustar nomes das variaveis
   extrairCapa($) {
-    let capa;
-    let datas = this.extraiEnvolvidos($);
-    capa = {
-      assunto: '',
+    let capa = {
       uf: "",
       comarca: "",
+      vara: "",
+      fase: "",
+      assunto: [""],
       classe: "",
+      // dataDistribuicao: Date,
     }
+    let Oab = [];
+    let resultado = [];
+    let advogado = []
+    let classe = []
+    $('.item-valor-padrao').each(async function (element) {
+      let advogados = $(this).text().split('\n');
+      let data = new JTEParser().removeVazios(advogados).join(' ');
+      classe.push(data)
+    })
+    capa.classe = classe[0]
 
-    return datas
+
+    $('detalhes-aba-geral').each(async function (element) {
+      let advogados = $(this).text().split('\n');
+      let data = new JTEParser().removeVazios(advogados);
+      if (data.length > 2) {
+      // continuar daqui.................................................................
+      }
+      console.log(datas);
+
+      // classe.push(data)
+    })
+
+    resultado = capa
+
+
+
+    return resultado
   }
 
   // retorna array com numero do processo.
@@ -180,7 +208,7 @@ class JTEParser extends BaseParser {
 
   }
 
-  // remove espaço vazios das strings que estão em um array
+  // remove string de espaço vazios e espaço vazio das strings que estão em um array
   removeVazios(array) {
     let limpo = [];
     let i = 0;

@@ -72,7 +72,7 @@ class ProcJTE extends ExtratorBase {
       //Estou carregando paginas locais até resolver o Puppeteer.
       let $ = cheerio.load(responseDev);
 
-      let dadosProcesso = this.parser.extrairCapa($)
+      let dadosProcesso = this.parser.parse($)
       console.log(dadosProcesso);
       
       // let envolvidos = this.parser.extraiEnvolvidos($)

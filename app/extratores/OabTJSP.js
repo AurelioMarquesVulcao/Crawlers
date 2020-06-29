@@ -96,16 +96,20 @@ class OabTJSP extends ExtratorBase {
 
         listaProcessos = listaProcessos.slice(0, 5); //TODO remover posteriormente
 
-        async.mapLimit(listaProcessos, 1, async (element) => {
-          extracoes.push(await new ProcessoTJSP(element, numeroOab).extrair());
+        //TODO descobrir como mapLimit realmente funciona
+        //ou colocar em uma fila separada e mandar ao bigdata os resultados conforme eles forem aparecendo
+        extracoes = async.mapLimit(listaProcessos, 1, async (element) => {
+          return await new ProcessoTJSP(element, numeroOab).extrair();
         });
 
+        console.log(extracoes);
+
         //resultados = await this.extrairProcessos(listaProcessos, cookies);
-        return Promise.all(extracoes).then((resultado) => {
+        return Promise.all(extracoes).then((resultados) => {
           this.logger.info('Terminada extração de processos.');
           let logs = [];
           let sucessos = resultados.filter((element) => element.sucesso);
-          let falhas = resultado.filter((element) => !element.sucesso);
+          let falhas = resultados.filter((element) => !element.sucesso);
 
           if (sucessos.length > 0) {
             this.logger.info(

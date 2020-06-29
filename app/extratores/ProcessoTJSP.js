@@ -1,11 +1,8 @@
 const cheerio = require('cheerio');
-const moment = require('moment');
-const re = require('xregexp');
 const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
-const { enums } = require('../configs/enums');
 const { Robo } = require('../lib/robo');
 
 const {
@@ -18,19 +15,15 @@ const {
 const { ExtratorBase } = require('./extratores');
 const { TJSPParser } = require('../parsers/TJSPParser');
 
-function adicionarMascara(numero) {
-  return numero;
-}
 
 class ProcessoTJSP extends ExtratorBase {
-  constructor() {
-    super();
+  constructor(url, isDebug) {
+    super(url, isDebug);
     this.parser = new TJSPParser();
     this.robo = new Robo();
     this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
     this.logger = null;
     this.numeroDoProcesso = '';
-    this.isDebug = false;
 
   }
 
@@ -82,7 +75,7 @@ class ProcessoTJSP extends ExtratorBase {
       this.logger.info('Conexão ao website concluido.');
       cookies = objResponse.cookies;
       cookies = cookies.map((element) => {
-        return element.replace(/\;.*/, '');
+        return element.replace(/;.*/, '');
       });
       cookies = cookies.join('; ');
       headers['Cookie'] = cookies;
@@ -109,7 +102,7 @@ class ProcessoTJSP extends ExtratorBase {
         });
         const $ = cheerio.load(objResponse.responseBody);
         // verifica se há uma tabela de movimentação dentro da pagina.
-        if ($('#tabelaTodasMovimentacoes').length == 0) {
+        if ($('#tabelaTodasMovimentacoes').length === 0) {
           this.logger.info(
             `Não foi possivel acessar a pagina do processo [Tentativas: ${
               tentativas + 1
@@ -162,7 +155,7 @@ class ProcessoTJSP extends ExtratorBase {
   }
 
   async getCaptchaUuid(cookies) {
-    let objResponse = {};
+    let objResponse;
     objResponse = await this.robo.acessar({
       url: 'https://esaj.tjsp.jus.br/cpopg/captchaControleAcesso.do',
       method: 'POST',
@@ -172,8 +165,7 @@ class ProcessoTJSP extends ExtratorBase {
         Cookie: cookies,
       },
     });
-    let uuid = objResponse.responseBody.uuidCaptcha;
-    return uuid;
+    return objResponse.responseBody.uuidCaptcha;
   }
 
   async getCaptcha() {

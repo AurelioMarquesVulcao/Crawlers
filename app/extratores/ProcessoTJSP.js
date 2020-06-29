@@ -120,7 +120,7 @@ class ProcessoTJSP extends ExtratorBase {
             `Pagina capturada com sucesso. [Tentativas: ${tentativas + 1}]`
           );
           this.logger.info('Iniciando processo de extração.');
-          extracao = await this.parser.parse(objResponse.body);
+          extracao = await this.parser.parse(objResponse.responseBody);
           this.logger.info('Processo de extração concluído.');
 
           this.logger.info('Iniciando salvamento de Andamento');
@@ -129,6 +129,7 @@ class ProcessoTJSP extends ExtratorBase {
 
           this.logger.info('Iniciando salvamento do Processo');
           resultado = await extracao.processo.salvar();
+          console.log('resultado', resultado);
           this.logger.info(
             `Processo: ${this.numeroDoProcesso} salvo | Quantidade de andamentos: ${extracao.andamentos.length}`
           );
@@ -150,7 +151,6 @@ class ProcessoTJSP extends ExtratorBase {
       };
     } catch (err) {
       this.logger.log('error', err);
-
       return {
         sucesso: false,
         numeroDoProcesso: this.numeroDoProcesso,

@@ -23,24 +23,15 @@ function adicionarMascara(numero) {
 }
 
 class ProcessoTJSP extends ExtratorBase {
-  constructor(numeroDoProcesso, numeroDaOab = '') {
+  constructor() {
     super();
     this.parser = new TJSPParser();
     this.robo = new Robo();
     this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
     this.logger = null;
-    this.numeroDoProcesso = numeroDoProcesso;
-    this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
+    this.numeroDoProcesso = '';
+    this.isDebug = false;
 
-    let nomeRobo = `${enums.tipoConsulta.Processo}${enums.nomesRobos.TJSP}`;
-    if (numeroDaOab) {
-      nomeRobo = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}`;
-    }
-    this.numeroDaOab = numeroDaOab;
-    this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
-      nomeRobo: nomeRobo,
-      NumeroDoProcesso: numeroDoProcesso,
-    });
   }
 
   /**
@@ -49,7 +40,17 @@ class ProcessoTJSP extends ExtratorBase {
    * @param {String} numeroDaOab indica que a extração teve inicio com uma oab
    * @returns {Promise<{sucesso: boolean, logs: [], numeroDoProcesso: string}|{sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: ("undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint")}|{resultado: (void|*|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos: *}|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos}), sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: string}>}
    */
-  async extrair() {
+  async extrair(numeroDoProcesso, numeroDaOab = '') {
+    const nomeRobo = 'ProcessoTJSP'
+    this.numeroDaOab = numeroDaOab;
+    this.numeroDoProcesso = numeroDoProcesso;
+    this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
+
+    this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
+      nomeRobo: nomeRobo,
+      NumeroDoProcesso: numeroDoProcesso,
+    });
+
     let resultado;
     let preParse;
     let uuidCaptcha;

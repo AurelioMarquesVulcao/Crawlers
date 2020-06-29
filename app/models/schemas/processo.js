@@ -138,6 +138,29 @@ processoSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
   return detalhes;
 };
 
+processoSchema.statics.listarProcessos = async function listarProcessos(
+  dias
+) {
+  let numeroProcessos = [];
+
+  let docs = await Processo.find(
+    {
+      dataAtualizacao: {
+        $gte: new Date(new Date().getTime() - dias * 24 * 3600 * 1000),
+      },
+    },
+    {
+      'detalhes.numeroProcessoMascara': 1,
+    }
+  );
+
+  docs.forEach((doc) => {
+    numeroProcessos.push(doc.detalhes.numeroProcessoMascara);
+  });
+
+  return numeroProcessos;
+};
+
 processoSchema.index({ 'detalhes.numeroProcesso': 1, type: -1 });
 
 const Processo = mongoose.model('Processo', processoSchema, 'processos');

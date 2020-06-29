@@ -40,6 +40,7 @@ class JTEParser extends BaseParser {
       qtdAndamentos: '',
       origemExtracao: '',
       envolvidos: this.envolvidos($),
+      advogados: this.advogados($),
       "origemDados": enums.nomesRobos.JTE,
       detalhes: ''
 
@@ -56,15 +57,29 @@ class JTEParser extends BaseParser {
     return 'detalhes'
   }
 
-  envolvidos($) {
+  advogados($){
     let resultado = [];
-    for(let i in this.extraiAdvogadoOab($)){
+    for (let i in this.extraiAdvogadoOab($)) {
       let advogado = {
-        nome: "(" + this.extraiAdvogadoOab($)[i][0] + ")" + " " + this.extraiAdvogadoOab($)[i][1],
-        tipo: "Advogado"
+        nome: this.extraiAdvogadoOab($)[i][1],
+        tipo: "Advogado",
+        oab: this.extraiAdvogadoOab($)[i][0]
       }
       resultado.push(advogado)
-    }
+    }   
+    return resultado
+  }
+
+  envolvidos($) {
+    let resultado = [];
+    // comitadopara padronizar o advogado no Banco de dados.
+    // for (let i in this.extraiAdvogadoOab($)) {
+    //   let advogado = {
+    //     nome: "(" + this.extraiAdvogadoOab($)[i][0] + ")" + " " + this.extraiAdvogadoOab($)[i][1],
+    //     tipo: "Advogado"
+    //   }
+    //   resultado.push(advogado)
+    // }
     let envolvidos = this.extraiEnvolvidos($)
     for (let i in envolvidos) {
       let separaNome = envolvidos[i].split(':')
@@ -73,14 +88,14 @@ class JTEParser extends BaseParser {
         tipo: separaNome[0]
       }
       resultado.push(envolvido)
-      
+
     }
     // console.log(resultado);
     return resultado
   }
   Oabs($) {
     let resultado = []
-    for(let i in this.extraiAdvogadoOab($)){
+    for (let i in this.extraiAdvogadoOab($)) {
       resultado.push(this.extraiAdvogadoOab($)[i][0])
     }
     return resultado
@@ -134,7 +149,7 @@ class JTEParser extends BaseParser {
       let advogados = $(this).text().split('\n');
       let data = new JTEParser().removeVazios(advogados).join(' ');
       let OAB = new JTEParser().separaAdvogadoOab(data).oab;
-      advogado = [OAB,new JTEParser().separaAdvogadoOab(data).advogado]    
+      advogado = [OAB, new JTEParser().separaAdvogadoOab(data).advogado]
       if (OAB.length > 2) resultado.push(advogado)
     })
     return resultado
@@ -154,8 +169,7 @@ class JTEParser extends BaseParser {
     if (!isNaN(parseFloat(numero)) && isFinite(numero)) {
       Oab = pegaOab
       advogado = pegaNome
-    }
-    else nome = false
+    } else nome = false
     return {
       oab: Oab,
       advogado: advogado

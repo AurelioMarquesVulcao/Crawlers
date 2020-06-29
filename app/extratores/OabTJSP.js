@@ -22,6 +22,8 @@ const {
 const { ExtratorBase } = require('./extratores');
 const { TJSPParser } = require('../parsers/TJSPParser');
 
+const { LogExecucao } = require('../lib/logExecucao');
+
 class OabTJSP extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
@@ -30,7 +32,15 @@ class OabTJSP extends ExtratorBase {
     this.logger = null;
   }
 
-  async extrair(numeroOab) {
+  async extrair(numeroOab, cadastroConsultaId) {
+    console.log('cadastroConsultaId', cadastroConsultaId);
+    let cadastroConsulta = {
+      SeccionalOab: 'SP',
+      TipoConsulta: 'processo',
+      NumeroOab: numeroOab,
+      _id: cadastroConsultaId,
+    };
+
     const nomeRobo = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}`;
     this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
       nomeRobo: nomeRobo,
@@ -38,7 +48,7 @@ class OabTJSP extends ExtratorBase {
     });
 
     try {
-      let extracoes = [];
+      let resultados = [];
       let preParse = {};
       let uuidCaptcha = '';
       let gResponse = '';
@@ -70,79 +80,75 @@ class OabTJSP extends ExtratorBase {
       uuidCaptcha = preParse.captcha.uuidCaptcha;
       this.logger.info('Analise do website concluida.');
       this.logger.info('Fazendo chamada para resolução do captcha.');
-      gResponse = await this.getCaptcha();
-      // gResponse = '03AGdBq27q2l_2WrptTO5a8Zluw3pUBSLS9nq1-dnzlxn2CJb_GGQpVI-1r_GdNwXmt84Rnd9QLy9_RwuPg0HuIRdMcu7Ey4tbYr-x0lyzjebu1SKnT2g0Md3mlA1tmGBDlRwh7J2yirglJmne3apSbfqZ3jsDPkrY9BA3NclmyQTckK1zilNlFUqMmuxgTwy9y-yyj_AWze30iuxAfvisgwu_NYfpApkQQML5GYlWBwe0BYyO_BzDIgZe6LwfB-N2csIhf3TK_f9yWPeVfjIq3IwT8OV-d2pn8bkZuPlPFxBJGyMfDupQvqoiBZ8ubigdZCnXmyHrkByg6UfWQLOfB7sgMxrcLk0GjTK59n1ttSl_vBb2DGNg6ZKLQNMOUcO8hlesI0hU970S1tNdz_DrBfSiBUPWubwm8RDv6AjkJgAbGo7nGGW5vMy3QbR0yO4u2CqVrF9qasoG'
+      // gResponse = await this.getCaptcha();
+      gResponse =
+        '03AGdBq27q2l_2WrptTO5a8Zluw3pUBSLS9nq1-dnzlxn2CJb_GGQpVI-1r_GdNwXmt84Rnd9QLy9_RwuPg0HuIRdMcu7Ey4tbYr-x0lyzjebu1SKnT2g0Md3mlA1tmGBDlRwh7J2yirglJmne3apSbfqZ3jsDPkrY9BA3NclmyQTckK1zilNlFUqMmuxgTwy9y-yyj_AWze30iuxAfvisgwu_NYfpApkQQML5GYlWBwe0BYyO_BzDIgZe6LwfB-N2csIhf3TK_f9yWPeVfjIq3IwT8OV-d2pn8bkZuPlPFxBJGyMfDupQvqoiBZ8ubigdZCnXmyHrkByg6UfWQLOfB7sgMxrcLk0GjTK59n1ttSl_vBb2DGNg6ZKLQNMOUcO8hlesI0hU970S1tNdz_DrBfSiBUPWubwm8RDv6AjkJgAbGo7nGGW5vMy3QbR0yO4u2CqVrF9qasoG';
       this.logger.info('Captcha resolvido');
 
       // Segunda parte: pegar a lista de processos
       this.logger.info('Recuperando lista de processos');
-      listaProcessos = await this.getListaProcessos(
-        numeroOab,
-        cookies,
-        uuidCaptcha,
-        gResponse
-      );
-      console.log(listaProcessos);
-      this.logger.info('Lista de processos recuperada');
+      let tentativa = 0;
+      do {
+        listaProcessos = await this.getListaProcessos(
+          numeroOab,
+          cookies,
+          uuidCaptcha,
+          gResponse
+        );
+        console.log(listaProcessos);
+        this.logger.info('Lista de processos recuperada');
 
-      // Terceira parte: passar a lista, pegar cada um dos codigos
-      // resultantes e mandar para o parser
-      if (listaProcessos.length > 0) {
-        this.logger.info('Inicio do processo de extração de processos');
+        // Terceira parte: passar a lista, pegar cada um dos codigos
+        // resultantes e mandar para o parser
+        if (listaProcessos.length > 0) {
+          this.logger.info('Inicio do processo de extração de processos');
 
-        // listaProcessos.forEach((element, index) => {
-        //   extracoes.push(new ProcessoTJSP(element, numeroOab, {uuidCaptcha: uuidCaptcha, gResponse: gResponse, cookies: cookies}).extrair());
-        // })
+          let lista = await Processo.listarProcessos(2);
+          listaProcessos = listaProcessos.filter((x) => !lista.includes(x));
 
-        listaProcessos = listaProcessos.slice(0, 5); //TODO remover posteriormente
-
-        //TODO descobrir como mapLimit realmente funciona
-        //ou colocar em uma fila separada e mandar ao bigdata os resultados conforme eles forem aparecendo
-        extracoes = async.mapLimit(listaProcessos, 1, async (element) => {
-          return await new ProcessoTJSP(element, numeroOab).extrair();
-        });
-
-        console.log(extracoes);
-
-        //resultados = await this.extrairProcessos(listaProcessos, cookies);
-        return Promise.all(extracoes).then((resultados) => {
-          this.logger.info('Terminada extração de processos.');
-          let logs = [];
-          let sucessos = resultados.filter((element) => element.sucesso);
-          let falhas = resultados.filter((element) => !element.sucesso);
-
-          if (sucessos.length > 0) {
+          for (const processo of listaProcessos) {
+            cadastroConsulta['NumeroProcesso'] = processo;
+            console.log('cadastroConsulta', cadastroConsulta);
             this.logger.info(
-              `${sucessos.length} processos extraidos com sucesso`
+              `Criando log de execução para o processo ${processo}.`
             );
+            await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
+            this.logger.info(
+              `Log de execução do processo ${processo} feito com sucesso`
+            );
+            this.logger.info(
+              `Enviando processo ${processo} a fila de extração.`
+            );
+            this.logger.info(`Presalvando processo ${processo}`);
+            let resultado = await new Processo({
+              detalhes: Processo.identificarDetalhes(processo),
+            }).salvar();
+            this.logger;
+            this.logger.info(`Processo ${processo} presalvo.`);
+            resultados.push(resultado);
+          }
 
-            if (falhas.length > 0) {
-              this.logger.info(
-                `${falhas.length} processos com falhas de extração.`
-              );
-            }
-            resultados.forEach((element, index) => {
-              logs = [...this.logger.logs, ...element.logs];
-            });
+          //resultados = await this.extrairProcessos(listaProcessos, cookies);
+          return Promise.all(resultados).then((resultados) => {
+            this.logger.info('Processos extraidos com sucesso');
             return {
-              resultado: sucessos,
+              resultado: resultados,
               sucesso: true,
               detalhes: '',
+              logs: logger.logs,
+            }
+          }).catch(e => {
+            this.logger.info('Não houve processos bem sucedidos');
+            return {
+              resultado: [],
+              sucesso: false,
+              detalhes: 'Extração encontrou problemas',
               logs: this.logger.logs,
             };
-          }
-          this.logger.ingo('Não houve processos bem sucedidos');
-          resultados.forEach((element, index) => {
-            logs = [...this.logger.logs, ...element.logs];
           });
-          return {
-            resultado: [],
-            sucesso: false,
-            detalhes: 'Extração encontrou problemas',
-            logs: this.logger.logs,
-          };
-        });
-      }
+        }
+        tentativa++;
+      } while (tentativa < 5);
 
       this.logger.info('Lista de processos vazia;');
       return {
@@ -236,6 +242,34 @@ class OabTJSP extends ExtratorBase {
   }
 
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
+    //TODO apagar depois
+    return [
+      '0000384-10.2020.8.26.0083',
+      '1000517-35.2020.8.26.0083',
+      '1000516-50.2020.8.26.0083',
+      '1001447-87.2019.8.26.0083',
+      '1001374-18.2019.8.26.0083',
+      '1001296-24.2019.8.26.0083',
+      '1000419-84.2019.8.26.0083',
+      '1003264-26.2018.8.26.0083',
+      '1003266-93.2018.8.26.0083',
+      '1003265-11.2018.8.26.0083',
+      '1003262-56.2018.8.26.0083',
+      '1003261-71.2018.8.26.0083',
+      '1003263-41.2018.8.26.0083',
+      '1003260-86.2018.8.26.0083',
+      '1003258-19.2018.8.26.0083',
+      '1003257-34.2018.8.26.0083',
+      '1003256-49.2018.8.26.0083',
+      '1003255-64.2018.8.26.0083',
+      '1003254-79.2018.8.26.0083',
+      '1003253-94.2018.8.26.0083',
+      '1003252-12.2018.8.26.0083',
+      '1003251-27.2018.8.26.0083',
+      '1003250-42.2018.8.26.0083',
+      '1003249-57.2018.8.26.0083',
+    ];
+
     await this.robo.acessar({
       url: 'https://esaj.tjsp.jus.br/cpopg/manterSessao.do?conversationId=',
       headers: {
@@ -332,7 +366,7 @@ class OabTJSP extends ExtratorBase {
 
   async extrairProcessos(listaProcessos, cookies) {
     // TODO teste de captcha em quantidade limitada, remover posteriormente
-    listaProcessos = listaProcessos.slice(0, 5);
+    // listaProcessos = listaProcessos.slice(0, 5);
     let count = 1;
 
     let resultados = listaProcessos.map(async (element) => {

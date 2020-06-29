@@ -34,7 +34,7 @@ const antiCaptchaHandler = async (
           new AntiCaptchaResponseException('NOT_AVALIABLE', err.message)
         );
       }
-      console.log('balance', balance);
+      // console.log('balance', balance);
       if (balance > 0) {
         Anticaptcha.createTaskProxyless((err, taskId) => {
           if (err) {
@@ -97,7 +97,7 @@ class AntiCaptchaHandler {
       },
     });
 
-    console.log(objResponse.responseBody);
+    // console.log(objResponse.responseBody);
     captchaId = objResponse.responseBody.taskId;
 
     if (this.testaErro(objResponse.responseBody).valido) {
@@ -340,7 +340,7 @@ class CaptchaIOHandler {
     let captchaId;
     let url;
     let tentativas = 0;
-    let espera = 20000;
+    let espera = 20000; // 20 segundos
     let data;
 
     // Realiza o pedido a api do captchas.io
@@ -391,10 +391,21 @@ class CaptchaIOHandler {
         tentativas++;
       } while (tentativas < 5);
     }
-    return {
-      sucesso: false,
-      detalhes: objResponse.responseBody,
-    };
+
+    console.log(`[VALIDO] ${objResponse.responseBody.request & this.testaErro(objResponse.responseBody.request).valido & objResponse.responseBody.request != 'CAPCHA_NOT_READY'}`);
+    console.log(`[BODY] ${objResponse.responseBody.request} \n\n`);
+
+    if (objResponse.responseBody.request & this.testaErro(objResponse.responseBody.request).valido & objResponse.responseBody.request != 'CAPCHA_NOT_READY') {
+      return {
+        sucesso: true,
+        detalhes: objResponse.responseBody,
+      };
+    } else {
+      return {
+        sucesso: false,
+        detalhes: objResponse.responseBody,
+      };
+    }
   }
 
   /**
@@ -470,16 +481,21 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     };
     let captcha;
 
-    console.log("Captchas.IO");
-    do {
-      console.log("Tentativa", tentativas);
-      resultado = await this.getCaptcha(website, websiteKey, pageAction, CaptchaIOHandler);
-      await sleep(5000);
-      if (resultado.sucesso) return resultado;
-      tentativas++;
-    } while (tentativas < maxTentativas);
-
-    tentativas = 0;
+    // console.log('Captchas.IO');
+    // do {
+    //   console.log('Tentativa', tentativas);
+    //   resultado = await this.getCaptcha(
+    //     website,
+    //     websiteKey,
+    //     pageAction,
+    //     CaptchaIOHandler
+    //   );
+    //   await sleep(5000);
+    //   if (resultado.sucesso) return resultado;
+    //   tentativas++;
+    // } while (tentativas < maxTentativas);
+    //
+    // tentativas = 0;
     console.log('AntiCaptcha');
 
     do {
@@ -492,10 +508,10 @@ module.exports.CaptchaHandler = class CaptchaHandler {
       );
       if (resultado.sucesso) return resultado;
       tentativas++;
-      await sleep(5000);
-    } while (tentativas < maxTentativas);
-    // } while(true)
-    console.log('1', resultado);
+      await sleep(10000);
+    // } while (tentativas < maxTentativas);
+    } while(true)
+    // console.log('1', resultado);
     return resultado;
   }
 
@@ -512,7 +528,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     } else {
       resultado.detalhes.push(captcha.detalhes);
     }
-    console.log('2', resultado);
+    // console.log('2', resultado);
     return resultado;
   }
 };

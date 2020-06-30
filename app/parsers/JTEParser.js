@@ -19,7 +19,7 @@ class JTEParser extends BaseParser {
 
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
-  parse($) {
+  parse($, $2) {
     console.time('parse');
     let dadosProcesso = new Processo({
       capa: this.capa($),
@@ -31,9 +31,12 @@ class JTEParser extends BaseParser {
       // "origemDados": enums.nomesRobos.JTE,  // verificar esse campo.
       detalhes: this.detalhes($)
     })
+    let n = this.detalhes($).numeroProcesso.trim()
+    let dadosAndamento = this.andamento($2,n)
     console.timeEnd('parse');
     return {
-      processos: dadosProcesso
+      processos: dadosProcesso._id,
+      andamentos: dadosAndamento
     }
   }
 
@@ -78,7 +81,7 @@ class JTEParser extends BaseParser {
   // funcao secundaria - organiza os dados dos envolvidos
   envolvidos($) {
     let resultado = [];
-    // comitadopara padronizar o advogado no Banco de dados.
+    // comitado para padronizar o advogado no Banco de dados.
     // for (let i in this.extraiAdvogadoOab($)) {
     //   let advogado = {
     //     nome: "(" + this.extraiAdvogadoOab($)[i][0] + ")" + " " + this.extraiAdvogadoOab($)[i][1],
@@ -113,13 +116,13 @@ class JTEParser extends BaseParser {
 
   }
 
-extraiAssunto($){
-  let assunto = $('detalhes-aba-geral').text().split('\n');
+  extraiAssunto($) {
+    let assunto = $('detalhes-aba-geral').text().split('\n');
     assunto = this.removeVazios(assunto)
     let teste = assunto[100]
-    if(!teste) return "Assunto nao Especificado";
+    if (!teste) return "Assunto nao Especificado";
     else return teste
-}
+  }
 
   extraiVaraCapa($) {
     console.time('VaraCapa');
@@ -202,6 +205,43 @@ extraiAssunto($){
   validaOAB() {
 
   }
+
+  // ----------------------------------------fim da raspagem dos dados do processo-----------------------------------------------
+
+andamento($,n){
+  let resultado = []
+  let datas = this.extraiAndamento($)
+  for (let j of datas) {
+    resultado.push(
+      new Andamento({
+        descricao: this.removeVazios(j)[0],
+        dataMovimentacao: "",
+        numeroProcesso: n
+      })
+    )  
+    // console.log(this.removeVazios(j)[0]);
+    }
+  console.log(this.extraiNumeroProcesso($));
+  
+  return resultado
+}
+
+  extraiAndamento($) {
+    let resultado = []
+    console.time('Andamentos');
+    $('ion-item div').each(async function (element) {
+      let andamentos = $(this).text().split('\n');
+      resultado.push(andamentos)
+    })
+    // console.log(resultado.length);
+    // console.log(resultado);
+    console.timeEnd('Andamentos');
+    return resultado
+  }
+
+
+
+
 
   // funcao de limpeza de dados - remove string de espaço vazios e espaço vazio das strings que estão em um array
   removeVazios(array) {

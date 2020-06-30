@@ -52,8 +52,17 @@ class ProcJTE extends ExtratorBase {
         //console.log(err)
         // console.log(data);
         responseDev = data
-        
       });
+
+
+      var responseDev2
+      fs.readFile(`app/test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
+        console.log(!!data)
+        //console.log(err)
+        // console.log(data);
+        responseDev2 = data
+      });
+
       // logger = new Logger(
       //   'info',
       //   'logs/OabTJPR/OabTJPRInfo.log', {
@@ -71,9 +80,12 @@ class ProcJTE extends ExtratorBase {
 
       //Estou carregando paginas locais até resolver o Puppeteer.
       let $ = cheerio.load(responseDev);
+      let $2 = cheerio.load(responseDev2);
 
-      let dadosProcesso = this.parser.parse($)
+      let dadosProcesso = this.parser.parse($,$2)
       console.log(dadosProcesso);
+      //console.log(responseDev2);
+      
       
       // let envolvidos = this.parser.extraiEnvolvidos($)
       var Processos = []

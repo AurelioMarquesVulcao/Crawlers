@@ -20,16 +20,15 @@ class JTEParser extends BaseParser {
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
   parse($) {
-    this.extraiClasseCapa($)
     console.time('parse');
     let dadosProcesso = new Processo({
       capa: this.capa($),
       oabs: this.removeVazios(this.Oabs($)),
       qtdAndamentos: '',
-      origemExtracao: '',
+      origemExtracao: enums.nomesRobos.JTE,
       envolvidos: this.envolvidos($),
       advogados: this.advogados($),
-      "origemDados": enums.nomesRobos.JTE,
+      // "origemDados": enums.nomesRobos.JTE,  // verificar esse campo.
       detalhes: this.detalhes($)
     })
     console.timeEnd('parse');
@@ -41,15 +40,14 @@ class JTEParser extends BaseParser {
   // funcao secundaria - organiza os dados da capa
   capa($) {
     let capa = {
-      uf: "",
-      comarca: "",
+      uf: "", // inserir uf na raspagem do puppeteer
+      comarca: "",  // perguntar onde extraio a comarca
       vara: this.extraiVaraCapa($),
-      fase: this.extraitesteCapa($),
-      assunto: [""],
+      fase: '', // perguntar onde extraio a comarca
+      assunto: [this.extraiAssunto($)],  // inserir raspagem de assunto na fase de testes
       classe: this.extraiClasseCapa($),
-      // dataDistribuicao: Date,
+      dataDistribuicao: Date(),
     }
-
     return capa
   }
 
@@ -115,42 +113,20 @@ class JTEParser extends BaseParser {
 
   }
 
-  extraitesteCapa($) {
-    console.time('testeCapa');
-    let Oab = [];
-    let resultado = [];
-    let advogado = []
-    let classe = []
-
-    $('detalhes-aba-geral').each(async function (index, element) {
-      let advogados = $('detalhes-aba-geral').text().split('\n');
-      let data = new JTEParser().removeVazios(advogados);
-      //console.log(data);
-      if (data.length > 2) {
-
-      }
-
-    })
-    console.timeEnd('testeCapa');
-    return "vara"
-  }
-
+extraiAssunto($){
+  let assunto = $('detalhes-aba-geral').text().split('\n');
+    assunto = this.removeVazios(assunto)
+    let teste = assunto[100]
+    if(!teste) return "Assunto nao Especificado";
+    else return teste
+}
 
   extraiVaraCapa($) {
     console.time('VaraCapa');
-    let datas = [];
     let advogados = $('detalhes-aba-geral').text().split('\n');
     advogados = this.removeVazios(advogados)
-    //console.log(advogados);
-    
-    // for (let i of advogados) {
-    //   if (i.length > 2) {
-    //     datas.push(i)
-    //     console.log(i);
-    //   }
-    // }
     console.timeEnd('VaraCapa');
-    return "vara"
+    return advogados[1].split('-')[1].trim()
   }
 
 

@@ -27,7 +27,7 @@ class JTEParser extends BaseParser {
   }
 
   // Extract all processes for a given Process number
-
+  // Funcao central da raspagem.
   parse($) {
 
     let dadosProcesso = new Processo({
@@ -38,7 +38,7 @@ class JTEParser extends BaseParser {
       envolvidos: this.envolvidos($),
       advogados: this.advogados($),
       "origemDados": enums.nomesRobos.JTE,
-      detalhes: ''
+      detalhes: Processo.identiidentificarDetalhes(this.extraiNumeroProcesso($))
 
     })
 
@@ -46,13 +46,14 @@ class JTEParser extends BaseParser {
       processos: dadosProcesso
     }
   }
+  // funcao secundaria - organiza os dados da capa
   capa($) {
     return capa
   }
   detalhes($) {
     return 'detalhes'
   }
-
+// funcao secundaria - organiza os dados dos advogados
   advogados($) {
     let resultado = [];
     for (let i in this.extraiAdvogadoOab($)) {
@@ -69,7 +70,7 @@ class JTEParser extends BaseParser {
     }
     return resultado
   }
-
+// funcao secundaria - organiza os dados dos envolvidos
   envolvidos($) {
     let resultado = [];
     // comitadopara padronizar o advogado no Banco de dados.
@@ -90,9 +91,11 @@ class JTEParser extends BaseParser {
       resultado.push(envolvido)
 
     }
-    // console.log(resultado);
+    //console.log(resultado);
     return resultado
   }
+
+  // funcao secundaria - organiza os dados das oabs
   Oabs($) {
     let resultado = []
     for (let i in this.extraiAdvogadoOab($)) {
@@ -100,6 +103,8 @@ class JTEParser extends BaseParser {
     }
     return resultado
   }
+
+  // funcao secundaria - organiza os dados dos andamentos
   andamentos($) {
 
   }
@@ -134,7 +139,7 @@ class JTEParser extends BaseParser {
       if (data.length > 2) {
       // continuar daqui.................................................................
       }
-      console.log(datas);
+      //console.log(datas);
 
       // classe.push(data)
     })
@@ -149,26 +154,28 @@ class JTEParser extends BaseParser {
   // retorna array com numero do processo.
   extraiNumeroProcesso($) {
     let datas = [];
+    let resultado = ''
     $('detalhes-aba-geral span').each(async function (element) {
       let numero = $(this).text().split("\n")[0];
-      datas.push(numero)
+      if (!!numero) resultado = numero
     })
-    let numeroProcesso = this.removeVazios(datas);
+    let numeroProcesso = resultado
+    console.log(resultado);
     return numeroProcesso
   }
 
-  // retornar dados dos envolvidos
+  // retornar um array com os dados dos envolvidos
   extraiEnvolvidos($) {
-    let datas = []
+    let resultado = []
     $('.item-painel-cabecalho').each(async function (element) {
       let polo = $(this).text().split('\n');
       polo = new JTEParser().removeVazios(polo).join(' ');
-      datas.push(polo)
+      resultado.push(polo)
     })
-    return datas
+    return resultado
   }
 
-  // retorna array com lista de Oab's
+  // retorna um array para cada advogado (oab/nome) do processo
   extraiAdvogadoOab($) {
     let Oab = [];
     let resultado = [];
@@ -208,7 +215,7 @@ class JTEParser extends BaseParser {
 
   }
 
-  // remove string de espaço vazios e espaço vazio das strings que estão em um array
+  // funcao de limpeza de dados - remove string de espaço vazios e espaço vazio das strings que estão em um array
   removeVazios(array) {
     let limpo = [];
     let i = 0;

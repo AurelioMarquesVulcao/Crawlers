@@ -1,21 +1,12 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
-const {
-  enums
-} = require('../configs/enums');
+const { enums } = require('../configs/enums');
 
 
-const {
-  BaseParser,
-  removerAcentos
-} = require('./BaseParser');
-const {
-  Processo
-} = require('../models/schemas/processo');
-const {
-  Andamento
-} = require('../models/schemas/andamento');
+const { BaseParser, removerAcentos } = require('./BaseParser');
+const { Processo } = require('../models/schemas/processo');
+const { Andamento } = require('../models/schemas/andamento');
 
 
 class JTEParser extends BaseParser {
@@ -29,31 +20,46 @@ class JTEParser extends BaseParser {
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
   parse($) {
-
+    this.extraiClasseCapa($)
+    console.time('parse');
     let dadosProcesso = new Processo({
-      capa: this.extrairCapa($),
+      capa: this.capa($),
       oabs: this.removeVazios(this.Oabs($)),
       qtdAndamentos: '',
       origemExtracao: '',
       envolvidos: this.envolvidos($),
       advogados: this.advogados($),
       "origemDados": enums.nomesRobos.JTE,
-      detalhes: Processo.identiidentificarDetalhes(this.extraiNumeroProcesso($))
-
+      detalhes: this.detalhes($)
     })
-
+    console.timeEnd('parse');
     return {
       processos: dadosProcesso
     }
   }
+
   // funcao secundaria - organiza os dados da capa
   capa($) {
+    let capa = {
+      uf: "",
+      comarca: "",
+      vara: this.extraiVaraCapa($),
+      fase: this.extraitesteCapa($),
+      assunto: [""],
+      classe: this.extraiClasseCapa($),
+      // dataDistribuicao: Date,
+    }
+
     return capa
   }
+
   detalhes($) {
-    return 'detalhes'
+    let numeroProcesso = this.extraiNumeroProcesso($)
+    let detalhes = Processo.identificarDetalhes(numeroProcesso)
+    return detalhes
   }
-// funcao secundaria - organiza os dados dos advogados
+
+  // funcao secundaria - organiza os dados dos advogados
   advogados($) {
     let resultado = [];
     for (let i in this.extraiAdvogadoOab($)) {
@@ -70,7 +76,8 @@ class JTEParser extends BaseParser {
     }
     return resultado
   }
-// funcao secundaria - organiza os dados dos envolvidos
+
+  // funcao secundaria - organiza os dados dos envolvidos
   envolvidos($) {
     let resultado = [];
     // comitadopara padronizar o advogado no Banco de dados.
@@ -89,7 +96,6 @@ class JTEParser extends BaseParser {
         tipo: separaNome[0]
       }
       resultado.push(envolvido)
-
     }
     //console.log(resultado);
     return resultado
@@ -109,46 +115,55 @@ class JTEParser extends BaseParser {
 
   }
 
-  // dividir em mais funções...
-  // ajustar nomes das variaveis
-  extrairCapa($) {
-    let capa = {
-      uf: "",
-      comarca: "",
-      vara: "",
-      fase: "",
-      assunto: [""],
-      classe: "",
-      // dataDistribuicao: Date,
-    }
+  extraitesteCapa($) {
+    console.time('testeCapa');
     let Oab = [];
     let resultado = [];
     let advogado = []
     let classe = []
+
+    $('detalhes-aba-geral').each(async function (index, element) {
+      let advogados = $('detalhes-aba-geral').text().split('\n');
+      let data = new JTEParser().removeVazios(advogados);
+      //console.log(data);
+      if (data.length > 2) {
+
+      }
+
+    })
+    console.timeEnd('testeCapa');
+    return "vara"
+  }
+
+
+  extraiVaraCapa($) {
+    console.time('VaraCapa');
+    let datas = [];
+    let advogados = $('detalhes-aba-geral').text().split('\n');
+    advogados = this.removeVazios(advogados)
+    //console.log(advogados);
+    
+    // for (let i of advogados) {
+    //   if (i.length > 2) {
+    //     datas.push(i)
+    //     console.log(i);
+    //   }
+    // }
+    console.timeEnd('VaraCapa');
+    return "vara"
+  }
+
+
+  extraiClasseCapa($) {
+    let classe = []
+
     $('.item-valor-padrao').each(async function (element) {
       let advogados = $(this).text().split('\n');
       let data = new JTEParser().removeVazios(advogados).join(' ');
       classe.push(data)
     })
-    capa.classe = classe[0]
 
-
-    $('detalhes-aba-geral').each(async function (element) {
-      let advogados = $(this).text().split('\n');
-      let data = new JTEParser().removeVazios(advogados);
-      if (data.length > 2) {
-      // continuar daqui.................................................................
-      }
-      //console.log(datas);
-
-      // classe.push(data)
-    })
-
-    resultado = capa
-
-
-
-    return resultado
+    return classe[0]
   }
 
   // retorna array com numero do processo.
@@ -160,7 +175,6 @@ class JTEParser extends BaseParser {
       if (!!numero) resultado = numero
     })
     let numeroProcesso = resultado
-    console.log(resultado);
     return numeroProcesso
   }
 
@@ -190,8 +204,6 @@ class JTEParser extends BaseParser {
     return resultado
   }
 
-
-
   // verifica um array e pega os numeros de OAB quando estes estão no inicio da string
   separaAdvogadoOab(nome) {
     // Implementar melhorias.
@@ -218,13 +230,22 @@ class JTEParser extends BaseParser {
   // funcao de limpeza de dados - remove string de espaço vazios e espaço vazio das strings que estão em um array
   removeVazios(array) {
     let limpo = [];
+    let resultado = [];
     let i = 0;
     for (i in array) {
       if (array[i].length > 2) {
         limpo.push(array[i].trim())
       }
     }
-    return limpo
+    // com essas linhas de código abaixo eu não preciso remover as linhas vazias dos array's
+    // precisando de menos código em todo o parse.
+    // remover códigos retundantes referentes a isso.
+    for (let j of limpo) {
+      if (j.length > 2) {
+        resultado.push(j)
+      }
+    }
+    return resultado
   }
 
 } // Fim da classe TJPRParser

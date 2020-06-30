@@ -77,7 +77,6 @@ class AntiCaptchaHandler {
     let captchaId;
     let tentativa = 0;
     let data;
-    console.log(website, websiteKey, pageAction);
     objResponse = await robo.acessar({
       url: 'http://api.anti-captcha.com/createTask',
       method: 'POST',
@@ -118,11 +117,11 @@ class AntiCaptchaHandler {
           },
         });
         data = new Date();
-        console.log(
-          '\tResponse',
-          objResponse.responseBody,
-          `${data.getHours()}:${data.getMinutes()}:${data.getSeconds()}`
-        );
+        // console.log(
+        //   '\tResponse',
+        //   objResponse.responseBody,
+        //   `${data.getHours()}:${data.getMinutes()}:${data.getSeconds()}`
+        // );
 
         if (!this.testaErro(objResponse.responseBody).valido) {
           break;
@@ -392,10 +391,20 @@ class CaptchaIOHandler {
       } while (tentativas < 5);
     }
 
-    console.log(`[VALIDO] ${objResponse.responseBody.request & this.testaErro(objResponse.responseBody.request).valido & objResponse.responseBody.request != 'CAPCHA_NOT_READY'}`);
+    console.log(
+      `[VALIDO] ${
+        objResponse.responseBody.request &
+        this.testaErro(objResponse.responseBody.request).valido &
+        (objResponse.responseBody.request != 'CAPCHA_NOT_READY')
+      }`
+    );
     console.log(`[BODY] ${objResponse.responseBody.request} \n\n`);
 
-    if (objResponse.responseBody.request & this.testaErro(objResponse.responseBody.request).valido & objResponse.responseBody.request != 'CAPCHA_NOT_READY') {
+    if (
+      objResponse.responseBody.request &
+      this.testaErro(objResponse.responseBody.request).valido &
+      (objResponse.responseBody.request != 'CAPCHA_NOT_READY')
+    ) {
       return {
         sucesso: true,
         detalhes: objResponse.responseBody,
@@ -496,10 +505,11 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     // } while (tentativas < maxTentativas);
     //
     // tentativas = 0;
-    console.log('AntiCaptcha');
 
     do {
-      console.log('Tentativa', tentativas);
+      console.log(
+        `\tAntiCaptcha - ReCaptchaV2 - [TENTATIVA: ${tentativas + 1}]`
+      );
       resultado = await this.getCaptcha(
         website,
         websiteKey,
@@ -509,8 +519,8 @@ module.exports.CaptchaHandler = class CaptchaHandler {
       if (resultado.sucesso) return resultado;
       tentativas++;
       await sleep(10000);
-    // } while (tentativas < maxTentativas);
-    } while(true)
+      // } while (tentativas < maxTentativas);
+    } while (true);
     // console.log('1', resultado);
     return resultado;
   }

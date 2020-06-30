@@ -80,9 +80,9 @@ class OabTJSP extends ExtratorBase {
       uuidCaptcha = preParse.captcha.uuidCaptcha;
       this.logger.info('Analise do website concluida.');
       this.logger.info('Fazendo chamada para resolução do captcha.');
-      // gResponse = await this.getCaptcha();
-      gResponse =
-        '03AGdBq27q2l_2WrptTO5a8Zluw3pUBSLS9nq1-dnzlxn2CJb_GGQpVI-1r_GdNwXmt84Rnd9QLy9_RwuPg0HuIRdMcu7Ey4tbYr-x0lyzjebu1SKnT2g0Md3mlA1tmGBDlRwh7J2yirglJmne3apSbfqZ3jsDPkrY9BA3NclmyQTckK1zilNlFUqMmuxgTwy9y-yyj_AWze30iuxAfvisgwu_NYfpApkQQML5GYlWBwe0BYyO_BzDIgZe6LwfB-N2csIhf3TK_f9yWPeVfjIq3IwT8OV-d2pn8bkZuPlPFxBJGyMfDupQvqoiBZ8ubigdZCnXmyHrkByg6UfWQLOfB7sgMxrcLk0GjTK59n1ttSl_vBb2DGNg6ZKLQNMOUcO8hlesI0hU970S1tNdz_DrBfSiBUPWubwm8RDv6AjkJgAbGo7nGGW5vMy3QbR0yO4u2CqVrF9qasoG';
+      gResponse = await this.getCaptcha();
+      // gResponse =
+      //   '03AGdBq27q2l_2WrptTO5a8Zluw3pUBSLS9nq1-dnzlxn2CJb_GGQpVI-1r_GdNwXmt84Rnd9QLy9_RwuPg0HuIRdMcu7Ey4tbYr-x0lyzjebu1SKnT2g0Md3mlA1tmGBDlRwh7J2yirglJmne3apSbfqZ3jsDPkrY9BA3NclmyQTckK1zilNlFUqMmuxgTwy9y-yyj_AWze30iuxAfvisgwu_NYfpApkQQML5GYlWBwe0BYyO_BzDIgZe6LwfB-N2csIhf3TK_f9yWPeVfjIq3IwT8OV-d2pn8bkZuPlPFxBJGyMfDupQvqoiBZ8ubigdZCnXmyHrkByg6UfWQLOfB7sgMxrcLk0GjTK59n1ttSl_vBb2DGNg6ZKLQNMOUcO8hlesI0hU970S1tNdz_DrBfSiBUPWubwm8RDv6AjkJgAbGo7nGGW5vMy3QbR0yO4u2CqVrF9qasoG';
       this.logger.info('Captcha resolvido');
 
       // Segunda parte: pegar a lista de processos
@@ -108,7 +108,6 @@ class OabTJSP extends ExtratorBase {
 
           for (const processo of listaProcessos) {
             cadastroConsulta['NumeroProcesso'] = processo;
-            console.log('cadastroConsulta', cadastroConsulta);
             this.logger.info(
               `Criando log de execução para o processo ${processo}.`
             );
@@ -123,29 +122,30 @@ class OabTJSP extends ExtratorBase {
             let resultado = await new Processo({
               detalhes: Processo.identificarDetalhes(processo),
             }).salvar();
-            this.logger;
             this.logger.info(`Processo ${processo} presalvo.`);
             resultados.push(resultado);
           }
 
           //resultados = await this.extrairProcessos(listaProcessos, cookies);
-          return Promise.all(resultados).then((resultados) => {
-            this.logger.info('Processos extraidos com sucesso');
-            return {
-              resultado: resultados,
-              sucesso: true,
-              detalhes: '',
-              logs: logger.logs,
-            }
-          }).catch(e => {
-            this.logger.info('Não houve processos bem sucedidos');
-            return {
-              resultado: [],
-              sucesso: false,
-              detalhes: 'Extração encontrou problemas',
-              logs: this.logger.logs,
-            };
-          });
+          return Promise.all(resultados)
+            .then((resultados) => {
+              this.logger.info('Processos extraidos com sucesso');
+              return {
+                resultado: resultados,
+                sucesso: true,
+                detalhes: '',
+                logs: logger.logs,
+              };
+            })
+            .catch((e) => {
+              this.logger.info('Não houve processos bem sucedidos');
+              return {
+                resultado: [],
+                sucesso: false,
+                detalhes: 'Extração encontrou problemas',
+                logs: this.logger.logs,
+              };
+            });
         }
         tentativa++;
       } while (tentativa < 5);
@@ -243,32 +243,32 @@ class OabTJSP extends ExtratorBase {
 
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
     //TODO apagar depois
-    return [
-      '0000384-10.2020.8.26.0083',
-      '1000517-35.2020.8.26.0083',
-      '1000516-50.2020.8.26.0083',
-      '1001447-87.2019.8.26.0083',
-      '1001374-18.2019.8.26.0083',
-      '1001296-24.2019.8.26.0083',
-      '1000419-84.2019.8.26.0083',
-      '1003264-26.2018.8.26.0083',
-      '1003266-93.2018.8.26.0083',
-      '1003265-11.2018.8.26.0083',
-      '1003262-56.2018.8.26.0083',
-      '1003261-71.2018.8.26.0083',
-      '1003263-41.2018.8.26.0083',
-      '1003260-86.2018.8.26.0083',
-      '1003258-19.2018.8.26.0083',
-      '1003257-34.2018.8.26.0083',
-      '1003256-49.2018.8.26.0083',
-      '1003255-64.2018.8.26.0083',
-      '1003254-79.2018.8.26.0083',
-      '1003253-94.2018.8.26.0083',
-      '1003252-12.2018.8.26.0083',
-      '1003251-27.2018.8.26.0083',
-      '1003250-42.2018.8.26.0083',
-      '1003249-57.2018.8.26.0083',
-    ];
+    // return [
+    //   '0000384-10.2020.8.26.0083',
+    //   '1000517-35.2020.8.26.0083',
+    //   '1000516-50.2020.8.26.0083',
+    //   '1001447-87.2019.8.26.0083',
+    //   '1001374-18.2019.8.26.0083',
+    //   '1001296-24.2019.8.26.0083',
+    //   '1000419-84.2019.8.26.0083',
+    //   '1003264-26.2018.8.26.0083',
+    //   '1003266-93.2018.8.26.0083',
+    //   '1003265-11.2018.8.26.0083',
+    //   '1003262-56.2018.8.26.0083',
+    //   '1003261-71.2018.8.26.0083',
+    //   '1003263-41.2018.8.26.0083',
+    //   '1003260-86.2018.8.26.0083',
+    //   '1003258-19.2018.8.26.0083',
+    //   '1003257-34.2018.8.26.0083',
+    //   '1003256-49.2018.8.26.0083',
+    //   '1003255-64.2018.8.26.0083',
+    //   '1003254-79.2018.8.26.0083',
+    //   '1003253-94.2018.8.26.0083',
+    //   '1003252-12.2018.8.26.0083',
+    //   '1003251-27.2018.8.26.0083',
+    //   '1003250-42.2018.8.26.0083',
+    //   '1003249-57.2018.8.26.0083',
+    // ];
 
     await this.robo.acessar({
       url: 'https://esaj.tjsp.jus.br/cpopg/manterSessao.do?conversationId=',
@@ -365,13 +365,7 @@ class OabTJSP extends ExtratorBase {
   }
 
   async extrairProcessos(listaProcessos, cookies) {
-    // TODO teste de captcha em quantidade limitada, remover posteriormente
-    // listaProcessos = listaProcessos.slice(0, 5);
-    let count = 1;
-
     let resultados = listaProcessos.map(async (element) => {
-      console.log('PROCESSOS', count);
-      count = count + 1;
       let body = await this.extrairProcessoHtml(element, cookies);
       if (body) {
         let extracao = await new TJSPParser().parse(body);
@@ -419,7 +413,7 @@ class OabTJSP extends ExtratorBase {
           },
         });
         const $ = cheerio.load(objResponse.responseBody);
-        if ($('#tabelaTodasMovimentacoes').length == 0) {
+        if ($('#tabelaTodasMovimentacoes').length === 0) {
           if (!retry) {
             console.log('not retry');
             gResponse = await this.getCaptcha();

@@ -7,6 +7,7 @@ const CAPTCHAIO_KEY = '405d27c9-5ef38c01c76b79.16080721';
 const ANTICAPTCHA_KEY = '4b93beb6fe87d3bf3cfd92966ec841a6';
 
 const { Robo } = require('../lib/robo');
+const { LogCaptcha } = require('../models/schemas/logCaptcha');
 
 const {
   AntiCaptchaResponseException,
@@ -130,6 +131,7 @@ class AntiCaptchaHandler {
         if (objResponse.responseBody.status == 'ready') {
           return {
             sucesso: true,
+            captchaId: captchaId,
             gResponse: objResponse.responseBody.solution.gRecaptchaResponse,
           };
         }
@@ -475,10 +477,14 @@ module.exports.CaptchaHandler = class CaptchaHandler {
    *
    * @param {Number} tentativas numero de repetições antes de desistir do captcha
    * @param {Number} espera tempo de espera entre uma chamada de captcha e outra
+   * @param {String} robo nome do robo
+   * @param {{numeroDoProcesso: String, numeroDaOab: String}} identificador
    */
-  constructor(tentativas = 5, espera = 5000) {
+  constructor(tentativas = 5, espera = 5000, robo, identificador) {
     this.tentativas = tentativas;
     this.espera = espera;
+    this.robo = robo;
+    this.identificador = identificador;
   }
 
   async resolveRecaptchaV2(website, websiteKey, pageAction, userAgent) {
@@ -488,8 +494,16 @@ module.exports.CaptchaHandler = class CaptchaHandler {
       sucesso: false,
       detalhes: [],
     };
-    let captcha;
 
+    let logCaptcha = {
+      Tipo: 'ReCaptchaV2',
+      Website: website,
+      WebsiteKey: websiteKey,
+      PageAction: pageAction,
+      Robo: this.robo,
+      NumeroProcesso: this.identificador.numeroDoProcesso,
+      NumeroOab: this.identificador.numeroDaOab,
+    };
     // console.log('Captchas.IO');
     // do {
     //   console.log('Tentativa', tentativas);
@@ -516,7 +530,12 @@ module.exports.CaptchaHandler = class CaptchaHandler {
         pageAction,
         AntiCaptchaHandler
       );
-      if (resultado.sucesso) return resultado;
+      if (resultado.sucesso) {
+        logCaptcha.Servico = 'AntiCaptcha';
+        logCaptcha.CaptchaBody = resultado;
+        new LogCaptcha(logCaptcha).save();
+        return resultado;
+      }
       tentativas++;
       await sleep(10000);
       // } while (tentativas < maxTentativas);
@@ -535,6 +554,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     if (captcha.sucesso) {
       resultado.sucesso = true;
       resultado.gResponse = captcha.gResponse;
+      resultado.captchaId = captcha.captchaId;
     } else {
       resultado.detalhes.push(captcha.detalhes);
     }

@@ -29,7 +29,7 @@ const logarExecucao = async (execucao) => {
       nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSP}`,
       NumeroOab: message.NumeroProcesso,
     });
-    logger.info(`Mensagem:\n\t${JSON.stringify(message)}`);
+    console.log(message);
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
@@ -62,6 +62,7 @@ const logarExecucao = async (execucao) => {
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
+      console.log('\n\n');
       await logarExecucao({
         Mensagem: message,
         DataInicio: dataInicio,
@@ -78,6 +79,8 @@ const logarExecucao = async (execucao) => {
       ch.ack(msg); //TODO remover comentario
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando proceso');
+      console.log('\n\n');
+
       await logarExecucao({
         LogConsultaId: message.LogConsultaId,
         Mensagem: message,

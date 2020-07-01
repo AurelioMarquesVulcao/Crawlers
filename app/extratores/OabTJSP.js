@@ -34,6 +34,7 @@ class OabTJSP extends ExtratorBase {
 
   async extrair(numeroOab, cadastroConsultaId) {
     console.log('cadastroConsultaId', cadastroConsultaId);
+    this.numeroDaOab = numeroOab;
     let cadastroConsulta = {
       SeccionalOab: 'SP',
       TipoConsulta: 'processo',
@@ -118,12 +119,7 @@ class OabTJSP extends ExtratorBase {
             this.logger.info(
               `Enviando processo ${processo} a fila de extração.`
             );
-            this.logger.info(`Presalvando processo ${processo}`);
-            let resultado = await new Processo({
-              detalhes: Processo.identificarDetalhes(processo),
-            }).salvar();
-            this.logger.info(`Processo ${processo} presalvo.`);
-            resultados.push(resultado);
+            resultados.push(Promise.resolve(processo));
           }
 
           //resultados = await this.extrairProcessos(listaProcessos, cookies);
@@ -184,7 +180,7 @@ class OabTJSP extends ExtratorBase {
   }
 
   async getCaptcha() {
-    const captchaHandler = new CaptchaHandler();
+    const captchaHandler = new CaptchaHandler(5, 5000, 'OabTJSP', {numeroDaOab: this.numeroDaOab});
     try {
       let captcha = {};
       captcha = await captchaHandler

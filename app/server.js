@@ -52,7 +52,7 @@ app.get('/getProcesso', (req, res) => {
 app.get('/getAndamentos', (req, res) => {
   Andamento.retornaAndamentos(req.query.numeroProcesso)
     .then( andamentos => {
-      res.status(200).send(andamentos);
+      res.status(200).send({ processo: req.query.numeroProcesso, andamentos: andamentos });
     })
 })
 

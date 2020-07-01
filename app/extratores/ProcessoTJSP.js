@@ -15,7 +15,6 @@ const {
 const { ExtratorBase } = require('./extratores');
 const { TJSPParser } = require('../parsers/TJSPParser');
 
-
 class ProcessoTJSP extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
@@ -24,7 +23,6 @@ class ProcessoTJSP extends ExtratorBase {
     this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
     this.logger = null;
     this.numeroDoProcesso = '';
-
   }
 
   /**
@@ -34,7 +32,7 @@ class ProcessoTJSP extends ExtratorBase {
    * @returns {Promise<{sucesso: boolean, logs: [], numeroDoProcesso: string}|{sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: ("undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint")}|{resultado: (void|*|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos: *}|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos}), sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: string}>}
    */
   async extrair(numeroDoProcesso, numeroDaOab = '') {
-    const nomeRobo = 'ProcessoTJSP'
+    const nomeRobo = 'ProcessoTJSP';
     this.numeroDaOab = numeroDaOab;
     this.numeroDoProcesso = numeroDoProcesso;
     this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
@@ -169,7 +167,9 @@ class ProcessoTJSP extends ExtratorBase {
   }
 
   async getCaptcha() {
-    const captchaHandler = new CaptchaHandler(5, 5000, 'ProcessoTJSP', {numeroDoProcesso: this.numeroDoProcesso});
+    const captchaHandler = new CaptchaHandler(5, 5000, 'ProcessoTJSP', {
+      numeroDoProcesso: this.numeroDoProcesso,
+    });
     try {
       let captcha = {};
       captcha = await captchaHandler

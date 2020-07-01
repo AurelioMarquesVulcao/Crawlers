@@ -61,11 +61,14 @@ class AntiCaptchaResponseException extends BaseException {
    * @param {any} params dados da excessao
    */
   constructor(code = 'GENERIC', message = '', ...params) {
+    super(...params);
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, AntiCaptchaResponseException);
     }
 
     this.code = code;
+    this.message = message;
   }
 }
 

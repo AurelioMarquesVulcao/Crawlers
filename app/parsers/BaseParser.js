@@ -1,4 +1,4 @@
-module.exports.removerAcentos = function removerAcentos(texto) {
+const removerAcentos = (texto) => {
   if (texto) {
     texto = texto.normalize("NFKD");
     // texto = Buffer.from(texto, 'ascii');
@@ -13,7 +13,7 @@ module.exports.removerAcentos = function removerAcentos(texto) {
 };
 
 if (typeof String.prototype.strip === "undefined") {
-  String.prototype.strip = function () {
+  String.prototype.strip = function() {
     return String(this).replace(/^\s+|\s+$/g, "");
   };
 }
@@ -32,42 +32,59 @@ module.exports.BaseParser = class BaseParser {
 };
 
 const tradutor = {
-  A: 'Autor',
-  AUTOR: 'Autor',
-  R: 'Reu',
-  REU: 'Reu',
-  AGTE: 'Agravante',
-  AGDO: 'Agravado',
-  REQUERIDO: 'Requerido',
-  REQUERENTE: 'Requerente',
-  SUSCTE: 'Suscitante',
-  SUSCDO: 'Suscitado',
-  APELANTE: 'Apelante',
-  APELADO: 'Apelado',
-  ADVOGADO: 'Advogado',
-  Advogado: 'Advogado',
-  Advogada: 'Advogado',
-  ADVOGADO_MIGRACAO: 'Advogado',
-  Apelte: 'Apelante',
-  Apeldo: 'Apelado',
-  PROCURADOR: 'Procurador',
-  IMPETRANTE: 'Impetrante',
-  IMPETRADO: 'Impetrado',
-  INTERESSADO: 'Interessado',
-  MPF: 'mpf',
-  'PROC/S/OAB': 'Procurador',
-  Exeqte: 'Exequente',
-  Exectdo: 'Executado',
-  Reqte: 'Requerente',
-  Reqdo: 'Requerido',
-  Embargte: 'Embargante',
-  Embargdo: 'Embargado',
-  'Nº Guia': 'NGuia',
-  'Situação da guia': 'SituacaoDaGuia',
-  'Valor Pago': 'ValorPago',
-  'Data Pagamento': 'DataPagamento',
-  'FASE ATUAL': 'FaseAtual',
-  'Data do Movimento': 'DataDoMovimento',
-  Perito: 'Perito',
+  "A": "Autor",
+  "Advogada": "Advogado",
+  "Advogado": "Advogado",
+  "Advogadomigracao": "Advogado",
+  "Agdo": "Agravado",
+  "Agravado": "Agravado",
+  "Agte": "Agravante",
+  "Agravante": "Agravante",
+  "Apelado": "Apelado",
+  "Apelante": "Apelante",
+  "Apeldo": "Apelado",
+  "Apelte": "Apelante",
+  "Autor": "Autor",
+  "Embargdo": "Embargado",
+  "Embargte": "Embargante",
+  "Exectdo": "Executado",
+  "Exeqte": "Exequente",
+  "Impetrado": "Impetrado",
+  "Impetrante": "Impetrante",
+  "Interessado": "Interessado",
+  "Perito": "Perito",
+  "Procsoab": "Procurador",
+  "Procurador": "Procurador",
+  "R": "Reu",
+  "Reqdo": "Requerido",
+  "Reqte": "Requerente",
+  "Requerente": "Requerente",
+  "Requerido": "Requerido",
+  "Reu": "Reu",
+  "Suscdo": "Suscitado",
+  "Suscte": "Suscitante"
 };
+
+/**
+ * Traduz o uma string para o tipo de envolvido correspondente
+ * @param {string} titulo o tipo de personagem
+ * @returns {string}
+ */
+const traduzir = (tipo) => {
+
+  // Remove acentos
+  tipo = removerAcentos(tipo);
+  // Remove caracteres indesejados
+  tipo = tipo.replace(/(\W|\_)/g, '');
+  // Capitalize
+  const key = tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase();
+
+  if (tradutor[key]){
+    return tradutor[key];
+  }
+  return key;
+};
+
+module.exports.removerAcentos = removerAcentos;
 module.exports.tradutor = tradutor;
+module.exports.traduzir = traduzir;

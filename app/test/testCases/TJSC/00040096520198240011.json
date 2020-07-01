@@ -1,0 +1,227 @@
+{
+  "capa": {
+    "assunto": "Pena Privativa de Liberdade",
+    "uf": "SC",
+    "comarca": "Brusque",
+    "classe": "Execucao Provisoria"
+  },
+  "detalhes": {
+    "tipo": "cnj",
+    "numeroProcesso": "00040096520198240011",
+    "numeroProcessoMascara": "0004009-65.2019.8.24.0011",
+    "instancia": 1,
+    "ano": 2019,
+    "orgao": 8,
+    "tribunal": 24,
+    "origem": 11
+  },
+  "envolvidos": [
+    {
+      "tipo": "Autor",
+      "nome": "Ministerio Publico do Estado de Santa Catarina"
+    },
+    {
+      "tipo": "Acusado",
+      "nome": "Paulo Jhony Machado Luz"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "Francisco Rodrigues de Souza"
+    }
+  ],
+  "oabs": ["47177SC"],
+  "dataAtualizacao": "dataFormatada",
+  "dataCriacao": "dataFormatada",
+  "andamentos": [
+    {
+      "data": "2019-09-24T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de mandado",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Certidao Automatica de Juntada do Mandado"
+    },
+    {
+      "data": "2019-09-24T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de mandado",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-24T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Certificado pelo Oficial de Justica",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Intimacao Positiva - PF - com Pecas Processuais"
+    },
+    {
+      "data": "2019-09-24T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "documento digitalizado",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-23T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Certificada a publicacao da relacao de intimacao de advogado",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Relacao :0147/2019 Data da Publicacao: 24/09/2019 Numero do Diario: 3152 Pagina:"
+    },
+    {
+      "data": "2019-09-20T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Encaminhado edital/relacao para publicacao",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Relacao: 0147/2019 Teor do ato: Aguarde-se o cumprimento da pena provisoria imposta, observando-se que a progressao ao regime semiaberto esta prevista para o dia 19/04/2021, salvo grade de remicao, e desde que preenchido o requisito subjetivo. Ciencia a defesa, Ministerio Publico e UPA local. Intimem-se. Oficie-se. Advogados(s): Francisco Rodrigues de Souza (OAB 47177/SC)"
+    },
+    {
+      "data": "2019-09-20T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-20T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Expedido mandado",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Mandado no: 011.2019/016742-0 Situacao: Cumprido - Ato positivo em 24/09/2019 Local: Oficial de justica - Jefferson Fagundes"
+    },
+    {
+      "data": "2019-09-20T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Certidao emitida",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Certidao da Remessa da Intimacao para o Portal Eletronico"
+    },
+    {
+      "data": "2019-09-20T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Ato Ordinatorio-Intimacao do Ministerio Publico",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Encaminho os presentes autos para intimacao do Ministerio Publico."
+    },
+    {
+      "data": "2019-09-19T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Mero expediente",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Aguarde-se o cumprimento da pena provisoria imposta, observando-se que a progressao ao regime semiaberto esta prevista para o dia 19/04/2021, salvo grade de remicao, e desde que preenchido o requisito subjetivo. Ciencia a defesa, Ministerio Publico e UPA local. Intimem-se. Oficie-se."
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Conclusos para despacho",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Conclusos para despacho",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Certidao emitida",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "Generico"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada peticao de apelacao",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de Procuracao",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de Denuncia",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de documento",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Auto de prisao em flagrante",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Juntada de guia de recolhimento provisoria",
+      "numeroProcesso": "00040096520198240011"
+    },
+    {
+      "data": "2019-09-18T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Distribuido por direcionamento",
+      "numeroProcesso": "00040096520198240011",
+      "observacao": "determinacao judicial"
+    }
+  ]
+}

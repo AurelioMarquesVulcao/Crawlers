@@ -123,6 +123,6 @@ class ProcJTE extends ExtratorBase {
 module.exports.ProcJTE = ProcJTE;
 
 // DEV START'S FOR PROJECT TEST and development
-(async () => {
-  await new ProcJTE().extrair("0000004-63.2019.5.21.0001")
-})()
+// (async () => {
+//   await new ProcJTE().extrair("0000004-63.2019.5.21.0001")
+// })()

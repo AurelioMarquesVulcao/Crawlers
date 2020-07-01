@@ -1,12 +1,21 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
-const { enums } = require('../configs/enums');
+const {
+  enums
+} = require('../configs/enums');
 
 
-const { BaseParser, removerAcentos } = require('./BaseParser');
-const { Processo } = require('../models/schemas/processo');
-const { Andamento } = require('../models/schemas/andamento');
+const {
+  BaseParser,
+  removerAcentos
+} = require('./BaseParser');
+const {
+  Processo
+} = require('../models/schemas/processo');
+const {
+  Andamento
+} = require('../models/schemas/andamento');
 
 
 class JTEParser extends BaseParser {
@@ -24,7 +33,7 @@ class JTEParser extends BaseParser {
     let dadosProcesso = new Processo({
       capa: this.capa($),
       oabs: this.removeVazios(this.Oabs($)),
-      qtdAndamentos: '',
+      qtdAndamentos: this.numeroDeAndamentos($2),
       origemExtracao: enums.nomesRobos.JTE,
       envolvidos: this.envolvidos($),
       advogados: this.advogados($),
@@ -32,11 +41,11 @@ class JTEParser extends BaseParser {
       detalhes: this.detalhes($)
     })
     let n = this.detalhes($).numeroProcesso.trim()
-    let dadosAndamento = this.andamento($2,n)
+    let dadosAndamento = this.andamento($2, n)
     console.timeEnd('parse');
     return {
-      processos: dadosProcesso._id,
-      andamentos: dadosAndamento
+      processos: dadosProcesso,
+      andamentos: dadosAndamento.slice(0,3)
     }
   }
 
@@ -44,10 +53,10 @@ class JTEParser extends BaseParser {
   capa($) {
     let capa = {
       uf: "", // inserir uf na raspagem do puppeteer
-      comarca: "",  // perguntar onde extraio a comarca
+      comarca: "", // perguntar onde extraio a comarca
       vara: this.extraiVaraCapa($),
       fase: '', // perguntar onde extraio a comarca
-      assunto: [this.extraiAssunto($)],  // inserir raspagem de assunto na fase de testes
+      assunto: [this.extraiAssunto($)], // inserir raspagem de assunto na fase de testes
       classe: this.extraiClasseCapa($),
       dataDistribuicao: Date(),
     }
@@ -208,30 +217,34 @@ class JTEParser extends BaseParser {
 
   // ----------------------------------------fim da raspagem dos dados do processo-----------------------------------------------
 
-andamento($,n){
-  let resultado = []
-  let datas = this.extraiAndamento($)
-  for (let j of datas) {
-    resultado.push(
-      new Andamento({
-        descricao: this.removeVazios(j)[0],
-        dataMovimentacao: "",
-        numeroProcesso: n
-      })
-    )  
-    // console.log(this.removeVazios(j)[0]);
-    }
-  console.log(this.extraiNumeroProcesso($));
-  
-  return resultado
-}
-
-  extraiAndamento($) {
+  andamento($, n) {
     let resultado = []
+    let texto = this.extraiAndamento($)
+    let data = this.extraiDataAndamento($)
+    for (let j = 0; j < texto.length; j++) {
+      resultado.push(
+        new Andamento({
+          descricao: this.removeVazios(texto[j])[0],
+          data: this.ajustaData(this.removeVazios(data[j])[0]),
+          numeroProcesso: n
+
+        })
+      )
+    }
+    return resultado
+  }
+  numeroDeAndamentos($) {
+    let numero = this.extraiAndamento($).length
+    return numero
+  }
+  extraiAndamento($) {
     console.time('Andamentos');
+    let resultado = []
     $('ion-item div').each(async function (element) {
       let andamentos = $(this).text().split('\n');
-      resultado.push(andamentos)
+      andamentos = new JTEParser().removeVazios(andamentos)
+      // console.log(andamentos.length);
+      if (andamentos.length > 0) resultado.push(andamentos)
     })
     // console.log(resultado.length);
     // console.log(resultado);
@@ -239,6 +252,20 @@ andamento($,n){
     return resultado
   }
 
+  extraiDataAndamento($) {
+    console.time('Andamentos');
+    let resultado = []
+    $('ion-text h4').each(async function (element) {
+      let andamentos = $(this).text().split('\n');
+      andamentos = new JTEParser().removeVazios(andamentos)
+      // console.log(andamentos.length);
+      if (andamentos.length > 0) resultado.push(andamentos)
+    })
+    // console.log(resultado.length);
+    // console.log(resultado);
+    console.timeEnd('Andamentos');
+    return resultado
+  }
 
 
 
@@ -263,6 +290,16 @@ andamento($,n){
     }
     return resultado
   }
+
+  // ajusta data brasil para Internacional recebe uma data por vez.
+  ajustaData(datas) {
+    let dia = datas.slice(0, 2);
+    let mes = datas.slice(2, 5);
+    let ano = datas.slice(5, 10);
+    let data = ano + "-" + mes + "-" + dia
+    return data
+  }
+
 
 } // Fim da classe TJPRParser
 

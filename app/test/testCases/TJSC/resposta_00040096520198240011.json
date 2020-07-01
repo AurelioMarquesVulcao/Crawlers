@@ -1,6 +1,6 @@
 {
   "capa": {
-    "assunto": "Pena Privativa de Liberdade",
+    "assunto": ["Pena Privativa de Liberdade"],
     "uf": "SC",
     "comarca": "Brusque",
     "classe": "Execucao Provisoria"
@@ -26,7 +26,7 @@
     },
     {
       "tipo": "Advogado",
-      "nome": "Francisco Rodrigues de Souza"
+      "nome": "(47177SC) Francisco Rodrigues de Souza"
     }
   ],
   "oabs": ["47177SC"],

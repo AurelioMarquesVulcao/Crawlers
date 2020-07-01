@@ -1,9 +1,9 @@
 {
   "capa": {
-    "assunto": ["Divida Ativa"],
+    "assunto": ["Prescricao"],
     "uf": "SC",
     "comarca": "Capital",
-    "classe": "Apelacao Civel"
+    "classe": "Embargos a Execucao Fiscal"
   },
   "detalhes":{
     "tipo": "cnj",

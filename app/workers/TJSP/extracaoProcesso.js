@@ -27,8 +27,9 @@ const logarExecucao = async (execucao) => {
     let message = JSON.parse(msg.content.toString());
     let logger = new Logger('info', 'logs/ProcessoTJSP/ProcessoTJSPInfo.log', {
       nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSP}`,
-      NumeroOab: message.NumeroOab,
+      NumeroOab: message.NumeroProcesso,
     });
+    logger.info(`Mensagem:\n\t${JSON.stringify(message)}`);
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);

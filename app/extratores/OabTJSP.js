@@ -180,7 +180,9 @@ class OabTJSP extends ExtratorBase {
   }
 
   async getCaptcha() {
-    const captchaHandler = new CaptchaHandler(5, 5000, 'OabTJSP', {numeroDaOab: this.numeroDaOab});
+    const captchaHandler = new CaptchaHandler(5, 5000, 'OabTJSP', {
+      numeroDaOab: this.numeroDaOab,
+    });
     try {
       let captcha = {};
       captcha = await captchaHandler

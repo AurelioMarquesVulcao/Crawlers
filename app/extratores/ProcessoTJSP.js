@@ -40,7 +40,7 @@ class ProcessoTJSP extends ExtratorBase {
     this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
 
     this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
-      nomeRobo: nomeRobo,
+      nomeRobo: 'processo.TJSP',
       NumeroDoProcesso: numeroDoProcesso,
     });
 
@@ -169,7 +169,7 @@ class ProcessoTJSP extends ExtratorBase {
   }
 
   async getCaptcha() {
-    const captchaHandler = new CaptchaHandler();
+    const captchaHandler = new CaptchaHandler(5, 5000, 'ProcessoTJSP', {numeroDoProcesso: this.numeroDoProcesso});
     try {
       let captcha = {};
       captcha = await captchaHandler
@@ -182,6 +182,9 @@ class ProcessoTJSP extends ExtratorBase {
         .catch((error) => {
           throw error;
         });
+
+      //TODO retirar
+      // console.log(responseAntiCaptcha)
 
       if (!captcha.sucesso) {
         throw new AntiCaptchaResponseException(

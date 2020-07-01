@@ -68,6 +68,9 @@ class OabTJBAPortal extends ExtratorBase {
       logger.info('Request de captura de processos concluido.');
       let listaProcessos = objResponse.responseBody.lstProcessos;
       logger.info('Iniciando processamento da lista de processos');
+      if (listaProcessos == null) {
+        throw new ExtracaoException('Lista de processos vazia', 'Não foi possivel recuperar a lista de processos (l.72)');
+      }
       resultados = listaProcessos.map(async (element) => {
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;

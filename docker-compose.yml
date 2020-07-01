@@ -61,6 +61,12 @@ services:
       service: base_node
     command: node workers/TJSP/extracao.js
 
+  worker-tjsp-processo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSP/extracaoProcesso.js
+
   worker-tjsc-oab:
     extends:
       file: common-services.yml

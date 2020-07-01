@@ -39,5 +39,6 @@ module.exports.enums = Object.freeze({
   },
   proxy: {
     proxiesUrl: process.env.PROXY_ADDRESS
-  }
+  },
+  bigdataAddress
 });

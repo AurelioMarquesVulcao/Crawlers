@@ -36,7 +36,7 @@ class JTEParser extends BaseParser {
       qtdAndamentos: this.numeroDeAndamentos($2),
       origemExtracao: enums.nomesRobos.JTE,
       envolvidos: this.envolvidos($),
-      advogados: this.advogados($),
+      //advogados: this.advogados($),
       // "origemDados": enums.nomesRobos.JTE,  // verificar esse campo.
       detalhes: this.detalhes($)
     })

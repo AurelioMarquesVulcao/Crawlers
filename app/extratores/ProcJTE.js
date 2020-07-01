@@ -39,13 +39,15 @@ class ProcJTE extends ExtratorBase {
   }
 
 
-  async extrair(numeroProcesso) {
+  async extrair(NumeroOab) {
+    let numeroProcesso = NumeroOab
     let resultado = [];
+    let dadosProcesso;
     try {
       // Call a page already with the captchas resolved from a local directory.
       var responseDev
-      // fs.readFile(`test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
-      fs.readFile(`app/test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
+      fs.readFile(`test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
+      // fs.readFile(`app/test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
         console.log(!!data)
         //console.log(err)
         // console.log(data);
@@ -54,8 +56,8 @@ class ProcJTE extends ExtratorBase {
 
 
       var responseDev2
-      // fs.readFile(`test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
-      fs.readFile(`app/test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
+      fs.readFile(`test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
+      // fs.readFile(`app/test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
         console.log(!!data)
         //console.log(err)
         // console.log(data);
@@ -64,9 +66,9 @@ class ProcJTE extends ExtratorBase {
 
       logger = new Logger(
         'info',
-        'logs/OabTJPR/OabTJPRInfo.log', {
+        'logs/ProcJTE/ProcJTE.log', {
           nomeRobo: enums.nomesRobos.JTE,
-          numeroProcesso: numeroProcesso,
+          NumeroOab:NumeroOab,
         }
       );
       let objResponse = await this.robo.acessar({
@@ -81,47 +83,46 @@ class ProcJTE extends ExtratorBase {
       let $ = cheerio.load(responseDev);
       let $2 = cheerio.load(responseDev2);
 
-      let dadosProcesso = this.parser.parse($, $2)
+      dadosProcesso = this.parser.parse($, $2)
 
-      console.log(dadosProcesso.andamentos.slice(0,3));
+      //console.log(dadosProcesso.andamentos.slice(0,3));
       //console.log(responseDev2);
 
 
       // let envolvidos = this.parser.extraiEnvolvidos($)
-      var Processos = []
-      Processos = await dadosProcesso.processo
-      // console.log(Processos);
+      var processo;
+      processo = dadosProcesso.processo
+      // console.log(processo);
       await dadosProcesso.processo.salvar()
       await Andamento.salvarAndamentos(dadosProcesso.andamentos)
-      console.log(Processos);
+      // console.log(processo);
 
-      // let i = 0;
-      // for (i in links) {
-      //   // resultado.push(
-      //   //   await new OabTJPR().extrairProcesso(links[i], envolvidos[i], numeroProcesso)
-      //   //   )
-      //   // Processos.push(
-      //   //   await resultado[i].processo.salvar()
-      //   // )
-      //   // await resultado[i].processo.salvar()
-      //   // await Andamento.salvarAndamentos(resultado[i].andamentos)
 
-      // }
     } catch (e) {
       console.log(e);
     }
     console.log('extraido o ' + numeroProcesso);
     //  usar return simples apenas para dev
-    //return Processos
-    return Promise.all(Processos).then((args) => {
-      logger.info('Processos extraidos com sucesso');
+    logger.info('Processos extraidos com sucesso');
       return {
-        resultado: args,
+        resultado: dadosProcesso,
         sucesso: true,
         detalhes: '',
         logs: logger.logs
       };
-    });
+
+
+
+
+    // return Promise.all(processo).then((args) => {
+    //   logger.info('Processos extraidos com sucesso');
+    //   return {
+    //     resultado: args,
+    //     sucesso: true,
+    //     detalhes: '',
+    //     logs: logger.logs
+    //   };
+    // });
   } // End extrair function
 
 
@@ -129,6 +130,6 @@ class ProcJTE extends ExtratorBase {
 module.exports.ProcJTE = ProcJTE;
 
 // DEV START'S FOR PROJECT TEST and development
-(async () => {
-  await new ProcJTE().extrair("0000004-63.2019.5.21.0001")
-})()
+// (async () => {
+//   await new ProcJTE().extrair("0000004-63.2019.5.21.0001")
+// })()

@@ -41,12 +41,10 @@ class ProcJTE extends ExtratorBase {
 
   async extrair(numeroProcesso) {
     let resultado = [];
-
-
-
     try {
       // Call a page already with the captchas resolved from a local directory.
       var responseDev
+      // fs.readFile(`test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
       fs.readFile(`app/test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
         console.log(!!data)
         //console.log(err)
@@ -56,6 +54,7 @@ class ProcJTE extends ExtratorBase {
 
 
       var responseDev2
+      // fs.readFile(`test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
       fs.readFile(`app/test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
         console.log(!!data)
         //console.log(err)
@@ -63,13 +62,13 @@ class ProcJTE extends ExtratorBase {
         responseDev2 = data
       });
 
-      // logger = new Logger(
-      //   'info',
-      //   'logs/OabTJPR/OabTJPRInfo.log', {
-      //     nomeRobo: enums.nomesRobos.JTE,
-      //     numeroProcesso: numeroProcesso,
-      //   }
-      // );
+      logger = new Logger(
+        'info',
+        'logs/OabTJPR/OabTJPRInfo.log', {
+          nomeRobo: enums.nomesRobos.JTE,
+          numeroProcesso: numeroProcesso,
+        }
+      );
       let objResponse = await this.robo.acessar({
         url: 'https://jte.csjt.jus.br/',
         method: 'GET',
@@ -82,13 +81,20 @@ class ProcJTE extends ExtratorBase {
       let $ = cheerio.load(responseDev);
       let $2 = cheerio.load(responseDev2);
 
-      let dadosProcesso = this.parser.parse($,$2)
-      console.log(dadosProcesso);
+      let dadosProcesso = this.parser.parse($, $2)
+
+      console.log(dadosProcesso.andamentos.slice(0,3));
       //console.log(responseDev2);
-      
-      
+
+
       // let envolvidos = this.parser.extraiEnvolvidos($)
       var Processos = []
+      Processos = await dadosProcesso.processo
+      // console.log(Processos);
+      await dadosProcesso.processo.salvar()
+      await Andamento.salvarAndamentos(dadosProcesso.andamentos)
+      console.log(Processos);
+
       // let i = 0;
       // for (i in links) {
       //   // resultado.push(
@@ -106,16 +112,16 @@ class ProcJTE extends ExtratorBase {
     }
     console.log('extraido o ' + numeroProcesso);
     //  usar return simples apenas para dev
-    return Processos
-    // return Promise.all(Processos).then((args) => {
-    //   logger.info('Processos extraidos com sucesso');
-    //   return {
-    //     resultado: args,
-    //     sucesso: true,
-    //     detalhes: '',
-    //     logs: logger.logs
-    //   };
-    // });
+    //return Processos
+    return Promise.all(Processos).then((args) => {
+      logger.info('Processos extraidos com sucesso');
+      return {
+        resultado: args,
+        sucesso: true,
+        detalhes: '',
+        logs: logger.logs
+      };
+    });
   } // End extrair function
 
 
@@ -123,6 +129,6 @@ class ProcJTE extends ExtratorBase {
 module.exports.ProcJTE = ProcJTE;
 
 // DEV START'S FOR PROJECT TEST and development
-// (async () => {
-//   await new ProcJTE().extrair("0000004-63.2019.5.21.0001")
-// })()
+(async () => {
+  await new ProcJTE().extrair("0000004-63.2019.5.21.0001")
+})()

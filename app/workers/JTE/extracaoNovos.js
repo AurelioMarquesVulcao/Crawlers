@@ -20,7 +20,7 @@ const logarExecucao = async (execucao) => {
     console.log(e);
   });
 
-  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJPR}.extracao.novos`;
+  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
 
     new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
       const dataInicio = new Date();
@@ -29,7 +29,7 @@ const logarExecucao = async (execucao) => {
         'info',
         'logs/OabTJPR/OabTJPRInfo.log',
         {
-          nomeRobo: enums.nomesRobos.TJPR,
+          nomeRobo: enums.nomesRobos.JTE,
           NumeroOab: message.NumeroOab,
         }
       );
@@ -86,7 +86,7 @@ const logarExecucao = async (execucao) => {
           status: e.message, 
           error: e.stack.replace(/\n+/,' ').trim(),
           logs: logger.logs,
-          NomeRobo: enums.nomesRobos.TJPR
+          NomeRobo: enums.nomesRobos.JTE
         }
       );
     }

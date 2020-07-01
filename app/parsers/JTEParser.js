@@ -29,7 +29,7 @@ class JTEParser extends BaseParser {
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
   parse($, $2) {
-    console.time('parse');
+    //console.time('parse');
     let dadosProcesso = new Processo({
       capa: this.capa($),
       oabs: this.removeVazios(this.Oabs($)),
@@ -42,10 +42,10 @@ class JTEParser extends BaseParser {
     })
     let n = this.detalhes($).numeroProcesso.trim()
     let dadosAndamento = this.andamento($2, n)
-    console.timeEnd('parse');
+    // console.timeEnd('parse');
     return {
-      processos: dadosProcesso,
-      andamentos: dadosAndamento.slice(0,3)
+      processo: dadosProcesso,
+      andamentos: dadosAndamento
     }
   }
 
@@ -54,10 +54,10 @@ class JTEParser extends BaseParser {
     let capa = {
       uf: "", // inserir uf na raspagem do puppeteer
       comarca: "", // perguntar onde extraio a comarca
-      vara: this.extraiVaraCapa($),
+      vara: this.extraiVaraCapa($).trim(),
       fase: '', // perguntar onde extraio a comarca
       assunto: [this.extraiAssunto($)], // inserir raspagem de assunto na fase de testes
-      classe: this.extraiClasseCapa($),
+      classe: this.extraiClasseCapa($).trim(),
       dataDistribuicao: Date(),
     }
     return capa
@@ -102,8 +102,8 @@ class JTEParser extends BaseParser {
     for (let i in envolvidos) {
       let separaNome = envolvidos[i].split(':')
       let envolvido = {
-        nome: separaNome[1],
-        tipo: separaNome[0]
+        nome: separaNome[1].trim(),
+        tipo: separaNome[0].trim()
       }
       resultado.push(envolvido)
     }
@@ -134,11 +134,9 @@ class JTEParser extends BaseParser {
   }
 
   extraiVaraCapa($) {
-    console.time('VaraCapa');
     let advogados = $('detalhes-aba-geral').text().split('\n');
     advogados = this.removeVazios(advogados)
-    console.timeEnd('VaraCapa');
-    return advogados[1].split('-')[1].trim()
+    return removerAcentos(advogados[1].split('-')[1].trim()) 
   }
 
 
@@ -162,7 +160,7 @@ class JTEParser extends BaseParser {
       let numero = $(this).text().split("\n")[0];
       if (!!numero) resultado = numero
     })
-    let numeroProcesso = resultado
+    let numeroProcesso = resultado.trim()
     return numeroProcesso
   }
 
@@ -238,7 +236,6 @@ class JTEParser extends BaseParser {
     return numero
   }
   extraiAndamento($) {
-    console.time('Andamentos');
     let resultado = []
     $('ion-item div').each(async function (element) {
       let andamentos = $(this).text().split('\n');
@@ -248,12 +245,10 @@ class JTEParser extends BaseParser {
     })
     // console.log(resultado.length);
     // console.log(resultado);
-    console.timeEnd('Andamentos');
     return resultado
   }
 
   extraiDataAndamento($) {
-    console.time('Andamentos');
     let resultado = []
     $('ion-text h4').each(async function (element) {
       let andamentos = $(this).text().split('\n');
@@ -263,7 +258,6 @@ class JTEParser extends BaseParser {
     })
     // console.log(resultado.length);
     // console.log(resultado);
-    console.timeEnd('Andamentos');
     return resultado
   }
 
@@ -277,7 +271,7 @@ class JTEParser extends BaseParser {
     let i = 0;
     for (i in array) {
       if (array[i].length > 2) {
-        limpo.push(array[i].trim())
+        limpo.push(removerAcentos(array[i].trim()))
       }
     }
     // com essas linhas de código abaixo eu não preciso remover as linhas vazias dos array's

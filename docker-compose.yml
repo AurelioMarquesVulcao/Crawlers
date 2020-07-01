@@ -49,17 +49,11 @@ services:
       service: base_node
     command: node workers/enfileirador.js
 
-  worker-tjba-portal:
+  worker-jte:
     extends:
       file: common-services.yml
       service: base_node
-    command: node workers/TJBAPortal/extracaoNovos.js
-
-  worker-tjsp-oab:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJSP/extracao.js
+    command: node workers/JTE/extracaoNovos.js
 
   cadastro-consulta:
     extends: 

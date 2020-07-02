@@ -25,7 +25,11 @@ class TJSCParser extends BaseParser {
     const envolvidos = this.extrairEnvolvidos($);
     const oabs = this.extrairOabs(envolvidos);
     // #tabelaTodasMovimentacoes
-    const andamentos = this.extrairAndamentos($);
+    const andamentos = this.extrairAndamentos(
+      $,
+      dataAtual,
+      detalhes.numeroProcesso
+    );
 
     const processo = new Processo({
       capa: capa,
@@ -241,10 +245,50 @@ class TJSCParser extends BaseParser {
     return oabs.filter(Boolean);
   }
 
-  extrairAndamentos($) {
+  extrairAndamentos($, dataAtual, numeroProcesso) {
     let andamentos = [];
-    const table = $('#tabelaTodasMovimentacoes > tbody > tr');
-    table.each((element) => {});
+    let andamentosHash = [];
+    let repeticao = {};
+
+    const table = $('#tabelaTodasMovimentacoes > tr');
+    table.each((index) => {
+      let data = $(
+        `#tabelaTodasMovimentacoes > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(1)`
+      );
+      data = moment(data.text().strip(), 'DD/MM/YYYY').format('YYYY-MM-DD');
+      let descricaoRaw = $(
+        `#tabelaTodasMovimentacoes > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(3)`
+      );
+
+      let observacao = descricaoRaw.find('span')[0].children[0].data.strip();
+      let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
+      observacao = re.replace(observacao, re(/\s\s+/g), ' ');
+      observacao = removerAcentos(observacao);
+
+      let andamento = {
+        numeroProcesso: numeroProcesso,
+        data: data,
+        dataInclusao: dataAtual,
+        descricao: removerAcentos(descricao),
+      };
+
+      if (observacao) {
+        andamento.observacao = observacao;
+      }
+
+      let hash = Andamento.criarHash(andamento);
+
+      if (andamentosHash.indexOf(hash) !== -1) {
+        let count = andamentosHash.filter((element) => element === hash).length;
+        andamento.descricao = `${andamento.descricao} [${count + 1}]`;
+      }
+      andamentos.push(andamento);
+      andamentosHash.push(hash);
+    });
     return andamentos;
   }
 }

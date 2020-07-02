@@ -5,7 +5,7 @@
     "comarca": "Capital",
     "classe": "Embargos a Execucao Fiscal"
   },
-  "detalhes":{
+  "detalhes": {
     "tipo": "cnj",
     "numeroProcesso": "03236535520148240023",
     "numeroProcessoMascara": "0323653-55.2014.8.24.0023",
@@ -17,27 +17,17 @@
   },
   "envolvidos": [
     {
-      "tipo": "Apelante",
-      "nome": "Estado de Santa Catarina"
-    },
-    {
-      "tipo": "Procurador",
-      "nome": "(32408SC) Francisco Jose Guardini Nogueira"
-    },
-    {
-      "tipo": "Procurador",
-      "nome": "Ederson Pires"
-    },
-    {
-      "tipo": "Apelado",
-      "nome": "Banco Itauleasing S/A"
+      "tipo": "Embargante",
+      "nome": "Cia. Itauleasing de Arrendamento Mercantil"
     },
     {
       "tipo": "Advogado",
-      "nome": "(71318SP) Marcelo Tesheiner Cavassani"
+      "nome": "(14991SC) Marcelo Tesheiner Cavassani"
+    },
+    {
+      "tipo": "Embargado",
+      "nome": "Estado de Santa Catarina"
     }
   ],
-  "oabs": [
-    "32408SC", "71318SP"
-  ]
+  "oabs": ["14991SC"]
 }

@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "crawler": "^1.2.2",
     "puppeteer": "^5.0.0"
   }
 }

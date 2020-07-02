@@ -47,3 +47,8 @@ services:
       file: common-services.yml
       service: base_node
     command: node workers/JTE/extracaoNovos.js
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

@@ -1,10 +1,10 @@
-const chai = require("chai");
-const subset = require("chai-subset");
-const fs = require("fs");
-const moment = require("moment");
-const { TJSCParser } = require("../parsers/TJSCParser");
+const chai = require('chai');
+const subset = require('chai-subset');
+const fs = require('fs');
+const moment = require('moment');
+const { TJSCParser } = require('../parsers/TJSCParser');
 
-const dataAtual = moment().format("YYYY-MM-DD");
+const dataAtual = moment().format('YYYY-MM-DD');
 const dataFormatada = new Date(dataAtual).toISOString();
 
 const teste = (numeroProcesso) => {
@@ -17,22 +17,27 @@ const teste = (numeroProcesso) => {
   resposta = JSON.parse(resposta);
   const extracao = new TJSCParser().parse(codigoHtml);
 
-  it("CAPA", function () {
+  it('CAPA', function () {
     const capa = extracao.processo.capa.toJSON();
     chai.expect(resposta.capa).to.eql(capa);
   });
 
-  it("DETALHES", () => {
+  it('DETALHES', () => {
     const detalhes = extracao.processo.detalhes.toJSON();
     chai.expect(resposta.detalhes).to.eql(detalhes);
   });
 
-  it("ENVOLVIDOS", () => {
+  it('ENVOLVIDOS', () => {
     const envolvidos = extracao.processo.envolvidos.toObject();
     chai.expect(resposta.envolvidos).to.eql(envolvidos);
   });
 
-  it("ANDAMENTOS", () => {
+  it('OABS', () => {
+    const oabs = extracao.processo.oabs.toObject();
+    chai.expect(resposta.oabs).to.eql(oabs);
+  });
+
+  it('ANDAMENTOS', () => {
     let andamentos = extracao.andamentos;
 
     andamentos = andamentos.map((element) => {
@@ -44,11 +49,11 @@ const teste = (numeroProcesso) => {
   });
 };
 
-describe("TJSC - Teste de Parser", function () {
-  describe("Processo: 03236535520148240023", function () {
-    teste("03236535520148240023");
+describe('TJSC - Teste de Parser', function () {
+  describe('Processo: 03236535520148240023', function () {
+    teste('03236535520148240023');
   });
   describe('Processo: 00040096520198240011', function () {
     teste('00040096520198240011');
-  })
+  });
 });

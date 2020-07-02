@@ -1,10 +1,10 @@
-const cheerio = require("cheerio");
-const moment = require("moment");
-const re = require("xregexp");
+const cheerio = require('cheerio');
+const moment = require('moment');
+const re = require('xregexp');
 
-const { BaseParser, removerAcentos, traduzir } = require("./BaseParser");
-const { Processo } = require("../models/schemas/processo");
-const { Andamento } = require("../models/schemas/andamento");
+const { BaseParser, removerAcentos, traduzir } = require('./BaseParser');
+const { Processo } = require('../models/schemas/processo');
+const { Andamento } = require('../models/schemas/andamento');
 
 class TJSCParser extends BaseParser {
   constructor() {
@@ -18,7 +18,7 @@ class TJSCParser extends BaseParser {
    */
   parse(content) {
     const $ = cheerio.load(content);
-    const dataAtual = moment().format("YYYY-MM-DD");
+    const dataAtual = moment().format('YYYY-MM-DD');
 
     const capa = this.extrairCapa($);
     const detalhes = this.extrairDetalhes($);
@@ -31,14 +31,14 @@ class TJSCParser extends BaseParser {
       capa: capa,
       detalhes: detalhes,
       envolvidos: envolvidos,
-      oabs: [],
+      oabs: oabs,
       qtdAndamentos: 0,
-      origemExtracao: "OabTJSP"
+      origemExtracao: 'OabTJSP',
     });
 
     return {
       processo: processo,
-      andamentos: "andamentos"
+      andamentos: 'andamentos',
     };
   }
 
@@ -46,10 +46,10 @@ class TJSCParser extends BaseParser {
   extrairCapa($) {
     let capa = {};
 
-    capa["uf"] = "SC";
-    capa["comarca"] = this.extrairComarca($);
-    capa["assunto"] = this.extrairAssunto($);
-    capa["classe"] = this.extrairClasse($);
+    capa['uf'] = 'SC';
+    capa['comarca'] = this.extrairComarca($);
+    capa['assunto'] = this.extrairAssunto($);
+    capa['classe'] = this.extrairClasse($);
 
     return capa;
   }
@@ -59,7 +59,7 @@ class TJSCParser extends BaseParser {
 
     comarca = removerAcentos(
       $(
-        "body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-2.mb-2 > div"
+        'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-2.mb-2 > div'
       )
         .text()
         .strip()
@@ -74,7 +74,7 @@ class TJSCParser extends BaseParser {
     assuntos.push(
       removerAcentos(
         $(
-          "body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-3.mb-3 > div"
+          'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-3.mb-3 > div'
         )
           .text()
           .strip()
@@ -89,7 +89,7 @@ class TJSCParser extends BaseParser {
 
     classe = removerAcentos(
       $(
-        "body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div:nth-child(1) > div"
+        'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div:nth-child(1) > div'
       )
         .text()
         .strip()
@@ -103,7 +103,7 @@ class TJSCParser extends BaseParser {
     let detalhes;
 
     numeroProcesso = $(
-      "body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(1) > div > span.unj-larger-1"
+      'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(1) > div > span.unj-larger-1'
     )
       .text()
       .strip();
@@ -115,11 +115,11 @@ class TJSCParser extends BaseParser {
 
   extrairEnvolvidos($) {
     let envolvidos = [];
-    const table = $("#tablePartesPrincipais > tbody > tr");
+    const table = $('#tablePartesPrincipais > tbody > tr');
 
     // pegar personagens
     table.map((index, linha) => {
-      let envolvido = { tipo: "", nome: "" };
+      let envolvido = { tipo: '', nome: '' };
       let advogados;
 
       // Extracao
@@ -136,7 +136,7 @@ class TJSCParser extends BaseParser {
       advogados = this.recuperaAdvogados(index, $);
 
       // Tratamento
-      envolvido.tipo = envolvido.tipo.replace(":", "").split(/\W/)[0];
+      envolvido.tipo = envolvido.tipo.replace(':', '').split(/\W/)[0];
       envolvido.tipo = traduzir(envolvido.tipo);
       // if (tradutor[envolvido.tipo]) envolvido.tipo = tradutor[envolvido.tipo];
       envolvido.nome = removerAcentos(envolvido.nome.trim());
@@ -174,20 +174,20 @@ class TJSCParser extends BaseParser {
       console.log('elementor', element);
       let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
       let adv = {
-        tipo: "",
-        nome: ""
+        tipo: '',
+        nome: '',
       };
-      let oab = "";
+      let oab = '';
 
-      let resultado = re.exec(element, re(regex))
+      let resultado = re.exec(element, re(regex));
 
       // Extracao
-      if(resultado) {
-        adv.tipo = resultado.tipo.strip()
-        adv.nome = resultado.nome.strip()
+      if (resultado) {
+        adv.tipo = resultado.tipo.strip();
+        adv.nome = resultado.nome.strip();
 
         //TODO fazer funcao de resgate da oab dentro das movimentações
-        let oab = this.resgatarOab(adv.nome);
+        let oab = this.resgatarOab(adv.nome, $);
 
         // Tratamento
         adv.nome = removerAcentos(adv.nome);
@@ -200,8 +200,31 @@ class TJSCParser extends BaseParser {
     return advogados.filter(Boolean);
   }
 
-  resgatarOab(nome) {
-    return '47177SC'
+  resgatarOab(nome, $) {
+    let movimentacoesEmTexto;
+    let advMatch;
+    let oab;
+
+    movimentacoesEmTexto = $('#tabelaTodasMovimentacoes').text();
+    advMatch = re.exec(
+      movimentacoesEmTexto,
+      re(`(?<nome>${nome})\\s\\(OAB\\s(?<oab>.+)\\)`)
+    );
+    if (advMatch) {
+      oab = advMatch.oab;
+      //padrao do site: <codigo><tipo?>/<tipo?><seccional>
+      oab = re.exec(
+        oab,
+        re(`(?<codigo>[0-9]+)(?<tipo>[A-Z]?.[A-Z]?)(?<seccional>[A-Z]{2})`)
+      );
+
+      oab = `${oab.codigo}${oab.tipo.replace(/\W/, '')}${oab.seccional}`;
+      return oab;
+    }
+    //Se existir verifica se existe uma oab escrita
+    //Se existir converte esta oab para o modelo <codigo><tipo><seccional>
+    //Retorna oab
+    return null;
   }
 
   extrairOabs(envolvidos) {
@@ -221,7 +244,7 @@ class TJSCParser extends BaseParser {
   extrairAndamentos($) {
     let andamentos = [];
     const table = $('#tabelaTodasMovimentacoes > tbody > tr');
-    table.each(element => { });
+    table.each((element) => {});
     return andamentos;
   }
 }

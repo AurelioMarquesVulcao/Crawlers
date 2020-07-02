@@ -42,7 +42,7 @@ class TJSCParser extends BaseParser {
 
     return {
       processo: processo,
-      andamentos: 'andamentos',
+      andamentos: andamentos,
     };
   }
 
@@ -266,7 +266,8 @@ class TJSCParser extends BaseParser {
 
       let observacao = descricaoRaw.find('span')[0].children[0].data.strip();
       let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
-      observacao = re.replace(observacao, re(/\s\s+/g), ' ');
+      observacao = observacao.replace(/\n/gm, ' ');
+      observacao = re.replace(observacao, re(/\s\s+/gm), ' ');
       observacao = removerAcentos(observacao);
 
       let andamento = {

@@ -1,0 +1,15 @@
+{
+  "name": "sandbox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "if-test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "crawler": "^1.2.2",
+    "puppeteer": "^5.0.0"
+  }
+}

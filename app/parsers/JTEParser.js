@@ -133,10 +133,25 @@ class JTEParser extends BaseParser {
     else return teste
   }
 
+  // precisa de melhorias para capturar corretamente a vara.
   extraiVaraCapa($) {
-    let advogados = $('detalhes-aba-geral').text().split('\n');
-    advogados = this.removeVazios(advogados)
-    return removerAcentos(advogados[1].split('-')[1].trim()) 
+    let resultado = "não possui vara"
+    $('detalhes-aba-geral p').each(async function (element) {
+      let advogados = $(this).text().split('\n');
+      //console.log(advogados);
+      advogados = new JTEParser().removeVazios(advogados)
+      let vara = 'não tem'//removerAcentos(advogados[1].split('-')[1].trim())
+      return vara
+
+    })
+    // let advogados = $('detalhes-aba-geral').text().split('\n');
+    // advogados = this.removeVazios(advogados)
+    // console.log(advogados);
+
+    // let vara = removerAcentos(advogados[1].split('-')[1].trim())
+    // if (!!vara) return vara
+    // if (!vara) return "nao possui vara"
+    return resultado
   }
 
 

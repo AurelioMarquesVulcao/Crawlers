@@ -66,7 +66,7 @@ class OabTJSP extends ExtratorBase {
       objResponse = await this.robo.acessar({
         url: this.url,
         method: 'GET',
-        usaProxy: false,
+        usaProxy: true,
         encoding: 'latin1',
       });
 
@@ -222,7 +222,7 @@ class OabTJSP extends ExtratorBase {
       url: 'https://esaj.tjsp.jus.br/cpopg/captchaControleAcesso.do',
       method: 'POST',
       encoding: 'latin1',
-      usaProxy: false,
+      usaProxy: true,
       headers: {
         Cookie: cookies,
         Accept:
@@ -240,33 +240,6 @@ class OabTJSP extends ExtratorBase {
   }
 
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
-    //TODO apagar depois
-    // return [
-    //   '0000384-10.2020.8.26.0083',
-    //   '1000517-35.2020.8.26.0083',
-    //   '1000516-50.2020.8.26.0083',
-    //   '1001447-87.2019.8.26.0083',
-    //   '1001374-18.2019.8.26.0083',
-    //   '1001296-24.2019.8.26.0083',
-    //   '1000419-84.2019.8.26.0083',
-    //   '1003264-26.2018.8.26.0083',
-    //   '1003266-93.2018.8.26.0083',
-    //   '1003265-11.2018.8.26.0083',
-    //   '1003262-56.2018.8.26.0083',
-    //   '1003261-71.2018.8.26.0083',
-    //   '1003263-41.2018.8.26.0083',
-    //   '1003260-86.2018.8.26.0083',
-    //   '1003258-19.2018.8.26.0083',
-    //   '1003257-34.2018.8.26.0083',
-    //   '1003256-49.2018.8.26.0083',
-    //   '1003255-64.2018.8.26.0083',
-    //   '1003254-79.2018.8.26.0083',
-    //   '1003253-94.2018.8.26.0083',
-    //   '1003252-12.2018.8.26.0083',
-    //   '1003251-27.2018.8.26.0083',
-    //   '1003250-42.2018.8.26.0083',
-    //   '1003249-57.2018.8.26.0083',
-    // ];
 
     await this.robo.acessar({
       url: 'https://esaj.tjsp.jus.br/cpopg/manterSessao.do?conversationId=',
@@ -281,6 +254,7 @@ class OabTJSP extends ExtratorBase {
         Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
         'Upgrade-Insecure-Requests': '1',
       },
+      usaProxy: true
     });
 
     let condition = false;
@@ -296,7 +270,7 @@ class OabTJSP extends ExtratorBase {
         url: url,
         method: 'GET',
         enconding: 'latin1',
-        usaProxy: false,
+        usaProxy: true,
         headers: {
           Cookie: cookies,
           Accept:
@@ -409,6 +383,7 @@ class OabTJSP extends ExtratorBase {
             Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
             'Upgrade-Insecure-Requests': '1',
           },
+          usaProxy: true
         });
         const $ = cheerio.load(objResponse.responseBody);
         if ($('#tabelaTodasMovimentacoes').length === 0) {

@@ -55,7 +55,7 @@ describe('TJSC - Teste de Parser', function () {
   describe('Processo: 03236535520148240023', function () {
     teste('03236535520148240023');
   });
-  // describe('Processo: 00040096520198240011', function () {
-  //   teste('00040096520198240011');
-  // });
+  describe('Processo: 00040096520198240011', function () {
+    teste('00040096520198240011');
+  });
 });

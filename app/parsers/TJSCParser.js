@@ -122,7 +122,7 @@ class TJSCParser extends BaseParser {
     const table = $('#tablePartesPrincipais > tbody > tr');
 
     // pegar personagens
-    table.map((index, linha) => {
+    table.map((index) => {
       let envolvido = { tipo: '', nome: '' };
       let advogados;
 
@@ -157,7 +157,7 @@ class TJSCParser extends BaseParser {
   }
 
   recuperaAdvogados(upperIndex, $) {
-    let advogados = [];
+    let advogados;
     let linha;
 
     // 1 transformar tudo em linhas
@@ -173,13 +173,12 @@ class TJSCParser extends BaseParser {
     if (linha) {
       linha = [linha.join(' ')];
     }
-    advogados = linha.map((element, index) => {
+    advogados = linha.map((element) => {
       let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
       let adv = {
         tipo: '',
         nome: '',
       };
-      let oab = '';
 
       let resultado = re.exec(element, re(regex));
 
@@ -246,8 +245,6 @@ class TJSCParser extends BaseParser {
   extrairAndamentos($, dataAtual, numeroProcesso) {
     let andamentos = [];
     let andamentosHash = [];
-    let repeticao = {};
-
     const table = $('#tabelaTodasMovimentacoes > tr');
     table.each((index) => {
       let data = $(

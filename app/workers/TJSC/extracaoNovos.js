@@ -29,6 +29,7 @@ const logarExecucao = async (execucao) => {
       nomeRobo: `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSC}`,
       NumeroOab: message.NumeroOab,
     });
+    console.table(message);
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
@@ -58,7 +59,7 @@ const logarExecucao = async (execucao) => {
       });
       logger.info('Resposta enviada ao BigData');
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-      //ch.ack(msg); removerComentario
+      ch.ack(msg);
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
       await logarExecucao({
@@ -74,7 +75,7 @@ const logarExecucao = async (execucao) => {
       logger.info('Encontrado erro durante a execução');
       logger.info(`Error: ${e.message}`);
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-      //ch.ack(msg); //TODO remover comentario
+      ch.ack(msg);
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando proceso');
       await logarExecucao({

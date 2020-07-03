@@ -112,10 +112,11 @@ class OabTJSC extends ExtratorBase {
                 resultado: resultados,
                 sucesso: true,
                 detalhes: '',
-                logs: logger.logs,
+                logs: this.logger.logs,
               };
             })
-            .catch(() => {
+            .catch((e) => {
+              this.logger.log('error', e);
               this.logger.info('Não houve processos bem sucedidos');
               return {
                 resultado: [],
@@ -241,7 +242,6 @@ class OabTJSC extends ExtratorBase {
     console.log(url);
     do {
       let objResponse = {};
-      // TODO remover caso o codigo funfe
       objResponse = await this.robo.acessar({
         url: url,
         method: 'GET',
@@ -270,8 +270,8 @@ class OabTJSC extends ExtratorBase {
         condition = true;
         url = 'https://esaj.tjsc.jus.br' + proximaPagina.attr('href');
       } catch (error) {
-        console.log('Problema ao pegar processos da página');
-        console.log(error);
+        this.logger.info('Problema ao pegar processos da página');
+        this.logger.log(error);
         condition = false;
       }
     } while (condition);

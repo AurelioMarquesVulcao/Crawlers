@@ -170,12 +170,10 @@ class TJSCParser extends BaseParser {
       .strip() // tira os espacos vazios
       .split(/\s\s+/) // list feita a partir das quebras de linha
       .splice(1); // remove primeiro elemento que normalmente é o nome do envolvido
-    console.log(linha);
     if (linha) {
       linha = [linha.join(' ')];
     }
     advogados = linha.map((element, index) => {
-      console.log('elementor', element);
       let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
       let adv = {
         tipo: '',
@@ -287,7 +285,7 @@ class TJSCParser extends BaseParser {
         let count = andamentosHash.filter((element) => element === hash).length;
         andamento.descricao = `${andamento.descricao} [${count + 1}]`;
       }
-      andamentos.push(andamento);
+      andamentos.push(new Andamento(andamento));
       andamentosHash.push(hash);
     });
     return andamentos;

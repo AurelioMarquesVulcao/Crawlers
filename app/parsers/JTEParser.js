@@ -1,21 +1,12 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
-const {
-  enums
-} = require('../configs/enums');
+const { enums } = require('../configs/enums');
 
 
-const {
-  BaseParser,
-  removerAcentos
-} = require('./BaseParser');
-const {
-  Processo
-} = require('../models/schemas/processo');
-const {
-  Andamento
-} = require('../models/schemas/andamento');
+const { BaseParser, removerAcentos } = require('./BaseParser');
+const { Processo } = require('../models/schemas/processo');
+const { Andamento } = require('../models/schemas/andamento');
 
 
 class JTEParser extends BaseParser {

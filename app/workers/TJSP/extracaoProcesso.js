@@ -49,7 +49,7 @@ const logarExecucao = async (execucao) => {
       logger.info('Resultado da extracao salva');
 
       logger.info('Enviando resposta ao BigData');
-      const resposta = await Helper.enviarFeedback(
+      await Helper.enviarFeedback(
         extracao.prepararEnvio()
       ).catch((err) => {
         console.log(err);
@@ -59,7 +59,7 @@ const logarExecucao = async (execucao) => {
       });
       logger.info('Resposta enviada ao BigData');
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
+      // ch.ack(msg);
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
       console.log('\n\n');

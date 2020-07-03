@@ -29,7 +29,7 @@ const logarExecucao = async (execucao) => {
       nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSC}`,
       NumeroOab: message.NumeroProcesso,
     });
-    console.log(message);
+    console.table(message);
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
@@ -76,7 +76,7 @@ const logarExecucao = async (execucao) => {
       logger.info('Encontrado erro durante a execução');
       logger.info(`Error: ${e.message}`);
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg); //TODO remover comentario
+      ch.ack(msg);
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando proceso');
       console.log('\n\n');

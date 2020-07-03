@@ -1,283 +1,293 @@
-const cheerio = require("cheerio");
-const moment = require("moment");
-const { antiCaptchaHandler } = require("../lib/captchaHandler");
-const { Processo } = require("../models/schemas/processo");
-const { Andamento } = require("../models/schemas/andamento");
-const re = require("xregexp");
+const cheerio = require('cheerio');
+const { enums } = require('../configs/enums');
+const { CaptchaHandler } = require('../lib/captchaHandler');
+const { Processo } = require('../models/schemas/processo');
+const { Logger } = require('../lib/util');
 
 const {
-  BaseException,
-  RequestException,
-  ExtracaoException,
-  AntiCaptchaResponseException
-} = require("../models/exception/exception");
-const { ExtratorBase } = require("./extratores");
-// const { TJSCParser } = require('../parsers/TJSCParser');
+  AntiCaptchaResponseException,
+} = require('../models/exception/exception');
+const { ExtratorBase } = require('./extratores');
+const { TJSCParser } = require('../parsers/TJSCParser');
+
+const { LogExecucao } = require('../lib/logExecucao');
 
 class OabTJSC extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
-    // TODO remover declaracao abaixo e descomentar uso do parser
-    this.parser = () => ({ processo: {}, listaAndamento: [] });
-    // this.parser = new TJSCParser();
-    this.dataSiteKey = "6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL";
-    this.numeroOab = "";
+    this.parser = new TJSCParser();
+    this.dataSiteKey = '6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL';
     this.logger = null;
   }
 
-  async extrair(numeroOab) {
+  async extrair(numeroOab, cadastroConsultaId) {
+    console.log('cadastroConsultaId', cadastroConsultaId);
+    this.numeroDaOab = numeroOab;
+    let cadastroConsulta = {
+      SeccionalOab: 'SC',
+      TipoConsulta: 'processo',
+      NumeroOab: numeroOab,
+      _id: cadastroConsultaId,
+    };
+
+    const nomeRobo = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSC}`;
+    this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
+      nomeRobo: nomeRobo,
+      NumeroOab: numeroOab,
+    });
+
     try {
-      this.numeroOab = numeroOab;
-      let preParse = {};
-      let resultado = [];
-      let objResponse;
-      let cookies;
+      let resultados = [];
+      let preParse;
       let uuidCaptcha;
       let gResponse;
+      let cookies;
       let listaProcessos = [];
+      let objResponse;
 
-      this.logger = new Logger("info", "logs/TJSC/TJSCInfo.log", {
-        nomeRobo: enums.nomesRobos.TJBAPortal,
-        NumeroOab: numeroOab
-      });
-
-      this.logger.info("Fazendo primeira conexão ao website.");
+      this.logger.info('Fazendo primeira conexão ao website');
       objResponse = await this.robo.acessar({
         url: this.url,
-        method: "GET",
-        encoding: "latin1",
-        usaProxy: false
+        method: 'GET',
+        usaProxy: false,
+        encoding: 'latin1',
       });
-      this.logger.info("Conexão ao website concluida.");
 
-      this.logger.info("Preparando resolução do captcha");
       cookies = objResponse.cookies;
+      cookies = cookies.map((element) => {
+        return element.replace(/;.*/, '');
+      });
+      cookies = cookies.join('; ');
+      cookies = cookies.replace(/cposgtj\d/, 'cpopg3');
+
+      this.logger.info('Fazendo pré-analise do website em busca de captchas');
       preParse = await this.preParse(objResponse.responseBody, cookies);
       uuidCaptcha = preParse.captcha.uuidCaptcha;
-      this.logger.info("Preparação de resolução do captcha concluida");
-
-      this.logger.info("Iniciando processo de resolução do captcha");
+      this.logger.info('Analise do website concluida.');
+      this.logger.info('Fazendo chamada para resolução do captcha.');
       gResponse = await this.getCaptcha();
-      this.logger.info("Processo de resolução do captcha concluido");
+      this.logger.info('Captcha resolvido');
 
-      this.logger.info("Iniciando recuperação da lista de processos");
-      listaProcessos = await this.getListaProcessos(
-        cookies,
-        uuidCaptcha,
-        gResponse
-      );
-      this.logger.info("Lista de processos recuperada");
-
-      if (listaProcessos.length > 0) {
-        this.logger.info(
-          "Iniciando recuperação de processos a partir da lista"
+      // Segunda parte: pegar a lista de processos
+      this.logger.info('Recuperando lista de processos');
+      let tentativa = 0;
+      do {
+        listaProcessos = await this.getListaProcessos(
+          numeroOab,
+          cookies,
+          uuidCaptcha,
+          gResponse
         );
-        resultado = this.processarListaProcessos(listaProcessos, cookies);
-        return Promise.all(resultado).then((args) => {
-          this.logger.info("Processos recupeados.");
-          return {
-            resultado: args,
-            sucesso: true,
-            detalhes: "",
-            logs: this.logger.logs
-          };
-        });
-      }
+        console.log(listaProcessos);
+        this.logger.info('Lista de processos recuperada');
 
-      this.logger.info("Lista de processo vazia");
+        // Terceira parte: passar a lista, pegar cada um dos codigos
+        // resultantes e mandar para o parser
+        if (listaProcessos.length > 0) {
+          this.logger.info('Inicio do processo de extração de processos');
+
+          let lista = await Processo.listarProcessos(2);
+          listaProcessos = listaProcessos.filter((x) => !lista.includes(x));
+
+          for (const processo of listaProcessos) {
+            cadastroConsulta['NumeroProcesso'] = processo;
+            this.logger.info(
+              `Criando log de execução para o processo ${processo}.`
+            );
+            await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
+            this.logger.info(
+              `Log de execução do processo ${processo} feito com sucesso`
+            );
+            this.logger.info(
+              `Enviando processo ${processo} a fila de extração.`
+            );
+            resultados.push(Promise.resolve(processo));
+          }
+
+          //resultados = await this.extrairProcessos(listaProcessos, cookies);
+          return Promise.all(resultados)
+            .then((resultados) => {
+              this.logger.info('Processos extraidos com sucesso');
+              return {
+                resultado: resultados,
+                sucesso: true,
+                detalhes: '',
+                logs: logger.logs,
+              };
+            })
+            .catch(() => {
+              this.logger.info('Não houve processos bem sucedidos');
+              return {
+                resultado: [],
+                sucesso: false,
+                detalhes: 'Extração encontrou problemas',
+                logs: this.logger.logs,
+              };
+            });
+        }
+        tentativa++;
+        gResponse = await this.getCaptcha();
+      } while (tentativa < 5);
+
+      this.logger.info('Lista de processos vazia;');
       return {
         resultado: [],
         sucesso: false,
-        detalhes: "Lista de processo vazia",
-        logs: this.logger.logs
+        detalhes: 'Lista de processos vazia',
+        logs: this.logger.logs,
       };
-    } catch (e) {
-      this.logger.log("error", e);
-      if (e instanceof RequestException) {
-        throw new RequestException(e.code, e.status, e.message);
-      } else if (e instanceof BaseException) {
-        throw new BaseException(e.code, e.message);
-      } else if (e instanceof ExtracaoException) {
-        if (/ERRO_CAPTCHA/.test(e.code)) {
-          //refaz tentativas de captcha (deixar aqui mas portal tjba n usa captcha por enquanto)
-          throw new ExtracaoException(e.code, null, e.message);
-        } else {
-          throw new BaseException(e.code, e.message);
-        }
-      } else {
-        if (
-          /ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT/.test(e.code)
-        ) {
-          throw new RequestException(e.code, e.status, e.message);
-        } else {
-          throw e;
-        }
-      }
+    } catch (error) {
+      this.logger.log('error', error);
+      throw error;
     }
   }
 
   /**
-   * Verifica a existencia de captchas e recupera o uuid caso exista
-   * @param {string} content Pagina recuperada pelo robo para ser usada com o cheerio
-   * @param {array} cookies Cookies da pagina
-   * @returns {Promise<{captcha: {hasCaptcha: boolean, uuidCaptcha: string}}>}
+   * Pré-processador da pagina a ser extraida
+   * @param {string} content Página resultade de uma consulta do co Axios
+   * @param {String} cookies
    */
   async preParse(content, cookies) {
     const $ = cheerio.load(content);
+
     let preParse = {
       captcha: {
         hasCaptcha: false,
-        uuidCaptcha: ""
-      }
+        uuidCaptcha: '',
+      },
     };
 
-    preParse.captcha.hasCaptcha = $(".g-response");
+    preParse.captcha.hasCaptcha = $('#rc-anchor-content');
     preParse.captcha.uuidCaptcha = await this.getCaptchaUuid(cookies);
 
     return preParse;
   }
 
-  /**
-   * Recupera o uuid por meio de requisição a pagina de controle de acesso
-   * @param {array} cookies Cookies da pagina
-   * @returns {Promise<string>}
-   */
+  async getCaptcha() {
+    const captchaHandler = new CaptchaHandler(5, 5000, 'OabTJSC', {
+      numeroDaOab: this.numeroDaOab,
+    });
+    try {
+      let captcha;
+      captcha = await captchaHandler
+        .resolveRecaptchaV2(
+          // captcha = await antiCaptchaHandler(
+          'https://esaj.tjsc.jus.br/cpopg/open.do',
+          this.dataSiteKey,
+          '/'
+        )
+        .catch((error) => {
+          throw error;
+        });
+
+      if (!captcha.sucesso) {
+        throw new AntiCaptchaResponseException(
+          'Falha na resposta',
+          'Nao foi possivel recuperar a resposta para o captcha'
+        );
+      }
+
+      return captcha.gResponse;
+    } catch (error) {
+      if (error instanceof AntiCaptchaResponseException) {
+        throw new AntiCaptchaResponseException(error.code, error.message);
+      }
+      throw error;
+    }
+  }
+
   async getCaptchaUuid(cookies) {
     let objResponse;
-
     objResponse = await this.robo.acessar({
-      url: "https://esaj.tjsc.jus.br/cposgtj/captchaControleAcesso.do",
-      method: "POST",
-      encoding: "latin1",
-      headers: { Cookie: cookies }
+      url: 'https://esaj.tjsc.jus.br/cpopg/captchaControleAcesso.do',
+      method: 'POST',
+      encoding: 'latin1',
+      usaProxy: false,
+      headers: {
+        Cookie: cookies,
+        Accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Accept-Encoding': 'gzip, deflate, br',
+        DNT: '1',
+        Connection: 'keep-alive',
+        Referer: 'https://esaj.tjsc.jus.br/cpopg/search.do',
+        'Upgrade-Insecure-Requests': '1',
+      },
+    });
+    return objResponse.responseBody.uuidCaptcha;
+  }
+
+  async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
+    await this.robo.acessar({
+      url: 'https://esaj.tjsc.jus.br/cpopg/manterSessao.do?conversationId=',
+      headers: {
+        Cookie: cookies,
+        Accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Accept-Encoding': 'gzip, deflate, br',
+        DNT: '1',
+        Connection: 'keep-alive',
+        Referer: 'https://esaj.tjsc.jus.br/cpopg/search.do',
+        'Upgrade-Insecure-Requests': '1',
+      },
     });
 
-    return objResponse.responseBody.uuid; // TODO verificar se é necessário transformar isso em json primeiro
-  }
-
-  /**
-   * Captura o captcha por uso do AntiCaptcha
-   * @returns {Promise<string>}
-   */
-  async getCaptcha() {
-    let response;
-
-    response = await antiCaptchaHandler(this.url, this.dataSiteKey, "/");
-
-    if (!response) {
-      throw new AntiCaptchaResponseException(
-        "CAPTCHA",
-        "Nao foi possivel recuperar a resposta para o captcha"
-      );
-    }
-
-    return response;
-  }
-
-  /**
-   * Retorna lista com os links dos processos
-   * @param {array} cookies Cookies da pagina
-   * @param {string} uuidCaptcha Codigio de identificação da sessao (?)
-   * @param {string} gResponse resposta do captcha
-   * @returns {Promise<[string]>}
-   */
-  async getListaProcessos(cookies, uuidCaptcha, gResponse) {
     let condition = false;
     let processos = [];
-    let url =
-      this.url +
-      `?conversationId=` +
-      `&paginaConsultada=0` +
-      `&cbPesquisa=NUMOAB` +
-      `&dePesquisa=${this.numeroOab}` +
-      `&uuidCaptcha=${uuidCaptcha}` +
-      `&g-captcha-response=${gResponse}`;
-
+    let url = `https://esaj.tjsc.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    console.log('cookies', cookies);
+    console.log(url);
     do {
-      let objResponse = this.robo.acessar({
+      let objResponse = {};
+      // TODO remover caso o codigo funfe
+      objResponse = await this.robo.acessar({
         url: url,
-        method: "GET",
-        encoding: "latin1",
+        method: 'GET',
+        enconding: 'latin1',
         usaProxy: false,
-        headers: { Cookies: cookies }
+        headers: {
+          Cookie: cookies,
+          Accept:
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3',
+          'Accept-Encoding': 'gzip, deflate, br',
+          DNT: '1',
+          Connection: 'keep-alive',
+          Referer: 'https://esaj.tjsc.jus.br/cpopg/search.do',
+          'Upgrade-Insecure-Requests': '1',
+        },
       });
-
       const $ = cheerio.load(objResponse.responseBody);
-
       try {
-        processos: [...processos, this.extrairLinkProcessos($)];
-        const proximaPagina = $('a[title|="Próxima página"]').first();
+        //processos = [...processos, ...this.extrairLinksProcessos($)];
+        processos = [...processos, ...this.extrairNumeroProcessos($)];
+        const proximaPagina = $('[title|="Próxima página"]').first();
 
         if (!proximaPagina.text()) return processos;
 
         condition = true;
-        url = this.url + "?" + proximaPagina.attr("href");
-      } catch (e) {
-        this.logger.info("Erro ao tentar adquirir a lista de processos");
+        url = 'https://esaj.tjsc.jus.br' + proximaPagina.attr('href');
+      } catch (error) {
+        console.log('Problema ao pegar processos da página');
+        console.log(error);
+        condition = false;
       }
     } while (condition);
+    return processos;
   }
 
-  /**
-   * Extrai da lista de processos os processos
-   * @param {array} listaProcessos
-   * @param {string} cookies
-   * @returns {Promise<[Object]>}
-   */
-  async processarListaProcessos(listaProcessos, cookies) {
-    let resultado;
+  extrairNumeroProcessos($) {
+    const rawProcessos = $('a.linkProcesso');
+    const listaNumeros = [];
 
-    // FIXME delimitador para checar o gasto de captcha
-    // TODO remover
-    listaProcessos = listaProcessos.slice(0, 5);
-
-    resultados = listaProcessos.map(async (element) => {
-      let extracao;
-      let processo;
-      let andamentos;
-      let resultado;
-
-      let body = await this.extrairProcesso(element, cookie);
-
-      if (body) {
-        extracao = await this.parser.parse(body);
-        processo = extracao.processo;
-        andamentos = extracao.andamentos;
-
-        await Andamento.salvarAndamentos(andamentos);
-        resultado = await processo.salvar();
-        logger.info(
-          `Processo: ${
-            processo.toObject().detalhes.numeroProcesso
-          } salvo | Quantidade de andamentos: ${andamentos.length}`
-        );
-        return Promise.resolve(resultado);
-      } else {
-        return Promise.resolve(false);
-      }
-    });
-    return Promise.all(resultados).then((args) => {
-      this.logger(
-        `Extração de ${args.filter(Boolean).length} processos feito com sucesso`
-      );
-      return args.filter(Boolean);
-    });
-  }
-
-  async extrairProcesso(urlProcesso, cookies) {
-    let objResponse;
-
-    objResponse = await this.robo.acessar({
-      url: urlProcesso,
-      method: "GET",
-      encoding: "latin1",
-      usaProxy: false,
-      usaJson: false,
-      headers: { Cookie: cookies },
-      randomUserAgent: false
+    rawProcessos.each((index, element) => {
+      let numero = $(element).text();
+      listaNumeros.push(numero.trim());
     });
 
-    return objResponse.responseBody;
+    return listaNumeros;
   }
 }
 

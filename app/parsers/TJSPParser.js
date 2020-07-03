@@ -5,17 +5,6 @@ const re = require('xregexp');
 const { BaseParser, removerAcentos, traduzir } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
-
-function getTds(content) {
-  const tds = content.each((element, index) => {
-    if (element.name == 'td') {
-      return element;
-    }
-  });
-
-  return tds.filter(Boolean);
-}
-
 class TJSPParser extends BaseParser {
   /**
    * TJSPParser
@@ -35,10 +24,10 @@ class TJSPParser extends BaseParser {
   }
 
   extrairComarca($) {
-    let comarca = '';
+    let comarca;
 
     comarca = $('tr:contains("Distribuição:")').next('tr').text().strip();
-    comarca = comarca.replace(/.*\s\-\s/g, '');
+    comarca = comarca.replace(/.*\s-\s/g, '');
 
     return removerAcentos(comarca);
   }
@@ -63,7 +52,7 @@ class TJSPParser extends BaseParser {
   }
 
   extrairEnvolvidos($) {
-    let rawEnvolvidosString = '';
+    let rawEnvolvidosString;
     let rawEnvolvidosList = [];
     let envolvidos = [];
 
@@ -71,20 +60,19 @@ class TJSPParser extends BaseParser {
     rawEnvolvidosString = re.replace(rawEnvolvidosString, re(/\s\s\s+/g), ' ');
     rawEnvolvidosString = re.replace(
       rawEnvolvidosString,
-      re(/(\s)(\w+\:)/g),
+      re(/(\s)(\w+:)/g),
       'xa0$2'
     );
 
     rawEnvolvidosList = rawEnvolvidosString.split('xa0');
 
-    envolvidos = rawEnvolvidosList.map((element, index) => {
+    envolvidos = rawEnvolvidosList.map((element) => {
       const match = re.exec(element, re(/(?<tipo>\w+)\:\s(?<nome>.*)/));
       let envolvido = {
         tipo: traduzir(match.groups.tipo),
         nome: match.groups.nome,
       };
       return JSON.parse(JSON.stringify(envolvido));
-      console.log('novo envolvido', match.groups.tipo);
     });
 
     envolvidos = this.preencherOabs($, envolvidos);
@@ -104,7 +92,7 @@ class TJSPParser extends BaseParser {
     movimentosString = $('#tabelaTodasMovimentacoes').text();
 
     return envolvidos.map((element) => {
-      if (element.tipo == 'Advogado') {
+      if (element.tipo === 'Advogado') {
         let regex = re(
           `(${element.nome})\\s(\\(OAB\\s(?<oab>\\d+)\\/SP\\))`,
           'gm'
@@ -125,7 +113,7 @@ class TJSPParser extends BaseParser {
   extrairOabs(envolvidos) {
     let oab = '';
     let oabs = envolvidos.map((element) => {
-      if (element.tipo == 'Advogado') {
+      if (element.tipo === 'Advogado') {
         oab = re.exec(element.nome, re(/\((?<oab>\d+\w+)\)/));
         if (oab) {
           return oab.groups.oab;
@@ -147,7 +135,7 @@ class TJSPParser extends BaseParser {
     const table = $('#tabelaTodasMovimentacoes');
     const tdsList = table.find('tr');
 
-    tdsList.each((index, element) => {
+    tdsList.each((index) => {
       let data = $(
         `#tabelaTodasMovimentacoes > tr:nth-child(${
           index + 1

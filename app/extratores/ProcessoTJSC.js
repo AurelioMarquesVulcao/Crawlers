@@ -64,6 +64,7 @@ class ProcessoTJSC extends ExtratorBase {
       this.logger.info('Fazendo primeira conexão.');
       objResponse = await this.robo.acessar({
         url: `https://esaj.tjsc.jus.br/cpopg/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`,
+        usaProxy: false
       });
       this.logger.info('Conexão ao website concluido.');
       cookies = objResponse.cookies;
@@ -91,6 +92,7 @@ class ProcessoTJSC extends ExtratorBase {
           method: 'GET',
           encoding: 'latin1',
           headers: headers,
+          usaProxy: false
         });
         const $ = cheerio.load(objResponse.responseBody);
         // verifica se há uma tabela de movimentação dentro da pagina.

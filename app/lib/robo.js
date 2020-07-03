@@ -56,6 +56,7 @@ class Requisicao {
             statusCode = res.status;
 
             if (statusCode == 200) {
+              console.log(res);
               const corpo = res.data ? res.data : true;
               resolve({
                 code: 'HTTP_200',

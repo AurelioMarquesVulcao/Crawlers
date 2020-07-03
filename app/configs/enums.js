@@ -27,7 +27,8 @@ module.exports.enums = Object.freeze({
   },
   nomesRobos: {
     TJBAPortal: "TJBAPortal",
-    TJSP: "TJSP"
+    TJSP: "TJSP",
+    TJRS: "TJRS"
   },
   tipoConsulta: {
     Oab: "oab",

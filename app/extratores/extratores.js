@@ -11,6 +11,7 @@ class ExtratorBase {
     this.url = url;
     this.robo = new Robo();
   }
+  
 }
 
 module.exports.ExtratorBase = ExtratorBase;

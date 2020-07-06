@@ -24,18 +24,23 @@ const roboVersao1 = async (numero) => {
 
     // para abrir o navegador use o headless: false
     var browser = await puppeteer.launch({
-        headless: true, slowMo: slow,
+        headless: false, slowMo: slow,
         ignoreHTTPSErrors: true,
-        executablePath: '/usr/bin/chromium-browser',
+        //executablePath: '/usr/bin/chromium-browser',
         args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+        //args: ['--ignore-certificate-errors', '--disable-gpu']
     });
+    console.log('ligou puppeteer');
+    
 
     var page = await browser.newPage();
 
     let preencheTribunal = async () => {
         // deixa a pagina menor a fim de economizar memoria
         await page.goto('https://jte.csjt.jus.br/', {waitUntil: 'networkidle2'})
-        await page.setViewport({ width: 600, height: 8000 })
+        // await page.goto('https://jte.csjt.jus.br/')
+        // await page.setViewport({ width: 600, height: 8000 })
+        console.log('entrou na pagina puppeteer');
         // para esperar carregar o elemento onde fica o tribunal
         // await page.waitFor(50)
         //console.log(!! await page.waitFor('mat-form-field'));

@@ -65,16 +65,17 @@ class ProcJTE extends ExtratorBase {
       
       let $2 = cheerio.load(objResponse.andamentos);
 
-      //dadosProcesso = this.parser.parse($, $2)
+      dadosProcesso = this.parser.parse($, $2)
 
       //console.log(dadosProcesso.andamentos.slice(0,3));
       //console.log(responseDev2);
 
 
       // let envolvidos = this.parser.extraiEnvolvidos($)
-      var processo;
-      processo = dadosProcesso.processo
-      // console.log(processo);
+      //var processo;
+      var processo = dadosProcesso.processo
+      console.log(processo);
+      console.log(dadosProcesso.andamentos.slice(0,3));
       await dadosProcesso.processo.salvar()
       await Andamento.salvarAndamentos(dadosProcesso.andamentos)
       // console.log(processo);
@@ -84,6 +85,8 @@ class ProcJTE extends ExtratorBase {
       console.log(e);
     }
     console.log('extraido o ' + numeroProcesso);
+    
+    
     //  usar return simples apenas para dev
     logger.info('Processos extraidos com sucesso');
     return {

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const HttpsProxyAgent = require('https-proxy-agent');
 const FormData = require('form-data');
 const moment = require('moment');
 
@@ -195,12 +196,13 @@ class Robo {
     }
 
     if (usaProxy)
-      options.proxy = {
+      options.proxy = new HttpsProxyAgent({
         host: 'proxy-proadv.7lan.net',
         port: 8181,
-        auth: { username: 'proadvproxy', password: 'C4fMSSjzKR5v9dzg' },
-      };
+        auth: 'proadvproxy:C4fMSSjzKR5v9dzg'
+      });
 
+    console.log('\n\n-------------', options.proxy, '\n\n')
     options.timeout = 60000;
     return this.requisicao.enviarRequest(options);
   }

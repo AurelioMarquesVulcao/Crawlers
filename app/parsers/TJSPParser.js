@@ -53,8 +53,8 @@ class TJSPParser extends BaseParser {
 
   extrairEnvolvidos($) {
     let rawEnvolvidosString;
-    let rawEnvolvidosList = [];
-    let envolvidos = [];
+    let rawEnvolvidosList;
+    let envolvidos;
 
     rawEnvolvidosString = $('#tablePartesPrincipais > tbody').text().strip();
     rawEnvolvidosString = re.replace(rawEnvolvidosString, re(/\s\s\s+/g), ' ');

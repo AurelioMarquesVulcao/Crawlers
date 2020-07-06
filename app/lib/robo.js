@@ -56,7 +56,9 @@ class Requisicao {
             statusCode = res.status;
 
             if (statusCode == 200) {
-              console.log(res);
+
+              // console.log(res);
+
               const corpo = res.data ? res.data : true;
               resolve({
                 code: 'HTTP_200',
@@ -202,6 +204,7 @@ class Robo {
       };
 
     options.timeout = 60000;
+    console.log(options)
     return this.requisicao.enviarRequest(options);
   }
 }

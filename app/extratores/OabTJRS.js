@@ -6,6 +6,7 @@ const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const re = require('xregexp');
 const axios = require('axios');
+const fs = require('fs');
 
 const {
   BaseException,
@@ -19,8 +20,7 @@ const { TJRSParser } = require('../parsers/TJRSParser');
 
 const saveFileSync = (path, arquivo, encoding) => {
   try {    
-    if(arquivo) {    
-      // , encoding  
+    if(arquivo) {          
       require("fs")
         .writeFileSync(path, arquivo, encoding);
     } else {
@@ -40,46 +40,102 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   }
 
   async resolverCaptchaAudio(oab, url, cookies) {
-    
-    // const captchaResponse = await this.robo.acessar(
-    //   url,
-    //   "GET",
-    //   null,
-    //   true,
-    //   false,
-    //   null,
-    //   { Cookie: cookies }
-    // );    
-    cookies = cookies.replace(/path\=\//g,'').replace(/\s+/g,' ').trim().replace();
 
-    const captchaResponse = await axios({
+    cookies = cookies.replace(/\spath\=\/\;?/g,'');    
+    let audio;
+
+    const imagemResponse = await axios({
+      method: 'get',
+      url: `https://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php?${new Date('2020-07-06').getTime()}`,
+      headers: {
+        Cookie: cookies
+      },
+      responseType: 'arraybuffer'
+    });
+    
+    const somResponse = await axios({
       url,
-      method: "GET",
-      enconding: null,
+      method: "GET",      
+      responseType: "arraybuffer",
       headers: {
         Cookie: cookies.replace(/path\=\//)
       }
-    });
+    }) 
+    
+    // const resQuebrarCaptcha = await this.robo.acessar({
+    //   // url: `http://172.16.16.8:5000/api/solve`,
+    //   url: `http://localhost:5000/api/solve`,
+    //   method: "post",
+    //   encoding: "utf8",
+    //   usaProxy: false,
+    //   usaJson: true,
+    //   params: captcha
+    // });    
 
-    saveFileSync(`captcha_${oab}.wav`, captchaResponse.data, 'binary');
+    audio = Buffer
+      .from(somResponse.data)
+      .toString('base64');    
 
-    const arquivoCaptcha = Buffer.from(captchaResponse.responseBody).toString("base64");
+    console.log(url);
+    console.log();
+    console.log(`Cookie: ${cookies}`);
+    console.log();
+    console.log(audio);
+
+    // let audio = Buffer.from(captchaResponse.data)
+    //   .toString('base64');
+
+    // let audio2 = Buffer.from(fs.readFileSync('./assets/captcha/audiofile.wav')).toString('base64');
+
+    // console.log(audio2);
+
+    // Helper.pred('----');
+
+
+//     console.log('0 - GET', url, `cookie: ${cookies}`);
+//     console.log(1, audio.toString('base64'));
+//     fs.writeFileSync(`./assets/captcha/1.audio.captcha.${oab}.wav`, audio);    
+//     // Helper.pred('teste123');    
+
+//     // console.log('1', captchaResponse.data);
+//     // console.log('2', audio.toString('base64'));
+
+    saveFileSync(`./assets/captcha/audio.captcha.${oab}.wav`, audio, 'base64');
 
     const captcha = {      
-      audio: arquivoCaptcha,
+      audio
     };
 
-    const resQuebrarCaptcha = await this.robo.acessar(
-      `http://172.16.16.8:5000/api/solve`,
-      "post",
-      "utf8",
-      false,
-      true,
-      captcha
-    );
+    console.log(2, captcha);    
 
-    return resQuebrarCaptcha.responseBody;
-  }  
+    // const resQuebrarCaptcha = await this.robo.acessar({
+    //   // url: `http://172.16.16.8:5000/api/solve`,
+    //   url: `http://localhost:5000/api/solve`,
+    //   method: "post",
+    //   encoding: "utf8",
+    //   usaProxy: false,
+    //   usaJson: true,
+    //   params: captcha
+    // });
+
+    const resQuebrarCaptcha = await axios({
+      // url: `http://172.16.16.8:5000/api/solve`,
+      url: `http://localhost:5000/api/solve`,
+      method: "POST",
+      encoding: "utf8",
+      data: captcha
+    });
+
+    console.log(3, resQuebrarCaptcha.data);
+    // Helper.pred('---');
+
+//     // return resQuebrarCaptcha.responseBody;
+
+    return {
+      texto: '0542',
+      sucesso: true
+    };
+  }
 
   extrairLinkCaptcha(content) {
     let url;
@@ -95,22 +151,65 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   async extrair(numeroOab) {
     try {
    
-      let responseCaptcha;
-      let objResponse = await this.robo.acessar({
+      let responseCaptcha, objResponse, urlCaptcha;      
+
+      objResponse = await this.robo.acessar({
         url: this.url,
         method: 'GET',
-        usaProxy: false,
+        usaProxy: true,
         encoding: 'latin1',
       });
-      
-      let urlCaptcha = this.extrairLinkCaptcha(objResponse.responseBody);
+
+      urlCaptcha = this.extrairLinkCaptcha(objResponse.responseBody);
 
       if (urlCaptcha) {
         responseCaptcha = await this.resolverCaptchaAudio(numeroOab, urlCaptcha, objResponse.cookies.join(';'));
       }
 
       if (responseCaptcha) {
+        console.log("teste", responseCaptcha);
+       
 
+        let post = {
+          "nome_comarca" : "Tribunal de Justiça",
+          "versao" : "",
+          "versao_fonetica" : "1",
+          "tipo" : "2",
+          "id_comarca" : "700",
+          "intervalo_movimentacao" : "15",
+          "N1_var2" : "1",
+          "id_comarca1" : "700",
+          "num_processo_mask" : "",
+          "num_processo" : "",
+          "numCNJ" : "N",
+          "id_comarca2" : "700",
+          "uf_oab" : "RS",
+          "num_oab" : "26629",
+          "foro" : "0",
+          "N1_var2_1" : "1",
+          "intervalo_movimentacao_1" : "15",
+          "ordem_consulta" : "1",
+          "N1_var" : "",
+          "id_comarca3" : "todas",
+          "nome_parte" : "",
+          "N1_var2_2" : "1",
+          "intervalo_movimentacao_2" : "0",
+          "code": responseCaptcha.texto
+        };      
+
+        if (responseCaptcha.sucesso) {
+          objResponse = await this.robo.acessar({
+            url: this.url,
+            method: 'GET',
+            usaProxy: true,
+            encoding: 'latin1',
+            params: post,
+            usaJson: true
+          });
+
+          console.log(objResponse.responseBody);
+          Helper.pred('tyeste');
+        }
       }
 
       let resultados = [];

@@ -30,6 +30,12 @@ module.exports.enums = Object.freeze({
     TJSP: "TJSP",
     TJRS: "TJRS"
   },
+  robos: {
+    TJRS: {
+      nome: "TJRS",
+      fila: "oab.TJRS.extracao.novos"
+    }
+  },
   tipoConsulta: {
     Oab: "oab",
     Processo: "processo"

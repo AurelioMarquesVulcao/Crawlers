@@ -17,7 +17,7 @@ class ExtratorFactory {
       extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg/open.do', isDebug);
     }
 
-    if (/oab.TJRS/.test(fila)) {
+    if (/oab.TJRS/.test(fila)) {      
       extrator = new OabTJRS('https://www.tjrs.jus.br/site_php/consulta/index.php', isDebug);
     }
 

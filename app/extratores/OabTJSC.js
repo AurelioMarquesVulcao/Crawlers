@@ -49,10 +49,11 @@ class OabTJSC extends ExtratorBase {
       objResponse = await this.robo.acessar({
         url: this.url,
         method: 'GET',
-        usaProxy: false,
+        usaProxy: true,
         encoding: 'latin1',
       });
 
+      console.log(objResponse);
       cookies = objResponse.cookies;
       cookies = cookies.map((element) => {
         return element.replace(/;.*/, '');
@@ -196,7 +197,7 @@ class OabTJSC extends ExtratorBase {
       url: 'https://esaj.tjsc.jus.br/cpopg/captchaControleAcesso.do',
       method: 'POST',
       encoding: 'latin1',
-      usaProxy: false,
+      usaProxy: true,
       headers: {
         Cookie: cookies,
         Accept:
@@ -239,7 +240,7 @@ class OabTJSC extends ExtratorBase {
         url: url,
         method: 'GET',
         enconding: 'latin1',
-        usaProxy: false,
+        usaProxy: true,
         headers: {
           Cookie: cookies,
           Accept:

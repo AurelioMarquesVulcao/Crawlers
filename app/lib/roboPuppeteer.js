@@ -26,14 +26,15 @@ const roboVersao1 = async (numero) => {
     var browser = await puppeteer.launch({
         headless: true, slowMo: slow,
         ignoreHTTPSErrors: true,
-        args: ['--ignore-certificate-errors']
+        executablePath: '/usr/bin/chromium-browser',
+        args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
     });
 
     var page = await browser.newPage();
 
     let preencheTribunal = async () => {
         // deixa a pagina menor a fim de economizar memoria
-        await page.goto('https://jte.csjt.jus.br/')
+        await page.goto('https://jte.csjt.jus.br/', {waitUntil: 'networkidle2'})
         await page.setViewport({ width: 600, height: 8000 })
         // para esperar carregar o elemento onde fica o tribunal
         // await page.waitFor(50)
@@ -113,7 +114,7 @@ const roboVersao1 = async (numero) => {
     let html2 = await page.evaluate(() => {
         // let text = document.querySelector('#divMovBrowser1').innerText
         let text = document.querySelector('html').innerHTML;
-        return text 
+        return text
     })
     //await console.log(html2);
     await console.log('andamentos ok');

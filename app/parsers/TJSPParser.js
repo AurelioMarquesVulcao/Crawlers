@@ -67,7 +67,7 @@ class TJSPParser extends BaseParser {
     rawEnvolvidosList = rawEnvolvidosString.split('xa0');
 
     envolvidos = rawEnvolvidosList.map((element) => {
-      const match = re.exec(element, re(/(?<tipo>\w+)\:\s(?<nome>.*)/));
+      const match = re.exec(element, re(/(?<tipo>\w+):\s(?<nome>.*)/));
       let envolvido = {
         tipo: traduzir(match.groups.tipo),
         nome: match.groups.nome,
@@ -75,7 +75,19 @@ class TJSPParser extends BaseParser {
       return JSON.parse(JSON.stringify(envolvido));
     });
 
-    envolvidos = this.preencherOabs($, envolvidos);
+    // envolvidos = this.preencherOabs($, envolvidos);
+    envolvidos = envolvidos.map(element => {
+      let oab = this.resgatarOab(element.nome, $);
+
+      if (oab) {
+        return {
+          tipo: element.tipo,
+          nome: `(${oab}) ${element.nome}`
+        }
+      }
+
+      return element;
+    });
 
     envolvidos = envolvidos.map((element) => {
       return {
@@ -87,29 +99,33 @@ class TJSPParser extends BaseParser {
     return envolvidos;
   }
 
-  preencherOabs($, envolvidos) {
-    let movimentosString = '';
-    movimentosString = $('#tabelaTodasMovimentacoes').text();
+  /**
+   * Verifica se há uma oab correspondente ao nome na tabela de andamentos
+   * @param {String} nome nome do envolvido
+   * @param {cheerio} $ objeto do cheerio
+   * @returns {string|boolean}
+   */
+  resgatarOab(nome, $) {
+    let movimentacoesEmtexto = $('#tabelaTodasMovimentacoes').text();
+    let advMatch = re.exec(
+      movimentacoesEmtexto,
+      re(`(?<nome>${nome})\\s\\(OAB\\s(?<oab>.+)\\)`)
+    );
 
-    return envolvidos.map((element) => {
-      if (element.tipo === 'Advogado') {
-        let regex = re(
-          `(${element.nome})\\s(\\(OAB\\s(?<oab>\\d+)\\/SP\\))`,
-          'gm'
-        );
-        let oab = re.exec(movimentosString, regex);
-        if (oab) {
-          element.nome = removerAcentos(`(${oab[3]}SP) ${element.nome}`);
-        } else {
-          element.nome = removerAcentos(element.nome);
-        }
-      } else {
-        element.nome = removerAcentos(element.nome);
-      }
-      return element;
-    });
+    if (advMatch) {
+      let oab = advMatch.oab;
+      oab = re.exec(
+        oab,
+        re(`(?<codigo>[0-9]+)(?<tipo>[A-Z]?.[A-Z]?)(?<seccional>[A-Z]{2})`)
+      );
+
+      oab = `${oab.codigo}${oab.tipo.replace(/\W/, '')}${oab.seccional}`
+
+      return oab;
+    }
+
+    return false;
   }
-
   extrairOabs(envolvidos) {
     let oab = '';
     let oabs = envolvidos.map((element) => {
@@ -126,9 +142,9 @@ class TJSPParser extends BaseParser {
     return oabs.filter(Boolean);
   }
 
-  extrairStatus(content) {
-    return 'Não informado.';
-  }
+  // extrairStatus(content) {
+  //   return 'Não informado.';
+  // }
 
   extrairAndamentos($, dataAtual, numeroProcesso) {
     let andamentos = [];
@@ -176,7 +192,7 @@ class TJSPParser extends BaseParser {
     const detalhes = this.extrairDetalhes(content);
     const envolvidos = this.extrairEnvolvidos(content);
     const oabs = this.extrairOabs(envolvidos);
-    const status = this.extrairStatus(content);
+    // const status = this.extrairStatus(content); //ainda nao encontrado uma ocorrencia em que apareça, mas se precisar ta ai
     const andamentos = this.extrairAndamentos(
       content,
       dataAtual,

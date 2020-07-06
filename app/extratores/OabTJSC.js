@@ -168,33 +168,26 @@ class OabTJSC extends ExtratorBase {
     const captchaHandler = new CaptchaHandler(5, 5000, 'OabTJSC', {
       numeroDaOab: this.numeroDaOab,
     });
-    try {
-      let captcha;
-      captcha = await captchaHandler
-        .resolveRecaptchaV2(
-          // captcha = await antiCaptchaHandler(
-          'https://esaj.tjsc.jus.br/cpopg/open.do',
-          this.dataSiteKey,
-          '/'
-        )
-        .catch((error) => {
-          throw error;
-        });
+    let captcha;
+    captcha = await captchaHandler
+      .resolveRecaptchaV2(
+        // captcha = await antiCaptchaHandler(
+        'https://esaj.tjsc.jus.br/cpopg/open.do',
+        this.dataSiteKey,
+        '/'
+      )
+      .catch((error) => {
+        throw error;
+      });
 
-      if (!captcha.sucesso) {
-        throw new AntiCaptchaResponseException(
-          'Falha na resposta',
-          'Nao foi possivel recuperar a resposta para o captcha'
-        );
-      }
-
-      return captcha.gResponse;
-    } catch (error) {
-      if (error instanceof AntiCaptchaResponseException) {
-        throw new AntiCaptchaResponseException(error.code, error.message);
-      }
-      throw error;
+    if (!captcha.sucesso) {
+      throw new AntiCaptchaResponseException(
+        'Falha na resposta',
+        'Nao foi possivel recuperar a resposta para o captcha'
+      );
     }
+
+    return captcha.gResponse;
   }
 
   async getCaptchaUuid(cookies) {

@@ -64,7 +64,7 @@ class ProcessoTJSC extends ExtratorBase {
       this.logger.info('Fazendo primeira conexão.');
       objResponse = await this.robo.acessar({
         url: `https://esaj.tjsc.jus.br/cpopg/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`,
-        usaProxy: false
+        usaProxy: false,
       });
       this.logger.info('Conexão ao website concluido.');
       cookies = objResponse.cookies;
@@ -92,7 +92,7 @@ class ProcessoTJSC extends ExtratorBase {
           method: 'GET',
           encoding: 'latin1',
           headers: headers,
-          usaProxy: false
+          usaProxy: false,
         });
         const $ = cheerio.load(objResponse.responseBody);
         // verifica se há uma tabela de movimentação dentro da pagina.
@@ -164,33 +164,26 @@ class ProcessoTJSC extends ExtratorBase {
     const captchaHandler = new CaptchaHandler(5, 5000, 'ProcessoTJSC', {
       numeroDoProcesso: this.numeroDoProcesso,
     });
-    try {
-      let captcha;
-      captcha = await captchaHandler
-        .resolveRecaptchaV2(
-          // captcha = await antiCaptchaHandler(
-          'https://esaj.tjsc.jus.br/cpopg/open.do',
-          this.dataSiteKey,
-          '/'
-        )
-        .catch((error) => {
-          throw error;
-        });
+    let captcha;
+    captcha = await captchaHandler
+      .resolveRecaptchaV2(
+        // captcha = await antiCaptchaHandler(
+        'https://esaj.tjsc.jus.br/cpopg/open.do',
+        this.dataSiteKey,
+        '/'
+      )
+      .catch((error) => {
+        throw error;
+      });
 
-      if (!captcha.sucesso) {
-        throw new AntiCaptchaResponseException(
-          'Falha na resposta',
-          'Nao foi possivel recuperar a resposta para o captcha'
-        );
-      }
-
-      return captcha.gResponse;
-    } catch (error) {
-      if (error instanceof AntiCaptchaResponseException) {
-        throw new AntiCaptchaResponseException(error.code, error.message);
-      }
-      throw error;
+    if (!captcha.sucesso) {
+      throw new AntiCaptchaResponseException(
+        'Falha na resposta',
+        'Nao foi possivel recuperar a resposta para o captcha'
+      );
     }
+
+    return captcha.gResponse;
   }
 }
 

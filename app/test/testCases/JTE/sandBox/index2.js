@@ -24,12 +24,10 @@ const processaNumero2 = (numero) => {
     }
 }
 //const entrada = processaNumero('0101091-44.2017.5.01.0048');
-const roboVersao1 = async (numero) => {
+const roboVersao1 = async () => {
     console.time('robo-1')
     // if (numero.length>19){entrada = processaNumero(numero);} else {entrada = processaNumero2(numero);}
-    entrada = processaNumero2(numero)
-    // entrada = processaNumero(numero);
-    console.log(entrada);
+
 
     const slow = numeroAleatorio(200, 350);
     const delay = numeroAleatorio(10, 40);
@@ -81,57 +79,102 @@ const roboVersao1 = async (numero) => {
         }
     }
     await logaTribunal()
-    let preencheProcesso = async () => {
+    let preencheProcesso = async (numero) => {
+        let entrada = processaNumero2(numero)
+        console.log(entrada);
         await page.waitFor(900)
         await page.waitFor('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > div')
         // aqui inicio o preenchimento do processo
-        await page.type('#campoNumeroProcesso', `${entrada.numeroprocesso}`, { delay: delay })
-        await page.type('#campoAno', `${entrada.ano}`, { delay: delay })
-        await page.type('#campoVara', `${entrada.vara}`, { delay: delay })
+
+        const input2 = await page.$('#campoNumeroProcesso');
+        await input2.click({ clickCount: 3 })
+        await page.type('#campoNumeroProcesso', `${entrada.numeroprocesso}`)
+
+        const input3 = await page.$('#campoAno');
+        await input3.click({ clickCount: 3 })
+        await page.type('#campoAno', `${entrada.ano}`)
+
+        const input4 = await page.$('#campoVara');
+        await input4.click({ clickCount: 3 })
+        await page.type('#campoVara', `${entrada.vara}`)
+
         await page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button', { delay: delay })
         //await page.waitFor('#listaProcessoEncontrado')
-        await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
+        //await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
+        await page.waitFor(900)
+        await page.waitFor(900)
+
+
+        // aguardo o retorno se o processo existir
+            // await page.waitFor('#listaProcessoEncontrado > resumo-processo > ion-grid > ion-row')
+            // await page.waitFor('#listaProcessoEncontrado')
+            // await page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
+
+            // await page.click('#listaProcessoEncontrado > resumo-processo > ion-grid > ion-row > ion-col:nth-child(2)')
+            //await page.click('#mat-tab-label-0-0')
+            // await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
+            // se o processo existir pego os dados gerais.
+            let html1 = await page.evaluate(() => {
+                // let text = document.querySelector('#mat-tab-content-0-0 > div > detalhes-aba-geral > div').innerText;
+                let text = document.querySelector('html').innerText;
+                return { text, }
+            })
+            await console.log('processo ok');
+            await console.log(html1);
+            //await page.click('#menu-content > detalhes-processo > ion-segment > ion-segment-button:nth-child(2)')
+            await page.click('#mat-tab-label-0-1')
+            await page.waitFor('#divMovBrowser1 > ion-grid > ion-row > ion-col')
+            // pego os andamentos do processo
+            let html2 = await page.evaluate(() => {
+                // let text = document.querySelector('#divMovBrowser1').innerText
+                let text = document.querySelector('html').innerText;
+                return { text, }
+            })
+            await console.log(html2);
+            await console.log('andamentos ok');
     }
 
-    let buscaProcesso = async () => {
+    
+    let buscaProcesso = async (numero) => {
         try {
-            await preencheProcesso()
+            await preencheProcesso(numero)
+            
         } catch (e) {
             // temporariameten estou entando infinitamente
-            await preencheProcesso()
+            await preencheProcesso(numero)
+            
         }
     }
+    // await buscaProcesso()
+    //await pegaDados()
 
-    // aguardo o retorno se o processo existir
-    // await page.waitFor('#listaProcessoEncontrado > resumo-processo > ion-grid > ion-row')
-    // await page.waitFor('#listaProcessoEncontrado')
-    await page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
-
-    // await page.click('#listaProcessoEncontrado > resumo-processo > ion-grid > ion-row > ion-col:nth-child(2)')
-    //await page.click('#mat-tab-label-0-0')
-    await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
-    // se o processo existir pego os dados gerais.
-    let html1 = await page.evaluate(() => {
-        // let text = document.querySelector('#mat-tab-content-0-0 > div > detalhes-aba-geral > div').innerText;
-        let text = document.querySelector('html').innerHTML;
-        return { text, }
-    })
-    await console.log('processo ok');
-    await console.log(html1);
-    //await page.click('#menu-content > detalhes-processo > ion-segment > ion-segment-button:nth-child(2)')
-    await page.click('#mat-tab-label-0-1')
-    await page.waitFor('#divMovBrowser1 > ion-grid > ion-row > ion-col')
-    // pego os andamentos do processo
-    let html2 = await page.evaluate(() => {
-        // let text = document.querySelector('#divMovBrowser1').innerText
-        let text = document.querySelector('html').innerHTML;
-        return { text, }
-    })
-    await console.log(html2);
-    await console.log('andamentos ok');
+    let numeros = [
+        "02921004920015020074",
+        "10005645620195020602",
+        "10021355620165020056",
+        "10020581420175020088",
+        "10006547220165020601",
+        "10011753420185020023",
+        "10018211720165020087",
+        "10014278220175020084",
+        "10007620820185020383",
+        "10002124920175020447",
+        "10003897420185020383",
+        "10000581820195020461",
+        "00849009720025020022",
+        "10002168120185020211",
+        "10009757720185020362",
+        "10014988720175020374",
+        "10002911720195020040",
+        "10000242020195020501",
+        "10016186920175020362",
+        "10003709620185020018"]
+    for (let i = 0; i < numeros.length; i++) {
+        await buscaProcesso(numeros[i])
+    }
 
     //await page.close()
-    await browser.close()
+    // await browser.close()
 
     console.timeEnd('robo-1')
     // return { geral: html1, andamentos: html2 }
@@ -141,7 +184,7 @@ const roboVersao1 = async (numero) => {
     //await browser.close()
 
 }
-//roboVersao1("02921004920015020074")
+roboVersao1()
 
 let laco = async () => {
     let numeros = [
@@ -171,7 +214,7 @@ let laco = async () => {
         //console.log(processaNumero2(numeros[i]));
     }
 }
-laco()
+//laco()
 // funções paralelas
 // console.log(laco());
 // funções complementares

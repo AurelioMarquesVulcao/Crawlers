@@ -5,7 +5,7 @@ const moment = require('moment');
 const { TJSCParser } = require('../parsers/TJSCParser');
 
 const dataAtual = moment().format('YYYY-MM-DD');
-const dataFormatada = dataAtual;
+const dataFormatada = new Date(dataAtual).toISOString();
 
 const teste = (numeroProcesso) => {
   const codigoHtml = fs.readFileSync(

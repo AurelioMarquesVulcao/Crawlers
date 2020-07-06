@@ -85,10 +85,11 @@ class Requisicao {
           }
         })
         .catch((err) => {
+          console.log('Robo erro', err);
           resolve({
             code: err.code,
-            status: 502,
-            message: err.message,
+            status: err.response.status,
+            message: err.response.statusText,
             responseContent: null,
             responseBody: '',
           });

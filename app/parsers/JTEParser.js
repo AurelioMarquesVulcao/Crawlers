@@ -43,7 +43,7 @@ class JTEParser extends BaseParser {
   // funcao secundaria - organiza os dados da capa
   capa($) {
     let capa = {
-      uf: "", // inserir uf na raspagem do puppeteer
+      uf: this.estado($), // inserir uf na raspagem do puppeteer
       comarca: "", // perguntar onde extraio a comarca
       vara: this.extraiVaraCapa($).trim(),
       fase: '', // perguntar onde extraio a comarca
@@ -124,6 +124,14 @@ class JTEParser extends BaseParser {
     else return teste
   }
 
+  estado($){
+    let resultado = 'Estado indeterminado'
+    let dados = this.detalhes($).tribunal
+    if (dados == 2 || dados == 5) resultado = 'SP'
+    if (dados == 1) resultado = 'RJ'
+    return resultado
+  }
+  
   // precisa de melhorias para capturar corretamente a vara.
   extraiVaraCapa($) {
     let resultado = "não possui vara"
@@ -162,7 +170,7 @@ class JTEParser extends BaseParser {
   extraiNumeroProcesso($) {
     let datas = [];
     let resultado = ''
-    $('detalhes-aba-geral span').each(async function (element) {
+    $('#mat-tab-content-0-0 > div > detalhes-aba-geral > div > span.item-painel-titulo').each(async function (element) {
       let numero = $(this).text().split("\n")[0];
       if (!!numero) resultado = numero
     })

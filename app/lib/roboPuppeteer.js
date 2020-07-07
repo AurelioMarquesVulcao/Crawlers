@@ -11,6 +11,13 @@ const processaNumero2 = (numero) => {
         vara: vara
     }
 }
+const escolheEstado = (numero) => {
+    let resultado;
+    numero = numero.slice(numero.length-6, numero.length-4)
+    if (numero == 01) resultado = 2     // Rio de Janeiro
+    if (numero == 02 || numero == 05) resultado = 03    // São Paulo
+    return resultado
+}
 
 const roboVersao1 = async (numero) => {
     console.time('robo-1')
@@ -54,7 +61,7 @@ const roboVersao1 = async (numero) => {
         await page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper', { slowMo: slow })
         // aqui que escolho o tribunal de 0 a 24 --- option-2 --- está marcado opcao 2 -- rio
         await page.waitFor(900)
-        await page.click('#mat-option-3', { slowMo: slow })
+        await page.click(`#mat-option-${escolheEstado(numero)}`, { slowMo: slow })
         // clica no confirmar - esse seletor pode quebrar ficar atento
         await page.click('ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span')
         // aqui a pagia faz uma requisicao ao tribunal -- costuma quebrar aqui.

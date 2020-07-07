@@ -196,13 +196,14 @@ class Robo {
     }
 
     if (usaProxy)
-      options.proxy = new HttpsProxyAgent({
-        host: 'proxy-proadv.7lan.net',
-        port: 8181,
-        auth: 'proadvproxy:C4fMSSjzKR5v9dzg'
-      });
+      options.httpsAgent = new HttpsProxyAgent(
+        'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181'
+      );
+    //   host: 'proxy-proadv.7lan.net',
+    //   port: 8181,
+    //   auth: 'proadvproxy:C4fMSSjzKR5v9dzg'
+    // });
 
-    console.log('\n\n-------------', options.proxy, '\n\n')
     options.timeout = 60000;
     return this.requisicao.enviarRequest(options);
   }

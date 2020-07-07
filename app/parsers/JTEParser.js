@@ -129,6 +129,7 @@ class JTEParser extends BaseParser {
     let dados = this.detalhes($).tribunal
     if (dados == 2 || dados == 5) resultado = 'SP'
     if (dados == 1) resultado = 'RJ'
+    if (dados == 21)
     return resultado
   }
   

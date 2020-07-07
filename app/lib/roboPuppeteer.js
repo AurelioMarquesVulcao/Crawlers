@@ -11,16 +11,17 @@ const processaNumero2 = (numero) => {
         vara: vara
     }
 }
+
 const escolheEstado = (numero) => {
     let resultado;
     numero = numero.slice(numero.length-6, numero.length-4)
     if (numero == 01) resultado = 2     // Rio de Janeiro
     if (numero == 02 || numero == 05) resultado = 03    // São Paulo
+    if (numero == 21) resultado = 22    // Rio Grande do Norte
     return resultado
 }
 
 const roboVersao1 = async (numero) => {
-    console.time('robo-1')
     entrada = processaNumero2(numero)
     console.log(entrada);
 
@@ -37,6 +38,7 @@ const roboVersao1 = async (numero) => {
         args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
         //args: ['--ignore-certificate-errors', '--disable-gpu']
     });
+    // se tirar isso ira travar a aplicacao
     console.log('ligou puppeteer');
     
 
@@ -47,6 +49,8 @@ const roboVersao1 = async (numero) => {
         await page.goto('https://jte.csjt.jus.br/', {waitUntil: 'networkidle2'})
         // await page.goto('https://jte.csjt.jus.br/')
         // await page.setViewport({ width: 600, height: 8000 })
+        
+        // se tirar isso ira travar a aplicacao
         console.log('entrou na pagina puppeteer');
         // para esperar carregar o elemento onde fica o tribunal
         // await page.waitFor(50)
@@ -132,7 +136,6 @@ const roboVersao1 = async (numero) => {
     await console.log('andamentos ok');
     // await page.close()
     await browser.close()
-    console.timeEnd('robo-1')
     return { geral: html1, andamentos: html2 }
 }
 

@@ -1,23 +1,10 @@
 const mongoose = require("mongoose");
-const {
-  enums
-} = require("../../configs/enums");
-const {
-  GerenciadorFila
-} = require("../../lib/filaHandler");
-const {
-  ExtratorFactory
-} = require("../../extratores/extratorFactory");
-const {
-  Extracao
-} = require("../../models/schemas/extracao");
-const {
-  Helper,
-  Logger
-} = require("../../lib/util");
-const {
-  LogExecucao
-} = require('../../lib/logExecucao');
+const { enums } = require("../../configs/enums");
+const { GerenciadorFila } = require("../../lib/filaHandler");
+const { ExtratorFactory } = require("../../extratores/extratorFactory");
+const { Extracao } = require("../../models/schemas/extracao");
+const { Helper, Logger } = require("../../lib/util");
+const { LogExecucao } = require('../../lib/logExecucao');
 
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
@@ -41,9 +28,9 @@ const logarExecucao = async (execucao) => {
     let logger = new Logger(
       'info',
       'logs/OabJTE/OabJTEInfo.log', {
-        nomeRobo: enums.nomesRobos.JTE,
-        NumeroOab: message.NumeroOab,
-      }
+      nomeRobo: enums.nomesRobos.JTE,
+      NumeroOab: message.NumeroOab,
+    }
     );
     try {
       logger.info('Mensagem recebida');
@@ -83,7 +70,7 @@ const logarExecucao = async (execucao) => {
       ch.ack(msg);
     } catch (e) {
       console.log(e);
-      
+
       logger.info('Encontrado erro durante a execução');
       logger.info(`Error: ${e.message}`);
       logger.info('Reconhecendo mensagem ao RabbitMQ');

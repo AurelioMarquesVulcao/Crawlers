@@ -18,6 +18,8 @@ const escolheEstado = (numero) => {
     if (numero == 01) resultado = 2     // Rio de Janeiro
     if (numero == 02 || numero == 05) resultado = 03    // São Paulo
     if (numero == 21) resultado = 22    // Rio Grande do Norte
+    if (numero == 15) resultado = 16    // São Paulo
+    if (numero == 03) resultado = 4    // São Paulo
     return resultado
 }
 
@@ -32,7 +34,7 @@ const roboVersao1 = async (numero) => {
 
     // para abrir o navegador use o headless: false
     var browser = await puppeteer.launch({
-        headless: false, slowMo: slow,
+        headless: true, slowMo: slow,
         ignoreHTTPSErrors: true,
         //executablePath: '/usr/bin/chromium-browser',
         args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']

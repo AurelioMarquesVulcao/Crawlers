@@ -124,15 +124,17 @@ class JTEParser extends BaseParser {
     else return teste
   }
 
-  estado($){
+  estado($) {
     let resultado = 'Estado indeterminado'
     let dados = this.detalhes($).tribunal
     if (dados == 2 || dados == 5) resultado = 'SP'
     if (dados == 1) resultado = 'RJ'
-    if (dados == 21)
-    return resultado
+    if (dados == 15) resultado = 'SP'
+    if (dados == 03) resultado = 'MG'
+    if (dados == 21) resultado = 'RN'
+      return resultado
   }
-  
+
   // precisa de melhorias para capturar corretamente a vara.
   extraiVaraCapa($) {
     let resultado = "não possui vara"
@@ -251,28 +253,38 @@ class JTEParser extends BaseParser {
     return numero
   }
   extraiAndamento($) {
-    let resultado = []
+    let resultado = [];
+    let dados = [];
     $('ion-item div').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos)
       // console.log(andamentos.length);
-      if (andamentos.length > 0) resultado.push(andamentos)
+      if (andamentos.length > 0) dados.push(andamentos)
     })
-    // console.log(resultado.length);
-    // console.log(resultado);
+    
+    // verifica duplicidade
+    let c = 0;
+    for (let i = 0; i < dados.length; i++) {
+      for (let j = 0; j < dados.length; j++) {
+        if (dados[i][0] === dados[j][0] && i != j) {
+          c++
+          dados[i][0] = dados[j] + ' [' + c + ']'
+        }
+      }
+    }
+    resultado = dados
     return resultado
   }
 
   extraiDataAndamento($) {
-    let resultado = []
+    let resultado = [];
+
     $('ion-text h4').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos)
       // console.log(andamentos.length);
       if (andamentos.length > 0) resultado.push(andamentos)
     })
-    // console.log(resultado.length);
-    // console.log(resultado);
     return resultado
   }
 
@@ -290,8 +302,6 @@ class JTEParser extends BaseParser {
       }
     }
     // com essas linhas de código abaixo eu não preciso remover as linhas vazias dos array's
-    // precisando de menos código em todo o parse.
-    // remover códigos retundantes referentes a isso.
     for (let j of limpo) {
       if (j.length > 2) {
         resultado.push(j)

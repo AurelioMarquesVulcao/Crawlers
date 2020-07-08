@@ -27,8 +27,10 @@ class ProcJTE extends ExtratorBase {
   }
 
 
-  async extrair(NumeroOab) {
-    let numeroProcesso = NumeroOab
+  async extrair(numeroProcesso) {
+    console.log(numeroProcesso);
+    
+    // let numeroProcesso = NumeroOab
     let dadosProcesso;
     try {
 
@@ -36,10 +38,10 @@ class ProcJTE extends ExtratorBase {
         'info',
         'logs/ProcJTE/ProcJTE.log', {
         nomeRobo: enums.nomesRobos.JTE,
-        NumeroOab: NumeroOab,
+        numeroProcesso: numeroProcesso,
       }
       );
-      let objResponse = await RoboPuppeteer(NumeroOab)
+      let objResponse = await RoboPuppeteer(numeroProcesso)
 
       //Estou carregando paginas locais até resolver o Puppeteer.
       let $ = cheerio.load(objResponse.geral);
@@ -55,15 +57,15 @@ class ProcJTE extends ExtratorBase {
       // let envolvidos = this.parser.extraiEnvolvidos($)
       //var processo;
       var processo = dadosProcesso.processo
-      console.log(processo);
-      console.log(dadosProcesso.andamentos.slice(0, 1));
+      //console.log(processo);
+      //console.log(dadosProcesso.andamentos.slice(0, 10));
       await dadosProcesso.processo.salvar()
       await Andamento.salvarAndamentos(dadosProcesso.andamentos)
       // console.log(processo);
 
 
     } catch (e) {
-      console.log(e);
+      //console.log(e);
     }
     console.log('extraido o ' + numeroProcesso);
 
@@ -77,18 +79,6 @@ class ProcJTE extends ExtratorBase {
       logs: logger.logs
     };
 
-
-
-
-    // return Promise.all(processo).then((args) => {
-    //   logger.info('Processos extraidos com sucesso');
-    //   return {
-    //     resultado: args,
-    //     sucesso: true,
-    //     detalhes: '',
-    //     logs: logger.logs
-    //   };
-    // });
   } // End extrair function
 
 
@@ -97,7 +87,7 @@ module.exports.ProcJTE = ProcJTE;
 
 // DEV START'S FOR PROJECT TEST and development
 // (async () => {
-//   await new ProcJTE().extrair("02921004920015020074")
+//   await new ProcJTE().extrair("00021625020145020016")
 // })()
 
 

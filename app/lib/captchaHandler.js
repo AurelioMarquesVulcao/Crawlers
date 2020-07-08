@@ -537,6 +537,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
         return resultado;
       }
       tentativas++;
+      console.log(resultado);
       await sleep(10000);
       // } while (tentativas < maxTentativas);
     } while (true);

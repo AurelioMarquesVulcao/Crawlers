@@ -2,6 +2,8 @@ const Crypto = require('crypto-js');
 const winston = require('winston');
 const moment = require('moment');
 
+const { Token } = require('../models/schemas/token');
+
 const { enums } = require('../configs/enums');
 const { Robo } = require('../lib/robo');
 
@@ -28,12 +30,47 @@ class Helper {
     this.exit(signal);
   }
 
+  static async resgatarNovoToken() {
+    const robo = new Robo();
+    return robo.acessar({
+      url: enums.bigdataUrls.login,
+      method: 'POST',
+      headers: {
+        'User-Agent': 'client',
+        'Content-Type': 'application/json'
+      },
+      usaJson: true,
+      params: {
+        login: '', // TODO recuperar login do Big Data
+        senha: '', // TODO recuperar pswrd do Big Data
+      },
+    });
+  }
+
   static async enviarFeedback(msg) {
     const robo = new Robo();
+    let resposta = await Token.hasValid();
+    let token;
+
+    if (resposta.sucesso) {
+      token = resposta.token;
+    } else {
+      resposta = await this.resgatarNovoToken();
+      if (resposta.responseBody.Sucesso) {
+        await new Token({ token: resposta.responseBody.Token }).save();
+      } else {
+        console.log('Não foi possivel recuperar o Token');
+        process.exit(1);
+      }
+    }
+
     return await robo.acessar({
       url: enums.bigdataUrls.resultadoConsulta,
       method: 'POST',
       encoding: '',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       usaProxy: false,
       usaJson: true,
       params: msg,

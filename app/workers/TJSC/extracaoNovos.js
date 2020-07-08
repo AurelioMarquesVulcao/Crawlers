@@ -58,9 +58,6 @@ const logarExecucao = async (execucao) => {
         );
       });
       logger.info('Resposta enviada ao BigData');
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
-      logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
       await logarExecucao({
         Mensagem: message,
@@ -70,13 +67,13 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSC,
       });
+      logger.info('Reconhecendo mensagem ao RabbitMQ');
+      ch.ack(msg);
+      logger.info('Mensagem reconhecida');
     } catch (e) {
       console.log('ERRU', e.code, e.message, '\n\n', e);
       logger.info('Encontrado erro durante a execução');
       logger.info(`Error: ${e.message}`);
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
-      logger.info('Mensagem reconhecida');
       logger.info('Finalizando proceso');
       await logarExecucao({
         LogConsultaId: message.LogConsultaId,
@@ -88,6 +85,9 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSC,
       });
+      logger.info('Reconhecendo mensagem ao RabbitMQ');
+      ch.ack(msg);
+      logger.info('Mensagem reconhecida');
     }
   });
 })();

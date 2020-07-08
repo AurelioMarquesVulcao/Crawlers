@@ -102,7 +102,7 @@ class OabTJSC extends ExtratorBase {
             this.logger.info(
               `Enviando processo ${processo} a fila de extração.`
             );
-            resultados.push(Promise.resolve(processo));
+            resultados.push(Promise.resolve({numeroProcesso: processo}));
           }
 
           //resultados = await this.extrairProcessos(listaProcessos, cookies);

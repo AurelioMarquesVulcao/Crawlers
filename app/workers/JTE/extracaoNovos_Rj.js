@@ -5,12 +5,16 @@ const { ExtratorFactory } = require("../../extratores/extratorFactory");
 const { Extracao } = require("../../models/schemas/extracao");
 const { Helper, Logger } = require("../../lib/util");
 const { LogExecucao } = require('../../lib/logExecucao');
+const puppeteer = require('puppeteer');
 
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
 }
 
+
 (async () => {
+
+
   mongoose.connect(enums.mongo.connString, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -22,6 +26,8 @@ const logarExecucao = async (execucao) => {
 
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-RJ`;
+  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-RJ`;
+  
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
@@ -38,7 +44,13 @@ const logarExecucao = async (execucao) => {
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
       logger.info('Iniciando processo de extração');
+      
+
+      
       const resultadoExtracao = await extrator.extrair(message.NumeroProcesso);
+      // testa se a extração ocorreu corretamente
+      resultadoExtracao.length
+      
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(
@@ -60,6 +72,7 @@ const logarExecucao = async (execucao) => {
 
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
+      // tentar reativar codigo
       // await logarExecucao({
       //   Mensagem: message,
       //   DataInicio: dataInicio,
@@ -68,11 +81,18 @@ const logarExecucao = async (execucao) => {
       //   logs: logger.logs,
       //   NomeRobo: enums.nomesRobos.JTE
       // });
+
       ch.ack(msg);
     } catch (e) {
-      console.log(e);
+      // envia a mensagem para a fila de reprocessamento
+      new GerenciadorFila().enviar(reConsumo, message);
 
       logger.info('Encontrado erro durante a execução');
+      // trata erro especifico para falha na estração
+      let error01 = "TypeError: Cannot read property 'length' of undefined at /app/workers/JTE/extracaoNovos_Sp_2.js:48:25 at async /app/lib/filaHandler.js:96:11";
+      if (e = error01) {
+        logger.info(erro01 = "\033[31m" + 'Extração Falhou')
+      }
       logger.info(`Error: ${e.message}`);
       logger.info('Reconhecendo mensagem ao RabbitMQ');
 

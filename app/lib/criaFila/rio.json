@@ -1,0 +1,703 @@
+{
+    "processos": [
+        {
+            "_id": ObjectId("5f0464b19f82472b5aedb5b8"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100032-74.2020.5.01.0061"
+            }
+        },
+        /* 2 createdAt:2020-07-07T12:03:32.000Z*/
+        {
+            "_id": ObjectId("5f0464949f82472b5aedb5b1"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100656-57.2020.5.01.0471"
+            }
+        },
+        /* 3 createdAt:2020-07-07T12:03:14.000Z*/
+        {
+            "_id": ObjectId("5f0464829f82472b5aedb5a8"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100507-94.2020.5.01.0072"
+            }
+        },
+        /* 4 createdAt:2020-07-07T12:03:09.000Z*/
+        {
+            "_id": ObjectId("5f04647d9f82472b5aedb590"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100304-07.2020.5.01.0049"
+            }
+        },
+        /* 5 createdAt:2020-07-07T12:03:08.000Z*/
+        {
+            "_id": ObjectId("5f04647c9f82472b5aedb589"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100465-63.2020.5.01.0066"
+            }
+        },
+        /* 6 createdAt:2020-07-07T12:02:43.000Z*/
+        {
+            "_id": ObjectId("5f0464639f82472b5aedb564"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101441-11.2016.5.01.0034"
+            }
+        },
+        /* 7 createdAt:2020-07-07T12:02:39.000Z*/
+        {
+            "_id": ObjectId("5f04645f9f82472b5aedb558"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100515-56.2020.5.01.0077"
+            }
+        },
+        /* 8 createdAt:2020-07-07T12:02:39.000Z*/
+        {
+            "_id": ObjectId("5f04645f9f82472b5aedb552"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100451-79.2020.5.01.0066"
+            }
+        },
+        /* 9 createdAt:2020-07-07T12:02:08.000Z*/
+        {
+            "_id": ObjectId("5f0464409f82472b5aedb53b"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100272-78.2020.5.01.0541"
+            }
+        },
+        /* 10 createdAt:2020-07-07T12:02:07.000Z*/
+        {
+            "_id": ObjectId("5f04643f9f82472b5aedb532"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100794-88.2020.5.01.0482"
+            }
+        },
+        /* 11 createdAt:2020-07-07T12:02:05.000Z*/
+        {
+            "_id": ObjectId("5f04643d9f82472b5aedb52a"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100355-95.2020.5.01.0282"
+            }
+        },
+        /* 12 createdAt:2020-07-07T12:01:49.000Z*/
+        {
+            "_id": ObjectId("5f04642d0285542bbc8b5b0c"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101919-19.2019.5.01.0000"
+            }
+        },
+        /* 13 createdAt:2020-07-07T12:01:47.000Z*/
+        {
+            "_id": ObjectId("5f04642b9f82472b5aedb529"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100496-09.2020.5.01.0511"
+            }
+        },
+        /* 14 createdAt:2020-07-07T12:01:40.000Z*/
+        {
+            "_id": ObjectId("5f0464249f82472b5aedb4cd"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100226-54.2016.5.01.0016"
+            }
+        },
+        /* 15 createdAt:2020-07-07T12:01:36.000Z*/
+        {
+            "_id": ObjectId("5f0464209f82472b5aedb4bf"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100265-21.2020.5.01.0207"
+            }
+        },
+        /* 16 createdAt:2020-07-07T12:01:34.000Z*/
+        {
+            "_id": ObjectId("5f04641e9f82472b5aedb4af"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100367-27.2020.5.01.0471"
+            }
+        },
+        /* 17 createdAt:2020-07-07T12:01:00.000Z*/
+        {
+            "_id": ObjectId("5f0463fc9f82472b5aedb4a5"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100304-59.2020.5.01.0452"
+            }
+        },
+        /* 18 createdAt:2020-07-07T12:00:38.000Z*/
+        {
+            "_id": ObjectId("5f0463e69f82472b5aedb49d"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100492-69.2020.5.01.0511"
+            }
+        },
+        /* 19 createdAt:2020-07-07T12:00:37.000Z*/
+        {
+            "_id": ObjectId("5f0463e59f82472b5aedb495"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100497-91.2020.5.01.0511"
+            }
+        },
+        /* 20 createdAt:2020-07-07T12:00:19.000Z*/
+        {
+            "_id": ObjectId("5f0463d39f82472b5aedb3b8"),
+            "detalhes": {
+                "numeroProcessoMascara": "0010695-77.2013.5.01.0010"
+            }
+        },
+        /* 21 createdAt:2020-07-07T12:00:09.000Z*/
+        {
+            "_id": ObjectId("5f0463c99f82472b5aedb3b0"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100499-76.2020.5.01.0021"
+            }
+        },
+        /* 22 createdAt:2020-07-07T12:00:04.000Z*/
+        {
+            "_id": ObjectId("5f0463c49f82472b5aedb3af"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100518-97.2020.5.01.0016"
+            }
+        },
+        /* 23 createdAt:2020-07-07T11:59:53.000Z*/
+        {
+            "_id": ObjectId("5f0463b99f82472b5aedb39e"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100145-47.2020.5.01.0281"
+            }
+        },
+        /* 24 createdAt:2020-07-07T11:59:43.000Z*/
+        {
+            "_id": ObjectId("5f0463af9f82472b5aedb385"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100240-73.2020.5.01.0541"
+            }
+        },
+        /* 25 createdAt:2020-07-07T11:59:20.000Z*/
+        {
+            "_id": ObjectId("5f0463989f82472b5aedb31d"),
+            "detalhes": {
+                "numeroProcessoMascara": "0011249-79.2015.5.01.0062"
+            }
+        },
+        /* 26 createdAt:2020-07-07T11:59:13.000Z*/
+        {
+            "_id": ObjectId("5f0463919f82472b5aedb315"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100395-85.2020.5.01.0247"
+            }
+        },
+        /* 27 createdAt:2020-07-07T11:58:22.000Z*/
+        {
+            "_id": ObjectId("5f04635e9f82472b5aedb30d"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100530-21.2020.5.01.0046"
+            }
+        },
+        /* 28 createdAt:2020-07-07T11:58:07.000Z*/
+        {
+            "_id": ObjectId("5f04634f9f82472b5aedb2ac"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100578-70.2018.5.01.0265"
+            }
+        },
+        /* 29 createdAt:2020-07-07T11:58:02.000Z*/
+        {
+            "_id": ObjectId("5f04634a9f82472b5aedb2a2"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100519-03.2020.5.01.0204"
+            }
+        },
+        /* 30 createdAt:2020-07-07T11:57:52.000Z*/
+        {
+            "_id": ObjectId("5f0463409f82472b5aedb29c"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100482-22.2020.5.01.0221"
+            }
+        },
+        /* 31 createdAt:2020-07-07T11:57:39.000Z*/
+        {
+            "_id": ObjectId("5f0463339f82472b5aedb28f"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100336-45.2020.5.01.0038"
+            }
+        },
+        /* 32 createdAt:2020-07-07T11:57:19.000Z*/
+        {
+            "_id": ObjectId("5f04631f9f82472b5aedb28e"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101308-75.2016.5.01.0225"
+            }
+        },
+        /* 33 createdAt:2020-07-07T11:57:04.000Z*/
+        {
+            "_id": ObjectId("5f0463109f82472b5aedb230"),
+            "detalhes": {
+                "numeroProcessoMascara": "0010921-65.2015.5.01.0284"
+            }
+        },
+        /* 34 createdAt:2020-07-07T11:56:58.000Z*/
+        {
+            "_id": ObjectId("5f04630a9f82472b5aedb22f"),
+            "detalhes": {
+                "numeroProcessoMascara": "0011552-48.2015.5.01.0077"
+            }
+        },
+        /* 35 createdAt:2020-07-07T11:56:38.000Z*/
+        {
+            "_id": ObjectId("5f0462f69f82472b5aedb219"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100240-19.2020.5.01.0462"
+            }
+        },
+        /* 36 createdAt:2020-07-07T11:55:31.000Z*/
+        {
+            "_id": ObjectId("5f0462b39f82472b5aedb18a"),
+            "detalhes": {
+                "numeroProcessoMascara": "0011113-53.2013.5.01.0062"
+            }
+        },
+        /* 37 createdAt:2020-07-07T11:55:29.000Z*/
+        {
+            "_id": ObjectId("5f0462b19f82472b5aedb10c"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101632-97.2017.5.01.0203"
+            }
+        },
+        /* 38 createdAt:2020-07-07T11:55:08.000Z*/
+        {
+            "_id": ObjectId("5f04629c9f82472b5aedb104"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100789-66.2020.5.01.0482"
+            }
+        },
+        /* 39 createdAt:2020-07-07T11:54:57.000Z*/
+        {
+            "_id": ObjectId("5f0462919f82472b5aedb0f4"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100496-74.2020.5.01.0069"
+            }
+        },
+        /* 40 createdAt:2020-07-07T11:54:24.000Z*/
+        {
+            "_id": ObjectId("5f0462709f82472b5aedb0dc"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100172-63.2020.5.01.0076"
+            }
+        },
+        /* 41 createdAt:2020-07-07T11:53:57.000Z*/
+        {
+            "_id": ObjectId("5f0462559f82472b5aedb0ba"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100492-46.2019.5.01.0045"
+            }
+        },
+        /* 42 createdAt:2020-07-07T11:53:43.000Z*/
+        {
+            "_id": ObjectId("5f0462479f82472b5aedb0ab"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101339-14.2019.5.01.0024"
+            }
+        },
+        /* 43 createdAt:2020-07-07T11:53:41.000Z*/
+        {
+            "_id": ObjectId("5f0462459f82472b5aedb08b"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100127-16.2020.5.01.0058"
+            }
+        },
+        /* 44 createdAt:2020-07-07T11:53:36.000Z*/
+        {
+            "_id": ObjectId("5f0462409f82472b5aedb079"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100182-27.2020.5.01.0038"
+            }
+        },
+        /* 45 createdAt:2020-07-07T11:53:36.000Z*/
+        {
+            "_id": ObjectId("5f0462409f82472b5aedb071"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100465-50.2020.5.01.0038"
+            }
+        },
+        /* 46 createdAt:2020-07-07T11:53:21.000Z*/
+        {
+            "_id": ObjectId("5f0462319f82472b5aedb03d"),
+            "detalhes": {
+                "numeroProcessoMascara": "0000973-96.2012.5.01.0028"
+            }
+        },
+        /* 47 createdAt:2020-07-07T11:53:10.000Z*/
+        {
+            "_id": ObjectId("5f0462269f82472b5aedb034"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100428-36.2020.5.01.0066"
+            }
+        },
+        /* 48 createdAt:2020-07-07T11:53:08.000Z*/
+        {
+            "_id": ObjectId("5f0462249f82472b5aedb01b"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100471-44.2020.5.01.0204"
+            }
+        },
+        /* 49 createdAt:2020-07-07T11:52:53.000Z*/
+        {
+            "_id": ObjectId("5f0462159f82472b5aedaff6"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100406-92.2020.5.01.0222"
+            }
+        },
+        /* 50 createdAt:2020-07-07T11:52:39.000Z*/
+        {
+            "_id": ObjectId("5f0462079f82472b5aedafde"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100064-30.2020.5.01.0045"
+            }
+        },
+        /* 51 createdAt:2020-07-07T11:52:39.000Z*/
+        {
+            "_id": ObjectId("5f0462079f82472b5aedaefa"),
+            "detalhes": {
+                "numeroProcessoMascara": "0010962-82.2014.5.01.0020"
+            }
+        },
+        /* 52 createdAt:2020-07-07T11:52:24.000Z*/
+        {
+            "_id": ObjectId("5f0461f89f82472b5aedaee8"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100092-26.2020.5.01.0262"
+            }
+        },
+        /* 53 createdAt:2020-07-07T11:52:10.000Z*/
+        {
+            "_id": ObjectId("5f0461ea9f82472b5aedaed8"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100012-05.2020.5.01.0281"
+            }
+        },
+        /* 54 createdAt:2020-07-07T11:51:55.000Z*/
+        {
+            "_id": ObjectId("5f0461db9f82472b5aedadcd"),
+            "detalhes": {
+                "numeroProcessoMascara": "0010487-15.2014.5.01.0057"
+            }
+        },
+        /* 55 createdAt:2020-07-07T11:51:39.000Z*/
+        {
+            "_id": ObjectId("5f0461cb9f82472b5aedadae"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100073-31.2020.5.01.0226"
+            }
+        },
+        /* 56 createdAt:2020-07-07T11:51:23.000Z*/
+        {
+            "_id": ObjectId("5f0461bb9f82472b5aedad67"),
+            "detalhes": {
+                "numeroProcessoMascara": "0011139-64.2015.5.01.0035"
+            }
+        },
+        /* 57 createdAt:2020-07-07T11:51:07.000Z*/
+        {
+            "_id": ObjectId("5f0461ab9f82472b5aedad5a"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100188-82.2020.5.01.0022"
+            }
+        },
+        /* 58 createdAt:2020-07-07T11:50:49.000Z*/
+        {
+            "_id": ObjectId("5f0461999f82472b5aedad50"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100401-40.2020.5.01.0038"
+            }
+        },
+        /* 59 createdAt:2020-07-07T11:50:40.000Z*/
+        {
+            "_id": ObjectId("5f0461909f82472b5aedad30"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100060-41.2020.5.01.0029"
+            }
+        },
+        /* 60 createdAt:2020-07-07T11:50:39.000Z*/
+        {
+            "_id": ObjectId("5f04618f9f82472b5aedacd1"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100077-73.2018.5.01.0053"
+            }
+        },
+        /* 61 createdAt:2020-07-07T11:50:25.000Z*/
+        {
+            "_id": ObjectId("5f0461819f82472b5aedacc2"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100343-75.2020.5.01.0284"
+            }
+        },
+        /* 62 createdAt:2020-07-07T11:50:11.000Z*/
+        {
+            "_id": ObjectId("5f0461739f82472b5aedac18"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100032-90.2016.5.01.0004"
+            }
+        },
+        /* 63 createdAt:2020-07-07T11:49:53.000Z*/
+        {
+            "_id": ObjectId("5f0461619f82472b5aedac0f"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100527-57.2020.5.01.0049"
+            }
+        },
+        /* 64 createdAt:2020-07-07T11:49:52.000Z*/
+        {
+            "_id": ObjectId("5f0461609f82472b5aedabc5"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100073-15.2020.5.01.0005"
+            }
+        },
+        /* 65 createdAt:2020-07-07T11:49:27.000Z*/
+        {
+            "_id": ObjectId("5f0461479f82472b5aedab93"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100330-79.2019.5.01.0262"
+            }
+        },
+        /* 66 createdAt:2020-07-07T11:49:21.000Z*/
+        {
+            "_id": ObjectId("5f0461419f82472b5aedab80"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101310-34.2019.5.01.0227"
+            }
+        },
+        /* 67 createdAt:2020-07-07T11:48:56.000Z*/
+        {
+            "_id": ObjectId("5f0461289f82472b5aedab61"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100219-72.2020.5.01.0323"
+            }
+        },
+        /* 68 createdAt:2020-07-07T11:48:35.000Z*/
+        {
+            "_id": ObjectId("5f0461139f82472b5aedab4e"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100207-33.2020.5.01.0202"
+            }
+        },
+        /* 69 createdAt:2020-07-07T11:48:25.000Z*/
+        {
+            "_id": ObjectId("5f0461099f82472b5aedab2b"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100106-18.2020.5.01.0227"
+            }
+        },
+        /* 70 createdAt:2020-07-07T11:48:03.000Z*/
+        {
+            "_id": ObjectId("5f0460f39f82472b5aedab0f"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101763-91.2017.5.01.0035"
+            }
+        },
+        /* 71 createdAt:2020-07-07T11:48:01.000Z*/
+        {
+            "_id": ObjectId("5f0460f19f82472b5aedab08"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100522-43.2020.5.01.0014"
+            }
+        },
+        /* 72 createdAt:2020-07-07T11:47:53.000Z*/
+        {
+            "_id": ObjectId("5f0460e99f82472b5aedaadf"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100438-81.2017.5.01.0035"
+            }
+        },
+        /* 73 createdAt:2020-07-07T11:47:37.000Z*/
+        {
+            "_id": ObjectId("5f0460d99f82472b5aedaad8"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100463-93.2020.5.01.0066"
+            }
+        },
+        /* 74 createdAt:2020-07-07T11:47:28.000Z*/
+        {
+            "_id": ObjectId("5f0460d09f82472b5aedaad0"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100377-56.2020.5.01.0282"
+            }
+        },
+        /* 75 createdAt:2020-07-07T11:47:12.000Z*/
+        {
+            "_id": ObjectId("5f0460c09f82472b5aedaac7"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100506-04.2020.5.01.0010"
+            }
+        },
+        /* 76 createdAt:2020-07-07T11:47:00.000Z*/
+        {
+            "_id": ObjectId("5f0460b49f82472b5aedaaac"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100034-32.2020.5.01.0065"
+            }
+        },
+        /* 77 createdAt:2020-07-07T11:46:42.000Z*/
+        {
+            "_id": ObjectId("5f0460a29f82472b5aedaaa5"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100404-66.2020.5.01.0079"
+            }
+        },
+        /* 78 createdAt:2020-07-07T11:46:33.000Z*/
+        {
+            "_id": ObjectId("5f0460999f82472b5aedaa9b"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100506-60.2020.5.01.0541"
+            }
+        },
+        /* 79 createdAt:2020-07-07T11:46:12.000Z*/
+        {
+            "_id": ObjectId("5f0460849f82472b5aedaa91"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100505-19.2020.5.01.0010"
+            }
+        },
+        /* 80 createdAt:2020-07-07T11:46:05.000Z*/
+        {
+            "_id": ObjectId("5f04607d9f82472b5aedaa86"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100384-04.2020.5.01.0038"
+            }
+        },
+        /* 81 createdAt:2020-07-07T11:45:51.000Z*/
+        {
+            "_id": ObjectId("5f04606f9f82472b5aedaa62"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100413-69.2020.5.01.0421"
+            }
+        },
+        /* 82 createdAt:2020-07-07T11:45:20.000Z*/
+        {
+            "_id": ObjectId("5f0460509f82472b5aedaa4c"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100152-34.2020.5.01.0024"
+            }
+        },
+        /* 83 createdAt:2020-07-07T11:45:19.000Z*/
+        {
+            "_id": ObjectId("5f04604f9f82472b5aeda9ee"),
+            "detalhes": {
+                "numeroProcessoMascara": "0010121-74.2015.5.01.0401"
+            }
+        },
+        /* 84 createdAt:2020-07-07T11:45:15.000Z*/
+        {
+            "_id": ObjectId("5f04604b9f82472b5aeda9d1"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100254-32.2020.5.01.0323"
+            }
+        },
+        /* 85 createdAt:2020-07-07T11:44:45.000Z*/
+        {
+            "_id": ObjectId("5f04602d9f82472b5aeda9b8"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101457-72.2019.5.01.0223"
+            }
+        },
+        /* 86 createdAt:2020-07-07T11:44:35.000Z*/
+        {
+            "_id": ObjectId("5f0460239f82472b5aeda96e"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100009-22.2020.5.01.0064"
+            }
+        },
+        /* 87 createdAt:2020-07-07T11:44:20.000Z*/
+        {
+            "_id": ObjectId("5f0460149f82472b5aeda94c"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100364-86.2020.5.01.0046"
+            }
+        },
+        /* 88 createdAt:2020-07-07T11:44:07.000Z*/
+        {
+            "_id": ObjectId("5f0460079f82472b5aeda944"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100518-52.2020.5.01.0031"
+            }
+        },
+        /* 89 createdAt:2020-07-07T11:44:00.000Z*/
+        {
+            "_id": ObjectId("5f0460009f82472b5aeda93c"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100368-94.2020.5.01.0282"
+            }
+        },
+        /* 90 createdAt:2020-07-07T11:43:53.000Z*/
+        {
+            "_id": ObjectId("5f045ff99f82472b5aeda930"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100487-68.2020.5.01.0019"
+            }
+        },
+        /* 91 createdAt:2020-07-07T11:43:37.000Z*/
+        {
+            "_id": ObjectId("5f045fe99f82472b5aeda924"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100397-07.2020.5.01.0069"
+            }
+        },
+        /* 92 createdAt:2020-07-07T11:43:34.000Z*/
+        {
+            "_id": ObjectId("5f045fe69f82472b5aeda91d"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100660-94.2020.5.01.0471"
+            }
+        },
+        /* 93 createdAt:2020-07-07T11:43:10.000Z*/
+        {
+            "_id": ObjectId("5f045fce9f82472b5aeda915"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100509-72.2020.5.01.0037"
+            }
+        },
+        /* 94 createdAt:2020-07-07T11:43:09.000Z*/
+        {
+            "_id": ObjectId("5f045fcd9f82472b5aeda901"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100275-85.2020.5.01.0265"
+            }
+        },
+        /* 95 createdAt:2020-07-07T11:43:02.000Z*/
+        {
+            "_id": ObjectId("5f045fc69f82472b5aeda8de"),
+            "detalhes": {
+                "numeroProcessoMascara": "0101026-66.2019.5.01.0246"
+            }
+        },
+        /* 96 createdAt:2020-07-07T11:42:41.000Z*/
+        {
+            "_id": ObjectId("5f045fb19f82472b5aeda8d4"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100537-19.2020.5.01.0432"
+            }
+        },
+        /* 97 createdAt:2020-07-07T11:42:41.000Z*/
+        {
+            "_id": ObjectId("5f045fb19f82472b5aeda8b3"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100066-88.2020.5.01.0048"
+            }
+        },
+        /* 98 createdAt:2020-07-07T11:42:17.000Z*/
+        {
+            "_id": ObjectId("5f045f999f82472b5aeda893"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100981-56.2019.5.01.0248"
+            }
+        },
+        /* 99 createdAt:2020-07-07T11:42:12.000Z*/
+        {
+            "_id": ObjectId("5f045f949f82472b5aeda886"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100529-42.2020.5.01.0432"
+            }
+        },
+        /* 100 createdAt:2020-07-07T11:42:12.000Z*/
+        {
+            "_id": ObjectId("5f045f949f82472b5aeda880"),
+            "detalhes": {
+                "numeroProcessoMascara": "0100522-07.2020.5.01.0026"
+            }
+        }
+    ]
+}

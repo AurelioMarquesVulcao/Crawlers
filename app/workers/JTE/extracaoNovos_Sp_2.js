@@ -22,7 +22,7 @@ const logarExecucao = async (execucao) => {
 
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
   
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
@@ -68,6 +68,7 @@ const logarExecucao = async (execucao) => {
 
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
+      // tentar reativar codigo
       // await logarExecucao({
       //   Mensagem: message,
       //   DataInicio: dataInicio,
@@ -76,14 +77,18 @@ const logarExecucao = async (execucao) => {
       //   logs: logger.logs,
       //   NomeRobo: enums.nomesRobos.JTE
       // });
+
       ch.ack(msg);
     } catch (e) {
       // envia a mensagem para a fila de reprocessamento
       new GerenciadorFila().enviar(reConsumo, message);
 
-      console.log(e);
-
       logger.info('Encontrado erro durante a execução');
+      // trata erro especifico para falha na estração
+      let error01 = "TypeError: Cannot read property 'length' of undefined at /app/workers/JTE/extracaoNovos_Sp_2.js:48:25 at async /app/lib/filaHandler.js:96:11";
+      if (e = error01) {
+        logger.info(erro01 = "\033[31m" + 'Extração Falhou')
+      }
       logger.info(`Error: ${e.message}`);
       logger.info('Reconhecendo mensagem ao RabbitMQ');
 

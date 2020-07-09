@@ -16,7 +16,7 @@ class GerenciadorFila {
    * @param {String} mensagem   Mensagem em JSON
    */
   enviarMensagem(ch, fila, mensagem) {
-    console.log(`${mensagem} -> ${fila}`);
+    //console.log(`${mensagem} -> ${fila}`);
     const buffer = Buffer.from(mensagem);
     ch.sendToQueue(fila, buffer);
   }

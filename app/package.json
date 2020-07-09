@@ -25,6 +25,7 @@
     "moment": "^2.24.0",
     "mongoose": "^5.9.6",
     "node-cron": "^2.0.3",
+    "puppeteer": "^5.0.0",
     "winston": "^3.2.1",
     "xregexp": "^4.3.0"
   },

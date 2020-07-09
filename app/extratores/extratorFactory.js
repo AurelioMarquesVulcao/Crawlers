@@ -17,9 +17,10 @@ class ExtratorFactory {
       extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg/open.do', isDebug);
     }
 
-    if (/oab.JTE/.test(fila)) {
+    if (/processo.JTE/.test(fila)) {
       extrator = new ProcJTE('https://jte.csjt.jus.br/', isDebug);
     }
+    
 
     return extrator;
   }

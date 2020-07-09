@@ -21,7 +21,7 @@ const logarExecucao = async (execucao) => {
   });
 
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
-  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-RJ`;
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();

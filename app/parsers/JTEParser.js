@@ -1,21 +1,12 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
-const {
-  enums
-} = require('../configs/enums');
+const { enums } = require('../configs/enums');
 
 
-const {
-  BaseParser,
-  removerAcentos
-} = require('./BaseParser');
-const {
-  Processo
-} = require('../models/schemas/processo');
-const {
-  Andamento
-} = require('../models/schemas/andamento');
+const { BaseParser, removerAcentos } = require('./BaseParser');
+const { Processo } = require('../models/schemas/processo');
+const { Andamento } = require('../models/schemas/andamento');
 
 
 class JTEParser extends BaseParser {
@@ -52,7 +43,7 @@ class JTEParser extends BaseParser {
   // funcao secundaria - organiza os dados da capa
   capa($) {
     let capa = {
-      uf: "", // inserir uf na raspagem do puppeteer
+      uf: this.estado($), // inserir uf na raspagem do puppeteer
       comarca: "", // perguntar onde extraio a comarca
       vara: this.extraiVaraCapa($).trim(),
       fase: '', // perguntar onde extraio a comarca
@@ -133,10 +124,36 @@ class JTEParser extends BaseParser {
     else return teste
   }
 
+  estado($) {
+    let resultado = 'Estado indeterminado'
+    let dados = this.detalhes($).tribunal
+    if (dados == 2 || dados == 15) resultado = 'SP'
+    if (dados == 1) resultado = 'RJ'
+    // if (dados == 15) resultado = 'SP'
+    if (dados == 3) resultado = 'MG'
+    if (dados == 21) resultado = 'RN'
+      return resultado
+  }
+
+  // precisa de melhorias
   extraiVaraCapa($) {
-    let advogados = $('detalhes-aba-geral').text().split('\n');
-    advogados = this.removeVazios(advogados)
-    return removerAcentos(advogados[1].split('-')[1].trim()) 
+    let resultado = "não possui vara"
+    $('detalhes-aba-geral p').each(async function (element) {
+      let advogados = $(this).text().split('\n');
+      //console.log(advogados);
+      advogados = new JTEParser().removeVazios(advogados)
+      let vara = 'não tem'//removerAcentos(advogados[1].split('-')[1].trim())
+      return vara
+
+    })
+    // let advogados = $('detalhes-aba-geral').text().split('\n');
+    // advogados = this.removeVazios(advogados)
+    // console.log(advogados);
+
+    // let vara = removerAcentos(advogados[1].split('-')[1].trim())
+    // if (!!vara) return vara
+    // if (!vara) return "nao possui vara"
+    return resultado
   }
 
 
@@ -156,7 +173,7 @@ class JTEParser extends BaseParser {
   extraiNumeroProcesso($) {
     let datas = [];
     let resultado = ''
-    $('detalhes-aba-geral span').each(async function (element) {
+    $('#mat-tab-content-0-0 > div > detalhes-aba-geral > div > span.item-painel-titulo').each(async function (element) {
       let numero = $(this).text().split("\n")[0];
       if (!!numero) resultado = numero
     })
@@ -236,28 +253,38 @@ class JTEParser extends BaseParser {
     return numero
   }
   extraiAndamento($) {
-    let resultado = []
+    let resultado = [];
+    let dados = [];
     $('ion-item div').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos)
       // console.log(andamentos.length);
-      if (andamentos.length > 0) resultado.push(andamentos)
+      if (andamentos.length > 0) dados.push(andamentos)
     })
-    // console.log(resultado.length);
-    // console.log(resultado);
+    
+    // verifica duplicidade
+    let c = 0;
+    for (let i = 0; i < dados.length; i++) {
+      for (let j = 0; j < dados.length; j++) {
+        if (dados[i][0] === dados[j][0] && i != j) {
+          c++
+          dados[i][0] = dados[j] + ' [' + c + ']'
+        }
+      }
+    }
+    resultado = dados
     return resultado
   }
 
   extraiDataAndamento($) {
-    let resultado = []
+    let resultado = [];
+
     $('ion-text h4').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos)
       // console.log(andamentos.length);
       if (andamentos.length > 0) resultado.push(andamentos)
     })
-    // console.log(resultado.length);
-    // console.log(resultado);
     return resultado
   }
 
@@ -275,8 +302,6 @@ class JTEParser extends BaseParser {
       }
     }
     // com essas linhas de código abaixo eu não preciso remover as linhas vazias dos array's
-    // precisando de menos código em todo o parse.
-    // remover códigos retundantes referentes a isso.
     for (let j of limpo) {
       if (j.length > 2) {
         resultado.push(j)

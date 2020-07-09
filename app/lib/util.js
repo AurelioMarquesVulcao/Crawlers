@@ -1,11 +1,11 @@
-const Crypto = require('crypto-js');
-const winston = require('winston');
-const moment = require('moment');
+const Crypto = require("crypto-js");
+const winston = require("winston");
+const moment = require("moment");
 
-const { Token } = require('../models/schemas/token');
+const { Token } = require("../models/schemas/token");
 
-const { enums } = require('../configs/enums');
-const { Robo } = require('../lib/robo');
+const { enums } = require("../configs/enums");
+const { Robo } = require("../lib/robo");
 
 class Helper {
   /**
@@ -34,16 +34,16 @@ class Helper {
     const robo = new Robo();
     return robo.acessar({
       url: enums.bigdataUrls.login,
-      method: 'POST',
+      method: "POST",
       headers: {
-        'User-Agent': 'client',
-        'Content-Type': 'application/json'
+        "User-Agent": "client",
+        "Content-Type": "application/json"
       },
       usaJson: true,
       params: {
-        login: '', // TODO recuperar login do Big Data
-        senha: '', // TODO recuperar pswrd do Big Data
-      },
+        Login: "extratificador_bigdata@impacta.adv.br",
+        Senha: "extratificador2019"
+      }
     });
   }
 
@@ -59,29 +59,29 @@ class Helper {
       if (resposta.responseBody.Sucesso) {
         await new Token({ token: resposta.responseBody.Token }).save();
       } else {
-        console.log('Não foi possivel recuperar o Token');
+        console.log("Não foi possivel recuperar o Token");
         process.exit(1);
       }
     }
 
     return await robo.acessar({
       url: enums.bigdataUrls.resultadoConsulta,
-      method: 'POST',
-      encoding: '',
+      method: "POST",
+      encoding: "",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`
       },
       usaProxy: false,
       usaJson: true,
-      params: msg,
+      params: msg
     });
   }
 }
 
 class Logger {
   constructor(
-    logLevel = 'info',
-    nomeArquivo = '',
+    logLevel = "info",
+    nomeArquivo = "",
     { nomeRobo, NumeroDoProcesso = null, NumeroOab = null } = {}
   ) {
     this.nomeRobo = nomeRobo;
@@ -89,18 +89,18 @@ class Logger {
     this.numeroOab = NumeroOab;
     this.logs = [];
     this.consoleLogger = winston.createLogger({
-      level: 'info',
+      level: "info",
       format: winston.format.simple(),
-      transports: [new winston.transports.Console()],
+      transports: [new winston.transports.Console()]
     });
     this.fileLogger = winston.createLogger({
       level: logLevel,
       format: winston.format.simple(),
       transports: [
         new winston.transports.File({
-          filename: nomeArquivo,
-        }),
-      ],
+          filename: nomeArquivo
+        })
+      ]
     });
   }
 

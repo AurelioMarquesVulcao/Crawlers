@@ -1,5 +1,4 @@
 const sleep = require('await-sleep');
-const { enums } = require('../configs/enums');
 let Anticaptcha = require('../bin/js/anticaptcha')(
   '4b93beb6fe87d3bf3cfd92966ec841a6'
 );
@@ -17,7 +16,6 @@ const antiCaptchaHandler = async (
   website,
   websiteKey,
   pageAction,
-  userAgent
 ) => {
   return new Promise((resolve, reject) => {
     Anticaptcha.setWebsiteURL(website);
@@ -537,7 +535,8 @@ module.exports.CaptchaHandler = class CaptchaHandler {
         return resultado;
       }
       tentativas++;
-      await sleep(10000);
+      console.log(`\t\t${resultado.detalhes[0].errorCode}`);
+      await sleep(100);
       // } while (tentativas < maxTentativas);
     } while (true);
     // console.log('1', resultado);

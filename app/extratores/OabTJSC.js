@@ -21,7 +21,7 @@ class OabTJSC extends ExtratorBase {
   }
 
   async extrair(numeroOab, cadastroConsultaId) {
-    console.log('cadastroConsultaId', cadastroConsultaId);
+    // console.log('cadastroConsultaId', cadastroConsultaId);
     this.numeroDaOab = numeroOab;
     let cadastroConsulta = {
       SeccionalOab: 'SC',
@@ -53,7 +53,7 @@ class OabTJSC extends ExtratorBase {
         encoding: 'latin1',
       });
 
-      console.log(objResponse);
+      // console.log(objResponse);
       cookies = objResponse.cookies;
       cookies = cookies.map((element) => {
         return element.replace(/;.*/, '');
@@ -79,7 +79,7 @@ class OabTJSC extends ExtratorBase {
           uuidCaptcha,
           gResponse
         );
-        console.log(listaProcessos);
+        // console.log(listaProcessos);
         this.logger.info('Lista de processos recuperada');
 
         // Terceira parte: passar a lista, pegar cada um dos codigos
@@ -102,7 +102,7 @@ class OabTJSC extends ExtratorBase {
             this.logger.info(
               `Enviando processo ${processo} a fila de extração.`
             );
-            resultados.push(Promise.resolve(processo));
+            resultados.push(Promise.resolve({numeroProcesso: processo}));
           }
 
           //resultados = await this.extrairProcessos(listaProcessos, cookies);
@@ -232,8 +232,8 @@ class OabTJSC extends ExtratorBase {
     let condition = false;
     let processos = [];
     let url = `https://esaj.tjsc.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-    console.log('cookies', cookies);
-    console.log(url);
+    // console.log('cookies', cookies);
+    // console.log(url);
     do {
       let objResponse = {};
       objResponse = await this.robo.acessar({

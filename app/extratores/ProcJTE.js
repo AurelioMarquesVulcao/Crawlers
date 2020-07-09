@@ -54,12 +54,15 @@ class ProcJTE extends ExtratorBase {
 
     //  usar return simples apenas para dev
     logger.info('Processos extraidos com sucesso');
-    return {
-      resultado: dadosProcesso,
-      sucesso: true,
-      detalhes: '',
-      logs: logger.logs
-    };
+    if (!!dadosProcesso){
+      return {
+        resultado: dadosProcesso,
+        sucesso: true,
+        detalhes: '',
+        logs: logger.logs
+      };
+    }
+    
 
   } // End extrair function
 

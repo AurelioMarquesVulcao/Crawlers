@@ -22,6 +22,8 @@ const logarExecucao = async (execucao) => {
 
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
+  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+  
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
@@ -38,7 +40,13 @@ const logarExecucao = async (execucao) => {
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
       logger.info('Iniciando processo de extração');
+      
+
+      
       const resultadoExtracao = await extrator.extrair(message.NumeroProcesso);
+      // testa se a extração ocorreu corretamente
+      resultadoExtracao.length
+      
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(
@@ -70,6 +78,9 @@ const logarExecucao = async (execucao) => {
       // });
       ch.ack(msg);
     } catch (e) {
+      // envia a mensagem para a fila de reprocessamento
+      new GerenciadorFila().enviar(reConsumo, message);
+
       console.log(e);
 
       logger.info('Encontrado erro durante a execução');

@@ -85,7 +85,7 @@ const roboVersao1 = async (numero) => {
         try {
             await preencheTribunal()
         } catch (e) {
-            console.log("\033[31m info: JTE - CNJ: " + numero + " - ERRO!!! NÃO FOI POSSIVEL ABRIR O TRIBUNAL");
+            console.log("\033[31m" + `info: JTE - CNJ: ${numero} - ERRO!!! NÃO FOI POSSIVEL ABRIR O TRIBUNAL`);
             await browser.close()
         }
     }
@@ -126,7 +126,7 @@ const roboVersao1 = async (numero) => {
         let text = document.querySelector('html').innerHTML;
         return text
     })
-    await console.log(`info: JTE - CNJ: ${numero} - html da capa do processo extraido do Puppeteer`);
+    await console.log("\033[0;32m" + `info: JTE - CNJ: ${numero} - html da capa do processo extraido do Puppeteer`);
     // await page.click('#menu-content > detalhes-processo > ion-segment > ion-segment-button:nth-child(2)')
     await page.click('#mat-tab-label-0-1')
     await page.waitFor('#divMovBrowser1 > ion-grid > ion-row > ion-col')
@@ -136,7 +136,7 @@ const roboVersao1 = async (numero) => {
         let text = document.querySelector('html').innerHTML;
         return text
     })
-    await console.log(`info: JTE - CNJ: ${numero} - html dos andamentos extraido do Puppeteer`);
+    await console.log("\033[0;32m" + `info: JTE - CNJ: ${numero} - html dos andamentos extraido do Puppeteer`);
     // await page.close()
     await browser.close()
     return { geral: html1, andamentos: html2 }

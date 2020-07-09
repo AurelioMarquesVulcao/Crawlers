@@ -42,27 +42,52 @@ services:
       file: common-services.yml
       service: base_node
     command: node workers/enfileirador.js
-  worker-jte3:
+  worker-jte-sp-2:
     extends:
       file: common-services.yml
       service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA}
-    mem_reservation: 150m
-    command: node workers/JTE/extracaoNovosSp.js
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: node workers/JTE/extracaoNovos_Sp_2.js
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "5"
-  worker-jte2:
+  worker-jte-sp-15:
     extends:
       file: common-services.yml
       service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA}
-    mem_reservation: 150m
-    command: node workers/JTE/extracaoNovos.js
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: node workers/JTE/extracaoNovos_Sp_15.js
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "5"
+  worker-jte-rj:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: node workers/JTE/extracaoNovos_Rj.js
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+  worker-jte-mg:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: node workers/JTE/extracaoNovos_Mg.js
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+

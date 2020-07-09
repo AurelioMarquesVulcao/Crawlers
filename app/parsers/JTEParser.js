@@ -127,15 +127,15 @@ class JTEParser extends BaseParser {
   estado($) {
     let resultado = 'Estado indeterminado'
     let dados = this.detalhes($).tribunal
-    if (dados == 2 || dados == 5) resultado = 'SP'
+    if (dados == 2 || dados == 15) resultado = 'SP'
     if (dados == 1) resultado = 'RJ'
-    if (dados == 15) resultado = 'SP'
-    if (dados == 03) resultado = 'MG'
+    // if (dados == 15) resultado = 'SP'
+    if (dados == 3) resultado = 'MG'
     if (dados == 21) resultado = 'RN'
       return resultado
   }
 
-  // precisa de melhorias para capturar corretamente a vara.
+  // precisa de melhorias
   extraiVaraCapa($) {
     let resultado = "não possui vara"
     $('detalhes-aba-geral p').each(async function (element) {

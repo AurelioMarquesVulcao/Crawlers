@@ -5,16 +5,12 @@ const { ExtratorFactory } = require("../../extratores/extratorFactory");
 const { Extracao } = require("../../models/schemas/extracao");
 const { Helper, Logger } = require("../../lib/util");
 const { LogExecucao } = require('../../lib/logExecucao');
-const puppeteer = require('puppeteer');
 
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
 }
 
-
 (async () => {
-
-
   mongoose.connect(enums.mongo.connString, {
     useNewUrlParser: true,
     useUnifiedTopology: true

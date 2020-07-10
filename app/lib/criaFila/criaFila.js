@@ -13,7 +13,7 @@ const roboVersao1 = async (numero) => {
     });
     var page = await browser.newPage();
 
-    await page.goto('http://0.0.0.0:15673/#/queues/%2F/processo.JTE.extracao.novos-SP-2')
+    await page.goto('http://0.0.0.0:15673/#/queues/%2F/processo.JTE.extracao.novos-RJ')
     await page.setViewport({ width: 1800, height: 92000 })
 
     await page.waitFor('#login > form > table > tbody > tr:nth-child(1) > td > input[type=text]');
@@ -213,7 +213,7 @@ const processosSP15 = [
     "00105980820165150067"
 ]
 const processosMG = ['00021625020145020016', '00101972120205030158', '00103665120205030079']
-const processos = processosSP
+const processos = processosRJ
 
 const post = async () => {
     for (let i = 0; i < processos.length; i++) {
@@ -233,7 +233,7 @@ function criaPost(numero) {
         "DataEnfileiramento" : "${new Date}",
         "NumeroProcesso" : "${numero}",
         "NumeroOab" : "null",        
-        "SeccionalOab" : "SP"
+        "SeccionalOab" : "RJ"
     }`
     return post
 }

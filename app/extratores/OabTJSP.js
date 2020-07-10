@@ -110,31 +110,32 @@ class OabTJSP extends ExtratorBase {
           for (const processo of listaProcessos) {
             cadastroConsulta['NumeroProcesso'] = processo;
             this.logger.info(
-              `Criando log de execução para o processo ${processo}.`
+              `Verificando log de execução para o processo ${processo}.`
             );
-            await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
+            let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
             this.logger.info(
-              `Log de execução do processo ${processo} feito com sucesso`
+              `Log de execução do processo ${processo} verificado com sucesso`
             );
-            this.logger.info(
-              `Enviando processo ${processo} a fila de extração.`
-            );
-            resultados.push(Promise.resolve(processo));
+
+            this.logger.info(logExec.mensagem);
+            if (logExec.enviado)
+              resultados.push(Promise.resolve({numeroProcesso: processo}));
           }
 
           //resultados = await this.extrairProcessos(listaProcessos, cookies);
           return Promise.all(resultados)
             .then((resultados) => {
-              this.logger.info('Processos extraidos com sucesso');
+              this.logger.info(`${resultados.length} Processos enviados para extração com sucesso`);
               return {
                 resultado: resultados,
                 sucesso: true,
                 detalhes: '',
-                logs: logger.logs,
+                logs: this.logger.logs,
               };
             })
             .catch((e) => {
-              this.logger.info('Não houve processos bem sucedidos');
+              this.logger.info('Opa! Erro encontrado.');
+              this.logger.log('error', e);
               return {
                 resultado: [],
                 sucesso: false,
@@ -143,6 +144,7 @@ class OabTJSP extends ExtratorBase {
               };
             });
         }
+        gResponse = await this.getCaptcha();
         tentativa++;
       } while (tentativa < 5);
 

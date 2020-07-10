@@ -39,8 +39,18 @@ module.exports.LogExecucao = class LogExecucao {
   static async cadastrarConsultaPendente(consultaPendente) {
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
 
-    if (nomeRobo) {
+    let mensagem = {
+      DataEnfileiramento: new Date(),
+      NumeroProcesso: consultaPendente.NumeroProcesso,
+      NumeroOab: consultaPendente.NumeroOab,
+      SeccionalOab: consultaPendente.SeccionalOab
+    };
+    // verifica se tem processos cadastrados com aquele cnj e não processados (DataTermino nula)
+    const consultasCadastradas = await ExecucaoConsulta.count({"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, DataTermino: null});
+
+    if (nomeRobo && !consultasCadastradas) {
       const nomeFila = `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
+      
       const execucao = {
         ConsultaCadastradaId: consultaPendente._id,
         NomeRobo: nomeRobo,
@@ -48,19 +58,24 @@ module.exports.LogExecucao = class LogExecucao {
           {
             status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`
           }
-        ]
+        ],
+        Mensagem: [mensagem]
       };
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();
-      const mensagem = {
-        ExecucaoConsultaId: ex._id,
-        ConsultaCadastradaId: consultaPendente._id,
-        DataEnfileiramento: new Date(),
-        NumeroProcesso: consultaPendente.NumeroProcesso,
-        NumeroOab: consultaPendente.NumeroOab,
-        SeccionalOab: consultaPendente.SeccionalOab
-      };
+      mensagem.ExecucaoConsultaId = ex._id,
+      mensagem.ConsultaCadastradaId = consultaPendente._id,
       gf.enviar(nomeFila, mensagem);
+
+      return { sucesso: true, enviado: true, mensagem: `Processo ${mensagem.NumeroProcesso} enviado para a fila.` };
+    }
+
+    if (!nomeRobo) {
+      return { sucesso: false, mensagem: 'Nome do robo inválido.' };
+    }
+
+    if (consultasCadastradas) {
+      return { sucesso: true, enviado: false, mensagem: `Processo ${mensagem.NumeroProcesso} já consta na fila.` };
     }
   }
   

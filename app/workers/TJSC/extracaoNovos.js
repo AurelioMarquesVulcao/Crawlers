@@ -3,7 +3,7 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
-const { Helper, Logger } = require('../../lib/util');
+const { Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 
 const logarExecucao = async (execucao) => {
@@ -20,7 +20,7 @@ const logarExecucao = async (execucao) => {
     console.log(e);
   });
 
-  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSC}.extracao.novos`;
+  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSC}.extracao.novos.1`;
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
@@ -41,23 +41,23 @@ const logarExecucao = async (execucao) => {
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
-      let extracao = await Extracao.criarExtracao(
+      await Extracao.criarExtracao(
         message,
         resultadoExtracao,
         message.SeccionalOab
       );
       logger.info('Resultado da extracao salva');
 
-      logger.info('Enviando resposta ao BigData');
-      const resposta = await Helper.enviarFeedback(
-        extracao.prepararEnvio()
-      ).catch((err) => {
-        console.log(err);
-        throw new Error(
-          `OabTJSC - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-        );
-      });
-      logger.info('Resposta enviada ao BigData');
+      // logger.info('Enviando resposta ao BigData');
+      // const resposta = await Helper.enviarFeedback(
+      //   extracao.prepararEnvio()
+      // ).catch((err) => {
+      //   console.log(err);
+      //   throw new Error(
+      //     `OabTJSC - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+      //   );
+      // });
+      // logger.info('Resposta enviada ao BigData');
       logger.info('Finalizando processo');
       await logarExecucao({
         Mensagem: message,
@@ -71,9 +71,8 @@ const logarExecucao = async (execucao) => {
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
     } catch (e) {
-      console.log('ERRU', e.code, e.message, '\n\n', e);
       logger.info('Encontrado erro durante a execução');
-      logger.info(`Error: ${e.message}`);
+      logger.log('error', e);
       logger.info('Finalizando proceso');
       await logarExecucao({
         LogConsultaId: message.LogConsultaId,

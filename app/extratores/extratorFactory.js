@@ -7,6 +7,7 @@ const { ProcessoTJSC } = require('./ProcessoTJSC');
 class ExtratorFactory {
   static getExtrator(fila, isDebug) {
     let extrator;
+    let url;
 
     if (/oab.TJBAPortal/.test(fila)) {
       extrator = new OabTJBAPortal(
@@ -24,11 +25,25 @@ class ExtratorFactory {
     }
 
     if (/oab.TJSC/.test(fila)) {
-      extrator = new OabTJSC('https://esaj.tjsc.jus.br/cpopg/open.do', isDebug);
+      if (/\.1/.test(fila)) // primeira instancia
+        url = 'https://esaj.tjsc.jus.br/cpopg';
+      if (/\.2/.test(fila)) // segunda instancia
+        url = 'https://esaj.tjsc.jus.br/cposgtj';
+      if(/\.tr/.test(fila)) // turmas recursais
+        url = 'https://esaj.tjsc.jus.br/cposg5';
+
+      extrator = new OabTJSC(url, isDebug);
     }
 
     if (/processo.TJSC/.test(fila)) {
-      extrator = new ProcessoTJSC(isDebug);
+      if (/\.1/.test(fila))
+        url = 'https://esaj.tjsc.jus.br/cpopg';
+      if (/\.2/.test(fila))
+        url = 'https://esaj.tjsc.jus.br/cposgtj';
+      if(/\.tr/.test(fila))
+        url = 'https://esaj.tjsc.jus.br/cposg5';
+
+      extrator = new ProcessoTJSC(url, isDebug);
     }
 
     return extrator;

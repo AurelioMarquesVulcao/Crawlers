@@ -53,7 +53,7 @@ class ProcessoTJSC extends ExtratorBase {
         'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
       'Sec-Fetch-Site': 'same-origin',
       'Sec-Fetch-Mode': 'navigate',
-      Referer: 'https://esaj.tjsc.jus.br/cpopg/search.do',
+      Referer: `${this.url}/search.do`,
       'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
     };
     let tentativas = 0;
@@ -63,7 +63,7 @@ class ProcessoTJSC extends ExtratorBase {
     try {
       this.logger.info('Fazendo primeira conexão.');
       objResponse = await this.robo.acessar({
-        url: `https://esaj.tjsc.jus.br/cpopg/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`,
+        url: `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`,
         usaProxy: false,
       });
       this.logger.info('Conexão ao website concluido.');
@@ -85,7 +85,7 @@ class ProcessoTJSC extends ExtratorBase {
 
         this.logger.info('Preparando para acessar site do processo.');
 
-        url = `https://esaj.tjsc.jus.br/cpopg/show.do?processo.codigo=2B0000W8N0000&processo.foro=${this.detalhes.origem}&processo.numero=${this.detalhes.numeroProcessoMascara}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+        url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=${this.detalhes.origem}&processo.numero=${this.detalhes.numeroProcessoMascara}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
         this.logger.info(`Acessando o site. [Tentativa: ${tentativas + 1}]`);
         objResponse = await this.robo.acessar({
           url: url,
@@ -149,7 +149,7 @@ class ProcessoTJSC extends ExtratorBase {
   async getCaptchaUuid(cookies) {
     let objResponse;
     objResponse = await this.robo.acessar({
-      url: 'https://esaj.tjsc.jus.br/cpopg/captchaControleAcesso.do',
+      url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
       encoding: 'latin1',
       usaProxy: false,
@@ -168,7 +168,7 @@ class ProcessoTJSC extends ExtratorBase {
     captcha = await captchaHandler
       .resolveRecaptchaV2(
         // captcha = await antiCaptchaHandler(
-        'https://esaj.tjsc.jus.br/cpopg/open.do',
+        `${this.url}/open.do`,
         this.dataSiteKey,
         '/'
       )

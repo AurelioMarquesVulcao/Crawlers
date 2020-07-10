@@ -47,7 +47,7 @@ class OabTJSC extends ExtratorBase {
 
       this.logger.info('Fazendo primeira conexão ao website');
       objResponse = await this.robo.acessar({
-        url: this.url,
+        url: `${this.url}/open.do`,
         method: 'GET',
         usaProxy: true,
         encoding: 'latin1',
@@ -93,22 +93,22 @@ class OabTJSC extends ExtratorBase {
           for (const processo of listaProcessos) {
             cadastroConsulta['NumeroProcesso'] = processo;
             this.logger.info(
-              `Criando log de execução para o processo ${processo}.`
+              `Verificando log de execução para o processo ${processo}.`
             );
-            await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
+            let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
             this.logger.info(
-              `Log de execução do processo ${processo} feito com sucesso`
+              `Log de execução do processo ${processo} verificado com sucesso`
             );
-            this.logger.info(
-              `Enviando processo ${processo} a fila de extração.`
-            );
-            resultados.push(Promise.resolve({numeroProcesso: processo}));
+            this.logger.info(logExec.mensagem);
+
+            if (logExec.enviado)
+              resultados.push(Promise.resolve({numeroProcesso: processo}));   
           }
 
           //resultados = await this.extrairProcessos(listaProcessos, cookies);
           return Promise.all(resultados)
             .then((resultados) => {
-              this.logger.info('Processos extraidos com sucesso');
+              this.logger.info(`${resultados.length} Processos enviados para extração`);
               return {
                 resultado: resultados,
                 sucesso: true,
@@ -194,7 +194,7 @@ class OabTJSC extends ExtratorBase {
   async getCaptchaUuid(cookies) {
     let objResponse;
     objResponse = await this.robo.acessar({
-      url: 'https://esaj.tjsc.jus.br/cpopg/captchaControleAcesso.do',
+      url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
       encoding: 'latin1',
       usaProxy: true,
@@ -215,7 +215,7 @@ class OabTJSC extends ExtratorBase {
 
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
     await this.robo.acessar({
-      url: 'https://esaj.tjsc.jus.br/cpopg/manterSessao.do?conversationId=',
+      url: `${this.url}/manterSessao.do?conversationId=`,
       headers: {
         Cookie: cookies,
         Accept:
@@ -231,7 +231,7 @@ class OabTJSC extends ExtratorBase {
 
     let condition = false;
     let processos = [];
-    let url = `https://esaj.tjsc.jus.br/cpopg/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    let url = `${this.url}/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
     // console.log('cookies', cookies);
     // console.log(url);
     do {

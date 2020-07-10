@@ -47,19 +47,16 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      logger.info('Enviando resposta ao BigData');
-      await Helper.enviarFeedback(
-        extracao.prepararEnvio()
-      ).catch((err) => {
-        console.log(err);
-        throw new Error(
-          `OabTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-        );
-      });
-      logger.info('Resposta enviada ao BigData');
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      //ch.ack(msg); removerComentario
-      logger.info('Mensagem reconhecida');
+      // logger.info('Enviando resposta ao BigData');
+      // await Helper.enviarFeedback(
+      //   extracao.prepararEnvio()
+      // ).catch((err) => {
+      //   console.log(err);
+      //   throw new Error(
+      //     `OabTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+      //   );
+      // });
+      // logger.info('Resposta enviada ao BigData');
       logger.info('Finalizando processo');
       await logarExecucao({
         Mensagem: message,
@@ -69,13 +66,12 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
-    } catch (e) {
-      console.log('ERRU', e.code, e.message, '\n\n', e);
-      logger.info('Encontrado erro durante a execução');
-      logger.info(`Error: ${e.message}`);
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-      //ch.ack(msg); //TODO remover comentario
+      ch.ack(msg);
       logger.info('Mensagem reconhecida');
+    } catch (e) {
+      logger.info('Encontrado erro durante a execução');
+      logger.log('error',e);
       logger.info('Finalizando proceso');
       await logarExecucao({
         LogConsultaId: message.LogConsultaId,
@@ -87,6 +83,9 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
+      logger.info('Reconhecendo mensagem ao RabbitMQ');
+      ch.ack(msg);
+      logger.info('Mensagem reconhecida');
     }
   });
 })();

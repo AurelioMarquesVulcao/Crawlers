@@ -115,6 +115,9 @@ class RoboPuppeteer {
     await this.browser.close();
   }
 }
+
+
+
 (async () => {
   let puppet = new RoboPuppeteer();
   await puppet.iniciar()

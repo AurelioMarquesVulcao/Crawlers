@@ -42,20 +42,28 @@ const salvarLog = async (log) => {
   );
 }
 
-(async () => {
+const connect = () => {
   mongoose.connect(enums.mongo.connString, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-  }); 
+  });
 
   mongoose.connection.on("error", (e) => {
     console.log(e);
-  });
+  });   
+}
 
-  // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJRS}.extracao.novos`;
-  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJRS}.extracao.novos`;
+const disconnect = async () => {
+  await mongoose.connection.close();
+}
 
-    new GerenciadorFila().consumir(enums.robos.TJRS.fila, async (ch, msg) => {
+(async () => {
+
+    connect();
+
+    const fila = `oab.${enums.robos.TJRS.filaExtracao}`;
+
+    new GerenciadorFila().consumir(fila, async (ch, msg) => {
 
       try {
         
@@ -63,17 +71,15 @@ const salvarLog = async (log) => {
         const message = JSON.parse(msg.content.toString());
         const nome = `${capitalize(enums.tipoConsulta.Oab)}${enums.robos.TJRS.nome}`;
         const pathLog = `logs/${nome}/${nome}Info.log`;
-        const logger = new Logger('info', pathLog,
-          {
-            nomeRobo: enums.robos.TJRS.nome,
-            NumeroOab: message.NumeroOab,
-          }
-        );
+        const logger = new Logger('info', pathLog, { nomeRobo: enums.robos.TJRS.nome, NumeroOab: message.NumeroOab });
   
         logger.info(`Início Consumo do robo ${enums.robos.TJRS.nome}!`);        
 
-        const extrator = ExtratorFactory.getExtrator(enums.robos.TJRS.fila, true);
+        const extrator = ExtratorFactory.getExtrator(fila, true);
         
+        console.log(extrator);
+        Helper.pred("---...");
+
         logger.info('Extrator recuperado e identificado!');
 
         logger.info('extracao inicializada!');

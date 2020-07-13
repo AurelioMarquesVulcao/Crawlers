@@ -42,44 +42,46 @@ const salvarLog = async (log) => {
   );
 }
 
-(async () => {
+const connect = () => {
   mongoose.connect(enums.mongo.connString, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-  }); 
+  });
 
   mongoose.connection.on("error", (e) => {
     console.log(e);
-  });
+  });   
+}
 
-  // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJRS}.extracao.novos`;
-  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJRS}.extracao.novos`;
+const disconnect = async () => {
+  await mongoose.connection.close();
+}
 
-    new GerenciadorFila().consumir(enums.robos.TJRS.fila, async (ch, msg) => {
+(async () => {
 
+    connect();
+
+    const fila = `processo.${enums.robos.TJRS.filaExtracao}`;
+
+    new GerenciadorFila().consumir(fila, async (ch, msg) => {
       try {
         
         const dataInicio = new Date();
         const message = JSON.parse(msg.content.toString());
         const nome = `${capitalize(enums.tipoConsulta.Oab)}${enums.robos.TJRS.nome}`;
         const pathLog = `logs/${nome}/${nome}Info.log`;
-        const logger = new Logger('info', pathLog,
-          {
-            nomeRobo: enums.robos.TJRS.nome,
-            NumeroOab: message.NumeroOab,
-          }
-        );
+        const logger = new Logger('info', pathLog, { nomeRobo: enums.robos.TJRS.nome, NumeroDoProcesso: message.NumeroDoProcesso, NumeroOab: message.NumeroOab });
   
         logger.info(`Início Consumo do robo ${enums.robos.TJRS.nome}!`);        
 
-        const extrator = ExtratorFactory.getExtrator(enums.robos.TJRS.fila, true);
-        
+        const extrator = ExtratorFactory.getExtrator(fila, true);
+
         logger.info('Extrator recuperado e identificado!');
 
-        logger.info('extracao inicializada!');
+        logger.info('extracao inicializada!');        
 
         console.time('extracao');        
-        const resultadoExtracao = await extrator.extrair(message.NumeroOab);
+        const resultadoExtracao = await extrator.extrair(message.NumeroProcesso);
         console.time('extracao');
         
         logger.info('extracao finalizada!');
@@ -150,3 +152,5 @@ const salvarLog = async (log) => {
   });
   
 })();
+
+

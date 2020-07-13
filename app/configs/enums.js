@@ -33,7 +33,8 @@ module.exports.enums = Object.freeze({
   robos: {
     TJRS: {
       nome: "TJRS",
-      fila: "oab.TJRS.extracao.novos"
+      filaExtracao: "TJRS.extracao.novos",
+      filaReprocessamento: "TJRS.extracao.novos"
     }
   },
   tipoConsulta: {

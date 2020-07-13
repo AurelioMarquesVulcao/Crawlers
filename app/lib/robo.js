@@ -203,8 +203,7 @@ class Robo {
         auth: { username: 'proadvproxy', password: 'C4fMSSjzKR5v9dzg' },
       };
 
-    options.timeout = 60000;
-    console.log(options)
+    options.timeout = 60000;    
     return this.requisicao.enviarRequest(options);
   }
 }

@@ -64,7 +64,7 @@ processoSchema.methods.salvar = async function salvar() {
   let processoObject = this.toObject();
   let pesquisaAndamentos = 0;
   delete processoObject['_id'];
-  console.log('verificando se há processos já salvos');
+  // verificando se há processos já salvos
   let pesquisa = await new Promise((resolve, reject) => {
     Processo.findOne(
       {
@@ -80,7 +80,7 @@ processoSchema.methods.salvar = async function salvar() {
     );
   });
 
-  console.log('verificando a quantidade de andamentos dentro do banco');
+  // verificando a quantidade de andamentos dentro do banco
   let doc = await new Promise((resolve, reject) => {
     processoObject.temAndamentosNovos = true;
     if (pesquisa && this.qtdAndamentos === pesquisa.qtdAndamentos) {
@@ -100,7 +100,7 @@ processoSchema.methods.salvar = async function salvar() {
     );
   });
 
-  console.log('Verifica se o processo foi atualizado');
+  // Verifica se o processo foi atualizado
   if (doc.upserted) {
     return {
       numeroProcesso: processoObject.detalhes.numeroProcesso,
@@ -116,7 +116,6 @@ processoSchema.methods.salvar = async function salvar() {
     pesquisaAndamentos = 0;
   }
 
-  console.log('retornando');
   return {
     numeroProcesso: processoObject.detalhes.numeroProcesso,
     temAndamentosNovos: processoObject.temAndamentosNovos,

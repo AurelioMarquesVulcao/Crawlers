@@ -29,9 +29,10 @@ class TJBAPortalParser extends BaseParser {
   }
 
   extrairComarca (content) {
+    let distribuicao = removerAcentos(content.distribuicao);
     for (let c of COMARCAS) {
-      if (c.test(content.distribuicao)) {
-        return c.toString().replace(/\//g, '');
+      if (c.test(distribuicao.toLowerCase())) {
+        return c.toString().replace(/\//g, '').toUpperCase();
       }
     }
   }

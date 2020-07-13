@@ -19,19 +19,19 @@ class JTEParser extends BaseParser {
 
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
-  parse($, $2) {
+  parse($, $2,numeroProcesso) {
     //console.time('parse');
     let dadosProcesso = new Processo({
-      capa: this.capa($),
+      capa: this.capa($,numeroProcesso),
       oabs: this.removeVazios(this.Oabs($)),
       qtdAndamentos: this.numeroDeAndamentos($2),
       origemExtracao: enums.nomesRobos.JTE,
       envolvidos: this.envolvidos($),
       //advogados: this.advogados($),
       // "origemDados": enums.nomesRobos.JTE,  // verificar esse campo.
-      detalhes: this.detalhes($)
+      detalhes: this.detalhes($,numeroProcesso)
     })
-    let n = this.detalhes($).numeroProcesso.trim()
+    let n = this.detalhes($,numeroProcesso).numeroProcesso.trim()
     let dadosAndamento = this.andamento($2, n)
     // console.timeEnd('parse');
     return {
@@ -41,9 +41,9 @@ class JTEParser extends BaseParser {
   }
 
   // funcao secundaria - organiza os dados da capa
-  capa($) {
+  capa($,numeroProcesso) {
     let capa = {
-      uf: this.estado($), // inserir uf na raspagem do puppeteer
+      uf: this.estado($,numeroProcesso), // inserir uf na raspagem do puppeteer
       comarca: "", // perguntar onde extraio a comarca
       vara: this.extraiVaraCapa($).trim(),
       fase: '', // perguntar onde extraio a comarca
@@ -54,8 +54,8 @@ class JTEParser extends BaseParser {
     return capa
   }
 
-  detalhes($) {
-    let numeroProcesso = this.extraiNumeroProcesso($)
+  detalhes($, numeroProcesso) {
+    // let numeroProcesso = this.extraiNumeroProcesso($)
     let detalhes = Processo.identificarDetalhes(numeroProcesso)
     return detalhes
   }
@@ -124,9 +124,9 @@ class JTEParser extends BaseParser {
     else return teste
   }
 
-  estado($) {
+  estado($,numeroProcesso) {
     let resultado = 'Estado indeterminado'
-    let dados = this.detalhes($).tribunal
+    let dados = this.detalhes($,numeroProcesso).tribunal
     if (dados == 2 || dados == 15) resultado = 'SP'
     if (dados == 1) resultado = 'RJ'
     // if (dados == 15) resultado = 'SP'

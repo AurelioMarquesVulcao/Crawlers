@@ -13,6 +13,8 @@ const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseE
 const { ExtratorBase } = require('./extratores');
 const { JTEParser } = require('../parsers/JTEParser');
 
+const { RoboPuppeteer3 } = require('../lib/roboPuppeteer_teste2')
+
 /**
  * Logger para console e arquivo
  */
@@ -23,11 +25,12 @@ class ProcJTE extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
     this.parser = new JTEParser();
+    this.puppet = new RoboPuppeteer3();
     this.dataSiteKey = '6LfDrDsUAAAAAOpZjoH4CP7G3_NJR1ogyeRFlOzR';
   }
 
 
-  async extrair(numeroProcesso) { 
+  async extrair(numeroProcesso, contador) {
     // let numeroProcesso = NumeroOab
     let dadosProcesso;
     try {
@@ -39,7 +42,12 @@ class ProcJTE extends ExtratorBase {
         numeroProcesso: numeroProcesso,
       }
       );
-      let objResponse = await RoboPuppeteer(numeroProcesso)
+      // let objResponse = await RoboPuppeteer(numeroProcesso)
+      console.log('ligou até aqui');
+
+      let objResponse = await this.puppet.preencheProcesso(numeroProcesso, contador)
+
+      console.log('pegou os dadosa da pagina');
 
       //Estou carregando paginas locais até resolver o Puppeteer.
       let $ = cheerio.load(objResponse.geral);
@@ -49,12 +57,12 @@ class ProcJTE extends ExtratorBase {
       await dadosProcesso.processo.salvar()
       await Andamento.salvarAndamentos(dadosProcesso.andamentos)
     } catch (e) {
-      //console.log(e);
+      console.log(e);
     }
 
     //  usar return simples apenas para dev
     logger.info('Processos extraidos com sucesso');
-    if (!!dadosProcesso){
+    if (!!dadosProcesso) {
       return {
         resultado: dadosProcesso,
         sucesso: true,
@@ -62,7 +70,7 @@ class ProcJTE extends ExtratorBase {
         logs: logger.logs
       };
     }
-    
+
 
   } // End extrair function
 
@@ -71,27 +79,6 @@ class ProcJTE extends ExtratorBase {
 module.exports.ProcJTE = ProcJTE;
 
 // DEV START'S FOR PROJECT TEST and development
-(async () => {
-  await new ProcJTE().extrair("00021625020145020016")
-})()
-
-// códigos de desenvolvimento
-
-      // Call a page already with the captchas resolved from a local directory.
-      // var responseDev
-      //fs.readFile(`test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
-        // fs.readFile(`app/test/testCases/JTE/g${numeroProcesso}.html`, 'utf8', (err, data) => {
-        //console.log(!!data)
-        //console.log(err)
-        // console.log(data);
-        //responseDev = data
-      //});
-
-      //var responseDev2
-      //fs.readFile(`test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
-        // fs.readFile(`app/test/testCases/JTE/m${numeroProcesso}.html`, 'utf8', (err, data) => {
-        //console.log(!!data)
-        //console.log(err)
-        // console.log(data);
-        //responseDev2 = data
-      //});
+// (async () => {
+//   await new ProcJTE().extrair("00021625020145020016")
+// })()

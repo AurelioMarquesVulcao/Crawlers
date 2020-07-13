@@ -90,16 +90,22 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  # geraFila:
-  #     extends:
-  #       file: common-services.yml
-  #       service: base_node
-  #     mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #     command: node workers/JTE/extracaoNovos_Mg.js
-  #     logging:
-  #       driver: "json-file"
-  #       options:
-  #         max-size: "10m"
-  #         max-file: "5"
+  worker-jte-teste:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: node workers/JTE/extracaoNovos.js
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+  gera-fila:
+      extends:
+        file: common-services.yml
+        service: base_node
+      command: node lib/criaFilaJTE.js
+
 

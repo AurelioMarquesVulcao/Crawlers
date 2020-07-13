@@ -11,6 +11,9 @@ const {
 const { ExtratorBase } = require('./extratores');
 const { TJSCParser } = require('../parsers/TJSCParser');
 
+const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json').INSTANCIAS_URL;
+
+
 class ProcessoTJSC extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
@@ -21,17 +24,23 @@ class ProcessoTJSC extends ExtratorBase {
     this.numeroDoProcesso = '';
   }
 
+  setInstanciaUrl(instancia) {
+    this.url = INSTANCIAS_URLS[instancia - 1];
+  }
+
   /**
    *
    * @param {String} numeroDoProcesso o numero do processo
    * @param {String} numeroDaOab indica que a extração teve inicio com uma oab
    * @returns {Promise<{sucesso: boolean, logs: [], numeroDoProcesso: string}|{sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: ("undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint")}|{resultado: (void|*|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos: *}|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos}), sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: string}>}
    */
-  async extrair(numeroDoProcesso, numeroDaOab = '') {
+  async extrair(numeroDoProcesso, numeroDaOab = '', instancia=1) {
     const nomeRobo = 'ProcessoTJSC';
     this.numeroDaOab = numeroDaOab;
     this.numeroDoProcesso = numeroDoProcesso;
     this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
+    this.instancia = instancia;
+    this.setInstanciaUrl(instancia);
 
     this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
       nomeRobo: 'processo.TJSC',
@@ -43,7 +52,7 @@ class ProcessoTJSC extends ExtratorBase {
     let gResponse;
     let cookies;
     let objResponse;
-    let url;
+    let url = '';
     let headers = {
       Host: 'esaj.tjsc.jus.br',
       Connection: 'keep-alive',
@@ -62,8 +71,18 @@ class ProcessoTJSC extends ExtratorBase {
 
     try {
       this.logger.info('Fazendo primeira conexão.');
+
+      console.log(this.instancia)
+      if (this.instancia === 1){
+        url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`
+      }  else {
+        url = `${this.url}/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(0, 15)}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${this.detalhes.numeroProcessoMascara}&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`
+      }
+
+      console.log('PRE URL', url);
+
       objResponse = await this.robo.acessar({
-        url: `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`,
+        url: url,
         usaProxy: false,
       });
       this.logger.info('Conexão ao website concluido.');
@@ -85,7 +104,16 @@ class ProcessoTJSC extends ExtratorBase {
 
         this.logger.info('Preparando para acessar site do processo.');
 
-        url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=${this.detalhes.origem}&processo.numero=${this.detalhes.numeroProcessoMascara}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+        if (this.instancia === 1){
+          url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=${this.detalhes.origem}&processo.numero=${this.detalhes.numeroProcessoMascara}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+        }
+        else {
+          url = `${this.url}/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(0, 15)}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${this.detalhes.numeroProcessoMascara}&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`
+        }
+
+        console.log(url);
+        console.log(cookies);
+
         this.logger.info(`Acessando o site. [Tentativa: ${tentativas + 1}]`);
         objResponse = await this.robo.acessar({
           url: url,

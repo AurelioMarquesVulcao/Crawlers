@@ -12,6 +12,8 @@ const { TJSCParser } = require('../parsers/TJSCParser');
 
 const { LogExecucao } = require('../lib/logExecucao');
 
+const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json').INSTANCIAS_URL;
+
 class OabTJSC extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
@@ -20,13 +22,27 @@ class OabTJSC extends ExtratorBase {
     this.logger = null;
   }
 
-  async extrair(numeroOab, cadastroConsultaId) {
-    // console.log('cadastroConsultaId', cadastroConsultaId);
+  setInstanciaUrl(instancia) {
+    this.url = INSTANCIAS_URLS[instancia - 1];
+  }
+
+  /**
+   * Extrai os processos
+   * @param {String|Number} numeroOab
+   * @param {ObjectID} cadastroConsultaId
+   * @param {Number} instancia
+   * @returns {Promise<{resultado: [], sucesso: boolean, logs: *, detalhes: string}|{resultado: unknown[], sucesso: boolean, logs: *, detalhes: string}|{resultado: [], sucesso: boolean, logs: *, detalhes: string}>}
+   */
+  async extrair(numeroOab, cadastroConsultaId, instancia=1) {
+    console.log(`numeroOaa: ${numeroOab}\ncadastroConsultaId: ${cadastroConsultaId}\ninstancia: ${instancia}`);
+    this.setInstanciaUrl(instancia);
     this.numeroDaOab = numeroOab;
+    this.instancia = instancia;
     let cadastroConsulta = {
       SeccionalOab: 'SC',
       TipoConsulta: 'processo',
       NumeroOab: numeroOab,
+      Instancia: instancia,
       _id: cadastroConsultaId,
     };
 
@@ -59,7 +75,7 @@ class OabTJSC extends ExtratorBase {
         return element.replace(/;.*/, '');
       });
       cookies = cookies.join('; ');
-      cookies = cookies.replace(/cposgtj\d/, 'cpopg3');
+      // cookies = cookies.replace(/cposgtj\d/, 'cpopg3');
 
       this.logger.info('Fazendo pré-analise do website em busca de captchas');
       preParse = await this.preParse(objResponse.responseBody, cookies);
@@ -80,11 +96,11 @@ class OabTJSC extends ExtratorBase {
           gResponse
         );
         // console.log(listaProcessos);
-        this.logger.info('Lista de processos recuperada');
 
         // Terceira parte: passar a lista, pegar cada um dos codigos
         // resultantes e mandar para o parser
         if (listaProcessos.length > 0) {
+          this.logger.info('Lista de processos recuperada');
           this.logger.info('Inicio do processo de extração de processos');
 
           let lista = await Processo.listarProcessos(2);
@@ -95,6 +111,7 @@ class OabTJSC extends ExtratorBase {
             this.logger.info(
               `Verificando log de execução para o processo ${processo}.`
             );
+            console.log(0, cadastroConsulta);
             let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
             this.logger.info(
               `Log de execução do processo ${processo} verificado com sucesso`
@@ -127,6 +144,7 @@ class OabTJSC extends ExtratorBase {
               };
             });
         }
+        this.logger.info('Lista de processos vazia');
         tentativa++;
         gResponse = await this.getCaptcha();
       } while (tentativa < 5);
@@ -173,7 +191,7 @@ class OabTJSC extends ExtratorBase {
     captcha = await captchaHandler
       .resolveRecaptchaV2(
         // captcha = await antiCaptchaHandler(
-        'https://esaj.tjsc.jus.br/cpopg/open.do',
+        `${this.url}/open.do`,
         this.dataSiteKey,
         '/'
       )
@@ -214,6 +232,7 @@ class OabTJSC extends ExtratorBase {
   }
 
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
+    let url = '';
     await this.robo.acessar({
       url: `${this.url}/manterSessao.do?conversationId=`,
       headers: {
@@ -224,17 +243,24 @@ class OabTJSC extends ExtratorBase {
         'Accept-Encoding': 'gzip, deflate, br',
         DNT: '1',
         Connection: 'keep-alive',
-        Referer: 'https://esaj.tjsc.jus.br/cpopg/search.do',
+        Referer: `${this.url}/search.do`,
         'Upgrade-Insecure-Requests': '1',
       },
     });
 
     let condition = false;
     let processos = [];
-    let url = `${this.url}/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-    // console.log('cookies', cookies);
-    // console.log(url);
+
+    // Verifica qual é a instancia e monta a url de acordo
+    if (this.instancia === 2) {
+      url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=0&cbPesquisa=NUMOAB&dePesquisa=${numeroOab}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`
+    } else {
+      url = `${this.url}/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    }
+
     do {
+      // console.log(url);
+      // console.log(cookies);
       let objResponse = {};
       objResponse = await this.robo.acessar({
         url: url,
@@ -249,7 +275,7 @@ class OabTJSC extends ExtratorBase {
           'Accept-Encoding': 'gzip, deflate, br',
           DNT: '1',
           Connection: 'keep-alive',
-          Referer: 'https://esaj.tjsc.jus.br/cpopg/search.do',
+          Referer: `${this.url}/search.do`,
           'Upgrade-Insecure-Requests': '1',
         },
       });

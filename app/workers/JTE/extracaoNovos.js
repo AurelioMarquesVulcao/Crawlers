@@ -17,6 +17,7 @@ const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer_teste2')
+const sleep = require('await-sleep');
 
 
 
@@ -28,12 +29,17 @@ let logger;
 
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
-}
+};
 
 
-var contador = 0;
 
-(async () => {
+
+
+async function tryInfinito() {
+
+  var contador = 0;
+  var contaErro = 0;
+
   mongoose.connect(enums.mongo.connString, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -68,6 +74,8 @@ var contador = 0;
   // tudo que está abaixo é acionado para cada processo na fila.
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+
+
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     let logger = new Logger(
@@ -108,8 +116,9 @@ var contador = 0;
         console.log('ligou até aqui');
 
         let objResponse = await puppet.preencheProcesso(numeroProcesso, contador)
-        if (!!objResponse)contador++
-        
+        if (!!objResponse) contador++
+
+
 
         console.log('pegou os dadosa da pagina');
 
@@ -182,6 +191,13 @@ var contador = 0;
       ch.ack(msg);
 
     } catch (e) {
+      contaErro++
+      if (contaErro > 1) {
+        await sleep(120000);
+        tryInfinito()
+
+      }
+
       console.log(e);
 
       // envia a mensagem para a fila de reprocessamento
@@ -215,7 +231,8 @@ var contador = 0;
 
   });
 
-})();
+}
+tryInfinito();
 
 //---------- funcoes complementares de tratamento--------------
 
@@ -239,3 +256,6 @@ function processaNumero(numero) {
     vara: vara
   }
 }
+
+
+

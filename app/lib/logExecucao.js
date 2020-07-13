@@ -41,10 +41,11 @@ module.exports.LogExecucao = class LogExecucao {
       DataEnfileiramento: new Date(),
       NumeroProcesso: consultaPendente.NumeroProcesso,
       NumeroOab: consultaPendente.NumeroOab,
-      SeccionalOab: consultaPendente.SeccionalOab
+      SeccionalOab: consultaPendente.SeccionalOab,
+      Instancia: consultaPendente.Instancia
     };
     // verifica se tem processos cadastrados com aquele cnj e não processados (DataTermino nula)
-    const consultasCadastradas = await ExecucaoConsulta.countDocuments({"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, DataTermino: null});
+    const consultasCadastradas = await ExecucaoConsulta.countDocuments({"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, "Mensagem.Instancia": mensagem.Instancia, DataTermino: null});
 
     if (nomeRobo && !consultasCadastradas) {
       const nomeFila = `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
@@ -62,7 +63,7 @@ module.exports.LogExecucao = class LogExecucao {
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();
       mensagem.ExecucaoConsultaId = ex._id
-      mensagem.ConsultaCadastradaId = consultaPendente._id
+      mensagem.ConsultaCadastradaId = consultaPendente._id;
       gf.enviar(nomeFila, mensagem);
 
       return { sucesso: true, enviado: true, mensagem: `Processo ${mensagem.NumeroProcesso} enviado para a fila.` };

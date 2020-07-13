@@ -25,25 +25,11 @@ class ExtratorFactory {
     }
 
     if (/oab.TJSC/.test(fila)) {
-      if (/\.1/.test(fila)) // primeira instancia
-        url = 'https://esaj.tjsc.jus.br/cpopg';
-      if (/\.2/.test(fila)) // segunda instancia
-        url = 'https://esaj.tjsc.jus.br/cposgtj';
-      if(/\.tr/.test(fila)) // turmas recursais
-        url = 'https://esaj.tjsc.jus.br/cposg5';
-
-      extrator = new OabTJSC(url, isDebug);
+      extrator = new OabTJSC('https://esaj.tjsc.jus.br/cpopg', isDebug);
     }
 
     if (/processo.TJSC/.test(fila)) {
-      if (/\.1/.test(fila))
-        url = 'https://esaj.tjsc.jus.br/cpopg';
-      if (/\.2/.test(fila))
-        url = 'https://esaj.tjsc.jus.br/cposgtj';
-      if(/\.tr/.test(fila))
-        url = 'https://esaj.tjsc.jus.br/cposg5';
-
-      extrator = new ProcessoTJSC(url, isDebug);
+      extrator = new ProcessoTJSC('https://esaj.tjsc.jus.br/cpopg', isDebug);
     }
 
     return extrator;

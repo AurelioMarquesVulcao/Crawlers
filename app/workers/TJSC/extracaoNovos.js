@@ -20,7 +20,7 @@ const logarExecucao = async (execucao) => {
     console.log(e);
   });
 
-  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSC}.extracao.novos.1`;
+  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSC}.extracao.novos`;
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
@@ -37,7 +37,8 @@ const logarExecucao = async (execucao) => {
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(
         message.NumeroOab,
-        message.ConsultaCadastradaId
+        message.ConsultaCadastradaId,
+        message.Instancia
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');

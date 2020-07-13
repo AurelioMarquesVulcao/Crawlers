@@ -37,7 +37,8 @@ const logarExecucao = async (execucao) => {
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(
         message.NumeroProcesso,
-        message.NumeroOab
+        message.NumeroOab,
+        message.Instancia
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');

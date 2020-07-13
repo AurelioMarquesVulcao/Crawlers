@@ -7,7 +7,7 @@ const { TJSCParser } = require('../parsers/TJSCParser');
 const dataAtual = moment().format('YYYY-MM-DD');
 const dataFormatada = new Date(dataAtual).toISOString();
 
-const teste = (numeroProcesso) => {
+const teste = (numeroProcesso, instancia) => {
   const codigoHtml = fs.readFileSync(
     `test/testCases/TJSC/${numeroProcesso}.html`
   );
@@ -17,7 +17,7 @@ const teste = (numeroProcesso) => {
   respostaString = String(respostaString);
   respostaString = respostaString.replace(/dataFormatada/gm, dataFormatada);
   const resposta = JSON.parse(respostaString);
-  const extracao = new TJSCParser().parse(codigoHtml);
+  const extracao = new TJSCParser().parse(codigoHtml, instancia);
 
   it('CAPA', function () {
     const capa = extracao.processo.capa.toJSON();
@@ -53,9 +53,12 @@ const teste = (numeroProcesso) => {
 
 describe('TJSC - Teste de Parser', function () {
   describe('Processo: 03236535520148240023', function () {
-    teste('03236535520148240023');
+    teste('03236535520148240023', 1);
   });
   describe('Processo: 00040096520198240011', function () {
-    teste('00040096520198240011');
+    teste('00040096520198240011', 1);
   });
+  describe('Processo: 00468204820128240023', function () {
+    teste('00468204820128240023', 2);
+  })
 });

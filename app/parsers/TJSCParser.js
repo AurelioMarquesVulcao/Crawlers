@@ -14,12 +14,14 @@ class TJSCParser extends BaseParser {
   /**
    * Recupera da pagina HTML os dados do processo
    * @param {string} content html da pagina
+   * @param {number} instancia do processo
    * @returns {{processo: Processo, andamentos: [Andamento]}}
    */
-  parse(content) {
+  parse(content, instancia) {
+    console.log('instancia', instancia);
+    this.instancia = instancia;
     const $ = cheerio.load(content);
     const dataAtual = moment().format('YYYY-MM-DD');
-
     const capa = this.extrairCapa($);
     const detalhes = this.extrairDetalhes($);
     const envolvidos = this.extrairEnvolvidos($);
@@ -61,30 +63,42 @@ class TJSCParser extends BaseParser {
   extrairComarca($) {
     let comarca;
 
-    comarca = removerAcentos(
+    comarca =
       $(
         'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-2.mb-2 > div'
       )
         .text()
         .strip()
-    );
+    ;
 
-    return comarca;
+    if (comarca === '') {
+      comarca = $('body > div.div-conteudo.container.unj-mb-40 > table:nth-child(12) > tbody > tr > td:nth-child(2)')
+        .text()
+        .strip()
+    }
+
+
+    return removerAcentos(comarca);
   }
 
   extrairAssunto($) {
     let assuntos = [];
+    let assunto;
 
-    assuntos.push(
-      removerAcentos(
-        $(
-          'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-3.mb-3 > div'
-        )
-          .text()
-          .strip()
+    assunto = $(
+      'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-3.mb-3 > div'
+    )
+      .text()
+      .strip();
+    if (assunto === '') {
+      assunto = $(
+        'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-md-4 > div > span'
       )
-    );
+        .text()
+        .strip();
+    }
 
+    assuntos.push(removerAcentos(assunto));
     return assuntos;
   }
 
@@ -113,13 +127,22 @@ class TJSCParser extends BaseParser {
       .strip();
 
     detalhes = Processo.identificarDetalhes(numeroProcesso);
-
+    detalhes.instancia = this.instancia;
     return detalhes;
   }
 
   extrairEnvolvidos($) {
     let envolvidos = [];
-    const table = $('#tablePartesPrincipais > tbody > tr');
+    let table;
+    let selector;
+
+    table = $('#tableTodasPartes > tbody > tr');
+    console.log(table.length);
+    selector = "#tableTodasPartes";
+    if (table.length === 0) {
+      table = $('#tablePartesPrincipais > tbody > tr');
+      selector = "#tablePartesPrincipais";
+    }
 
     // pegar personagens
     table.map((index) => {
@@ -128,16 +151,18 @@ class TJSCParser extends BaseParser {
 
       // Extracao
       envolvido.tipo = $(
-        `#tablePartesPrincipais > tbody > tr:nth-child(${
+        `${selector} > tbody > tr:nth-child(${
           index + 1
         }) > td:nth-child(1).label > span`
       )[0].children[0].data.strip();
+      console.log('data1')
       envolvido.nome = $(
-        `#tablePartesPrincipais > tbody > tr:nth-child(${
+        `${selector} > tbody > tr:nth-child(${
           index + 1
         }) > td:nth-child(2)`
       )[0].children[0].data.strip();
-      advogados = this.recuperaAdvogados(index, $);
+      console.log('data2')
+      advogados = this.recuperaAdvogados(index, $, selector);
 
       // Tratamento
       envolvido.tipo = envolvido.tipo.replace(':', '').split(/\W/)[0];
@@ -156,13 +181,13 @@ class TJSCParser extends BaseParser {
     return envolvidos;
   }
 
-  recuperaAdvogados(upperIndex, $) {
+  recuperaAdvogados(upperIndex, $, selector) {
     let advogados;
     let linha;
 
     // 1 transformar tudo em linhas
     linha = $(
-      `#tablePartesPrincipais > tbody > tr:nth-child(${
+      `${selector} > tbody > tr:nth-child(${
         upperIndex + 1
       }) > td:nth-child(2)`
     )
@@ -170,7 +195,7 @@ class TJSCParser extends BaseParser {
       .strip() // tira os espacos vazios
       .split(/\s\s+/) // list feita a partir das quebras de linha
       .splice(1); // remove primeiro elemento que normalmente é o nome do envolvido
-    if (linha) {
+    if (selector !== '#tableTodasPartes') {
       linha = [linha.join(' ')];
     }
     advogados = linha.map((element) => {
@@ -180,8 +205,8 @@ class TJSCParser extends BaseParser {
         nome: '',
       };
 
-      let resultado = re.exec(element, re(regex));
-
+      let resultado = re.exec(element.replace('\n', ' '), re(regex));
+      console.log('element', element, '\n');
       // Extracao
       if (resultado) {
         adv.tipo = resultado.tipo.strip();
@@ -245,21 +270,35 @@ class TJSCParser extends BaseParser {
   extrairAndamentos($, dataAtual, numeroProcesso) {
     let andamentos = [];
     let andamentosHash = [];
-    const table = $('#tabelaTodasMovimentacoes > tr');
+    let observacao;
+    let table;
+    let selector;
+    table = $('#tabelaTodasMovimentacoes > tr');
+    selector = "#tabelaTodasMovimentacoes";
+    // if (table.length === 0) {
+    //   table = $('#tabelaUltimasMovimentacoes > tr');
+    //   selector = "#tabelaUltimasMovimentacoes";
+    // }
+
     table.each((index) => {
       let data = $(
-        `#tabelaTodasMovimentacoes > tr:nth-child(${
+        `${selector} > tr:nth-child(${
           index + 1
         }) > td:nth-child(1)`
       );
       data = moment(data.text().strip(), 'DD/MM/YYYY').format('YYYY-MM-DD');
       let descricaoRaw = $(
-        `#tabelaTodasMovimentacoes > tr:nth-child(${
+        `${selector} > tr:nth-child(${
           index + 1
         }) > td:nth-child(3)`
       );
 
-      let observacao = descricaoRaw.find('span')[0].children[0].data.strip();
+      if (descricaoRaw.find('span')[0].children.length > 0) {
+        observacao = descricaoRaw.find('span')[0].children[0].data.strip();
+      } else {
+        observacao = descricaoRaw.find('span').text().strip();
+      }
+      console.log('data3');
       let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
       observacao = observacao.replace(/\n/gm, ' ');
       observacao = re.replace(observacao, re(/\s\s+/gm), ' ');

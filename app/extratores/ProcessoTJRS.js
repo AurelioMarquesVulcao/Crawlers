@@ -100,7 +100,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
 //     // console.log('1', captchaResponse.data);
 //     // console.log('2', audio.toString('base64'));
 
-    saveFileSync(`./assets/captcha/audio.captcha.${oab}.wav`, audio, 'base64');
+    saveFileSync(`./app/assets/captcha/audio.captcha.${oab}.wav`, audio, 'base64');
 
     const captcha = {      
       audio

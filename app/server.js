@@ -35,6 +35,7 @@ app.get("/getProcesso", (req, res) => {
         console.log(err);
         res.status(220).send(err);
       }
+      console.log('resposta', result);
       let resposta = result.toJSON();
       Andamento.find({ numeroProcesso: req.query.numeroProcesso }, function (
         err,

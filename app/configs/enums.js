@@ -28,7 +28,10 @@ module.exports.enums = Object.freeze({
   nomesRobos: {
     TJBAPortal: "TJBAPortal",
     TJSP: "TJSP",
-    TJRS: "TJRS"
+    TJRS: "TJRS",
+    TJSC: "TJSC",
+    TJMG: "TJMG",
+    JTE: "JTE"    
   },
   robos: {
     TJRS: {
@@ -42,7 +45,9 @@ module.exports.enums = Object.freeze({
     Processo: "processo"
   },
   bigdataUrls: {
-    resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`
+    resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`,
+    login: `http://${bigdataAddress}/login/`,
+    captchaDecoder: 'http://172.16.16.8:5000/api/solve',
   },
   proxy: {
     proxiesUrl: process.env.PROXY_ADDRESS

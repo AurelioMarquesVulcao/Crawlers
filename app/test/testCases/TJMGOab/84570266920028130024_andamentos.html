@@ -1,0 +1,3306 @@
+<html>
+  <head>
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link href="/css/tjmg.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="js/sfUtil.js"></script>
+    <style type="text/css">
+      <!--
+      .linha3  {
+               background-color: #FFFFFF;
+               font-family: Verdana, Arial, Helvetica, sans-serif;
+               font-size: 7pt;
+               font-style: normal
+      }
+
+      .linha4  {
+               background-color: #F3E2E2;
+               font-family: Verdana, Arial, Helvetica, sans-serif;
+               font-size: 7pt;
+               font-style: normal
+      }
+      -->
+    </style>
+    <title>TJMG - Andamento Processual - Andamentos</title>
+  </head>
+
+  <body>
+    <!-- cabecalho -->
+    <script type="text/javascript" src="/js/tjmg.js" id="jsTjmg"></script>
+    <script type="text/javascript" src="/js/tjmg_ui.js" id="jsTjmgUi"></script>
+
+    <style type="text/css">
+      header .wrapper-header {
+        background: #7e1819;
+        color: white;
+        padding: 0px 0 0px 0;
+      }
+    </style>
+
+    <header role="banner">
+      <div class="wrapper-header">
+        <a
+          target="_blank"
+          title="Link para Portal TJMG"
+          aria-label="Logo do Tribunal de Justiça do Estado de Minas Gerais"
+          class="brand-logo logo-tjmg"
+          href="http://www.tjmg.jus.br"
+        >
+          <img src="imagens/logo_tjmg.png" />
+        </a>
+      </div>
+    </header>
+    <!-- menu -->
+
+    <style>
+      a.link-consulta:active,
+      a.link-consulta:visited {
+        color: #1515ab;
+      }
+
+      a.link-consulta:hover {
+        color: #000a66;
+        text-decoration: none;
+      }
+    </style>
+
+    <noscript
+      ><br />
+      <center>
+        <font color="#FF0000;"
+          ><b
+            >O Javascript do seu Browser est&aacute; desativado. Voc&ecirc; deve
+            ativ&aacute;-lo para realizar a pesquisa.</b
+          ></font
+        >
+      </center></noscript
+    >
+    <br />
+    <div
+      style="
+        text-align: right;
+        font-size: 10px;
+        font-style: italic;
+        font-weight: bold;
+      "
+    >
+      Versão de 02/12/2019 16:53
+    </div>
+
+    <p class="info">
+      Melhor visualizado nas vers&otilde;es mais recentes dos navegadores
+      Internet Explorer, Google Chrome ou Mozilla Firefox.
+    </p>
+
+    <div style="text-align: center;">
+      <br /><br />
+
+      O TJMG possui outros sistemas de consulta processual. Verifique também:
+      <a
+        class="link-consulta"
+        href="https://pje.tjmg.jus.br/pje/ConsultaPublica/listView.seam"
+        target="_blank"
+        >PJe Justiça Comum e JEsp</a
+      >&nbsp;&nbsp;-&nbsp;&nbsp;
+      <a
+        class="link-consulta"
+        href="https://pjerecursal.tjmg.jus.br/pje/ConsultaPublica/listView.seam"
+        target="_blank"
+        >PJe Recursal</a
+      >&nbsp;&nbsp;-&nbsp;&nbsp;
+      <a
+        class="link-consulta"
+        href="https://projudi.tjmg.jus.br/projudi/interno.jsp?endereco=/projudi/consultapublica/CentroConsultaPublica"
+        target="_blank"
+        >PROJUDI</a
+      >&nbsp;&nbsp;-&nbsp;&nbsp;
+      <a
+        class="link-consulta"
+        href="http://seeu.pje.jus.br/seeu/processo/consultaPublica.do?actionType=iniciar"
+        target="_blank"
+        >SEEU</a
+      >
+      <br /><br />
+    </div>
+
+    <p id="localizacao">
+      &raquo; Consultas &raquo; Andamento Processual &raquo; 1&ordf;
+      Inst&acirc;ncia &raquo; Resultados
+    </p>
+
+    <div class="tabbar">
+      <span class="corpo">1&ordf; Inst&acirc;ncia:</span>
+      <a href="index.jsp" class="tabact">N&uacute;meros</a>
+      <a href="index_nome.jsp">Partes</a>
+      <a href="index_oab.jsp">Advogados</a>
+      <a href="emitir_certidao.jsp">Certid&atilde;o</a>
+
+      <span class="corpo">2&ordf; Inst&acirc;ncia:</span>
+      <a href="proc_massiva2.jsp">N&uacute;meros</a>
+      <a href="proc_nome.jsp?comrCodigo=24&amp;numero=20">Partes</a>
+      <a href="proc_oab.jsp?comrCodigo=24&amp;numero=20">Advogados</a>
+      <a href="emitir_certidao2.jsp">Certid&atilde;o</a>
+
+      &nbsp;&nbsp;
+      <!--   span class="corpo"><a href="https://projudi.tjmg.gov.br/projudi/interno.jsp?endereco=/projudi/buscas/ProcessosParte" target="sisCNJ">Processo Eletr&ocirc;nico</a></span -->
+    </div>
+
+    <h1>Comarca de Belo Horizonte - Dados do processo</h1>
+
+    <p align="center" class="corpo">
+      <b> Todos os Andamentos </b>
+    </p>
+
+    <form method="get" action="proc_massiva.jsp">
+      <table width="100%" class="corpo">
+        <tr>
+          <td>
+            <input
+              type="button"
+              class="botao_vinho"
+              value="Voltar"
+              onclick="history.back(); return false"
+            />
+          </td>
+          <td align="right">
+            <input
+              type="button"
+              class="botao_vinho"
+              value="Imprimir"
+              onclick="self.print()"
+            />
+            <input type="hidden" name="comrCodigo" value="24" />
+            <input type="hidden" name="numero" value="1" />
+            <input type="submit" class="botao_vinho" value="Nova Consulta" />
+          </td>
+        </tr>
+      </table>
+    </form>
+    <hr />
+
+    <table width="100%" class="tabela_formulario">
+      <tr>
+        <td nowrap align="left"><b>N&Uacute;MERO TJMG: 002402845702-6</b></td>
+        <td nowrap align="left">
+          <b>NUMERAÇÃO ÚNICA: 8457026-69.2002.8.13.0024</b>
+        </td>
+      </tr>
+      <tr>
+        <td nowrap align="center"><b> 24ª VARA CÍVEL </b></td>
+        <td nowrap align="center" width="15%"><b> ATIVO </b></td>
+      </tr>
+    </table>
+    <br />
+
+    <table class="corpo" align="center">
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE ALVARÁ JUDICIAL&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          19/05/2020
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          29/04/2020
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE COMPROVANTE ENVIO DE OF.-MALOTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/04/2020
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/04/2020
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO CITAÇÃO/INTIMAÇÃO/NOTIFICAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/05/2020
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/04/2020
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROFERIDO DESPACHO - CUMPRA-SE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/04/2020
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) SUBSTITUTO LEGAL 23192 &nbsp;&nbsp;</td>
+        <td>
+          03/04/2020
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO (OUTRAS)&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          03/04/2020
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          04/03/2020
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          04/03/2020
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          17/10/2019
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO VISTA PARTES&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/10/2019
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE CARTA PRECATÓRIA&nbsp;&nbsp;</td>
+        <td>CUMPRIDA &nbsp;&nbsp;</td>
+        <td>
+          08/10/2019
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          30/04/2019
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROFERIDO DESPACHO - CUMPRA-SE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          30/04/2019
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 23739 &nbsp;&nbsp;</td>
+        <td>
+          26/04/2019
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE CARTA PRECATÓRIA&nbsp;&nbsp;</td>
+        <td>LEILÃO CUMPRIDO &nbsp;&nbsp;</td>
+        <td>
+          26/04/2019
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          26/04/2019
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          11/03/2019
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/01/2019
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CARTA PRECATÓRIA .&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          03/01/2019
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          03/01/2019
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          28/12/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO INTIMAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          06/12/2018
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          23/11/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROFERIDO DESPACHO - EXPEÇA-SE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          26/07/2018
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROFERIDO DESPACHO - MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/05/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 23739 &nbsp;&nbsp;</td>
+        <td>
+          06/04/2018
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/04/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          03/04/2018
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          02/04/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>111202/MG &nbsp;&nbsp;</td>
+        <td>
+          27/03/2018
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>111202/MG &nbsp;&nbsp;</td>
+        <td>
+          28/02/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA ÀS PARTES EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          23/02/2018
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROFERIDO DESPACHO - MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/02/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 23739 &nbsp;&nbsp;</td>
+        <td>
+          29/01/2018
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE CARTA PRECATÓRIA&nbsp;&nbsp;</td>
+        <td>CAXAMBU &nbsp;&nbsp;</td>
+        <td>
+          29/01/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          29/01/2018
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/01/2018
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          21/11/2017
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO VISTA AUTOR&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/11/2017
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE CARTA PRECATÓRIA&nbsp;&nbsp;</td>
+        <td>NC &nbsp;&nbsp;</td>
+        <td>
+          01/11/2017
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          19/10/2017
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>REMETIDOS OS AUTOS AO SETOR DA OAB&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          18/10/2017
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          18/10/2017
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/08/2017
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO CITAÇÃO/INTIMAÇÃO/NOTIFICAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/08/2017
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          03/08/2017
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          27/07/2017
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          20/07/2017
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE COMPROVANTE GUIA DE CUSTAS E TAX&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          02/06/2017
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO INTIMAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          17/05/2017
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          04/05/2017
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROFERIDO DESPACHO - EXPEÇA-SE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/12/2016
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 23739 &nbsp;&nbsp;</td>
+        <td>
+          21/11/2016
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>056543/MG &nbsp;&nbsp;</td>
+        <td>
+          21/11/2016
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO&nbsp;&nbsp;</td>
+        <td>056543/MG &nbsp;&nbsp;</td>
+        <td>
+          16/11/2016
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO (OUTRAS)&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          16/11/2016
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          18/08/2016
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/08/2016
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/08/2016
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>056543/MG &nbsp;&nbsp;</td>
+        <td>
+          08/08/2016
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>056543/MG &nbsp;&nbsp;</td>
+        <td>
+          03/08/2016
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO INTIMAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          03/08/2016
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROFERIDO DESPACHO - MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          06/04/2016
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 23739 &nbsp;&nbsp;</td>
+        <td>
+          25/01/2016
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) SUBSTITUTO(A) 33415 &nbsp;&nbsp;</td>
+        <td>
+          26/10/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          26/10/2015
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          01/09/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          26/08/2015
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          26/08/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>042437E/MG &nbsp;&nbsp;</td>
+        <td>
+          26/08/2015
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>042437E/MG &nbsp;&nbsp;</td>
+        <td>
+          19/06/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO CITAÇÃO/INTIMAÇÃO/NOTIFICAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          19/06/2015
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>DOCUMENTO ENTREGUE&nbsp;&nbsp;</td>
+        <td>. &nbsp;&nbsp;</td>
+        <td>
+          15/06/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CERTIDÃO DE .&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          15/06/2015
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) SUBSTITUTO(A) 33415 &nbsp;&nbsp;</td>
+        <td>
+          10/06/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO (OUTRAS)&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/06/2015
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO INTIMAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          12/06/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          29/04/2015
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS AO ÓRGÃO PÚBLICO SEAJUR- 24A.V.CIVEL&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          29/04/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          11/12/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REDISTRIBUÍDO POR CRIAÇÃO/EXTINÇÃO/ALTERAÇÃO DE COMPETÊNCIA DE
+          VARA&nbsp;&nbsp;
+        </td>
+        <td>00240125 &nbsp;&nbsp;</td>
+        <td>
+          25/04/2015
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE COMPROVANTE TAXA CERTIDÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          11/12/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          11/12/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DOCUMENTO ENTREGUE&nbsp;&nbsp;</td>
+        <td>CERTIDÃO &nbsp;&nbsp;</td>
+        <td>
+          10/12/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CERTIDÃO DE FATOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          04/12/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO EXPEÇA-SE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/11/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/11/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/11/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/11/2011
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>041306E/MG &nbsp;&nbsp;</td>
+        <td>
+          07/11/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>041306E/MG &nbsp;&nbsp;</td>
+        <td>
+          03/11/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          03/11/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          02/09/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO INTIMAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          27/08/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          25/08/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          22/08/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          22/08/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>041306E/MG &nbsp;&nbsp;</td>
+        <td>
+          22/08/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>041306E/MG &nbsp;&nbsp;</td>
+        <td>
+          07/08/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE-15 DIAS EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          06/08/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 26807 &nbsp;&nbsp;</td>
+        <td>
+          30/07/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/05/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>DECORRIDO PRAZO DO(A) PARTES&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/05/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/05/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXECUTADOS EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          12/03/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/03/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          14/02/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/02/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/02/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/02/2014
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>032320E/MG &nbsp;&nbsp;</td>
+        <td>
+          07/02/2014
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>032320E/MG &nbsp;&nbsp;</td>
+        <td>
+          17/12/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          12/12/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DECORRIDO PRAZO DO(A) 09122013&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/12/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXECUTADOS-15DIAS EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          20/09/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DECORRIDO PRAZO DO(A) 17092013&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          17/09/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA ÀS PARTES EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          30/08/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE CARTA PRECATÓRIA&nbsp;&nbsp;</td>
+        <td>. &nbsp;&nbsp;</td>
+        <td>
+          28/08/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          15/07/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          15/07/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>DOCUMENTO ENTREGUE&nbsp;&nbsp;</td>
+        <td>PRECATÓRIA AG.DEV. &nbsp;&nbsp;</td>
+        <td>
+          28/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          28/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CARTA PRECATÓRIA .&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          23/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          23/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          23/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          23/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>038331E/MG &nbsp;&nbsp;</td>
+        <td>
+          22/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>038331E/MG &nbsp;&nbsp;</td>
+        <td>
+          17/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          16/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DECORRIDO PRAZO DO(A) EXECUTADO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          14/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          14/05/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXECUTADO EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          21/03/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          18/03/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO LAVRAR TERMO PENHORA EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          12/03/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 26807 &nbsp;&nbsp;</td>
+        <td>
+          06/03/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO (OUTRAS)&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          06/03/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/03/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/03/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>033137E/MG &nbsp;&nbsp;</td>
+        <td>
+          05/03/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>033137E/MG &nbsp;&nbsp;</td>
+        <td>
+          26/02/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO INTIMAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          11/01/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          08/01/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          08/01/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/01/2013
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>138637/MG &nbsp;&nbsp;</td>
+        <td>
+          07/01/2013
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>138637/MG &nbsp;&nbsp;</td>
+        <td>
+          12/12/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          14/12/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE CARTA PRECATÓRIA&nbsp;&nbsp;</td>
+        <td>PARC. CUMPRIDA &nbsp;&nbsp;</td>
+        <td>
+          12/12/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          12/12/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO (OUTRAS)&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/12/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/10/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          02/10/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          02/10/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>028474E/MG &nbsp;&nbsp;</td>
+        <td>
+          02/10/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>028474E/MG &nbsp;&nbsp;</td>
+        <td>
+          21/09/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          21/09/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 26807 &nbsp;&nbsp;</td>
+        <td>
+          06/09/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DECORRIDO PRAZO DO(A) 05092012&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/09/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA ÀS PARTES EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          02/08/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          31/07/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          11/06/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          06/06/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          REMETIDOS OS AUTOS DA CENTRAL DE DEVOLUÇÃO DE AUTOS PARA A SECRETARIA
+          DE JUÍZO&nbsp;&nbsp;
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          06/06/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          RECEBIDOS OS AUTOS PELA CENTRAL DE DEVOLUÇÃO DE AUTOS&nbsp;&nbsp;
+        </td>
+        <td>032320E/MG &nbsp;&nbsp;</td>
+        <td>
+          06/06/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>032320E/MG &nbsp;&nbsp;</td>
+        <td>
+          04/06/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          04/06/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 26807 &nbsp;&nbsp;</td>
+        <td>
+          29/03/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          29/03/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          28/02/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA ÀS PARTES EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          13/02/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/02/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA ÀS PARTES EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/02/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          07/02/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>024618E/MG &nbsp;&nbsp;</td>
+        <td>
+          25/01/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>024618E/MG &nbsp;&nbsp;</td>
+        <td>
+          13/01/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DOCUMENTO ENTREGUE&nbsp;&nbsp;</td>
+        <td>PRECATÓRIA &nbsp;&nbsp;</td>
+        <td>
+          13/01/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CARTA PRECATÓRIA CAXAMBU&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          13/01/2012
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/01/2012
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CARTA PRECATÓRIA .&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          01/12/2011
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/12/2011
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CARTA PRECATÓRIA .&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          01/12/2011
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          01/12/2011
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          01/12/2011
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>024618E/MG &nbsp;&nbsp;</td>
+        <td>
+          24/11/2011
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO&nbsp;&nbsp;</td>
+        <td>024618E/MG &nbsp;&nbsp;</td>
+        <td>
+          18/11/2011
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE CARTA PRECATÓRIA&nbsp;&nbsp;</td>
+        <td>NAO CUMPRIDA &nbsp;&nbsp;</td>
+        <td>
+          18/11/2011
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          05/10/2011
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/06/2011
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO (OUTRAS)&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/06/2011
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          10/05/2011
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA EXEQUENTE EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          29/04/2011
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DECORRIDO PRAZO DO(A) 25042011&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          25/04/2011
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          23/11/2010
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO (OUTRAS)&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          23/11/2010
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          28/10/2010
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PUBLICADO DESPACHO VISTA ÀS PARTES EM&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          15/09/2010
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE OFÍCIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          13/09/2010
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DOCUMENTO ENTREGUE&nbsp;&nbsp;</td>
+        <td>CARTA PRECATÓRIA &nbsp;&nbsp;</td>
+        <td>
+          17/08/2010
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>020803E/MG &nbsp;&nbsp;</td>
+        <td>
+          17/08/2010
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>020803E/MG &nbsp;&nbsp;</td>
+        <td>
+          09/08/2010
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>DOCUMENTO ENTREGUE&nbsp;&nbsp;</td>
+        <td>CARTA PRECATÓRIA &nbsp;&nbsp;</td>
+        <td>
+          09/08/2010
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CARTA PRECATÓRIA CAXAMBU&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          11/08/2010
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CARTA PRECATÓRIA AVALIAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          04/08/2010
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>EXPEDIÇÃO DE CARTA PRECATÓRIA .&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          11/12/2009
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          04/12/2009
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>ATO ORDINATÓRIO MERO EXPEDIENTE&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          17/11/2009
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA DE PETIÇÃO DE MANIFESTAÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          17/11/2009
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROTOCOLIZADA PETIÇÃO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          27/10/2009
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO TRIBUNAL DE JUSTIÇA&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          19/10/2009
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>REMETIDOS OS AUTOS AO TRIBUNAL DE JUSTIÇA&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          17/09/2008
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JULGAMENTO DE EMBARGOS &nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/02/2004
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>APENSAMENTO - EFETIVADO(A)&nbsp;&nbsp;</td>
+        <td>024042578781 &nbsp;&nbsp;</td>
+        <td>
+          09/02/2004
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>020548/MG &nbsp;&nbsp;</td>
+        <td>
+          05/02/2004
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO RÉU &nbsp;&nbsp;</td>
+        <td>020548/MG &nbsp;&nbsp;</td>
+        <td>
+          29/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>DILIGÊNCIA - DEFERIDO(A)&nbsp;&nbsp;</td>
+        <td>DEVOLUCAO PRAZO &nbsp;&nbsp;</td>
+        <td>
+          31/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DILIGÊNCIA - DEFERIDO(A)&nbsp;&nbsp;</td>
+        <td>DEVOLUCAO PRAZO &nbsp;&nbsp;</td>
+        <td>
+          31/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) SUBSTITUTO(A) 10801 &nbsp;&nbsp;</td>
+        <td>
+          29/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>PETIÇÀO &nbsp;&nbsp;</td>
+        <td>
+          29/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>001891E/MG &nbsp;&nbsp;</td>
+        <td>
+          23/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>001891E/MG &nbsp;&nbsp;</td>
+        <td>
+          18/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS VISTA &nbsp;&nbsp;</td>
+        <td>EXEQUENTE &nbsp;&nbsp;</td>
+        <td>
+          18/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA CUMPRIR DILIGÊNCIA &nbsp;&nbsp;</td>
+        <td>AG. PUBLICAR &nbsp;&nbsp;</td>
+        <td>
+          15/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>CARTA PRECATÓRIA &nbsp;&nbsp;</td>
+        <td>
+          15/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JUNTADA DE &nbsp;&nbsp;</td>
+        <td>PET &nbsp;&nbsp;</td>
+        <td>
+          10/12/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA DEVOLUÇÃO PRECATÓRIA &nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          21/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>PETICAO &nbsp;&nbsp;</td>
+        <td>
+          21/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JUNTADA DE &nbsp;&nbsp;</td>
+        <td>PET &nbsp;&nbsp;</td>
+        <td>
+          18/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>083916/MG &nbsp;&nbsp;</td>
+        <td>
+          18/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>083916/MG &nbsp;&nbsp;</td>
+        <td>
+          14/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS VISTA &nbsp;&nbsp;</td>
+        <td>EXEQUENTE &nbsp;&nbsp;</td>
+        <td>
+          13/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA CUMPRIR DILIGÊNCIA &nbsp;&nbsp;</td>
+        <td>AG PUBLICACAO &nbsp;&nbsp;</td>
+        <td>
+          10/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>PETICAO &nbsp;&nbsp;</td>
+        <td>
+          10/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JUNTADA DE &nbsp;&nbsp;</td>
+        <td>PET &nbsp;&nbsp;</td>
+        <td>
+          06/11/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>PROCESSO SUSPENSO &nbsp;&nbsp;</td>
+        <td>30 DIAS &nbsp;&nbsp;</td>
+        <td>
+          30/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) SUBSTITUTO(A) 10801 &nbsp;&nbsp;</td>
+        <td>
+          29/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA CUMPRIR DILIGÊNCIA &nbsp;&nbsp;</td>
+        <td>AG DESPACHO &nbsp;&nbsp;</td>
+        <td>
+          22/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>PETICAO &nbsp;&nbsp;</td>
+        <td>
+          22/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JUNTADA DE &nbsp;&nbsp;</td>
+        <td>PET &nbsp;&nbsp;</td>
+        <td>
+          20/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>083916/MG &nbsp;&nbsp;</td>
+        <td>
+          17/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>083916/MG &nbsp;&nbsp;</td>
+        <td>
+          14/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS VISTA &nbsp;&nbsp;</td>
+        <td>EXEQUENTE &nbsp;&nbsp;</td>
+        <td>
+          10/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA CUMPRIR DILIGÊNCIA &nbsp;&nbsp;</td>
+        <td>AG.PUBLICAR &nbsp;&nbsp;</td>
+        <td>
+          07/10/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA DECURSO PRAZO &nbsp;&nbsp;</td>
+        <td>M-004 &nbsp;&nbsp;</td>
+        <td>
+          29/09/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA CUMPRIR PRECATÓRIA &nbsp;&nbsp;</td>
+        <td>CARTA PRECATÓRIA &nbsp;&nbsp;</td>
+        <td>
+          23/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>PETIÇÃO &nbsp;&nbsp;</td>
+        <td>
+          23/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JUNTADA DE &nbsp;&nbsp;</td>
+        <td>PETICAO &nbsp;&nbsp;</td>
+        <td>
+          15/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          15/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>083916/MG &nbsp;&nbsp;</td>
+        <td>
+          10/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS VISTA &nbsp;&nbsp;</td>
+        <td>EXEQUENTE &nbsp;&nbsp;</td>
+        <td>
+          10/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA CUMPRIR DILIGÊNCIA &nbsp;&nbsp;</td>
+        <td>AG. PUBLICAÇÃO &nbsp;&nbsp;</td>
+        <td>
+          07/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>PETIÇÃO &nbsp;&nbsp;</td>
+        <td>
+          07/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JUNTADA DE &nbsp;&nbsp;</td>
+        <td>PETICAO &nbsp;&nbsp;</td>
+        <td>
+          02/07/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA DEVOLUÇÃO PRECATÓRIA &nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          09/05/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>INTIMAÇÃO - ORDENADO(A)&nbsp;&nbsp;</td>
+        <td>AG.DEVOL.PRECATORIA &nbsp;&nbsp;</td>
+        <td>
+          09/05/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 22417822 &nbsp;&nbsp;</td>
+        <td>
+          05/05/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA CUMPRIR DILIGÊNCIA &nbsp;&nbsp;</td>
+        <td>AG DESPACHO &nbsp;&nbsp;</td>
+        <td>
+          05/05/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>PETICAO &nbsp;&nbsp;</td>
+        <td>
+          05/05/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JUNTADA DE &nbsp;&nbsp;</td>
+        <td>PETICAO &nbsp;&nbsp;</td>
+        <td>
+          02/05/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>RECEBIDOS OS AUTOS DO ADVOGADO&nbsp;&nbsp;</td>
+        <td>083916/MG &nbsp;&nbsp;</td>
+        <td>
+          30/04/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS ENTREGUES EM CARGA AO ADVOGADO DO AUTOR &nbsp;&nbsp;</td>
+        <td>083916/MG &nbsp;&nbsp;</td>
+        <td>
+          29/04/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AUTOS VISTA &nbsp;&nbsp;</td>
+        <td>EXEQUENTE &nbsp;&nbsp;</td>
+        <td>
+          25/04/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA CUMPRIR DILIGÊNCIA &nbsp;&nbsp;</td>
+        <td>AG PUBLICACAO &nbsp;&nbsp;</td>
+        <td>
+          22/04/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>JUNTADA EFETIVADA DE &nbsp;&nbsp;</td>
+        <td>OFICIO &nbsp;&nbsp;</td>
+        <td>
+          22/04/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA JUNTADA DE &nbsp;&nbsp;</td>
+        <td>PETICAO &nbsp;&nbsp;</td>
+        <td>
+          10/04/2003
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA DECURSO PRAZO &nbsp;&nbsp;</td>
+        <td>DIVERSOS 10/04 &nbsp;&nbsp;</td>
+        <td>
+          10/04/2003
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>AGUARDA DEVOLUÇÃO DE &nbsp;&nbsp;</td>
+        <td>CARTA PRECATORIA &nbsp;&nbsp;</td>
+        <td>
+          25/11/2002
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>DOCUMENTO À DISPOSIÇÃO: &nbsp;&nbsp;</td>
+        <td>CARTA PRECATORIA &nbsp;&nbsp;</td>
+        <td>
+          22/11/2002
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>DILIGÊNCIA - ORDENADO(A)&nbsp;&nbsp;</td>
+        <td>ASSINAR &nbsp;&nbsp;</td>
+        <td>
+          18/11/2002
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>INTIMAÇÃO - ORDENADO(A)&nbsp;&nbsp;</td>
+        <td>EXPEDIR C.PRECATORIA &nbsp;&nbsp;</td>
+        <td>
+          09/11/2002
+        </td>
+      </tr>
+
+      <tr class="linha2">
+        <td>
+          &nbsp;
+        </td>
+        <td>CONCLUSOS PARA DESPACHO&nbsp;&nbsp;</td>
+        <td>JUIZ(A) TITULAR 22417822 &nbsp;&nbsp;</td>
+        <td>
+          01/11/2002
+        </td>
+      </tr>
+
+      <tr class="linha1">
+        <td>
+          &nbsp;
+        </td>
+        <td>DISTRIBUÍDO POR SORTEIO&nbsp;&nbsp;</td>
+        <td>&nbsp;&nbsp;</td>
+        <td>
+          30/10/2002
+        </td>
+      </tr>
+    </table>
+
+    <div align="left" class="corpo">
+      <br />
+      Consulta realizada em <b> 07/05/2020 às 15:24:53 </b> <br />
+    </div>
+    <hr />
+    <form method="get" action="proc_massiva.jsp">
+      <table width="100%" class="corpo">
+        <tr>
+          <td>
+            <input
+              type="button"
+              class="botao_vinho"
+              value="Voltar"
+              onclick="history.back(); return false"
+            />
+          </td>
+          <td align="right">
+            <input
+              type="button"
+              class="botao_vinho"
+              value="Imprimir"
+              onclick="self.print()"
+            />
+            <input type="hidden" name="comrCodigo" value="24" />
+            <input type="hidden" name="numero" value="1" />
+            <input type="submit" class="botao_vinho" value="Nova Consulta" />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>

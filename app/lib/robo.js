@@ -86,7 +86,8 @@ class Requisicao {
             status: err.response.status,
             message: err.response.statusText,
             responseContent: null,
-            responseBody: '',
+            responseBody: err.response.data ? err.response.data : '',
+            headers: err.response.headers
           });
         });
     });

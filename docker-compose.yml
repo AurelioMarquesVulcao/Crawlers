@@ -79,6 +79,14 @@ services:
       service: base_node
     command: node workers/TJSC/extracaoProcesso.js
 
+  worker-tjmg-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    depends_on:
+      - nginx
+      - mongodb
+    command: node workers/TJMG/extracaoNovos.js
 
   cadastro-consulta:
     extends:

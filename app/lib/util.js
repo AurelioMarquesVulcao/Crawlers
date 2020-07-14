@@ -1,6 +1,7 @@
 const Crypto = require("crypto-js");
 const winston = require("winston");
 const moment = require("moment");
+const Axios = require('axios');
 
 const { Token } = require("../models/schemas/token");
 
@@ -74,6 +75,38 @@ class Helper {
       usaProxy: false,
       usaJson: true,
       params: msg
+    });
+  }
+
+  static async downloadImage(url, headers) {
+    return await Axios({
+      url,
+      method: 'GET',
+      responseType: 'arraybuffer',
+      headers: headers
+    }).then((response) => {
+      return Buffer.from(response.data).toString('base64');
+    });
+  }
+
+  static async downloadAudio(url, headers) {
+    return await Axios({
+      url,
+      method: 'GET',
+      responseType: 'arraybuffer',
+      headers: headers,
+    }).then((response) => {
+      return Buffer.from(response.data).toString('base64');
+    });
+  }
+
+  static async quebrarCaptcha(captchaString, tipo) {
+    return await new Robo().acessar({
+      url: enums.bigdataUrls.captchaDecoder,
+      method: 'POST',
+      usaProxy: false,
+      usaJson: true,
+      params: { captcha: captchaString, tipp: tipo },
     });
   }
 }

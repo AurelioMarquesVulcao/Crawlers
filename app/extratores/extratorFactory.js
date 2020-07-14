@@ -3,6 +3,7 @@ const { OabTJSP } = require('./OabTJSP');
 const { ProcessoTJSP } = require("./ProcessoTJSP");
 const { OabTJSC } = require('./OabTJSC');
 const { ProcessoTJSC } = require('./ProcessoTJSC');
+const { OabTJMG } = require('./OabTJMG');
 
 class ExtratorFactory {
   static getExtrator(fila, isDebug) {
@@ -32,6 +33,12 @@ class ExtratorFactory {
       extrator = new ProcessoTJSC('https://esaj.tjsc.jus.br/cpopg', isDebug);
     }
 
+    if (/oab.TJMG/.test(fila)) {
+      extrator = new OabTJMG(
+        'https://www4.tjmg.jus.br/juridico/sf/index_oab.jsp',
+        isDebug
+      );
+    }
     return extrator;
   }
 }

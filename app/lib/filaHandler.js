@@ -5,8 +5,13 @@ class GerenciadorFila {
   /** Handler que envia e consome mensagens de uma fila do RabbitMq.
    * @param {number} prefetch int com número de consumidores da fila.
    */
-  constructor(prefetch = 1) {
-    this.host = enums.rabbitmq.connString;
+  constructor(host = null, prefetch = 1) {
+    console.log('rabbithost', host);
+    if (host) {
+      this.host = host;
+    } else {
+      this.host = enums.rabbitmq.connString;
+    }
     this.prefetch = prefetch;
   }
 

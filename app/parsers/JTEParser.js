@@ -129,13 +129,13 @@ class JTEParser extends BaseParser {
   }
 
   estado($, numeroProcesso) {
-    console.log('olhe aqui---------------------------------------------------');
+    
 
     let resultado = 'Estado indeterminado'
-    console.log(numeroProcesso);
+    
 
     let dados = this.detalhes(numeroProcesso).tribunal
-    console.log(dados);
+    
 
     if (dados == 2 || dados == 15) resultado = 'SP'
     if (dados == 1) resultado = 'RJ'

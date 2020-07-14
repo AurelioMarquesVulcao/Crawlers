@@ -10,7 +10,7 @@ const { ExtratorFactory } = require("../../extratores/extratorFactory");
 const { Extracao } = require("../../models/schemas/extracao");
 const { Helper, Logger } = require("../../lib/util");
 const { LogExecucao } = require('../../lib/logExecucao');
-const { RoboPuppeteer } = require('../../lib/roboPuppeteer')
+const { RoboPuppeteer } = require('../../lib/roboPuppeteer-rev-000')
 const { Andamento } = require('../../models/schemas/andamento');
 const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseException, } = require('../../models/exception/exception');
 const { ExtratorBase } = require('../../extratores/extratores');
@@ -57,9 +57,6 @@ var contador = 0;
   }
 
 
-
-
-  //01003040720205010049
 
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
@@ -108,7 +105,9 @@ var contador = 0;
         // let objResponse = await RoboPuppeteer(numeroProcesso)
         console.log('ligou até aqui');
 
+        console.time("\033[0;32m"+"info: JTE - CNJ : ---------------- - tempo para preencher/obter um processo")
         let objResponse = await puppet.preencheProcesso(numeroProcesso, contador)
+        console.timeEnd("\033[0;32m"+"info: JTE - CNJ : ---------------- - tempo para preencher/obter um processo")
         if (!!objResponse)contador++
         
 

@@ -5,8 +5,10 @@ const { BaseParser } = require('./BaseParser');
 const { removerAcentos, traduzir } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
-
+const { COMARCAS } = require('../assets/tjba/comarcas');
 // parser => processo
+
+
 
 class TJBAPortalParser extends BaseParser {
   /**
@@ -20,11 +22,19 @@ class TJBAPortalParser extends BaseParser {
     let capa = {};
 
     capa['uf'] = 'BA';
-    capa['comarca'] = 'Bahia';
+    capa['comarca'] = removerAcentos(this.extrairComarca(content));
     capa['assunto'] = [this.extrairAssunto(content)];
     capa['classe'] = removerAcentos(content.classe);
-
     return capa;
+  }
+
+  extrairComarca (content) {
+    let distribuicao = removerAcentos(content.distribuicao);
+    for (let c of COMARCAS) {
+      if (c.test(distribuicao.toLowerCase())) {
+        return c.toString().replace(/\//g, '').toUpperCase();
+      }
+    }
   }
 
   extrairAssunto(content) {

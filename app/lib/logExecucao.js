@@ -35,6 +35,7 @@ module.exports.LogExecucao = class LogExecucao {
   }
 
   static async cadastrarConsultaPendente(consultaPendente) {
+    let resposta;
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
 
     let mensagem = {

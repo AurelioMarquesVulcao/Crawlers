@@ -69,6 +69,7 @@ class ProcessoTJSP extends ExtratorBase {
       this.logger.info('Fazendo primeira conexão.');
       objResponse = await this.robo.acessar({
         url: `https://esaj.tjsp.jus.br/cpopg/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`,
+        usaProxy: true
       });
       this.logger.info('Conexão ao website concluido.');
       cookies = objResponse.cookies;
@@ -97,6 +98,7 @@ class ProcessoTJSP extends ExtratorBase {
           method: 'GET',
           encoding: 'latin1',
           headers: headers,
+          usaProxy: true
         });
         const $ = cheerio.load(objResponse.responseBody);
         // verifica se há uma tabela de movimentação dentro da pagina.
@@ -158,7 +160,7 @@ class ProcessoTJSP extends ExtratorBase {
       url: 'https://esaj.tjsp.jus.br/cpopg/captchaControleAcesso.do',
       method: 'POST',
       encoding: 'latin1',
-      usaProxy: false,
+      usaProxy: true,
       headers: {
         Cookie: cookies,
       },

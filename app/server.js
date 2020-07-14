@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get('/getProcesso', (req, res) => {
+app.get("/getProcesso", (req, res) => {
   Processo.findOne(
     { "detalhes.numeroProcesso": req.query.numeroProcesso },
     function (err, result) {
@@ -55,12 +55,15 @@ app.get('/getProcesso', (req, res) => {
   );
 });
 
-app.get('/getAndamentos', (req, res) => {
-  Andamento.retornaAndamentos(req.query.numeroProcesso)
-    .then( andamentos => {
-      res.status(200).send({ processo: req.query.numeroProcesso, andamentos: andamentos });
-    })
-})
+app.get("/getAndamentos", (req, res) => {
+  Andamento.retornaAndamentos(req.query.numeroProcesso).then((andamentos) => {
+    res
+      .status(200)
+      .send({ processo: req.query.numeroProcesso, andamentos: andamentos });
+  });
+});
+
+app.use("/api", routes);
 
 // `mongodb://${process.env.MONGO_ROOT_USERNAME}:${process.env.MONGO_ROOT_PASSWORD}@mongodb/admin`,
 

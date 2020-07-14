@@ -67,8 +67,21 @@ services:
       service: base_node
     command: node workers/TJSP/extracaoProcesso.js
 
+  worker-tjsc-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSC/extracaoNovos.js
+
+  worker-tjsc-processo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSC/extracaoProcesso.js
+
+
   cadastro-consulta:
-    extends: 
+    extends:
       file: common-services.yml
       service: base_node
     command: node workers/consumer_cadastro_consulta.js

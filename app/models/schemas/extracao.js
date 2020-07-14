@@ -63,6 +63,10 @@ ExtracaoSchema.statics.criarExtracao = async function criarExtracao(
   return Extracao.findOne({ idLog: message.ExecucaoConsultaId });
 };
 
+/**
+ * Prepara um json com a formatação referente ao bigdata
+ * @returns {{Resultado: (null|[Object]), Sucesso: Boolean, Detalhes: [String], IdLog: String, NumeroDoProcesso: (null|String), NumeroOab: (null|String)}}
+ */
 ExtracaoSchema.methods.prepararEnvio = function prepararEnvio() {
   return {
     IdLog: this.idLog,

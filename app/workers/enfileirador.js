@@ -48,6 +48,7 @@ class Enfileirador {
       const execucao = {
         ConsultaCadastradaId: consultaPendente._id,
         NomeRobo: nomeRobo,
+        Instancia: consultaPendente.Instancia,
         Log: [
           {
             status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`,
@@ -60,6 +61,7 @@ class Enfileirador {
         ExecucaoConsultaId: ex._id,
         ConsultaCadastradaId: consultaPendente._id,
         DataEnfileiramento: new Date(),
+        Instancia: consultaPendente.Instancia,
         NumeroProcesso: consultaPendente.NumeroProcesso,
         NumeroOab: consultaPendente.NumeroOab,
         SeccionalOab: consultaPendente.SeccionalOab,

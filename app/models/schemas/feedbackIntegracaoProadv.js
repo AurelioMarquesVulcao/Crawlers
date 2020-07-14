@@ -18,6 +18,14 @@ feedbackIntegracaoProadvSchema.statics.salvar = async function salvar(obj) {
   new FeedbackIntegracaoProadv(obj).save();
 };
 
+feedbackIntegracaoProadvSchema.statics.marcarAtualizado = async function marcarAtualizado(obj) {  
+  await FeedbackIntegracaoProadv.updateOne({_id: obj.id}, {
+    $set: {
+      atualizado: true
+    }
+  });
+};
+
 const FeedbackIntegracaoProadv = mongoose.model('FeedbackIntegracaoProadv', feedbackIntegracaoProadvSchema, 'feedbackIntegracaoProadv');
 
 module.exports.FeedbackIntegracaoProadv = FeedbackIntegracaoProadv;

@@ -1,12 +1,9 @@
 const axios = require('axios');
+const HttpsProxyAgent = require('https-proxy-agent');
 const FormData = require('form-data');
 const moment = require('moment');
 
 const { RequestException } = require('../models/exception/exception');
-const { enums } = require('../configs/enums');
-
-const chromeUserAgent =
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
 
 class Requisicao {
   /**
@@ -40,22 +37,20 @@ class Requisicao {
     if (!cookies) return [];
 
     let reProxy = /SERVERID=.*;\spath=\//g;
-    let validos = cookies.filter((x) => {
+    return cookies.filter((x) => {
       return !reProxy.test(x);
     });
-
-    return validos;
   }
 
   async enviarRequest(options) {
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise((resolve) => {
       let statusCode = 500;
       axios(options)
         .then((res) => {
           if (res) {
             statusCode = res.status;
 
-            if (statusCode == 200) {
+            if (statusCode === 200) {
               const corpo = res.data ? res.data : true;
               resolve({
                 code: 'HTTP_200',
@@ -85,12 +80,14 @@ class Requisicao {
           }
         })
         .catch((err) => {
+          console.log('Robo erro', err);
           resolve({
             code: err.code,
-            status: 502,
-            message: err.message,
+            status: err.response.status,
+            message: err.response.statusText,
             responseContent: null,
-            responseBody: '',
+            responseBody: err.response.data ? err.response.data : '',
+            headers: err.response.headers
           });
         });
     });
@@ -130,14 +127,6 @@ class Requisicao {
   }
 }
 
-class Resposta {
-  constructor(labels = [], dados = [], error = null) {
-    this.labels = labels;
-    this.dados = dados;
-    this.error = error;
-  }
-}
-
 class Robo {
   /**
    * Robo
@@ -145,7 +134,6 @@ class Robo {
   constructor() {
     this.requisicao = new Requisicao();
     this.cookies = '';
-    this.headless = true;
   }
 
   /**
@@ -162,14 +150,14 @@ class Robo {
   async acessar({
     url,
     method = 'GET',
-    encoding = null,
+    encoding = '',
     usaProxy = false,
     usaJson = false,
     params = null,
     headers = {},
     randomUserAgent = false,
   } = {}) {
-    if (!url || url == '') throw new Error('URL vazia!');
+    if (!url || url === '') throw new Error('URL vazia!');
 
     headers['User-Agent'] = this.requisicao.obterUserAgent(randomUserAgent);
 
@@ -180,7 +168,7 @@ class Robo {
     };
 
     if (params) {
-      if (usaJson) options.json = params;
+      if (usaJson) options.data = params;
       // Json
       else {
         // FormData
@@ -193,18 +181,20 @@ class Robo {
       }
     }
 
-    if (usaProxy)
-      options.proxy = {
-        host: 'proxy-proadv.7lan.net',
-        port: 8181,
-        auth: { username: 'proadvproxy', password: 'C4fMSSjzKR5v9dzg' },
-      };
+    if (usaProxy) {
+      options.httpsAgent = new HttpsProxyAgent(
+        "http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181"
+      );
+    }
+    //   host: 'proxy-proadv.7lan.net',
+    //   port: 8181,
+    //   auth: 'proadvproxy:C4fMSSjzKR5v9dzg'
+    // });
 
     options.timeout = 60000;
     return this.requisicao.enviarRequest(options);
   }
 }
 
-module.exports.Resposta = Resposta;
 module.exports.Requisicao = Requisicao;
 module.exports.Robo = Robo;

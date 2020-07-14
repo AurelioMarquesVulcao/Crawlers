@@ -1,13 +1,13 @@
-require("../bootstrap");
-const mongoose = require("mongoose");
-const ConsultasCadastradas = require("../models/schemas/consultas_cadastradas")
+require('../bootstrap');
+const mongoose = require('mongoose');
+const ConsultasCadastradas = require('../models/schemas/consultas_cadastradas')
   .ConsultasCadastradas;
-const ExecucaoConsulta = require("../models/schemas/execucao_consulta")
+const ExecucaoConsulta = require('../models/schemas/execucao_consulta')
   .ExecucaoConsulta;
-const GerenciadorFila = require("../lib/filaHandler").GerenciadorFila;
-const moment = require("moment");
-const enums = require("../configs/enums").enums;
-const cron = require("node-cron");
+const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila;
+const moment = require('moment');
+const enums = require('../configs/enums').enums;
+const cron = require('node-cron');
 
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
@@ -49,11 +49,12 @@ class Enfileirador {
       const execucao = {
         ConsultaCadastradaId: consultaPendente._id,
         NomeRobo: nomeRobo,
+        Instancia: consultaPendente.Instancia,
         Log: [
           {
-            status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`
-          }
-        ]
+            status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`,
+          },
+        ],
       };
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();
@@ -61,11 +62,13 @@ class Enfileirador {
         ExecucaoConsultaId: ex._id,
         ConsultaCadastradaId: consultaPendente._id,
         DataEnfileiramento: new Date(),
+        Instancia: consultaPendente.Instancia,
         NumeroProcesso: consultaPendente.NumeroProcesso,
         NumeroOab: consultaPendente.NumeroOab,
-        SeccionalOab: consultaPendente.SeccionalOab
+        SeccionalOab: consultaPendente.SeccionalOab,
       };
       gf.enviar(nomeFila, mensagem);
+      console.log(`${mensagem} -> ${nomeFila}`);
     }
   }
 
@@ -74,12 +77,12 @@ class Enfileirador {
    */
   static async executar() {
     try {
-      const dataCorte = new moment().subtract(7, "days");
+      const dataCorte = new moment().subtract(7, 'days');
       const busca = {
         $or: [
           { DataUltimaConsultaTribunal: { $lte: dataCorte } },
-          { DataUltimaConsultaTribunal: null }
-        ]
+          { DataUltimaConsultaTribunal: null },
+        ],
       };
 
       const lista = await ConsultasCadastradas.find(busca);
@@ -95,10 +98,10 @@ class Enfileirador {
   }
 }
 
-console.log("Realizando execução ao iniciar o container.");
+console.log('Realizando execução ao iniciar o container.');
 Enfileirador.executar();
 
-cron.schedule("0 * * * *", () => {
-  console.log("Executando enfileirador.");
+cron.schedule('0 * * * *', () => {
+  console.log('Executando enfileirador.');
   Enfileirador.executar();
 });

@@ -62,8 +62,8 @@ var contador = 0;
   //01003040720205010049
 
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
-  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
-  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
+  const nomeFila = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
+  const reConsumo = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
 
   // tudo que está abaixo é acionado para cada processo na fila.
 
@@ -94,6 +94,7 @@ var contador = 0;
       var resultadoExtracao = {}
       let numeroProcesso = message.NumeroProcesso
       let dadosProcesso;
+      var processo ;
       let parser = new JTEParser();
       try {
 
@@ -117,9 +118,10 @@ var contador = 0;
         let $ = cheerio.load(objResponse.geral);
         let $2 = cheerio.load(objResponse.andamentos);
         dadosProcesso = parser.parse($, $2, numeroProcesso)
-        var processo = dadosProcesso.processo
+        // var processo = dadosProcesso.processo
         await dadosProcesso.processo.salvar()
         await Andamento.salvarAndamentos(dadosProcesso.andamentos)
+        processo = await dadosProcesso.processo.salvar()
       } catch (e) {
         console.log(e);
       }
@@ -128,15 +130,12 @@ var contador = 0;
       logger.info('Processos extraidos com sucesso');
       if (!!dadosProcesso) {
         resultadoExtracao = {
-          resultado: dadosProcesso,
+          resultado: processo,
           sucesso: true,
-          detalhes: '',
           logs: logger.logs
         };
       }
-
-
-
+  
 
       await console.log("\033[0;32m" + "Resultado da extração " + "\033[0;34m" + !!resultadoExtracao);
 
@@ -146,18 +145,27 @@ var contador = 0;
       // new GerenciadorFila().enviar(reConsumo, message);
 
       // testa se a extração ocorreu corretamente
-      resultadoExtracao.length
+      //resultadoExtracao.length
 
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
+
+
+
+
       let extracao = await Extracao.criarExtracao(
         message,
         resultadoExtracao,
         message.SeccionalProcesso
       );
+      console.log(extracao);
+      //console.log(resultadoExtracao.resultado.processo.detalhes);
+      
+      
       logger.info('Resultado da extracao salva');
 
       logger.info('Enviando resposta ao BigData');
+      
       const resposta = await Helper.enviarFeedback(
         extracao.prepararEnvio()
       ).catch((err) => {

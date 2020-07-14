@@ -102,10 +102,38 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  gera-fila:
-      extends:
-        file: common-services.yml
-        service: base_node
-      command: node lib/criaFilaJTE.js
+  # gera-fila:
+  #     extends:
+  #       file: common-services.yml
+  #       service: base_node
+  #     command: node lib/criaFilaJTE.js
+  #   command: node workers/TJSP/extracao.js
+  worker-tjsp-processo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSP/extracaoProcesso.js
 
+  worker-tjsc-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSC/extracaoNovos.js
 
+  worker-tjsc-processo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSC/extracaoProcesso.js
+
+  worker-tjmg-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJMG/extracaoNovos.js
+
+  cadastro-consulta:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/consumer_cadastro_consulta.js

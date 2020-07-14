@@ -72,7 +72,21 @@ class AntiCaptchaResponseException extends BaseException {
   }
 }
 
+class CaptchaIOException extends BaseException {
+  constructor(code = 'GENERIC', message = '', ...params) {
+    super(...params);
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, CaptchaIoException);
+    }
+
+    this.code = code;
+    this.message = message;
+  }
+}
+
 module.exports.BaseException = BaseException;
 module.exports.ExtracaoException = ExtracaoException;
 module.exports.RequestException = RequestException;
 module.exports.AntiCaptchaResponseException = AntiCaptchaResponseException;
+module.exports.CaptchaIOException = CaptchaIOException;

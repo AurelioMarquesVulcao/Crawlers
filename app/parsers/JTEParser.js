@@ -19,19 +19,21 @@ class JTEParser extends BaseParser {
 
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
-  parse($, $2,numeroProcesso) {
+  parse($, $2, numeroProcesso) {
+    let cnj = this.mascaraNumero(numeroProcesso)
+
     //console.time('parse');
     let dadosProcesso = new Processo({
-      capa: this.capa($,numeroProcesso),
+      capa: this.capa($, cnj),
       oabs: this.removeVazios(this.Oabs($)),
       qtdAndamentos: this.numeroDeAndamentos($2),
       origemExtracao: enums.nomesRobos.JTE,
       envolvidos: this.envolvidos($),
       //advogados: this.advogados($),
       // "origemDados": enums.nomesRobos.JTE,  // verificar esse campo.
-      detalhes: this.detalhes($,numeroProcesso)
+      detalhes: this.detalhes(cnj)
     })
-    let n = this.detalhes($,numeroProcesso).numeroProcesso.trim()
+    let n = this.detalhes(cnj).numeroProcesso.trim()
     let dadosAndamento = this.andamento($2, n)
     // console.timeEnd('parse');
     return {
@@ -41,9 +43,9 @@ class JTEParser extends BaseParser {
   }
 
   // funcao secundaria - organiza os dados da capa
-  capa($,numeroProcesso) {
+  capa($, numeroProcesso) {
     let capa = {
-      uf: this.estado($,numeroProcesso), // inserir uf na raspagem do puppeteer
+      uf: this.estado($, numeroProcesso), // inserir uf na raspagem do puppeteer
       comarca: "", // perguntar onde extraio a comarca
       vara: this.extraiVaraCapa($).trim(),
       fase: '', // perguntar onde extraio a comarca
@@ -54,9 +56,10 @@ class JTEParser extends BaseParser {
     return capa
   }
 
-  detalhes($, numeroProcesso) {
+  detalhes(numeroProcesso) {
     // let numeroProcesso = this.extraiNumeroProcesso($)
     let detalhes = Processo.identificarDetalhes(numeroProcesso)
+
     return detalhes
   }
 
@@ -67,11 +70,12 @@ class JTEParser extends BaseParser {
       let advogado = {
         nome: this.extraiAdvogadoOab($)[i][1],
         tipo: "Advogado",
-        oab: {
-          uf: this.extraiAdvogadoOab($)[i][0].split('-')[1],
-          numero: this.extraiAdvogadoOab($)[i][0].split('-')[0],
-          oab: this.extraiAdvogadoOab($)[i][0]
-        }
+        // Adaptado para incluir advogado nas partes envolvidas
+        // oab: {
+        //   uf: this.extraiAdvogadoOab($)[i][0].split('-')[1],
+        //   numero: this.extraiAdvogadoOab($)[i][0].split('-')[0],
+        //   oab: this.extraiAdvogadoOab($)[i][0]
+        // }
       }
       resultado.push(advogado)
     }
@@ -124,15 +128,21 @@ class JTEParser extends BaseParser {
     else return teste
   }
 
-  estado($,numeroProcesso) {
+  estado($, numeroProcesso) {
+    console.log('olhe aqui---------------------------------------------------');
+
     let resultado = 'Estado indeterminado'
-    let dados = this.detalhes($,numeroProcesso).tribunal
+    console.log(numeroProcesso);
+
+    let dados = this.detalhes(numeroProcesso).tribunal
+    console.log(dados);
+
     if (dados == 2 || dados == 15) resultado = 'SP'
     if (dados == 1) resultado = 'RJ'
     // if (dados == 15) resultado = 'SP'
     if (dados == 3) resultado = 'MG'
     if (dados == 21) resultado = 'RN'
-      return resultado
+    return resultado
   }
 
   // precisa de melhorias
@@ -261,7 +271,7 @@ class JTEParser extends BaseParser {
       // console.log(andamentos.length);
       if (andamentos.length > 0) dados.push(andamentos)
     })
-    
+
     // verifica duplicidade
     let c = 0;
     for (let i = 0; i < dados.length; i++) {
@@ -317,6 +327,15 @@ class JTEParser extends BaseParser {
     let ano = datas.slice(5, 10);
     let data = ano + "-" + mes + "-" + dia
     return data
+  }
+  mascaraNumero(numeroProcesso){
+    let resultado = '';
+    resultado = numeroProcesso.slice(0,7)+'-'+numeroProcesso.slice(7,9)
+    +'.'+numeroProcesso.slice(9,13)+'.'+numeroProcesso.slice(13,14)
+    +'.'+numeroProcesso.slice(numeroProcesso.length-6,numeroProcesso.length-4)
+    +'.'+numeroProcesso.slice(numeroProcesso.length-4,numeroProcesso.length)
+
+    return resultado
   }
 
 

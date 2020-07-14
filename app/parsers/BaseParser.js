@@ -44,6 +44,8 @@ const tradutor = {
   "Apelante": "Apelante",
   "Apeldo": "Apelado",
   "Apelte": "Apelante",
+  "Apdo": "Apelado",
+  "Apte": "Apelante",
   "Autor": "Autor",
   "Embargdo": "Embargado",
   "Embargte": "Embargante",

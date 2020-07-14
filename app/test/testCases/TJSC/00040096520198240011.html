@@ -1,0 +1,3132 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+
+
+
+
+
+
+
+
+    <script language="javascript" type="text/JavaScript" src="https://esaj.tjsc.jus.br/sajcas/verificarLogin.js?script=1593626750943"></script>
+
+    <script language="javascript">
+      if(window.sajcas && window.sajcas.usuarioLogadoNoCasServer) {
+        var urlRetornoSistema = '';
+        if(urlRetornoSistema === '') {
+          urlRetornoSistema = window.location.href;
+        }
+
+        if(urlRetornoSistema.lastIndexOf('?') != -1) {
+          urlRetornoSistema += '&';
+        } else {
+          urlRetornoSistema += '?';
+        }
+        urlRetornoSistema+= 'gateway=true';
+        window.location.href = urlRetornoSistema;
+      }
+    </script>
+
+
+    <title>Portal de Serviços e-SAJ</title>
+
+
+    <script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={licenseKey:"b61bdf610d",applicationID:"222268696"};window.NREUM||(NREUM={}),__nr_require=function(e,n,t){function r(t){if(!n[t]){var i=n[t]={exports:{}};e[t][0].call(i.exports,function(n){var i=e[t][1][n];return r(i||n)},i,i.exports)}return n[t].exports}if("function"==typeof __nr_require)return __nr_require;for(var i=0;i<t.length;i++)r(t[i]);return r}({1:[function(e,n,t){function r(){}function i(e,n,t){return function(){return o(e,[u.now()].concat(f(arguments)),n?null:this,t),n?void 0:this}}var o=e("handle"),a=e(4),f=e(5),c=e("ee").get("tracer"),u=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var p=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",d=l+"ixn-";a(p,function(e,n){s[n]=i(l+n,!0,"api")}),s.addPageAction=i(l+"addPageAction",!0),s.setCurrentRouteName=i(l+"routeName",!0),n.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,n){var t={},r=this,i="function"==typeof n;return o(d+"tracer",[u.now(),e,t],r),function(){if(c.emit((i?"":"no-")+"fn-start",[u.now(),r,i],t),i)try{return n.apply(this,arguments)}catch(e){throw c.emit("fn-err",[arguments,this,e],t),e}finally{c.emit("fn-end",[u.now()],t)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,n){m[n]=i(d+n)}),newrelic.noticeError=function(e,n){"string"==typeof e&&(e=new Error(e)),o("err",[e,u.now(),!1,n])}},{}],2:[function(e,n,t){function r(e,n){var t=e.getEntries();t.forEach(function(e){"first-paint"===e.name?c("timing",["fp",Math.floor(e.startTime)]):"first-contentful-paint"===e.name&&c("timing",["fcp",Math.floor(e.startTime)])})}function i(e,n){var t=e.getEntries();t.length>0&&c("lcp",[t[t.length-1]])}function o(e){if(e instanceof s&&!l){var n,t=Math.round(e.timeStamp);n=t>1e12?Date.now()-t:u.now()-t,l=!0,c("timing",["fi",t,{type:e.type,fid:n}])}}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var a,f,c=e("handle"),u=e("loader"),s=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){a=new PerformanceObserver(r),f=new PerformanceObserver(i);try{a.observe({entryTypes:["paint"]}),f.observe({entryTypes:["largest-contentful-paint"]})}catch(p){}}if("addEventListener"in document){var l=!1,d=["click","keydown","mousedown","pointerdown","touchstart"];d.forEach(function(e){document.addEventListener(e,o,!1)})}}},{}],3:[function(e,n,t){function r(e,n){if(!i)return!1;if(e!==i)return!1;if(!n)return!0;if(!o)return!1;for(var t=o.split("."),r=n.split("."),a=0;a<r.length;a++)if(r[a]!==t[a])return!1;return!0}var i=null,o=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var f=navigator.userAgent,c=f.match(a);c&&f.indexOf("Chrome")===-1&&f.indexOf("Chromium")===-1&&(i="Safari",o=c[1])}n.exports={agent:i,version:o,match:r}},{}],4:[function(e,n,t){function r(e,n){var t=[],r="",o=0;for(r in e)i.call(e,r)&&(t[o]=n(r,e[r]),o+=1);return t}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],5:[function(e,n,t){function r(e,n,t){n||(n=0),"undefined"==typeof t&&(t=e?e.length:0);for(var r=-1,i=t-n||0,o=Array(i<0?0:i);++r<i;)o[r]=e[n+r];return o}n.exports=r},{}],6:[function(e,n,t){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,n,t){function r(){}function i(e){function n(e){return e&&e instanceof r?e:e?c(e,f,o):o()}function t(t,r,i,o){if(!l.aborted||o){e&&e(t,r,i);for(var a=n(i),f=v(t),c=f.length,u=0;u<c;u++)f[u].apply(a,r);var p=s[y[t]];return p&&p.push([b,t,r,a]),a}}function d(e,n){h[e]=v(e).concat(n)}function m(e,n){var t=h[e];if(t)for(var r=0;r<t.length;r++)t[r]===n&&t.splice(r,1)}function v(e){return h[e]||[]}function g(e){return p[e]=p[e]||i(t)}function w(e,n){u(e,function(e,t){n=n||"feature",y[t]=n,n in s||(s[n]=[])})}var h={},y={},b={on:d,addEventListener:d,removeEventListener:m,emit:t,get:g,listeners:v,context:n,buffer:w,abort:a,aborted:!1};return b}function o(){return new r}function a(){(s.api||s.feature)&&(l.aborted=!0,s=l.backlog={})}var f="nr@context",c=e("gos"),u=e(4),s={},p={},l=n.exports=i();l.backlog=s},{}],gos:[function(e,n,t){function r(e,n,t){if(i.call(e,n))return e[n];var r=t();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,n,{value:r,writable:!0,enumerable:!1}),r}catch(o){}return e[n]=r,r}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(e,n,t){function r(e,n,t,r){i.buffer([e],r),i.emit(e,n,t)}var i=e("ee").get("handle");n.exports=r,r.ee=i},{}],id:[function(e,n,t){function r(e){var n=typeof e;return!e||"object"!==n&&"function"!==n?-1:e===window?0:a(e,o,function(){return i++})}var i=1,o="nr@id",a=e("gos");n.exports=r},{}],loader:[function(e,n,t){function r(){if(!x++){var e=E.info=NREUM.info,n=d.getElementsByTagName("script")[0];if(setTimeout(s.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&n))return s.abort();u(y,function(n,t){e[n]||(e[n]=t)}),c("mark",["onload",a()+E.offset],null,"api");var t=d.createElement("script");t.src="https://"+e.agent,n.parentNode.insertBefore(t,n)}}function i(){"complete"===d.readyState&&o()}function o(){c("mark",["domContent",a()+E.offset],null,"api")}function a(){return O.exists&&performance.now?Math.round(performance.now()):(f=Math.max((new Date).getTime(),f))-E.offset}var f=(new Date).getTime(),c=e("handle"),u=e(4),s=e("ee"),p=e(3),l=window,d=l.document,m="addEventListener",v="attachEvent",g=l.XMLHttpRequest,w=g&&g.prototype;NREUM.o={ST:setTimeout,SI:l.setImmediate,CT:clearTimeout,XHR:g,REQ:l.Request,EV:l.Event,PR:l.Promise,MO:l.MutationObserver};var h=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1169.min.js"},b=g&&w&&w[m]&&!/CriOS/.test(navigator.userAgent),E=n.exports={offset:f,now:a,origin:h,features:{},xhrWrappable:b,userAgent:p};e(1),e(2),d[m]?(d[m]("DOMContentLoaded",o,!1),l[m]("load",r,!1)):(d[v]("onreadystatechange",i),l[v]("onload",r)),c("mark",["firstbyte",f],null,"api");var x=0,O=e(6)},{}],"wrap-function":[function(e,n,t){function r(e){return!(e&&e instanceof Function&&e.apply&&!e[a])}var i=e("ee"),o=e(5),a="nr@original",f=Object.prototype.hasOwnProperty,c=!1;n.exports=function(e,n){function t(e,n,t,i){function nrWrapper(){var r,a,f,c;try{a=this,r=o(arguments),f="function"==typeof t?t(r,a):t||{}}catch(u){l([u,"",[r,a,i],f])}s(n+"start",[r,a,i],f);try{return c=e.apply(a,r)}catch(p){throw s(n+"err",[r,a,p],f),p}finally{s(n+"end",[r,a,c],f)}}return r(e)?e:(n||(n=""),nrWrapper[a]=e,p(e,nrWrapper),nrWrapper)}function u(e,n,i,o){i||(i="");var a,f,c,u="-"===i.charAt(0);for(c=0;c<n.length;c++)f=n[c],a=e[f],r(a)||(e[f]=t(a,u?f+i:i,o,f))}function s(t,r,i){if(!c||n){var o=c;c=!0;try{e.emit(t,r,i,n)}catch(a){l([a,t,r,i])}c=o}}function p(e,n){if(Object.defineProperty&&Object.keys)try{var t=Object.keys(e);return t.forEach(function(t){Object.defineProperty(n,t,{get:function(){return e[t]},set:function(n){return e[t]=n,n}})}),n}catch(r){l([r])}for(var i in e)f.call(e,i)&&(n[i]=e[i]);return n}function l(n){try{e.emit("internal-error",n)}catch(t){}}return e||(e=i),t.inPlace=u,t.flag=a,t}},{}]},{},["loader"]);</script><link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/cpopg/softheme/src/css/app.css">
+    <link rel="stylesheet" href="/cpopg/softheme/src/fonts/saj/styles.css">
+    <link rel="stylesheet" href="/cpopg/css/formulario.css" type="text/css"/>
+
+
+    <link rel="stylesheet" href="/cpopg/webjars/select2/3.5.4/select2.css" type="text/css" >
+    <link rel="stylesheet" href="/cpopg/webjars/select2/3.5.4/select2-bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="/cpopg/css/saj/select2/saj-select2.css">
+
+
+
+    <script>
+      window.saj = window.saj || {};
+      window.saj.env = window.saj.env || {};
+      window.saj.env.root = '/cpopg';
+      window.saj.env.css = '/cpopg/css';
+      window.saj.env.js = '/cpopg/js';
+      window.saj.env.imagens = '/cpopg/imagens';
+      window.saj.env.queryString = 'processo.codigo=0B005360F0000&processo.foro=11&conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=47177&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=sajcaptcha_69ecd181b1d744309a646da2cd988dff&paginaConsulta=1';
+
+      window.saj.cpo = window.saj.cpo || {};
+
+      // transfere variavel se cpo esta rodando para totem
+      window.saj.cpo.totem = 'false' == 'true';
+    </script>
+
+
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/jquery/jquery.min.js?n=1620728708"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/jquery/jquery.func_toggle.js?n=c120b93b-7855-4750-a114-986bd8050289"></script>
+    <script language="javascript" type="text/javascript" src="/cpopg/js/jquery/jquery.blockUI.min.js?n=49e345bc-f432-48f8-86d9-3d2c367d0434"></script>
+    <script language="javascript" type="text/javascript" src="/cpopg/js/jquery/jquery.browser.min.js?n=4a2f0fa5-1ce7-4b16-b262-922ce1bbcc11"></script>
+
+    <script language="javascript" type="text/javascript" src="/cpopg/webjars/lodash/4.17.5/lodash.js?n=059c76cc-b6e4-4d57-a344-2a349e801687"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/select2/select2.js?n=7b9615f5-2b9a-47eb-9129-5d35b0462438"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/webjars/select2/3.5.4/select2_locale_pt-BR.js?n=4cc7948c-8fae-4eb7-971a-cd87659df20a"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj/saj-select2.js?n=c1782e55-c15f-4b66-bc44-6a5e64ab9b2b"></script>
+
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj/saj-web-2.2.41-4.js?n=cdd413d5-c9c6-4db7-9bc3-b5e119f08773"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj/saj-tooltip.js?n=687e0d2c-97e2-4314-b4d5-bf3f8c520d96"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj/saj-popup-modal-1.0.0-1.js?n=279ea8d4-0782-4c95-a633-cfee4133af11"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj/saj-browser.js?n=d34b0fe3-9206-40d1-8574-2cccdb883574"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj/saj-mascara-input.js?n=4ce596e4-23dd-403b-a8fb-3d00f968c75b"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj/saj-numeroProcesso.js?n=cf3d1de3-e000-47ee-ae66-5252bec8fa5c"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj-cpo-cbpesquisa.js?n=686458821"></script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/js/saj/acessibilidade/acessibilidade.js?n=34778da3-a5bf-4bd9-88ed-96e6957f00a1"></script>
+
+    <script language="javascript" type="text/JavaScript" src="/cpopg/softheme/src/js/app.js?n=16289891"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js?n=93cecf80-485e-48fe-8b10-14fe3e077da2" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js?n=1791337263" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+
+
+
+
+
+    <script>
+      (function($){
+        $(function(){
+          var intervalo = 1795000;
+          $.saj.manterSessao('/cpopg/manterSessao.do', intervalo);
+        });
+
+      })(jQuery);
+    </script>
+
+
+
+
+
+    <script language="javascript" type="text/JavaScript">
+      $.saj = $.saj || {};
+      $.saj.acessoRecurso = {
+        abrirPastaDigitalEmPopup: 'true' == 'true',
+        idRecursoQueProvocouLiberacaoPorSenha: '',
+        popupSenha: {
+          mostrar: 'false' == 'true',
+          titulo: 'Senha do processo',
+          altura: 220 + Number("10"),
+          alturaAdicionalParaMensagemValidacao: Number("0"),
+          largura: 580
+        }
+      };
+
+      $.saj.getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)), sURLVariables = sPageURL.split('&'), sParameterName, i;
+        for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+          if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+          }
+        }
+      };
+    </script>
+    <script language="javascript" type="text/JavaScript" src="/cpopg/jsp/show-2.8.33-0.js?n=1080350973"></script>
+
+    <script type="text/javascript">
+      (function($) {
+        $(function(){
+          // Correção temporária do alinhamento do divisor de seção de formulário do SPW
+          $('td[background$="spw/fundo_subtitulo2.gif"]').attr('valign', 'top');
+
+        })
+      })(jQuery);
+    </script>
+</head>
+
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+  (function ($) {
+    $(function () {
+      var captcha = $.saj.getUrlParameter('uuidCaptcha');
+
+      if (!captcha) {
+        return;
+      }
+
+      if(!captcha){
+        return;
+      }
+      var $processoPrinc = $('.processoPrinc');
+      $processoPrinc.attr('href', $processoPrinc.attr('href') + '&uuidCaptcha=' + captcha);
+
+      var $processoPaiApenso = $('.processoPaiApenso');
+      $processoPaiApenso.attr('href', $processoPaiApenso.attr('href') + '&uuidCaptcha=' + captcha);
+
+      $('.incidente').each(function () {
+        var $incidente = $(this);
+        var url = $incidente.attr('href');
+        $incidente.attr('href', url + '&uuidCaptcha=' + captcha);
+      });
+
+    })
+  })(jQuery);
+</script>
+
+<!-- HEADER-->
+<div class="unj-entity-header">
+
+
+
+
+
+    <div class="unj-entity-header__actions">
+        <div class="container">
+            <div class="row">
+                <div class="col-3 col-md-4">
+                    <a href="javascript:history.back();" class="unj-link-back">
+                        <i class="icon-back"></i>
+                    </a>
+                </div>
+                <div class="col-13 col-md-12 unj-ta-r">
+                    <!-- CDAS -->
+
+                    <!-- Custas -->
+
+                    <!-- Pasta digital -->
+
+
+
+
+
+
+
+
+
+
+                    <a class="linkPasta btn btn-secondary btn-space" id="linkPasta" aria-hidden="true" title="Pasta digital" href="#liberarAutoPorSenha">
+                        Visualizar autos
+                    </a>
+                    <!-- link da pasta digital exibido somente para leitores de tela (deficientes visuais), neste caso o link anterior é ignorado pelo leitor
+                    Obs: necessário manter a table devido aos atributos de acessibilidade se comportarem adequadamente com a tabela, comportamento que não é possível colocando
+                    os atributos somente na tag do link-->
+                    <a class="linkPasta btn btn-secondary btn-space" id="linkPastaAcessibilidade" style="font-size:0;height:0;width:0;padding:0;margin:0;border:none" href="#liberarAutoPorSenha&acessibilidade=true">
+                        Visualizar autos
+                    </a>
+
+
+
+                    <!-- Peticionar -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+    <div class="unj-entity-header__summary">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-xl-13">
+                    <!--principal -->
+
+                    <span class="unj-larger-1">
+                        0004009-65.2019.8.24.0011
+                    </span>
+
+
+
+
+
+                    <!-- incidente -->
+
+
+
+                </div>
+
+            </div>
+            <div class="row">
+
+                <div class="col-lg-3 col-xl-3 mb-3">
+                    <span class="unj-label">Classe</span>
+                    <div class="lh-1-1 line-clamp__2"><span title="Execução Provisória">Execução Provisória</span></div>
+                </div>
+
+
+                <div class="col-lg-2 col-xl-3 mb-3">
+                    <span class="unj-label">
+                        Assunto
+                    </span>
+                    <div class="lh-1-1 line-clamp__2"> <span title="Pena Privativa de Liberdade">Pena Privativa de Liberdade</span></div>
+                </div>
+
+
+                <div class="col-lg-2 col-xl-2 mb-2">
+                    <span class="unj-label">Foro</span>
+                    <div class="lh-1-1 line-clamp__2"> <span title="Brusque">Brusque</span></div>
+                </div>
+
+
+                <div class="col-lg-3 col-xl-2 mb-2">
+                    <span class="unj-label">Vara</span>
+                    <div class="lh-1-1 line-clamp__2"><span title="Vara Criminal">Vara Criminal</span></div>
+                </div>
+
+
+
+
+                <!-- Processo principal -->
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <div class="unj-entity-header__details">
+        <div class="container">
+            <div class="unj-ta-r">
+                <a href="#maisDetalhes" class="unj-link-collapse" data-toggle="collapse" aria-expanded="false" aria-controls="maisDetalhes">
+                <span class="unj-link-collapse__show">
+                    <i class="unj-link-collapse__icon glyph glyph-chevron-down"></i>
+                    Mais
+                </span>
+                    <span class="unj-link-collapse__hide">
+                    <i class="unj-link-collapse__icon glyph glyph-chevron-up"></i>
+                    Recolher
+                </span>
+                </a>
+            </div>
+            <div id="maisDetalhes" class="collapse" aria-expanded="false">
+                <div class="row unj-row--border-top">
+                    <div class="col-lg-3 mb-2">
+                        <span class="unj-label">Distribuição </span>
+                        <div>18/09/2019 às 15:08 - Direcionamento</div>
+                    </div>
+
+
+                    <div class="col-lg-3 mb-2">
+                        <span class="unj-label">Controle</span>
+                        <div>2019/002066</div>
+                    </div>
+
+
+                    <div class="col-lg-2 col-xl-2 mb-2">
+                        <span class="unj-label">Área</span>
+                        <div class="lh-1-1 line-clamp__2"> <span title="Criminal">Criminal</span></div>
+                    </div>
+
+
+
+                    <div class="col-lg-3 mb-2">
+                        <span class="unj-label">Outros números</span>
+                        <div> 0001528-32.2019.8.24.0011</div>
+                    </div>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="div-conteudo container mb-90">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <aside class="aside-nav aside-nav--left">
+        <div class="aside-nav__inner">
+            <header class="aside-nav__main-menu__header">
+                <script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={licenseKey:"b61bdf610d",applicationID:"277847833"};window.NREUM||(NREUM={}),__nr_require=function(e,n,t){function r(t){if(!n[t]){var i=n[t]={exports:{}};e[t][0].call(i.exports,function(n){var i=e[t][1][n];return r(i||n)},i,i.exports)}return n[t].exports}if("function"==typeof __nr_require)return __nr_require;for(var i=0;i<t.length;i++)r(t[i]);return r}({1:[function(e,n,t){function r(){}function i(e,n,t){return function(){return o(e,[u.now()].concat(f(arguments)),n?null:this,t),n?void 0:this}}var o=e("handle"),a=e(4),f=e(5),c=e("ee").get("tracer"),u=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var p=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",d=l+"ixn-";a(p,function(e,n){s[n]=i(l+n,!0,"api")}),s.addPageAction=i(l+"addPageAction",!0),s.setCurrentRouteName=i(l+"routeName",!0),n.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,n){var t={},r=this,i="function"==typeof n;return o(d+"tracer",[u.now(),e,t],r),function(){if(c.emit((i?"":"no-")+"fn-start",[u.now(),r,i],t),i)try{return n.apply(this,arguments)}catch(e){throw c.emit("fn-err",[arguments,this,e],t),e}finally{c.emit("fn-end",[u.now()],t)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,n){m[n]=i(d+n)}),newrelic.noticeError=function(e,n){"string"==typeof e&&(e=new Error(e)),o("err",[e,u.now(),!1,n])}},{}],2:[function(e,n,t){function r(e,n){var t=e.getEntries();t.forEach(function(e){"first-paint"===e.name?c("timing",["fp",Math.floor(e.startTime)]):"first-contentful-paint"===e.name&&c("timing",["fcp",Math.floor(e.startTime)])})}function i(e,n){var t=e.getEntries();t.length>0&&c("lcp",[t[t.length-1]])}function o(e){if(e instanceof s&&!l){var n,t=Math.round(e.timeStamp);n=t>1e12?Date.now()-t:u.now()-t,l=!0,c("timing",["fi",t,{type:e.type,fid:n}])}}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var a,f,c=e("handle"),u=e("loader"),s=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){a=new PerformanceObserver(r),f=new PerformanceObserver(i);try{a.observe({entryTypes:["paint"]}),f.observe({entryTypes:["largest-contentful-paint"]})}catch(p){}}if("addEventListener"in document){var l=!1,d=["click","keydown","mousedown","pointerdown","touchstart"];d.forEach(function(e){document.addEventListener(e,o,!1)})}}},{}],3:[function(e,n,t){function r(e,n){if(!i)return!1;if(e!==i)return!1;if(!n)return!0;if(!o)return!1;for(var t=o.split("."),r=n.split("."),a=0;a<r.length;a++)if(r[a]!==t[a])return!1;return!0}var i=null,o=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var f=navigator.userAgent,c=f.match(a);c&&f.indexOf("Chrome")===-1&&f.indexOf("Chromium")===-1&&(i="Safari",o=c[1])}n.exports={agent:i,version:o,match:r}},{}],4:[function(e,n,t){function r(e,n){var t=[],r="",o=0;for(r in e)i.call(e,r)&&(t[o]=n(r,e[r]),o+=1);return t}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],5:[function(e,n,t){function r(e,n,t){n||(n=0),"undefined"==typeof t&&(t=e?e.length:0);for(var r=-1,i=t-n||0,o=Array(i<0?0:i);++r<i;)o[r]=e[n+r];return o}n.exports=r},{}],6:[function(e,n,t){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,n,t){function r(){}function i(e){function n(e){return e&&e instanceof r?e:e?c(e,f,o):o()}function t(t,r,i,o){if(!l.aborted||o){e&&e(t,r,i);for(var a=n(i),f=v(t),c=f.length,u=0;u<c;u++)f[u].apply(a,r);var p=s[y[t]];return p&&p.push([b,t,r,a]),a}}function d(e,n){h[e]=v(e).concat(n)}function m(e,n){var t=h[e];if(t)for(var r=0;r<t.length;r++)t[r]===n&&t.splice(r,1)}function v(e){return h[e]||[]}function g(e){return p[e]=p[e]||i(t)}function w(e,n){u(e,function(e,t){n=n||"feature",y[t]=n,n in s||(s[n]=[])})}var h={},y={},b={on:d,addEventListener:d,removeEventListener:m,emit:t,get:g,listeners:v,context:n,buffer:w,abort:a,aborted:!1};return b}function o(){return new r}function a(){(s.api||s.feature)&&(l.aborted=!0,s=l.backlog={})}var f="nr@context",c=e("gos"),u=e(4),s={},p={},l=n.exports=i();l.backlog=s},{}],gos:[function(e,n,t){function r(e,n,t){if(i.call(e,n))return e[n];var r=t();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,n,{value:r,writable:!0,enumerable:!1}),r}catch(o){}return e[n]=r,r}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(e,n,t){function r(e,n,t,r){i.buffer([e],r),i.emit(e,n,t)}var i=e("ee").get("handle");n.exports=r,r.ee=i},{}],id:[function(e,n,t){function r(e){var n=typeof e;return!e||"object"!==n&&"function"!==n?-1:e===window?0:a(e,o,function(){return i++})}var i=1,o="nr@id",a=e("gos");n.exports=r},{}],loader:[function(e,n,t){function r(){if(!x++){var e=E.info=NREUM.info,n=d.getElementsByTagName("script")[0];if(setTimeout(s.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&n))return s.abort();u(y,function(n,t){e[n]||(e[n]=t)}),c("mark",["onload",a()+E.offset],null,"api");var t=d.createElement("script");t.src="https://"+e.agent,n.parentNode.insertBefore(t,n)}}function i(){"complete"===d.readyState&&o()}function o(){c("mark",["domContent",a()+E.offset],null,"api")}function a(){return O.exists&&performance.now?Math.round(performance.now()):(f=Math.max((new Date).getTime(),f))-E.offset}var f=(new Date).getTime(),c=e("handle"),u=e(4),s=e("ee"),p=e(3),l=window,d=l.document,m="addEventListener",v="attachEvent",g=l.XMLHttpRequest,w=g&&g.prototype;NREUM.o={ST:setTimeout,SI:l.setImmediate,CT:clearTimeout,XHR:g,REQ:l.Request,EV:l.Event,PR:l.Promise,MO:l.MutationObserver};var h=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1169.min.js"},b=g&&w&&w[m]&&!/CriOS/.test(navigator.userAgent),E=n.exports={offset:f,now:a,origin:h,features:{},xhrWrappable:b,userAgent:p};e(1),e(2),d[m]?(d[m]("DOMContentLoaded",o,!1),l[m]("load",r,!1)):(d[v]("onreadystatechange",i),l[v]("onload",r)),c("mark",["firstbyte",f],null,"api");var x=0,O=e(6)},{}],"wrap-function":[function(e,n,t){function r(e){return!(e&&e instanceof Function&&e.apply&&!e[a])}var i=e("ee"),o=e(5),a="nr@original",f=Object.prototype.hasOwnProperty,c=!1;n.exports=function(e,n){function t(e,n,t,i){function nrWrapper(){var r,a,f,c;try{a=this,r=o(arguments),f="function"==typeof t?t(r,a):t||{}}catch(u){l([u,"",[r,a,i],f])}s(n+"start",[r,a,i],f);try{return c=e.apply(a,r)}catch(p){throw s(n+"err",[r,a,p],f),p}finally{s(n+"end",[r,a,c],f)}}return r(e)?e:(n||(n=""),nrWrapper[a]=e,p(e,nrWrapper),nrWrapper)}function u(e,n,i,o){i||(i="");var a,f,c,u="-"===i.charAt(0);for(c=0;c<n.length;c++)f=n[c],a=e[f],r(a)||(e[f]=t(a,u?f+i:i,o,f))}function s(t,r,i){if(!c||n){var o=c;c=!0;try{e.emit(t,r,i,n)}catch(a){l([a,t,r,i])}c=o}}function p(e,n){if(Object.defineProperty&&Object.keys)try{var t=Object.keys(e);return t.forEach(function(t){Object.defineProperty(n,t,{get:function(){return e[t]},set:function(n){return e[t]=n,n}})}),n}catch(r){l([r])}for(var i in e)f.call(e,i)&&(n[i]=e[i]);return n}function l(n){try{e.emit("internal-error",n)}catch(t){}}return e||(e=i),t.inPlace=u,t.flag=a,t}},{}]},{},["loader"]);</script><span
+                    class="aside-nav__main-menu__header__text">  Menu e-SAJ</span>
+                <a href="#" class="aside-nav__user__close-button close-offcanvas">
+                    <img src="https://esaj.tjsc.jus.br/esaj/img/icons/icon-close--light.png" alt="">
+                </a>
+            </header>
+            <nav class="aside-nav__main-menu">
+                <ul class="aside-nav__main-menu__list" id="conteudoMenuEsaj">
+                </ul>
+            </nav>
+            <div id="esaj-beta-switcher-placeholder"></div>
+        </div>
+    </aside>
+    <aside class="aside-nav aside-nav--right aside-nav__user">
+        <div class="aside-nav__inner">
+            <div class="aside-nav__user__sign">
+                <div class="aside-nav__user__sign__brand">
+                    <img src="https://esaj.tjsc.jus.br/esaj/img/aside/brasoes/br-tjsc.jpg" alt="">
+                </div>
+                <ul class="aside-nav__user__sign__list">
+                    <li><span class="aside-nav__user__sign__title">Tribunal de Justi&ccedil;a</span></li>
+                    <li><span class="aside-nav__user__sign__place">Estado de Santa Catarina</span></li>
+                </ul>
+                <a href="#" class="aside-nav__user__close-button close-offcanvas">
+                    <img src="https://esaj.tjsc.jus.br/esaj/img/icons/icon-close--dark.png" alt="">
+                </a>
+            </div>
+            <hr>
+            <div class="aside-nav__user__info">
+                <h4 class="aside-nav__user__title">Minha conta</h4>
+                <ul class="aside-nav__user__info__list">
+                    <li class="aside-nav__user__info__list__item"><span class="aside-nav__user__info__name" id="menuNmUsuarioLogado"></span></li>
+                    <li class="aside-nav__user__info__list__item"><span class="aside-nav__user__info__oab" id="menuUsuarioOabs">OAB: </span></li>
+                </ul>
+                <ul class="aside-nav__user__info__list-access">
+                    <li class="aside-nav__user__info__list-access__item"><a class="aside-nav__user__info__list-access__item__link" href="https://esaj.tjsc.jus.br/esaj/cadastro.do">Meu perfil</a></li>
+
+                    <li class="aside-nav__user__info__list-access__item"><a class="aside-nav__user__info__list-access__item__link" href="https://esaj.tjsc.jus.br/caixapostal">Caixa Postal</a></li>
+
+                    <li class="aside-nav__user__info__list-access__item"><a class="aside-nav__user__info__list-access__item__link" id="logoutLink" href="#">Sair</a></li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+    <header>
+        <link rel="shortcut icon" href="https://esaj.tjsc.jus.br/esaj/tema/padrao/clientes/SC/imagens/favicon.ico" type="image/x-icon"/>
+        <link href="https://esaj.tjsc.jus.br/esaj/app.css" rel="stylesheet" type="text/css"/>
+        <nav class="header__navbar">
+            <a class="header__navbar__menu-hamburger open__aside-nav--left navbar-menu-hamburger__item__link">
+                <span class="menu-hamburger__alert" style="display:none;"></span>
+                <span class="glyph glyph-hamburger"></span>
+            </a>
+
+            <h1 class="header__navbar__title" href=""><a class="linkLogo" href="https://esaj.tjsc.jus.br/esaj/redirecionarNovoEsaj.do"><strong>e-SAJ</strong></a> | Consulta de Processos - 1º Grau</h1>
+
+            <ul class="header__navbar__menu header__navbar__menu--right">
+                <li class="header__navbar__menu__item header__navbar__menu__item--initials">
+                    <a class="header__navbar__brand__initials" href="https://www.tjsc.jus.br"> TJSC </a>
+                </li>
+                <li class="header__navbar__menu__item header__navbar__menu__item--user">
+               <span class="header__navbar__name open__aside-nav--right">
+                     <span id="headerNmUsuarioLogado" class="header__navbar__name__text"></span>
+                     <span class="glyph glyph-contact header__navbar__name__icon"></span>
+               </span>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <div class="offcanvas-backdrop"></div>
+    <script>
+      var appEsajLayout = appEsajLayout || {};
+      appEsajLayout.urlNovoMenuHtml = 'https://esaj.tjsc.jus.br/esaj/menuPortalV2Html.do';
+
+      var appEsajCas = appEsajCas || {};
+      appEsajCas.urlServicoConteudoIdentificacao = 'https://esaj.tjsc.jus.br/sajcas/conteudoIdentificacaoJson?script=1590362637891';
+    </script>
+    <script src="https://esaj.tjsc.jus.br/esaj/js/portalV2-bundle.js?n=964344313"></script>
+
+    <script src="https://esaj.tjsc.jus.br/sajcas/seletorVersaoBeta.js?n=5d414c07-bc5c-4f22-9732-9b0d878a8a39&versao=2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Dados da delegacia</h2>
+
+
+    </div>
+
+    <!--  cabecalho da lista (Delegacias) -->
+
+    <!--  dados da lista (Delegacias) -->
+
+
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1"  >
+        <thead>
+        <tr class="label">
+            <th>Documento</th>
+            <th>Número</th>
+            <th>Distrito policial</th>
+            <th>Município</th>
+        </tr>
+        <tr class="fundoEscuro" height="2" aria-hidden="true">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody id="dadosDaDelegacia">
+
+        <tr id="" class="fundoClaro">
+            <td width="20%">Auto de Prisão em Flagrante</td>
+            <td width="20%">00034.2019.00045</td>
+            <td width="30%">Delegacia de Polícia da Comarca de Brusque</td>
+            <td width="30%">Brusque-SC</td>
+        </tr>
+
+        <tr id="" class="fundoEscuro">
+            <td width="20%">Boletim de Ocorrência</td>
+            <td width="20%">00034.2019.0002592</td>
+            <td width="30%">Delegacia de Polícia da Comarca de Brusque</td>
+            <td width="30%">Brusque-SC</td>
+        </tr>
+
+        </tbody>
+    </table>
+
+
+
+    <!--  dados da lista (Delegacias) -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Partes do processo</h2>
+
+
+    </div>
+
+    <!--  cabecalho da tabela de lista (partes) -->
+
+
+    <!--  dados da lista partes principais (partes) -->
+    <table id="tablePartesPrincipais" style="margin-left:15px; margin-top:1px;" align="center" border="0" cellPadding="0" cellSpacing="0" width="98%">
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro">
+            <td valign="top" width="141" style="padding-bottom: 5px" class="label">
+                <span class="mensagemExibindo">Autor&nbsp;</span>
+            </td>
+            <td width="*" align="left" style="padding-bottom: 5px">
+
+
+
+
+                Ministério Público do Estado de Santa Catarina
+
+
+
+
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro">
+            <td valign="top" width="141" style="padding-bottom: 5px" class="label">
+                <span class="mensagemExibindo">Acusado&nbsp;</span>
+            </td>
+            <td width="*" align="left" style="padding-bottom: 5px">
+
+
+
+
+                Paulo Jhony Machado Luz
+
+
+
+
+
+
+                <br />
+                <span class="mensagemExibindo">Advogado:&nbsp;</span>
+                Francisco Rodrigues de Souza&nbsp;
+
+
+            </td>
+        </tr>
+
+
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+
+
+
+
+
+
+
+        <h2 class="subtitle">Movimentações</h2>
+
+
+    </div>
+
+
+
+
+
+    <table  style="margin-left:15px; margin-top:1px;" align="center" border="0" cellPadding="0" cellSpacing="0" width="98%">
+
+
+        <thead>
+        <tr>
+            <th width="120" class="label" style="vertical-align: bottom">Data</th>
+            <th vAlign="middle" width="20" aria-hidden="true">&nbsp;</th>
+            <th vAlign="middle"  class="label">Movimento</th>
+        </tr>
+        <tr class="fundoEscuro" height="2" aria-hidden="true">
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </thead>
+
+
+        <tbody id="tabelaUltimasMovimentacoes">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                24/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239822901"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239822901"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha"> Juntada de mandado
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Certid&atilde;o Autom&aacute;tica de Juntada do Mandado
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                24/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de mandado
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                24/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239822512"
+                   title="Visualizar documento em inteiro teor"
+                   href="/cpopg/abrirDocumentoVinculadoMovimentacao.do?processo.codigo=0B005360F0000&cdDocumento=239822512&nmRecursoAcessado=Certificado+pelo+Oficial+de+Justi%C3%A7a">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239822512"
+                   title="Visualizar documento em inteiro teor"
+                   href="/cpopg/abrirDocumentoVinculadoMovimentacao.do?processo.codigo=0B005360F0000&cdDocumento=239822512&nmRecursoAcessado=Certificado+pelo+Oficial+de+Justi%C3%A7a"> Certificado pelo Oficial de Justiça
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Intima&ccedil;&atilde;o Positiva - PF - com Pe&ccedil;as Processuais
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                24/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                documento digitalizado
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                23/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Certificada a publicação da relação de intimação de advogado
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Rela&ccedil;&atilde;o :0147/2019
+Data da Publica&ccedil;&atilde;o: 24/09/2019
+N&uacute;mero do Di&aacute;rio: 3152
+P&aacute;gina:
+		</span>
+
+            </td>
+        </tr>
+
+
+
+        </tbody>
+
+
+        <tbody style="display: none;" id="tabelaTodasMovimentacoes">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                24/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239822901"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239822901"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha"> Juntada de mandado
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Certid&atilde;o Autom&aacute;tica de Juntada do Mandado
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                24/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de mandado
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                24/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239822512"
+                   title="Visualizar documento em inteiro teor"
+                   href="/cpopg/abrirDocumentoVinculadoMovimentacao.do?processo.codigo=0B005360F0000&cdDocumento=239822512&nmRecursoAcessado=Certificado+pelo+Oficial+de+Justi%C3%A7a">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239822512"
+                   title="Visualizar documento em inteiro teor"
+                   href="/cpopg/abrirDocumentoVinculadoMovimentacao.do?processo.codigo=0B005360F0000&cdDocumento=239822512&nmRecursoAcessado=Certificado+pelo+Oficial+de+Justi%C3%A7a"> Certificado pelo Oficial de Justiça
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Intima&ccedil;&atilde;o Positiva - PF - com Pe&ccedil;as Processuais
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                24/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                documento digitalizado
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                23/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Certificada a publicação da relação de intimação de advogado
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Rela&ccedil;&atilde;o :0147/2019
+Data da Publica&ccedil;&atilde;o: 24/09/2019
+N&uacute;mero do Di&aacute;rio: 3152
+P&aacute;gina:
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                20/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Encaminhado edital/relação para publicação
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Rela&ccedil;&atilde;o: 0147/2019
+Teor do ato: Aguarde-se o cumprimento da pena provis&oacute;ria imposta, observando-se que a progress&atilde;o ao regime semiaberto est&aacute; prevista para o dia 19/04/2021, salvo grade de remi&ccedil;&atilde;o, e desde que preenchido o requisito subjetivo. Ci&ecirc;ncia &agrave; defesa, Minist&eacute;rio P&uacute;blico e UPA local. Intimem-se. Oficie-se.
+Advogados(s): Francisco Rodrigues de Souza (OAB 47177/SC)
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                20/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                20/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239539883"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239539883"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha"> Expedido mandado
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Mandado n&ordm;: 011.2019/016742-0
+Situa&ccedil;&atilde;o: Cumprido - Ato positivo em 24/09/2019
+Local: Oficial de justi&ccedil;a - Jefferson Fagundes
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                20/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239539708"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239539708"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha"> Certidão emitida
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Certid&atilde;o da Remessa da Intima&ccedil;&atilde;o para o Portal Eletr&ocirc;nico
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                20/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239539667"
+                   title="Visualizar documento em inteiro teor"
+                   href="/cpopg/abrirDocumentoVinculadoMovimentacao.do?processo.codigo=0B005360F0000&cdDocumento=239539667&nmRecursoAcessado=Ato+Ordinat%C3%B3rio-Intima%C3%A7%C3%A3o+do+Minist%C3%A9rio+P%C3%BAblico">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239539667"
+                   title="Visualizar documento em inteiro teor"
+                   href="/cpopg/abrirDocumentoVinculadoMovimentacao.do?processo.codigo=0B005360F0000&cdDocumento=239539667&nmRecursoAcessado=Ato+Ordinat%C3%B3rio-Intima%C3%A7%C3%A3o+do+Minist%C3%A9rio+P%C3%BAblico"> Ato Ordinatório-Intimação do Ministério Público
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Encaminho os presentes autos para intima&ccedil;&atilde;o do Minist&eacute;rio P&uacute;blico.
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                19/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239436355"
+                   title="Visualizar documento em inteiro teor"
+                   href="/cpopg/abrirDocumentoVinculadoMovimentacao.do?processo.codigo=0B005360F0000&cdDocumento=239436355&nmRecursoAcessado=Mero+expediente">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239436355"
+                   title="Visualizar documento em inteiro teor"
+                   href="/cpopg/abrirDocumentoVinculadoMovimentacao.do?processo.codigo=0B005360F0000&cdDocumento=239436355&nmRecursoAcessado=Mero+expediente"> Mero expediente
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Aguarde-se o cumprimento da pena provis&oacute;ria imposta, observando-se que a progress&atilde;o ao regime semiaberto est&aacute; prevista para o dia 19/04/2021, salvo grade de remi&ccedil;&atilde;o, e desde que preenchido o requisito subjetivo. Ci&ecirc;ncia &agrave; defesa, Minist&eacute;rio P&uacute;blico e UPA local. Intimem-se. Oficie-se.
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Conclusos para despacho
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Conclusos para despacho
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+
+
+
+
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-239393496"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha">
+                    <img width="16" height="16" border="0" src="/cpopg/imagens/doc.png" />
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+                <a class="linkMovVincProc"
+                   id="linkMovVincProc-2-239393496"
+                   title="Visualizar documento em inteiro teor"
+                   href="#liberarAutoPorSenha"> Certidão emitida
+                </a>
+
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			Gen&eacute;rico
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada petição de apelação
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de Procuração
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de Denúncia
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de documento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Auto de prisão em flagrante
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Juntada de guia de recolhimento provisória
+
+
+
+                <br />
+                <span style="font-style: italic;">
+
+		</span>
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                18/09/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px">
+
+
+
+
+                Distribuido por direcionamento
+
+
+
+                <br />
+                <span style="font-style: italic;">
+			determina&ccedil;&atilde;o judicial
+		</span>
+
+            </td>
+        </tr>
+
+
+
+        </tbody>
+
+
+
+
+    </table>
+
+    <div id="divLinksTituloBlocoMovimentacoes" style="text-align:right">
+
+
+
+
+
+
+
+
+
+
+        <input id="mensagemNaoExibidamovimentacoes" type="hidden" value=""/>
+
+        <input id="linkNaoExibidomovimentacoes" type="hidden" value="Recolher"/>
+
+        <span id="mensagensExibindomovimentacoes" class="mensagemExibindo">
+
+</span> &nbsp;
+
+        <a id="linkmovimentacoes" href="javascript:" class="linkNaoSelecionado unj-link-collapse">
+        <span id="setasDireitamovimentacoes" class="setasDireita">
+            <i class="unj-link-collapse__icon glyph glyph-chevron-down"></i>
+        </span>
+            Mais
+        </a>
+
+        <script>
+          $(function() {
+            var controlarLink = function() {
+              var $linkNaoExibido = $('input#linkNaoExibidomovimentacoes');
+              var conteudoLinkNaoApresentado = $linkNaoExibido.val();
+              var $link = $('a#linkmovimentacoes');
+
+              $linkNaoExibido.val($link.html());
+              $link.html(conteudoLinkNaoApresentado);
+            };
+
+            var controlarMensagem = function() {
+              var $mensagemNaoExibida = $('input#mensagemNaoExibidamovimentacoes');
+              var $spanMensagem = $('span#mensagensExibindomovimentacoes');
+              var mensagemExibida = $spanMensagem.html();
+              var mensagemNaoExibida = $mensagemNaoExibida.val();
+
+              $spanMensagem.html(mensagemNaoExibida);
+              $mensagemNaoExibida.val(mensagemExibida);
+            };
+
+            var controlarMensagemLink = function() {
+              controlarMensagem();
+              controlarLink();
+            };
+
+            var esconderElementosExtrasMostrarDefault = function() {
+              $('#tabelaTodasMovimentacoes').hide();
+              $('#tabelaUltimasMovimentacoes').show();
+            };
+
+            var mostrarElementosExtrasEsconderDefault = function() {
+              $('#tabelaUltimasMovimentacoes').hide();
+              $('#tabelaTodasMovimentacoes').show();
+            };
+
+            var initPagina = function() {
+              var setasDireita = '<span id="setasDireitamovimentacoes" class="setasDireita"><i class="unj-link-collapse__icon glyph glyph-chevron-up"></i></span>';
+              var $linkEscondido = $('input#linkNaoExibidomovimentacoes');
+              $linkEscondido.val(setasDireita+$linkEscondido.val());
+            };
+
+            var bindLink = function() {
+              var $link = $('a#linkmovimentacoes');
+              $link.funcToggle('click', mostrarElementosExtrasEsconderDefault, esconderElementosExtrasMostrarDefault);
+              $link.bind('click', controlarMensagemLink);
+            };
+
+            initPagina();
+            bindLink();
+            esconderElementosExtrasMostrarDefault();
+          });
+        </script>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Petições diversas</h2>
+
+
+    </div>
+
+    <!-- Tabela de petições diversas -->
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1"  >
+
+
+
+        <tbody>
+        <tr>
+            <td colspan="2" align="left">
+
+
+
+                Não há petições diversas vinculadas a este processo.
+
+
+            </td>
+        </tr>
+        </tbody>
+
+
+    </table>
+    <!--  Tabela de petições diversas -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="text/javascript">
+      (function($) {
+        $(function(){
+          var captcha = $.saj.getUrlParameter('uuidCaptcha');
+          if(!captcha){
+            return;
+          }
+          $('.incidente a').each(function(){
+            var $incidente = $(this);
+            var url = $incidente.attr('href');
+            $incidente.attr('href', url+'&uuidCaptcha='+captcha);
+          });
+        })
+      })(jQuery);
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Incidentes, ações incidentais, recursos e execuções de sentenças</h2>
+
+
+    </div>
+
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1"  >
+
+
+
+        <tr>
+            <td colspan="3" align="left">
+
+
+
+                Não há incidentes, ações incidentais, recursos ou execuções de sentenças vinculados a este processo.
+
+
+            </td>
+        </tr>
+
+
+    </table>
+    <!--  Incidentes -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="text/javascript">
+      (function ($) {
+        $(function () {
+          var captcha = $.saj.getUrlParameter('uuidCaptcha');
+
+          if(!captcha){
+            return;
+          }
+          $.each($('.processoApensado'), function (i, value) {
+            var $link = $(value);
+            $link.attr('href', $link.attr('href') + '&uuidCaptcha=' + captcha);
+          })
+
+        })
+      })(jQuery);
+    </script>
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Apensos, Entranhados e Unificados</h2>
+
+
+    </div>
+
+
+
+
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1">
+        <tbody id="dadosApensosNaoDisponiveis">
+        <tr>
+            <td colspan="3" align="left">Não há processos apensados, entranhados e unificados a este processo.</td>
+        </tr>
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Audiências</h2>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a name="audienciasPlaceHolder"></a>
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1">
+
+
+
+        <tr>
+            <td colspan="3" align="left">
+
+
+
+                Não há Audiências futuras vinculadas a este processo.
+
+
+            </td>
+        </tr>
+
+
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <form id="popupCdas" style="display: none;">
+        <!--  dados da lista (CDAs) -->
+        <div style="height:210px; overflow: auto;">
+            <table id="tableCdasPrincipais" style="margin-left:10px; margin-top:1px; width: 98%;">
+                <thead>
+                <tr class="fundoClaro">
+                    <th style="text-align:left;">Número CDA</th>
+                    <th style="text-align:left;">Valor</th>
+                    <th style="text-align:left;">Dt. CDA</th>
+                    <th style="text-align:left;">Valor atualizado</th>
+                    <th style="text-align:left;">Dt. atualização</th>
+                    <th style="text-align:left;">Situação</th>
+                </tr>
+                <tr class="fundoEscuro" height="2" aria-hidden="true">
+                    <td colspan="6"/>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <form action="/cpopg/show.do?processo.codigo=0B005360F0000&processo.foro=11&conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=47177&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=sajcaptcha_69ecd181b1d744309a646da2cd988dff&paginaConsulta=1" id="popupSenha" style="display: none;" method="POST">
+
+        <table role="document">
+            <tr>
+                <td colspan="2" style="padding-bottom:20px">Atendendo a resolução 121 do CNJ.</td>
+            </tr>
+
+            <tr>
+                <td colspan="2" style="padding-bottom:20px">Se for advogado(a) nesse processo, é necessário<span id="identificacao"></span></td>
+
+
+
+                <script language="javascript" type="text/JavaScript" src="https://esaj.tjsc.jus.br/sajcas/conteudoIdentificacao?script=1593626750952"></script>
+
+
+            </tr>
+
+            <tr align="center">
+                <td align="left" colspan="2" style="padding-bottom:20px">
+                    <div style="float:left; line-height:30px;">Se for uma parte ou interessado, digite a senha do processo</div>
+                    <div style="float:left;width: 140px; padding-left:15px">
+                        <input type="password" name="senhaProcesso" maxlength="12" value="" rotulo="" class="form-control" id="senhaProcesso">
+                        <input type="hidden" name="idRecursoQueProvocouLiberacaoPorSenha" value="">
+                    </div>
+                    <div class="unj-form-control-group__icon">
+                        <div class="dropdown show">
+                            <a href="javascript:;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="glyph glyph-info" aria-hidden="true"></span>
+                            </a>
+                            <div class="dropdown-menu tooltip-campos" aria-labelledby="dropdownMenuLink">
+
+                                É necessário informar uma senha para acessar processo em segredo de justiça, bem como para acessar autos dos demais processos.<br/><br/>
+                                Se for parte do processo e ainda não possua uma senha, <b>solicite-a no cartório</b>.<br/><br/>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <input type="button" name="btFechar" value="Cancelar" onclick="" onmouseover="B_mOver(this);" onmouseout="B_mOut(this);" class="spwBotao " id="botaoFecharPopupSenha">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <input type="submit" name="btEnviarSenha" value="Continuar" onclick="" onmouseover="B_mOver(this);" onmouseout="B_mOut(this);" onmouseover="B_mOver(this);" onmouseout="B_mOut(this);" class="spwBotaoDefault btn-space" id="btEnviarSenha">
+
+
+
+
+                </td>
+            </tr>
+        </table>
+    </form>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<footer>
+    <nav class="navbar__footer">
+        <div class="navbar__footer__container">
+
+            <ul class="navbar__footer__list-brand">
+                <li class="navbar__footer__list-brand__item">
+                    <a href="#" class="navbar__footer__list-brand__item__link">
+                        <img src="https://esaj.tjsc.jus.br/esaj/img/brand/icon-saj.png" alt="SAJ">
+                    </a>
+                </li>
+                <li class="navbar__footer__list-brand__item">
+                    <a href="#" class="navbar__footer__list-brand__item__link">
+                        <img src="https://esaj.tjsc.jus.br/esaj/img/brand/icon-softplan.png" alt="Softplan">
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar__footer__list-actions">
+            </ul>
+        </div>
+    </nav>
+</footer>
+
+
+
+
+
+
+
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"errorBeacon":"bam.nr-data.net","licenseKey":"b61bdf610d","agent":"","beacon":"bam.nr-data.net","applicationTime":154,"applicationID":"222268696","transactionName":"MlZRN0QECkMAVERZDgscYBdEEBBDIFREWQ4LHFERGAYLXU9EX1YVFV9SDRgWBVpPVEBfTxZHQRZCFkpRAkNZXw9LYFsMQSQHRAhYXg==","queueTime":0}</script></body>
+</html>

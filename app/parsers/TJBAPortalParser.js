@@ -2,11 +2,13 @@ const cheerio = require('cheerio');
 const moment = require('moment');
 
 const { BaseParser } = require('./BaseParser');
-const { removerAcentos } = require('./BaseParser');
+const { removerAcentos, traduzir } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
-
+const { COMARCAS } = require('../assets/tjba/comarcas');
 // parser => processo
+
+
 
 class TJBAPortalParser extends BaseParser {
   /**
@@ -20,11 +22,19 @@ class TJBAPortalParser extends BaseParser {
     let capa = {};
 
     capa['uf'] = 'BA';
-    capa['comarca'] = 'Bahia';
+    capa['comarca'] = removerAcentos(this.extrairComarca(content));
     capa['assunto'] = [this.extrairAssunto(content)];
     capa['classe'] = removerAcentos(content.classe);
-
     return capa;
+  }
+
+  extrairComarca (content) {
+    let distribuicao = removerAcentos(content.distribuicao);
+    for (let c of COMARCAS) {
+      if (c.test(distribuicao.toLowerCase())) {
+        return c.toString().replace(/\//g, '').toUpperCase();
+      }
+    }
   }
 
   extrairAssunto(content) {
@@ -41,29 +51,38 @@ class TJBAPortalParser extends BaseParser {
       if (element.tipo) {
         let nome = element.nome.replace(/\s[^\w-]\s.+$/, '');
         nome = removerAcentos(nome);
-        let tipo = removerAcentos(element.tipo);
+        let tipo = traduzir(element.tipo);
+
+        if (tipo == "Advogado") {
+          nome = nome.replace(/\s\W\s.*/, '');
+          nome = `(${element.documento}) ${nome}`;
+        } else {
+          if (element.advogado) {
+            envolvidos.push(this.extrairAdvogado(element.advogado));
+          }
+        }
         envolvidos.push({
           nome: nome,
-          tipo: tipo,
+          tipo: tipo
         });
-
-        if (element.advogado) {
-          let advogado = element.advogado;
-          let oab = /\d+\w{2}/.exec(advogado);
-          advogado = advogado.replace(/\s.\d+\w{2}.$/, '');
-          if (oab) {
-            advogado = `(${oab[0]}) ${advogado}`;
-          }
-          envolvidos.push({
-            nome: removerAcentos(advogado),
-            tipo: 'Advogado',
-          });
-        }
       }
     });
 
     return envolvidos;
   }
+
+  extrairAdvogado(advogado) {
+    let oab = /\d+\w{2}/.exec(advogado);
+    advogado = advogado.replace(/\s.\d+\w{2}.$/, '');
+    if (oab) {
+      advogado = `(${oab[0]}) ${advogado}`;
+    }
+    return {
+      nome: removerAcentos(advogado),
+      tipo: 'Advogado',
+    };
+  }
+
 
   extrairAndamentos(content, dataAtual, numeroProcesso) {
     let movimentos = [];

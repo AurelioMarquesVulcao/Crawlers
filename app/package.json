@@ -4,7 +4,7 @@
   "description": "Crawler de oabs",
   "main": "server.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --recursive 'test/*.spec.js'",
     "start": "nodemon server.js"
   },
   "author": "Vitor Nascimento (IMPACTA)",
@@ -31,6 +31,7 @@
     "mongoose": "^5.9.6",
     "prettier": "^2.0.5",
     "node-cron": "^2.0.3",
+    "querystring": "^0.2.0",
     "puppeteer": "^5.0.0",
     "winston": "^3.2.1",
     "xregexp": "^4.3.0"

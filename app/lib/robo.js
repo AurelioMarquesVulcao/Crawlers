@@ -191,7 +191,7 @@ class Robo {
     //   auth: 'proadvproxy:C4fMSSjzKR5v9dzg'
     // });
 
-    options.timeout = 60000;
+    options.timeout = 60000;    
     return this.requisicao.enviarRequest(options);
   }
 }

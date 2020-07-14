@@ -1,9 +1,11 @@
 const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJSP } = require('./OabTJSP');
-const { ProcessoTJSP } = require("./ProcessoTJSP");
-const { OabTJSC } = require('./OabTJSC');
-const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { OabTJMG } = require('./OabTJMG');
+const { OabTJRS } = require('./OabTJRS');
+const { OabTJSC } = require('./OabTJSC');
+const { ProcessoTJRS } = require('./ProcessoTJRS');
+const { ProcessoTJSP } = require("./ProcessoTJSP");
+const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { ProcJTE } = require('./ProcJTE');
 
 class ExtratorFactory {
@@ -21,6 +23,14 @@ class ExtratorFactory {
     if (/oab.TJSP/.test(fila)) {
       extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg/open.do', isDebug);
     }
+
+    if (/oab.TJRS/.test(fila)) {      
+      extrator = new OabTJRS('https://www.tjrs.jus.br/site_php/consulta/index.php', isDebug);
+    }
+
+    if (/processo.TJRS/.test(fila)) {      
+      extrator = new ProcessoTJRS('https://www.tjrs.jus.br/site_php/consulta/index.php', isDebug);
+    }    
 
     if (/processo.JTE/.test(fila)) {
       extrator = new ProcJTE('https://jte.csjt.jus.br/', isDebug);

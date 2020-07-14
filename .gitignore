@@ -128,3 +128,6 @@ mongodb/*
 
 # WebStorm
 .idea/*
+
+# arquivos de captcha de audio #
+*.wav

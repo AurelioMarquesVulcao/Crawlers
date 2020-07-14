@@ -31,6 +31,32 @@ class Helper {
     this.exit(signal);
   }
 
+  static removerEspacosEmBranco(texto) {
+    return texto
+      .replace(/\n+|\s+|\t+/g, " ")      
+      .trim();
+  }
+
+  static removerEspeciais(texto) {    
+    return texto         
+      .replace(/\n+|\t+/g, ' ')
+      .replace(/\:+/,'')
+      .replace(/\s+/g,'_')
+      .replace(/\(+|\)+/g,'')
+      .trim();
+  }
+
+  static removerAcento(texto) {    
+    return texto
+      .toLowerCase()
+      .replace(/[ÁÀÂÃÄ]/gi, "a")
+      .replace(/[ÉÈÊË]/gi, "e")
+      .replace(/[ÍÌÎÏ]/gi, "i")
+      .replace(/[ÓÒÔÕÖ]/gi, "o")
+      .replace(/[ÚÙÛÜ]/gi, "u")
+      .replace(/[Ç]/gi, "c");
+  }
+  
   static async resgatarNovoToken() {
     const robo = new Robo();
     return robo.acessar({

@@ -3,6 +3,7 @@ const axios = require("axios").default;
 const GerenciadorFila = require("../lib/filaHandler").GerenciadorFila;
 const ConsultasCadastradas = require("../models/schemas/consultas_cadastradas")
   .ConsultasCadastradas;
+const bigDataAddress = require("../configs/enums").enums.bigdataAddress;
 
 const gerenciadorFila = new GerenciadorFila();
 
@@ -14,7 +15,7 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
       NumeroOab: mensagemObj.NumeroOab,
       NumeroProcesso: mensagemObj.NumeroProcesso,
       TipoConsulta: mensagemObj.TipoConsulta,
-      SeccionalOab: mensagemObj.SeccionalOab,
+      SeccionalOab: mensagemObj.SeccionalOab
     };
 
     const consulta = await ConsultasCadastradas.findOne(query);
@@ -34,7 +35,7 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
 
         axios
           .get(
-            `http://192.168.99.100:8083/consultaPublica/confirmarCadastro/${mensagemObj.CadastroConsultaId}`
+            `${bigDataAddress}/consultaPublica/confirmarCadastro/${mensagemObj.CadastroConsultaId}`
           )
           .then((res) => console.log(res.data))
           .catch((err) => console.error("Erro: ", err));

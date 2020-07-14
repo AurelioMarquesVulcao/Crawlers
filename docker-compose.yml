@@ -83,9 +83,6 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    depends_on:
-      - nginx
-      - mongodb
     command: node workers/TJMG/extracaoNovos.js
 
   cadastro-consulta:

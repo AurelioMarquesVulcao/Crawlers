@@ -1,6 +1,5 @@
 const sleep = require('await-sleep');
 const { enums } = require('../configs/enums');
-const { Robo } = require('../lib/robo');
 const axios = require('axios');
 let Anticaptcha = require('../bin/js/anticaptcha')(
   '4b93beb6fe87d3bf3cfd92966ec841a6'

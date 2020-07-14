@@ -34,7 +34,8 @@ module.exports.enums = Object.freeze({
     Processo: "processo"
   },
   bigdataUrls: {
-    resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`
+    resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`,
+    login: `http://${bigdataAddress}/login/`
   },
   proxy: {
     proxiesUrl: process.env.PROXY_ADDRESS

@@ -75,6 +75,22 @@ AndamentoSchema.methods.salvar = async function salvar() {
   });
 };
 
+AndamentoSchema.statics.retornaAndamentos = async function retornaAndamentos(numeroProcesso) {
+  return Andamento.find({ numeroProcesso: numeroProcesso }, function (
+    err,
+    result
+  ) {
+    if (err) {
+      console.log(err);
+      return { sucesso: false }
+    }
+    let andamentos = result.map((element, index) => {
+      return element.toJSON();
+    });
+    return { sucesso: true, andamentos:andamentos }
+  })
+}
+
 AndamentoSchema.index({ numeroProcesso: 1, type: -1 });
 
 const Andamento = mongoose.model('Andamento', AndamentoSchema, 'andamentos');

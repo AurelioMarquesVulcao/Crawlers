@@ -34,20 +34,33 @@ const ExtracaoSchema = new Schema(
   }
 );
 
+/**
+ * Cria (ou atualiza) e retorna um objeto do tipo Extracao.
+ * @param {{ExecucaoConsultaId: String, NumeroProcesso: String, NumeroOab: String}}message
+ * @param {{resultado: [Object], sucesso: Boolean, detalhes: [String]}} extracao
+ * @param {String} uf
+ * @returns {Promise<Extracao>}
+ */
 ExtracaoSchema.statics.criarExtracao = async function criarExtracao(
   message,
   extracao,
   uf
 ) {
-  return await Extracao.create({
-    idLog: message.ExecucaoConsultaId,
-    numeroProcesso: message.NumeroProcesso,
-    oab: message.NumeroOab,
-    resultado: extracao.resultado,
-    sucesso: extracao.sucesso,
-    detalhes: extracao.detalhes,
-    uf: uf,
-  });
+  await Extracao.updateOne(
+    { idLog: message.ExecucaoConsultaId },
+    {
+      idLog: message.ExecucaoConsultaId,
+      numeroProcesso: message.NumeroProcesso,
+      oab: message.NumeroOab,
+      resultado: extracao.resultado,
+      sucesso: extracao.sucesso,
+      detalhes: extracao.detalhes,
+      uf: uf,
+    },
+    { upsert: true }
+  );
+
+  return Extracao.findOne({ idLog: message.ExecucaoConsultaId });
 };
 
 ExtracaoSchema.methods.prepararEnvio = function prepararEnvio() {

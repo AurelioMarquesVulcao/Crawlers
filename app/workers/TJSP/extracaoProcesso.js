@@ -20,23 +20,24 @@ const logarExecucao = async (execucao) => {
     console.log(e);
   });
 
-  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}.extracao.novos`;
+  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSP}.extracao.novos`;
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
-    let logger = new Logger('info', 'logs/OabTJSP/OabTJSPInfo.log', {
-      nomeRobo: `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}`,
-      NumeroOab: message.NumeroOab,
+    let logger = new Logger('info', 'logs/ProcessoTJSP/ProcessoTJSPInfo.log', {
+      nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSP}`,
+      NumeroOab: message.NumeroProcesso,
     });
+    console.log(message);
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(
-        message.NumeroOab,
-        message.ConsultaCadastradaId
+        message.NumeroProcesso,
+        message.NumeroOab
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
@@ -47,17 +48,18 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      // logger.info('Enviando resposta ao BigData');
-      // await Helper.enviarFeedback(
-      //   extracao.prepararEnvio()
-      // ).catch((err) => {
-      //   console.log(err);
-      //   throw new Error(
-      //     `OabTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-      //   );
-      // });
-      // logger.info('Resposta enviada ao BigData');
+      logger.info('Enviando resposta ao BigData');
+      await Helper.enviarFeedback(
+        extracao.prepararEnvio()
+      ).catch((err) => {
+        console.log(err);
+        throw new Error(
+          `ProcessoTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+        );
+      });
+      logger.info('Resposta enviada ao BigData');
       logger.info('Finalizando processo');
+      console.log('\n\n');
       await logarExecucao({
         Mensagem: message,
         DataInicio: dataInicio,
@@ -70,9 +72,12 @@ const logarExecucao = async (execucao) => {
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
     } catch (e) {
+      console.log('ERRU', e.code, e.message, '\n\n', e);
       logger.info('Encontrado erro durante a execução');
-      logger.log('error',e);
+      logger.log('error', e);
       logger.info('Finalizando proceso');
+      console.log('\n\n');
+
       await logarExecucao({
         LogConsultaId: message.LogConsultaId,
         Mensagem: message,

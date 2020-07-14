@@ -77,7 +77,6 @@ class Requisicao {
           } else {
             resolve({
               code: 'HTTP_RESPONSE_FAIL',
-              message: 'Não houve resposta do servidor!',
               status: statusCode,
               message: `StatusCode: ${statusCode}.`,
               responseContent: null,
@@ -181,7 +180,7 @@ class Robo {
     };
 
     if (params) {
-      if (usaJson) options.json = params;
+      if (usaJson) options.data = params;
       // Json
       else {
         // FormData

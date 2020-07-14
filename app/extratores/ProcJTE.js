@@ -1,6 +1,6 @@
 const cheerio = require('cheerio');
 const { Logger } = require('../lib/util');
-const { RoboPuppeteer } = require('../lib/roboPuppeteer')
+const { RoboPuppeteer } = require('../lib/roboPuppeteer-rev-000')
 const moment = require('moment');
 const { Andamento } = require('../models/schemas/andamento');
 const re = require('xregexp');

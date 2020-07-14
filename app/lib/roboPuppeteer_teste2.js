@@ -6,10 +6,11 @@ class RoboPuppeteer3 {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
       headless: true,
-      slowMo: 100,
+      slowMo: 90,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', 'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', 'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
     });
     this.page = await this.browser.newPage();
     this.acessar('https://www.google.com/');

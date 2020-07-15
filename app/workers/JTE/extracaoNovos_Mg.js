@@ -16,7 +16,7 @@ const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseE
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer_teste2')
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer')
 
 
 
@@ -65,6 +65,7 @@ var contador = 0;
   // tudo que está abaixo é acionado para cada processo na fila.
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+    console.time("\033[31m" + "Tempo de consumo de fila é ")
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     let logger = new Logger(
@@ -86,7 +87,7 @@ var contador = 0;
       // await new ProcJTE().extrair("00021625020145020016")
 
       //const resultadoExtracao = {}
-      console.log('o contador está em: ' + contador);
+      //console.log('o contador está em: ' + contador);
       // const resultadoExtracao = await puppet.preencheProcesso("01003040720205010049", contador)
       var resultadoExtracao = {}
       let numeroProcesso = message.NumeroProcesso
@@ -103,15 +104,14 @@ var contador = 0;
         }
         );
         // let objResponse = await RoboPuppeteer(numeroProcesso)
-        console.log('ligou até aqui');
+        //console.log('ligou até aqui');
 
-        console.time("\033[0;32m"+"info: JTE - CNJ : ---------------- - tempo para preencher/obter um processo")
+        
         let objResponse = await puppet.preencheProcesso(numeroProcesso, contador)
-        console.timeEnd("\033[0;32m"+"info: JTE - CNJ : ---------------- - tempo para preencher/obter um processo")
+        
         if (!!objResponse)contador++
         
 
-        console.log('pegou os dadosa da pagina');
 
         //Estou carregando paginas locais até resolver o Puppeteer.
         let $ = cheerio.load(objResponse.geral);
@@ -136,7 +136,7 @@ var contador = 0;
       }
   
 
-      await console.log("\033[0;32m" + "Resultado da extração " + "\033[0;34m" + !!resultadoExtracao);
+      await console.log("\033[0;32m" + "Resultado da extração " + "\033[0;34m" + !!resultadoExtracao+"\033[1;37m");
 
       //const resultadoExtracao = await extrator.extrair(message.NumeroProcesso, contador);
       // const resultadoExtracao = extrator.extrair(message.NumeroProcesso)
@@ -157,7 +157,7 @@ var contador = 0;
         resultadoExtracao,
         message.SeccionalProcesso
       );
-      console.log(extracao);
+      // console.log(extracao);
       //console.log(resultadoExtracao.resultado.processo.detalhes);
       
       
@@ -187,7 +187,7 @@ var contador = 0;
       // });
 
       ch.ack(msg);
-
+      console.timeEnd("\033[31m" + "Tempo de consumo de fila é ")
     } catch (e) {
       console.log(e);
 

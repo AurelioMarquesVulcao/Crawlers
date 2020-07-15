@@ -84,6 +84,7 @@ class JTEParser extends BaseParser {
 
   // funcao secundaria - organiza os dados dos envolvidos
   envolvidos($) {
+    let advogados = this.advogados($)
     let resultado = [];
     // comitado para padronizar o advogado no Banco de dados.
     // for (let i in this.extraiAdvogadoOab($)) {
@@ -102,6 +103,10 @@ class JTEParser extends BaseParser {
       }
       resultado.push(envolvido)
     }
+    for (let i in advogados) {
+      resultado.push(advogados[i])
+    }
+
     //console.log(resultado);
     return resultado
   }

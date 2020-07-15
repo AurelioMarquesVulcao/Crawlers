@@ -9,8 +9,8 @@ class RoboPuppeteer3 {
       slowMo: 100,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
     });
     this.page = await this.browser.newPage();
     this.acessar('https://www.google.com/');
@@ -65,6 +65,7 @@ class RoboPuppeteer3 {
 
 
   async preencheProcesso(numero, contador) {
+    console.time("info: JTE - CNJ : ---------------- - tempo para preencher um processo")
     let entrada = processaNumero(numero)
     //await console.log("leu a entrada: " + entrada.numeroprocesso);
     await console.log("O contador de processo esta em: " + contador);
@@ -94,11 +95,13 @@ class RoboPuppeteer3 {
     console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
 
     //await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
+    console.timeEnd("info: JTE - CNJ : ---------------- - tempo para preencher um processo")
     return await this.pegaHtml(contador, numero)
   }
 
 
   async pegaHtml(contador, numero) {
+    console.time("info: JTE - CNJ : ---------------- - tempo para obter um processo")
     //const contador = 0
 
     await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
@@ -129,6 +132,7 @@ class RoboPuppeteer3 {
     // await page.close()
     //await browser.close()
     //contador ++
+    console.timeEnd("info: JTE - CNJ : ---------------- - tempo para obter um processo")
     return { geral: html1, andamentos: html2 }
   }
 

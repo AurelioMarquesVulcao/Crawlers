@@ -31,10 +31,12 @@ class OabTJSC extends ExtratorBase {
    * @param {String|Number} numeroOab
    * @param {ObjectID} cadastroConsultaId
    * @param {Number} instancia
-   * @returns {Promise<{resultado: [], sucesso: boolean, logs: *, detalhes: string}|{resultado: unknown[], sucesso: boolean, logs: *, detalhes: string}|{resultado: [], sucesso: boolean, logs: *, detalhes: string}>}
+   * @returns {Promise<{resultado: [], sucesso: boolean, logs: *, detalhes: string}|{resultado: [], sucesso: boolean, logs: *, detalhes: string}|{resultado: [], sucesso: boolean, logs: *, detalhes: string}>}
    */
-  async extrair(numeroOab, cadastroConsultaId, instancia=1) {
-    console.log(`numeroOaa: ${numeroOab}\ncadastroConsultaId: ${cadastroConsultaId}\ninstancia: ${instancia}`);
+  async extrair(numeroOab, cadastroConsultaId, instancia = 1) {
+    // console.log(
+    //   `numeroOaa: ${numeroOab}\ncadastroConsultaId: ${cadastroConsultaId}\ninstancia: ${instancia}`
+    // );
     this.setInstanciaUrl(instancia);
     this.numeroDaOab = numeroOab;
     this.instancia = instancia;
@@ -89,13 +91,17 @@ class OabTJSC extends ExtratorBase {
       this.logger.info('Recuperando lista de processos');
       let tentativa = 0;
       do {
+        this.logger.info(
+          `Tentativa de recuperacao da lista de processos [TENTATIVA: ${
+            tentativa + 1
+          }]`
+        );
         listaProcessos = await this.getListaProcessos(
           numeroOab,
           cookies,
           uuidCaptcha,
           gResponse
         );
-        // console.log(listaProcessos);
 
         // Terceira parte: passar a lista, pegar cada um dos codigos
         // resultantes e mandar para o parser
@@ -111,21 +117,24 @@ class OabTJSC extends ExtratorBase {
             this.logger.info(
               `Verificando log de execução para o processo ${processo}.`
             );
-            console.log(0, cadastroConsulta);
-            let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
+            let logExec = await LogExecucao.cadastrarConsultaPendente(
+              cadastroConsulta
+            );
             this.logger.info(
               `Log de execução do processo ${processo} verificado com sucesso`
             );
             this.logger.info(logExec.mensagem);
 
             if (logExec.enviado)
-              resultados.push(Promise.resolve({numeroProcesso: processo}));   
+              resultados.push(Promise.resolve({ numeroProcesso: processo }));
           }
 
           //resultados = await this.extrairProcessos(listaProcessos, cookies);
           return Promise.all(resultados)
             .then((resultados) => {
-              this.logger.info(`${resultados.length} Processos enviados para extração`);
+              this.logger.info(
+                `${resultados.length} Processos enviados para extração`
+              );
               return {
                 resultado: resultados,
                 sucesso: true,
@@ -143,10 +152,11 @@ class OabTJSC extends ExtratorBase {
                 logs: this.logger.logs,
               };
             });
+        } else {
+          this.logger.info('Lista de processos vazia');
+          tentativa++;
+          gResponse = await this.getCaptcha();
         }
-        this.logger.info('Lista de processos vazia');
-        tentativa++;
-        gResponse = await this.getCaptcha();
       } while (tentativa < 5);
 
       this.logger.info('Lista de processos vazia;');
@@ -252,17 +262,17 @@ class OabTJSC extends ExtratorBase {
     let processos = [];
 
     // Verifica qual é a instancia e monta a url de acordo
-    if (this.instancia === 2) {
-      url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=0&cbPesquisa=NUMOAB&dePesquisa=${numeroOab}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`
-    } else {
+    if (this.instancia === 2)
+      url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=0&cbPesquisa=NUMOAB&dePesquisa=${numeroOab}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    if (this.instancia === 3)
+      url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=0&cbPesquisa=NUMOAB&dePesquisa=${numeroOab}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    if (this.instancia === 1)
       url = `${this.url}/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-    }
 
     do {
       // console.log(url);
       // console.log(cookies);
-      let objResponse = {};
-      objResponse = await this.robo.acessar({
+      let objResponse = await this.robo.acessar({
         url: url,
         method: 'GET',
         enconding: 'latin1',
@@ -285,10 +295,14 @@ class OabTJSC extends ExtratorBase {
         processos = [...processos, ...this.extrairNumeroProcessos($)];
         const proximaPagina = $('[title|="Próxima página"]').first();
 
+        if (processos.length === 0) {
+          processos = this.preParseProcesso(objResponse.responseBody);
+        }
         if (!proximaPagina.text()) return processos;
 
-        condition = true;
         url = 'https://esaj.tjsc.jus.br' + proximaPagina.attr('href');
+
+        condition = true;
       } catch (error) {
         this.logger.info('Problema ao pegar processos da página');
         this.logger.log(error);
@@ -296,6 +310,19 @@ class OabTJSC extends ExtratorBase {
       }
     } while (condition);
     return processos;
+  }
+
+  /**
+   * Verifica se é redirecionado para uma pagina de processo unico diretamente
+   * @param {string} body responseBody da pagina
+   */
+  preParseProcesso(body) {
+    const $ = cheerio.load(body);
+
+    if ($('h2.subtitle').length > 0) {
+      return [$('span.unj-larger-1').text().trim()];
+    }
+    return [];
   }
 
   extrairNumeroProcessos($) {

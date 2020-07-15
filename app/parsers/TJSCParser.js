@@ -18,7 +18,6 @@ class TJSCParser extends BaseParser {
    * @returns {{processo: Processo, andamentos: [Andamento]}}
    */
   parse(content, instancia) {
-    console.log('instancia', instancia);
     this.instancia = instancia;
     const $ = cheerio.load(content);
     const dataAtual = moment().format('YYYY-MM-DD');
@@ -63,20 +62,19 @@ class TJSCParser extends BaseParser {
   extrairComarca($) {
     let comarca;
 
-    comarca =
-      $(
-        'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-2.mb-2 > div'
-      )
-        .text()
-        .strip()
-    ;
+    comarca = $(
+      'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-2.mb-2 > div'
+    )
+      .text()
+      .strip();
 
     if (comarca === '') {
-      comarca = $('body > div.div-conteudo.container.unj-mb-40 > table:nth-child(12) > tbody > tr > td:nth-child(2)')
+      comarca = $(
+        'body > div.div-conteudo.container.unj-mb-40 > table:nth-child(12) > tbody > tr > td:nth-child(2)'
+      )
         .text()
-        .strip()
+        .strip();
     }
-
 
     return removerAcentos(comarca);
   }
@@ -137,11 +135,10 @@ class TJSCParser extends BaseParser {
     let selector;
 
     table = $('#tableTodasPartes > tbody > tr');
-    console.log(table.length);
-    selector = "#tableTodasPartes";
+    selector = '#tableTodasPartes';
     if (table.length === 0) {
       table = $('#tablePartesPrincipais > tbody > tr');
-      selector = "#tablePartesPrincipais";
+      selector = '#tablePartesPrincipais';
     }
 
     // pegar personagens
@@ -155,13 +152,9 @@ class TJSCParser extends BaseParser {
           index + 1
         }) > td:nth-child(1).label > span`
       )[0].children[0].data.strip();
-      console.log('data1')
       envolvido.nome = $(
-        `${selector} > tbody > tr:nth-child(${
-          index + 1
-        }) > td:nth-child(2)`
+        `${selector} > tbody > tr:nth-child(${index + 1}) > td:nth-child(2)`
       )[0].children[0].data.strip();
-      console.log('data2')
       advogados = this.recuperaAdvogados(index, $, selector);
 
       // Tratamento
@@ -178,6 +171,8 @@ class TJSCParser extends BaseParser {
 
     // pegar os advogados
 
+    envolvidos = this.filtrarUnicosLista(envolvidos);
+
     return envolvidos;
   }
 
@@ -187,9 +182,7 @@ class TJSCParser extends BaseParser {
 
     // 1 transformar tudo em linhas
     linha = $(
-      `${selector} > tbody > tr:nth-child(${
-        upperIndex + 1
-      }) > td:nth-child(2)`
+      `${selector} > tbody > tr:nth-child(${upperIndex + 1}) > td:nth-child(2)`
     )
       .text() // pega o texto
       .strip() // tira os espacos vazios
@@ -206,7 +199,6 @@ class TJSCParser extends BaseParser {
       };
 
       let resultado = re.exec(element.replace('\n', ' '), re(regex));
-      console.log('element', element, '\n');
       // Extracao
       if (resultado) {
         adv.tipo = resultado.tipo.strip();
@@ -274,7 +266,7 @@ class TJSCParser extends BaseParser {
     let table;
     let selector;
     table = $('#tabelaTodasMovimentacoes > tr');
-    selector = "#tabelaTodasMovimentacoes";
+    selector = '#tabelaTodasMovimentacoes';
     // if (table.length === 0) {
     //   table = $('#tabelaUltimasMovimentacoes > tr');
     //   selector = "#tabelaUltimasMovimentacoes";
@@ -282,15 +274,11 @@ class TJSCParser extends BaseParser {
 
     table.each((index) => {
       let data = $(
-        `${selector} > tr:nth-child(${
-          index + 1
-        }) > td:nth-child(1)`
+        `${selector} > tr:nth-child(${index + 1}) > td:nth-child(1)`
       );
       data = moment(data.text().strip(), 'DD/MM/YYYY').format('YYYY-MM-DD');
       let descricaoRaw = $(
-        `${selector} > tr:nth-child(${
-          index + 1
-        }) > td:nth-child(3)`
+        `${selector} > tr:nth-child(${index + 1}) > td:nth-child(3)`
       );
 
       if (descricaoRaw.find('span')[0].children.length > 0) {
@@ -298,7 +286,6 @@ class TJSCParser extends BaseParser {
       } else {
         observacao = descricaoRaw.find('span').text().strip();
       }
-      console.log('data3');
       let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
       observacao = observacao.replace(/\n/gm, ' ');
       observacao = re.replace(observacao, re(/\s\s+/gm), ' ');

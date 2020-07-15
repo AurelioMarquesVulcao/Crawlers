@@ -102,12 +102,11 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  # gera-fila:
-  #     extends:
-  #       file: common-services.yml
-  #       service: base_node
-  #     command: node lib/criaFilaJTE.js
-  #   command: node workers/TJSP/extracao.js
+  gera-fila:
+      extends:
+        file: common-services.yml
+        service: base_node
+      command: node workers/JTE/criaFila.js
   worker-tjsp-processo:
     extends:
       file: common-services.yml

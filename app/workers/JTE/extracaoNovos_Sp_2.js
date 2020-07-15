@@ -47,13 +47,13 @@ var contador = 0;
   await puppet.iniciar()
   await puppet.acessar("https://jte.csjt.jus.br/")
   try {
-    await puppet.preencheTribunal('00109663320175150115')
+    await puppet.preencheTribunal('10000242020195020501')
   } catch (e) {
     console.log("falha ao logar");
     await puppet.fechar()
     await puppet.iniciar()
     await puppet.acessar("https://jte.csjt.jus.br/")
-    await puppet.preencheTribunal('00109663320175150115')
+    await puppet.preencheTribunal('10000242020195020501')
   }
 
 
@@ -63,7 +63,7 @@ var contador = 0;
 
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
+  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
 
   // tudo que está abaixo é acionado para cada processo na fila.
 
@@ -108,9 +108,9 @@ var contador = 0;
         // let objResponse = await RoboPuppeteer(numeroProcesso)
         //console.log('ligou até aqui');
 
-        console.time("\033[0;32m"+"info: JTE - CNJ : ---------------- - tempo para preencher/obter um processo"+"\033[1;37m")
+        
         let objResponse = await puppet.preencheProcesso(numeroProcesso, contador)
-        console.timeEnd("\033[0;32m"+"info: JTE - CNJ : ---------------- - tempo para preencher/obter um processo"+"\033[1;37m")
+        
         if (!!objResponse)contador++
         
 

@@ -65,7 +65,7 @@ var contador = 0;
   // tudo que está abaixo é acionado para cada processo na fila.
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
-    console.time("\033[31m" + "Tempo de consumo de fila é ")
+    
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     let logger = new Logger(
@@ -187,7 +187,7 @@ var contador = 0;
       // });
 
       ch.ack(msg);
-      console.timeEnd("\033[31m" + "Tempo de consumo de fila é ")
+      
     } catch (e) {
       console.log(e);
 

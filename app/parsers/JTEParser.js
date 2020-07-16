@@ -250,8 +250,11 @@ class JTEParser extends BaseParser {
   andamento($, n) {
     let resultado = []
     let texto = this.extraiAndamento($)
+    
     let data = this.extraiDataAndamento($)
     for (let j = 0; j < texto.length; j++) {
+      // console.log(texto[j]);
+      // console.log(data[j]);     
       resultado.push(
         new Andamento({
           descricao: this.removeVazios(texto[j])[0],
@@ -270,7 +273,7 @@ class JTEParser extends BaseParser {
   extraiAndamento($) {
     let resultado = [];
     let dados = [];
-    $('ion-item div').each(async function (element) {
+    $('ion-item p').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos)
       // console.log(andamentos.length);
@@ -327,6 +330,8 @@ class JTEParser extends BaseParser {
 
   // ajusta data brasil para Internacional recebe uma data por vez.
   ajustaData(datas) {
+    
+    
     let dia = datas.slice(0, 2);
     let mes = datas.slice(2, 5);
     let ano = datas.slice(5, 10);
@@ -345,11 +350,6 @@ class JTEParser extends BaseParser {
 
 
 } // Fim da classe TJPRParser
-
-// START'S FOR PROJECT TEST and development
-// (async ()=>{
-//   await new TJPRParser().extraiOAB($)
-// })()
 
 
 

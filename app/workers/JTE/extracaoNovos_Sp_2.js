@@ -63,7 +63,7 @@ var contador = 0;
 
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
+  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
 
   // tudo que está abaixo é acionado para cada processo na fila.
 
@@ -121,7 +121,9 @@ var contador = 0;
         dadosProcesso = parser.parse($, $2, numeroProcesso)
         // var processo = dadosProcesso.processo
         await dadosProcesso.processo.salvar()
+        console.time('tempo para pegar o processo')
         await Andamento.salvarAndamentos(dadosProcesso.andamentos)
+        console.timeEnd('tempo para pegar o processo')
         processo = await dadosProcesso.processo.salvar()
       } catch (e) {
         console.log(e);

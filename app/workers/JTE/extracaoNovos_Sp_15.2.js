@@ -16,7 +16,7 @@ const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseE
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer_teste2')
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 
 
 
@@ -111,7 +111,7 @@ var contador = 0;
         if (!!objResponse)contador++
         
 
-        console.log('pegou os dadosa da pagina');
+        console.log('pegou os dados da pagina');
 
         //Estou carregando paginas locais até resolver o Puppeteer.
         let $ = cheerio.load(objResponse.geral);

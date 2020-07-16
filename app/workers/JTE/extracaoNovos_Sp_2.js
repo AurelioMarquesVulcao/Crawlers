@@ -16,8 +16,7 @@ const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseE
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer')
-
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 
 
 /**
@@ -57,10 +56,6 @@ var contador = 0;
   }
 
 
-
-
-  //01003040720205010049
-
   // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
   const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
@@ -82,19 +77,11 @@ var contador = 0;
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
       logger.info('Iniciando processo de extração');
-
-
-
-
-      // await new ProcJTE().extrair("00021625020145020016")
-
-      //const resultadoExtracao = {}
-      //console.log('o contador está em: ' + contador);
-      // const resultadoExtracao = await puppet.preencheProcesso("01003040720205010049", contador)
+      //-------------------------------------------------- inicio do extrator--------------------------------------------
       var resultadoExtracao = {}
       let numeroProcesso = message.NumeroProcesso
       let dadosProcesso;
-      var processo ;
+      var processo;
       let parser = new JTEParser();
       try {
 
@@ -105,31 +92,20 @@ var contador = 0;
           numeroProcesso: numeroProcesso,
         }
         );
-        // let objResponse = await RoboPuppeteer(numeroProcesso)
-        //console.log('ligou até aqui');
-
-        
+        console.time('\033[0;31m tempo para pegar o processo \033[0m')
         let objResponse = await puppet.preencheProcesso(numeroProcesso, contador)
-        
-        if (!!objResponse)contador++
-        
-
-
-        //Estou carregando paginas locais até resolver o Puppeteer.
+        console.timeEnd('\033[0;31m tempo para pegar o processo \033[0m')
+        if (!!objResponse) contador++
         let $ = cheerio.load(objResponse.geral);
         let $2 = cheerio.load(objResponse.andamentos);
         dadosProcesso = parser.parse($, $2, numeroProcesso)
         // var processo = dadosProcesso.processo
         await dadosProcesso.processo.salvar()
-        console.time('tempo para pegar o processo')
         await Andamento.salvarAndamentos(dadosProcesso.andamentos)
-        console.timeEnd('tempo para pegar o processo')
         processo = await dadosProcesso.processo.salvar()
       } catch (e) {
         console.log(e);
       }
-
-      //  usar return simples apenas para dev
       logger.info('Processos extraidos com sucesso');
       if (!!dadosProcesso) {
         resultadoExtracao = {
@@ -138,17 +114,8 @@ var contador = 0;
           logs: logger.logs
         };
       }
-  
-
-      await console.log("\033[0;32m" + "Resultado da extração " + "\033[0;34m" + !!resultadoExtracao+"\033[1;37m");
-
-      //const resultadoExtracao = await extrator.extrair(message.NumeroProcesso, contador);
-      // const resultadoExtracao = extrator.extrair(message.NumeroProcesso)
-      //console.log(resultadoExtracao);
-      // new GerenciadorFila().enviar(reConsumo, message);
-
-      // testa se a extração ocorreu corretamente
-      //resultadoExtracao.length
+      //-------------------------------------------------- Fim do extrator--------------------------------------------
+      if (!!dadosProcesso) await console.log("\033[0;32m" + "Resultado da extração " + "\033[0;34m" + !!resultadoExtracao + "\033[0m");
 
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
@@ -163,12 +130,12 @@ var contador = 0;
       );
       // console.log(extracao);
       //console.log(resultadoExtracao.resultado.processo.detalhes);
-      
-      
+
+
       logger.info('Resultado da extracao salva');
 
       logger.info('Enviando resposta ao BigData');
-      //process.exit()
+      //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
       // const resposta = await Helper.enviarFeedback(
       //   extracao.prepararEnvio()
       // ).catch((err) => {
@@ -194,10 +161,8 @@ var contador = 0;
 
     } catch (e) {
       console.log(e);
-
       // envia a mensagem para a fila de reprocessamento
       new GerenciadorFila().enviar(reConsumo, message);
-
       logger.info('Encontrado erro durante a execução');
       // trata erro especifico para falha na estração
       let error01 = "TypeError: Cannot read property 'length' of undefined at /app/workers/JTE/extracaoNovos_Sp_2.js:48:25 at async /app/lib/filaHandler.js:96:11";
@@ -206,11 +171,9 @@ var contador = 0;
       }
       logger.info(`Error: ${e.message}`);
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando proceso');
       console.log(message.LogConsultaId);
-
       // await logarExecucao({
       //   LogConsultaId: message.LogConsultaId,
       //   Mensagem: message,
@@ -227,26 +190,3 @@ var contador = 0;
   });
 
 })();
-
-//---------- funcoes complementares de tratamento--------------
-
-function escolheEstado(numero) {
-  let resultado;
-  numero = numero.slice(numero.length - 6, numero.length - 4)
-  if (numero == 01) resultado = 2     // Rio de Janeiro
-  if (numero == 02 || numero == 05) resultado = 03    // São Paulo
-  if (numero == 21) resultado = 22    // Rio Grande do Norte
-  if (numero == 15) resultado = 16    // São Paulo
-  if (numero == 03) resultado = 4    // São Paulo
-  return resultado
-}
-function processaNumero(numero) {
-  let numeroProcesso = numero.trim().slice(0, 7);
-  let ano = numero.trim().slice(9, 13);
-  let vara = numero.trim().slice(numero.length - 4, numero.length);
-  return {
-    numeroprocesso: numeroProcesso,
-    ano: ano,
-    vara: vara
-  }
-}

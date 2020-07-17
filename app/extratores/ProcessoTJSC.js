@@ -25,6 +25,7 @@ class ProcessoTJSC extends ExtratorBase {
   }
 
   setInstanciaUrl(instancia) {
+    instancia = instancia;
     this.url = INSTANCIAS_URLS[instancia - 1];
   }
 
@@ -39,8 +40,8 @@ class ProcessoTJSC extends ExtratorBase {
     this.numeroDaOab = numeroDaOab;
     this.numeroDoProcesso = numeroDoProcesso;
     this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
-    this.instancia = instancia;
-    this.setInstanciaUrl(instancia);
+    this.instancia = Number(instancia);
+    this.setInstanciaUrl(this.instancia);
 
     this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
       nomeRobo: 'processo.TJSC',

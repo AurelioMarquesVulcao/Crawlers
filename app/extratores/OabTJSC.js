@@ -23,6 +23,7 @@ class OabTJSC extends ExtratorBase {
   }
 
   setInstanciaUrl(instancia) {
+    instancia = instancia;
     this.url = INSTANCIAS_URLS[instancia - 1];
   }
 
@@ -37,9 +38,9 @@ class OabTJSC extends ExtratorBase {
     // console.log(
     //   `numeroOaa: ${numeroOab}\ncadastroConsultaId: ${cadastroConsultaId}\ninstancia: ${instancia}`
     // );
-    this.setInstanciaUrl(instancia);
     this.numeroDaOab = numeroOab;
-    this.instancia = instancia;
+    this.instancia = Number(instancia);
+    this.setInstanciaUrl(this.instancia)
     let cadastroConsulta = {
       SeccionalOab: 'SC',
       TipoConsulta: 'processo',
@@ -269,6 +270,7 @@ class OabTJSC extends ExtratorBase {
     if (this.instancia === 1)
       url = `${this.url}/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
 
+    this.logger.info('Iniciando acesso a lista de processos');
     do {
       // console.log(url);
       // console.log(cookies);
@@ -296,6 +298,7 @@ class OabTJSC extends ExtratorBase {
         const proximaPagina = $('[title|="Próxima página"]').first();
 
         if (processos.length === 0) {
+          this.logger.info('Oab devolve apenas um processo.');
           processos = this.preParseProcesso(objResponse.responseBody);
         }
         if (!proximaPagina.text()) return processos;

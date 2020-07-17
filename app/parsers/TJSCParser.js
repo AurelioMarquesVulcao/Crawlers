@@ -18,7 +18,7 @@ class TJSCParser extends BaseParser {
    * @returns {{processo: Processo, andamentos: [Andamento]}}
    */
   parse(content, instancia) {
-    this.instancia = instancia;
+    this.instancia = Number(instancia);
     const $ = cheerio.load(content);
     const dataAtual = moment().format('YYYY-MM-DD');
     const capa = this.extrairCapa($);

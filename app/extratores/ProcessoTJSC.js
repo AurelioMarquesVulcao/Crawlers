@@ -72,18 +72,14 @@ class ProcessoTJSC extends ExtratorBase {
     try {
       this.logger.info('Fazendo primeira conexão.');
 
-      console.log(this.instancia)
-      if (this.instancia === 1){
-        url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`
-      }  else {
-        url = `${this.url}/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(0, 15)}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${this.detalhes.numeroProcessoMascara}&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`
-      }
+      url = `${this.url}/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(0, 15)}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${this.detalhes.numeroProcessoMascara}&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`
+
 
       console.log('PRE URL', url);
 
       objResponse = await this.robo.acessar({
         url: url,
-        usaProxy: false,
+        usaProxy: true,
       });
       this.logger.info('Conexão ao website concluido.');
       cookies = objResponse.cookies;
@@ -120,7 +116,7 @@ class ProcessoTJSC extends ExtratorBase {
           method: 'GET',
           encoding: 'latin1',
           headers: headers,
-          usaProxy: false,
+          usaProxy: true,
         });
         const $ = cheerio.load(objResponse.responseBody);
         // verifica se há uma tabela de movimentação dentro da pagina.
@@ -180,7 +176,7 @@ class ProcessoTJSC extends ExtratorBase {
       url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
       encoding: 'latin1',
-      usaProxy: false,
+      usaProxy: true,
       headers: {
         Cookie: cookies,
       },

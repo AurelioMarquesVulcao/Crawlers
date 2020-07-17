@@ -166,7 +166,8 @@ class TJSCParser extends BaseParser {
       // Atribuição
       envolvidos.push(envolvido);
 
-      if (advogados) envolvidos = [...envolvidos, ...advogados];
+      if (advogados)
+        envolvidos = [...envolvidos, ...advogados];
     });
 
     // pegar os advogados
@@ -177,45 +178,39 @@ class TJSCParser extends BaseParser {
   }
 
   recuperaAdvogados(upperIndex, $, selector) {
-    let advogados;
+    let advogados = [];
     let linha;
 
-    // 1 transformar tudo em linhas
     linha = $(
       `${selector} > tbody > tr:nth-child(${upperIndex + 1}) > td:nth-child(2)`
     )
-      .text() // pega o texto
-      .strip() // tira os espacos vazios
-      .split(/\s\s+/) // list feita a partir das quebras de linha
-      .splice(1); // remove primeiro elemento que normalmente é o nome do envolvido
-    if (selector !== '#tableTodasPartes') {
-      linha = [linha.join(' ')];
+      .text()
+    linha = linha.match(/^[\t ]*(?<tipo>\w+):\W+(?<nome>.+)/gm)
+    if (linha) {
+      advogados = linha.map((element) => {
+        let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
+        let adv = {
+          tipo: '',
+          nome: '',
+        };
+        let resultado = re.exec(element.replace('\n', ' '), re(regex));
+        // Extracao
+        if (resultado) {
+          adv.tipo = traduzir(resultado.tipo.strip());
+          adv.nome = resultado.nome.strip();
+
+          //TODO fazer funcao de resgate da oab dentro das movimentações
+          let oab = this.resgatarOab(adv.nome, $);
+
+          // Tratamento
+          adv.nome = removerAcentos(adv.nome);
+          if (oab) adv.nome = `(${oab}) ${adv.nome}`;
+
+          return adv;
+        }
+      });
     }
-    advogados = linha.map((element) => {
-      let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
-      let adv = {
-        tipo: '',
-        nome: '',
-      };
-
-      let resultado = re.exec(element.replace('\n', ' '), re(regex));
-      // Extracao
-      if (resultado) {
-        adv.tipo = resultado.tipo.strip();
-        adv.nome = resultado.nome.strip();
-
-        //TODO fazer funcao de resgate da oab dentro das movimentações
-        let oab = this.resgatarOab(adv.nome, $);
-
-        // Tratamento
-        adv.nome = removerAcentos(adv.nome);
-        if (oab) adv.nome = `(${oab}) ${adv.nome}`;
-
-        return adv;
-      }
-    });
-
-    return advogados.filter(Boolean);
+    return advogados.filter(x => Boolean(x));
   }
 
   resgatarOab(nome, $) {
@@ -286,10 +281,13 @@ class TJSCParser extends BaseParser {
       } else {
         observacao = descricaoRaw.find('span').text().strip();
       }
+      //FIXME retornando com acento?
       let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
       observacao = observacao.replace(/\n/gm, ' ');
       observacao = re.replace(observacao, re(/\s\s+/gm), ' ');
       observacao = removerAcentos(observacao);
+      descricao = descricao.replace(/\n/g, ' ');
+      descricao = descricao.replace(/\s\s+/g, ' ')
 
       let andamento = {
         numeroProcesso: numeroProcesso,

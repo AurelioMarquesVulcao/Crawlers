@@ -1,0 +1,1996 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+
+
+
+
+
+
+
+
+    <script language="javascript" type="text/JavaScript" src="https://esaj.tjsc.jus.br/sajcas/verificarLogin.js?script=1594992040782"></script>
+
+    <script language="javascript">
+      if(window.sajcas && window.sajcas.usuarioLogadoNoCasServer) {
+        var urlRetornoSistema = '';
+        if(urlRetornoSistema === '') {
+          urlRetornoSistema = window.location.href;
+        }
+
+        if(urlRetornoSistema.lastIndexOf('?') != -1) {
+          urlRetornoSistema += '&';
+        } else {
+          urlRetornoSistema += '?';
+        }
+        urlRetornoSistema+= 'gateway=true';
+        window.location.href = urlRetornoSistema;
+      }
+    </script>
+
+
+    <title>Portal de Serviços e-SAJ</title>
+    <!-- Adicionado aqui para não impactar mobile -->
+
+    <script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={licenseKey:"b61bdf610d",applicationID:"158477763"};window.NREUM||(NREUM={}),__nr_require=function(e,n,t){function r(t){if(!n[t]){var i=n[t]={exports:{}};e[t][0].call(i.exports,function(n){var i=e[t][1][n];return r(i||n)},i,i.exports)}return n[t].exports}if("function"==typeof __nr_require)return __nr_require;for(var i=0;i<t.length;i++)r(t[i]);return r}({1:[function(e,n,t){function r(){}function i(e,n,t){return function(){return o(e,[u.now()].concat(f(arguments)),n?null:this,t),n?void 0:this}}var o=e("handle"),a=e(4),f=e(5),c=e("ee").get("tracer"),u=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var p=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",d=l+"ixn-";a(p,function(e,n){s[n]=i(l+n,!0,"api")}),s.addPageAction=i(l+"addPageAction",!0),s.setCurrentRouteName=i(l+"routeName",!0),n.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,n){var t={},r=this,i="function"==typeof n;return o(d+"tracer",[u.now(),e,t],r),function(){if(c.emit((i?"":"no-")+"fn-start",[u.now(),r,i],t),i)try{return n.apply(this,arguments)}catch(e){throw c.emit("fn-err",[arguments,this,e],t),e}finally{c.emit("fn-end",[u.now()],t)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,n){m[n]=i(d+n)}),newrelic.noticeError=function(e,n){"string"==typeof e&&(e=new Error(e)),o("err",[e,u.now(),!1,n])}},{}],2:[function(e,n,t){function r(e,n){var t=e.getEntries();t.forEach(function(e){"first-paint"===e.name?c("timing",["fp",Math.floor(e.startTime)]):"first-contentful-paint"===e.name&&c("timing",["fcp",Math.floor(e.startTime)])})}function i(e,n){var t=e.getEntries();t.length>0&&c("lcp",[t[t.length-1]])}function o(e){if(e instanceof s&&!l){var n,t=Math.round(e.timeStamp);n=t>1e12?Date.now()-t:u.now()-t,l=!0,c("timing",["fi",t,{type:e.type,fid:n}])}}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var a,f,c=e("handle"),u=e("loader"),s=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){a=new PerformanceObserver(r),f=new PerformanceObserver(i);try{a.observe({entryTypes:["paint"]}),f.observe({entryTypes:["largest-contentful-paint"]})}catch(p){}}if("addEventListener"in document){var l=!1,d=["click","keydown","mousedown","pointerdown","touchstart"];d.forEach(function(e){document.addEventListener(e,o,!1)})}}},{}],3:[function(e,n,t){function r(e,n){if(!i)return!1;if(e!==i)return!1;if(!n)return!0;if(!o)return!1;for(var t=o.split("."),r=n.split("."),a=0;a<r.length;a++)if(r[a]!==t[a])return!1;return!0}var i=null,o=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var f=navigator.userAgent,c=f.match(a);c&&f.indexOf("Chrome")===-1&&f.indexOf("Chromium")===-1&&(i="Safari",o=c[1])}n.exports={agent:i,version:o,match:r}},{}],4:[function(e,n,t){function r(e,n){var t=[],r="",o=0;for(r in e)i.call(e,r)&&(t[o]=n(r,e[r]),o+=1);return t}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],5:[function(e,n,t){function r(e,n,t){n||(n=0),"undefined"==typeof t&&(t=e?e.length:0);for(var r=-1,i=t-n||0,o=Array(i<0?0:i);++r<i;)o[r]=e[n+r];return o}n.exports=r},{}],6:[function(e,n,t){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,n,t){function r(){}function i(e){function n(e){return e&&e instanceof r?e:e?c(e,f,o):o()}function t(t,r,i,o){if(!l.aborted||o){e&&e(t,r,i);for(var a=n(i),f=v(t),c=f.length,u=0;u<c;u++)f[u].apply(a,r);var p=s[y[t]];return p&&p.push([b,t,r,a]),a}}function d(e,n){h[e]=v(e).concat(n)}function m(e,n){var t=h[e];if(t)for(var r=0;r<t.length;r++)t[r]===n&&t.splice(r,1)}function v(e){return h[e]||[]}function g(e){return p[e]=p[e]||i(t)}function w(e,n){u(e,function(e,t){n=n||"feature",y[t]=n,n in s||(s[n]=[])})}var h={},y={},b={on:d,addEventListener:d,removeEventListener:m,emit:t,get:g,listeners:v,context:n,buffer:w,abort:a,aborted:!1};return b}function o(){return new r}function a(){(s.api||s.feature)&&(l.aborted=!0,s=l.backlog={})}var f="nr@context",c=e("gos"),u=e(4),s={},p={},l=n.exports=i();l.backlog=s},{}],gos:[function(e,n,t){function r(e,n,t){if(i.call(e,n))return e[n];var r=t();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,n,{value:r,writable:!0,enumerable:!1}),r}catch(o){}return e[n]=r,r}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(e,n,t){function r(e,n,t,r){i.buffer([e],r),i.emit(e,n,t)}var i=e("ee").get("handle");n.exports=r,r.ee=i},{}],id:[function(e,n,t){function r(e){var n=typeof e;return!e||"object"!==n&&"function"!==n?-1:e===window?0:a(e,o,function(){return i++})}var i=1,o="nr@id",a=e("gos");n.exports=r},{}],loader:[function(e,n,t){function r(){if(!x++){var e=E.info=NREUM.info,n=d.getElementsByTagName("script")[0];if(setTimeout(s.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&n))return s.abort();u(y,function(n,t){e[n]||(e[n]=t)}),c("mark",["onload",a()+E.offset],null,"api");var t=d.createElement("script");t.src="https://"+e.agent,n.parentNode.insertBefore(t,n)}}function i(){"complete"===d.readyState&&o()}function o(){c("mark",["domContent",a()+E.offset],null,"api")}function a(){return O.exists&&performance.now?Math.round(performance.now()):(f=Math.max((new Date).getTime(),f))-E.offset}var f=(new Date).getTime(),c=e("handle"),u=e(4),s=e("ee"),p=e(3),l=window,d=l.document,m="addEventListener",v="attachEvent",g=l.XMLHttpRequest,w=g&&g.prototype;NREUM.o={ST:setTimeout,SI:l.setImmediate,CT:clearTimeout,XHR:g,REQ:l.Request,EV:l.Event,PR:l.Promise,MO:l.MutationObserver};var h=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1169.min.js"},b=g&&w&&w[m]&&!/CriOS/.test(navigator.userAgent),E=n.exports={offset:f,now:a,origin:h,features:{},xhrWrappable:b,userAgent:p};e(1),e(2),d[m]?(d[m]("DOMContentLoaded",o,!1),l[m]("load",r,!1)):(d[v]("onreadystatechange",i),l[v]("onload",r)),c("mark",["firstbyte",f],null,"api");var x=0,O=e(6)},{}],"wrap-function":[function(e,n,t){function r(e){return!(e&&e instanceof Function&&e.apply&&!e[a])}var i=e("ee"),o=e(5),a="nr@original",f=Object.prototype.hasOwnProperty,c=!1;n.exports=function(e,n){function t(e,n,t,i){function nrWrapper(){var r,a,f,c;try{a=this,r=o(arguments),f="function"==typeof t?t(r,a):t||{}}catch(u){l([u,"",[r,a,i],f])}s(n+"start",[r,a,i],f);try{return c=e.apply(a,r)}catch(p){throw s(n+"err",[r,a,p],f),p}finally{s(n+"end",[r,a,c],f)}}return r(e)?e:(n||(n=""),nrWrapper[a]=e,p(e,nrWrapper),nrWrapper)}function u(e,n,i,o){i||(i="");var a,f,c,u="-"===i.charAt(0);for(c=0;c<n.length;c++)f=n[c],a=e[f],r(a)||(e[f]=t(a,u?f+i:i,o,f))}function s(t,r,i){if(!c||n){var o=c;c=!0;try{e.emit(t,r,i,n)}catch(a){l([a,t,r,i])}c=o}}function p(e,n){if(Object.defineProperty&&Object.keys)try{var t=Object.keys(e);return t.forEach(function(t){Object.defineProperty(n,t,{get:function(){return e[t]},set:function(n){return e[t]=n,n}})}),n}catch(r){l([r])}for(var i in e)f.call(e,i)&&(n[i]=e[i]);return n}function l(n){try{e.emit("internal-error",n)}catch(t){}}return e||(e=i),t.inPlace=u,t.flag=a,t}},{}]},{},["loader"]);</script><link rel="stylesheet" href="/cposg5/softheme/src/css/app.css">
+    <link rel="stylesheet" href="/cposg5/softheme/src/fonts/saj/styles.css">
+    <link rel="stylesheet" href="/cposg5/css/formulario.css" type="text/css"/>
+
+    <link rel="stylesheet" href="/cposg5/webjars/select2/3.5.4/select2.css" type="text/css" >
+    <link rel="stylesheet" href="/cposg5/webjars/select2/3.5.4/select2-bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="/cposg5/css/saj/select2/saj-select2.css">
+
+
+
+    <script>
+      window.saj = window.saj || {};
+      window.saj.env = window.saj.env || {};
+      window.saj.env.root = '/cposg5';
+      window.saj.env.css = '/cposg5/css';
+      window.saj.env.js = '/cposg5/js';
+      window.saj.env.imagens = '/cposg5/imagens';
+
+      window.saj.cpo = window.saj.cpo || {};
+      // transfere variavel se cpo esta rodando para totem
+      window.saj.cpo.totem = 'false' == 'true';
+
+      window.saj.cpo.instanciaConsulta = {
+        SG5: 'true' == 'true',
+        SG5TJ: 'false' == 'true',
+        SG5CR: 'true' == 'true',
+        value: 'SG5CR'
+      };
+    </script>
+
+
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/jquery/jquery.min.js?n=1620728708"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/jquery/jquery.func_toggle.js?n=16ceabb7-0f92-4a87-8572-0062d5cbe733"></script>
+    <script language="javascript" type="text/javascript" src="/cposg5/js/jquery/jquery.blockUI.min.js?n=01d01f74-7d50-4e60-ac8f-c2622b28ee74"></script>
+    <script language="javascript" type="text/javascript" src="/cposg5/js/jquery/jquery.browser.min.js?n=df9c1624-d0ea-4ab0-b328-723c985e241d"></script>
+
+    <script language="javascript" type="text/javascript" src="/cposg5/webjars/lodash/4.17.5/lodash.js?n=b2c14a4a-6f1c-4564-a210-18994f1d5f4e"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/select2/select2.js?n=476df620-d151-42cd-9f6d-297745f89e4c"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/webjars/select2/3.5.4/select2_locale_pt-BR.js?n=b9a377ca-5d92-4414-807e-535f46502518"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj/saj-select2.js?n=96464832-b470-4798-b097-44859315b3d5"></script>
+
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj/saj-web-2.2.41-4.js?n=87a2144b-0823-46aa-8563-3df11a9c40fb"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj/saj-tooltip.js?n=3b679476-78ab-4cb3-a024-6b975b457791"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj/saj-popup-modal-1.0.0-1.js?n=68c2a1ce-3a9e-41cb-bd91-e97c796b2709"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj/saj-browser.js?n=c0a380fb-49f0-4560-b1bf-78fd566eceb5"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj/saj-mascara-input.js?n=6efe5403-6b48-44a5-8ac8-28105c4fbe0e"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj/saj-numeroProcesso.js?n=69f29334-2272-4ff7-b02a-7d2f67ca33d9"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj-cpo-cbpesquisa.js?n=3374557194"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/saj/acessibilidade/acessibilidade.js?n=021ed4fd-c775-4d58-a8b9-b7f6651ee4ef"></script>
+
+
+    <script language="javascript" type="text/JavaScript" src="/cposg5/softheme/src/js/app.js?n=16289891"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js?n=f800a605-5984-4cf0-a027-69b45aaff556" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js?n=1791337263" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+
+
+
+
+
+    <script>
+      (function($){
+        $(function(){
+          var intervalo = 115000;
+          $.saj.manterSessao('/cposg5/manterSessao.do', intervalo);
+        });
+
+      })(jQuery);
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+      window.saj.cpo = window.saj.cpo || {};
+      window.saj.cpo.urlBaseAcessoRecursoProcessoParaUsuario = '/cposg5/autorizarAcessoRecursoProcessoParaUsuario.do?processoPK.cdProcesso=P300009560000&processoPK.cdForo=910&processoPK.tpOrigemProcesso=2&processoPK.flOrigem=S&processoPK.aliasDaBase=SG5CR&numeroProcesso=0300683-76.2016.8.24.0060&cdVara=13';
+      window.saj.cpo.urlBaseAcessoRecursoMidiaAudienciaProcessoParaUsuario= '/cposg5/autorizarAcessoRecursoAudienciaGravada.do?processoPK.cdProcesso=P300009560000&processoPK.cdForo=910&processoPK.tpOrigemProcesso=2&processoPK.flOrigem=S&processoPK.aliasDaBase=SG5CR&numeroProcesso=0300683-76.2016.8.24.0060&cdVara=13';
+      window.saj.cpo.urlBaseAcessoRecursoProcessoComSenha = '/cposg5/autorizarAcessoRecursoProcessoPorSenha.do?processoPK.cdProcesso=P300009560000&processoPK.cdForo=910&processoPK.tpOrigemProcesso=2&processoPK.flOrigem=S&processoPK.aliasDaBase=SG5CR&numeroProcesso=0300683-76.2016.8.24.0060';
+      window.saj.cpo.abrirAutorizarAcessoRecursoProcessoPorSenha = '/cposg5/abrirAutorizarAcessoRecursoProcessoPorSenha.do?processoPK.cdProcesso=P300009560000&processoPK.cdForo=910&processoPK.tpOrigemProcesso=2&processoPK.flOrigem=S&processoPK.aliasDaBase=SG5CR&numeroProcesso=0300683-76.2016.8.24.0060';
+    </script>
+
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/acessoRecurso-2.10.2-0.js?n=821347917"></script>
+    <script language="javascript" type="text/JavaScript" src="/cposg5/js/acessoProcesso-2.10.2-0.js?n=3127152735"></script>
+
+
+
+
+
+
+
+    <script>
+      (function($){
+        $(function(){
+          var intervalo = 50000;
+          $.saj.manterSessao('/cposg5/manterSessao.do', intervalo);
+        });
+
+      })(jQuery);
+    </script>
+
+
+
+
+
+
+    <!-- Correção temporária do alinhamento do divisor de seção de formulário do SPW -->
+    <script type="text/javascript">
+      $(function(){$('td[background$="spw/fundo_subtitulo2.gif"]').attr('valign', 'top')});
+    </script>
+</head>
+
+
+<script language="javascript" type="text/JavaScript">
+  $.saj.getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)), sURLVariables = sPageURL.split('&'), sParameterName, i;
+    for (i = 0; i < sURLVariables.length; i++) {
+      sParameterName = sURLVariables[i].split('=');
+      if (sParameterName[0] === sParam) {
+        return sParameterName[1] === undefined ? true : sParameterName[1];
+      }
+    }
+  };
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+  (function($) {
+    $(function(){
+      var captcha = $.saj.getUrlParameter('uuidCaptcha');
+
+      if (!captcha) {
+        return;
+      }
+
+      var url = $('.processoPrinc').attr('href');
+      $('.processoPrinc').attr('href', url+'&uuidCaptcha='+captcha);
+
+      var $processoPaiApenso = $('.processoPaiApenso');
+      $processoPaiApenso.attr('href', $processoPaiApenso.attr('href') + '&uuidCaptcha=' + captcha);
+
+      var $incidente = $('.incidente');
+      $incidente.attr('href', $incidente.attr('href') + '&uuidCaptcha=' + captcha);
+    })
+  })(jQuery);
+</script>
+
+
+<input type="hidden" name="cdProcesso" value="P300009560000"/>
+
+
+
+
+
+
+<!-- HEADER-->
+<div class="unj-entity-header">
+
+
+
+
+
+
+    <div class="unj-entity-header__actions">
+        <div class="container">
+            <div class="row">
+                <div class="col-3 col-md-4">
+                    <a href="javascript:history.back();" class="unj-link-back">
+                        <i class="icon-back"></i>
+                    </a>
+                </div>
+                <div class="col-13 col-md-12 unj-ta-r">
+                    <!-- Pasta digital -->
+
+
+                    <a class="linkPasta btn btn-secondary btn-space" title="Pasta Digital" href="#" name="">
+                        Visualizar autos
+                    </a>
+
+                    <!-- Peticionar -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <div class="unj-entity-header__summary">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-13">
+                    <!--principal -->
+
+                    <span class="unj-larger-1">
+                        0300683-76.2016.8.24.0060
+                    </span>
+
+
+
+
+
+                    <!-- incidente -->
+
+
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-md-3">
+                    <span class="unj-label">Classe</span>
+                    <div class="lh-1-1 line-clamp__2"> <span title="Recurso Inominado">Recurso Inominado</span></div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <span class="unj-label">
+                        Assunto
+                    </span>
+                    <div class="lh-1-1 line-clamp__2"><span title="Equivalência salarial">Equivalência salarial</span></div>
+                </div>
+
+
+                <div class="col-md-3">
+                    <span class="unj-label">Seção</span>
+                    <div class="lh-1-1 line-clamp__2"> <span title="Turmas Recursais">Turmas Recursais</span></div>
+                </div>
+
+
+                <div class="col-md-3">
+                    <span class="unj-label">Orgão Julgador</span>
+                    <div class="lh-1-1 line-clamp__2"> <span title="Terceira Turma Recursal">Terceira Turma Recursal</span></div>
+                </div>
+
+
+                <div class="col-md-2">
+                    <span class="unj-label">Área</span>
+                    <div class="lh-1-1 line-clamp__2"><span title="Cível">Cível</span></div>
+                </div>
+
+                <!-- Processo principal -->
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <div class="unj-entity-header__details">
+        <div class="container">
+            <div class="unj-ta-r">
+                <a href="#maisDetalhes" class="unj-link-collapse" data-toggle="collapse" aria-expanded="false" aria-controls="maisDetalhes">
+                <span class="unj-link-collapse__show">
+                    <i class="unj-link-collapse__icon glyph glyph-chevron-down"></i>
+                    Mais
+                </span>
+                    <span class="unj-link-collapse__hide">
+                    <i class="unj-link-collapse__icon glyph glyph-chevron-up"></i>
+                    Recolher
+                </span>
+                </a>
+            </div>
+            <div id="maisDetalhes" class="collapse" aria-expanded="false">
+                <div class="row unj-row--border-top">
+
+
+
+
+                    <div class="col-lg-3 mb-2">
+                        <span class="unj-label">Relator</span>
+                        <div class="line-clamp__2"><span title="ANTONIO AUGUSTO BAGGIO E UBALDO">ANTONIO AUGUSTO BAGGIO E UBALDO</span></div>
+                    </div>
+
+
+
+                    <div class="col-lg-3 mb-2">
+                        <span class="unj-label">Valor da ação</span>
+                        <div class="line-clamp__2"><span title="10.000,00">10.000,00</span></div>
+                    </div>
+
+
+
+
+
+
+                    <div class="col-lg-3 mb-2">
+                        <span class="unj-label">Origem</span>
+                        <div class="line-clamp__2"><span title="Comarca de São Domingos / São Domingos / Vara Única">Comarca de São Domingos / São Domingos / Vara Única</span></div>
+                    </div>
+
+
+                    <div class="col-lg-3 mb-2">
+                        <span class="unj-label">Volume / Apenso</span>
+                        <div class="line-clamp__2"><span title="1 / 0">1 / 0</span></div>
+                    </div>
+
+
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<body>
+<div class="div-conteudo container unj-mb-40">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <aside class="aside-nav aside-nav--left">
+        <div class="aside-nav__inner">
+            <header class="aside-nav__main-menu__header">
+                <script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={licenseKey:"b61bdf610d",applicationID:"277847833"};window.NREUM||(NREUM={}),__nr_require=function(e,n,t){function r(t){if(!n[t]){var i=n[t]={exports:{}};e[t][0].call(i.exports,function(n){var i=e[t][1][n];return r(i||n)},i,i.exports)}return n[t].exports}if("function"==typeof __nr_require)return __nr_require;for(var i=0;i<t.length;i++)r(t[i]);return r}({1:[function(e,n,t){function r(){}function i(e,n,t){return function(){return o(e,[u.now()].concat(f(arguments)),n?null:this,t),n?void 0:this}}var o=e("handle"),a=e(4),f=e(5),c=e("ee").get("tracer"),u=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var p=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",d=l+"ixn-";a(p,function(e,n){s[n]=i(l+n,!0,"api")}),s.addPageAction=i(l+"addPageAction",!0),s.setCurrentRouteName=i(l+"routeName",!0),n.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,n){var t={},r=this,i="function"==typeof n;return o(d+"tracer",[u.now(),e,t],r),function(){if(c.emit((i?"":"no-")+"fn-start",[u.now(),r,i],t),i)try{return n.apply(this,arguments)}catch(e){throw c.emit("fn-err",[arguments,this,e],t),e}finally{c.emit("fn-end",[u.now()],t)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,n){m[n]=i(d+n)}),newrelic.noticeError=function(e,n){"string"==typeof e&&(e=new Error(e)),o("err",[e,u.now(),!1,n])}},{}],2:[function(e,n,t){function r(e,n){var t=e.getEntries();t.forEach(function(e){"first-paint"===e.name?c("timing",["fp",Math.floor(e.startTime)]):"first-contentful-paint"===e.name&&c("timing",["fcp",Math.floor(e.startTime)])})}function i(e,n){var t=e.getEntries();t.length>0&&c("lcp",[t[t.length-1]])}function o(e){if(e instanceof s&&!l){var n,t=Math.round(e.timeStamp);n=t>1e12?Date.now()-t:u.now()-t,l=!0,c("timing",["fi",t,{type:e.type,fid:n}])}}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var a,f,c=e("handle"),u=e("loader"),s=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){a=new PerformanceObserver(r),f=new PerformanceObserver(i);try{a.observe({entryTypes:["paint"]}),f.observe({entryTypes:["largest-contentful-paint"]})}catch(p){}}if("addEventListener"in document){var l=!1,d=["click","keydown","mousedown","pointerdown","touchstart"];d.forEach(function(e){document.addEventListener(e,o,!1)})}}},{}],3:[function(e,n,t){function r(e,n){if(!i)return!1;if(e!==i)return!1;if(!n)return!0;if(!o)return!1;for(var t=o.split("."),r=n.split("."),a=0;a<r.length;a++)if(r[a]!==t[a])return!1;return!0}var i=null,o=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var f=navigator.userAgent,c=f.match(a);c&&f.indexOf("Chrome")===-1&&f.indexOf("Chromium")===-1&&(i="Safari",o=c[1])}n.exports={agent:i,version:o,match:r}},{}],4:[function(e,n,t){function r(e,n){var t=[],r="",o=0;for(r in e)i.call(e,r)&&(t[o]=n(r,e[r]),o+=1);return t}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],5:[function(e,n,t){function r(e,n,t){n||(n=0),"undefined"==typeof t&&(t=e?e.length:0);for(var r=-1,i=t-n||0,o=Array(i<0?0:i);++r<i;)o[r]=e[n+r];return o}n.exports=r},{}],6:[function(e,n,t){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,n,t){function r(){}function i(e){function n(e){return e&&e instanceof r?e:e?c(e,f,o):o()}function t(t,r,i,o){if(!l.aborted||o){e&&e(t,r,i);for(var a=n(i),f=v(t),c=f.length,u=0;u<c;u++)f[u].apply(a,r);var p=s[y[t]];return p&&p.push([b,t,r,a]),a}}function d(e,n){h[e]=v(e).concat(n)}function m(e,n){var t=h[e];if(t)for(var r=0;r<t.length;r++)t[r]===n&&t.splice(r,1)}function v(e){return h[e]||[]}function g(e){return p[e]=p[e]||i(t)}function w(e,n){u(e,function(e,t){n=n||"feature",y[t]=n,n in s||(s[n]=[])})}var h={},y={},b={on:d,addEventListener:d,removeEventListener:m,emit:t,get:g,listeners:v,context:n,buffer:w,abort:a,aborted:!1};return b}function o(){return new r}function a(){(s.api||s.feature)&&(l.aborted=!0,s=l.backlog={})}var f="nr@context",c=e("gos"),u=e(4),s={},p={},l=n.exports=i();l.backlog=s},{}],gos:[function(e,n,t){function r(e,n,t){if(i.call(e,n))return e[n];var r=t();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,n,{value:r,writable:!0,enumerable:!1}),r}catch(o){}return e[n]=r,r}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(e,n,t){function r(e,n,t,r){i.buffer([e],r),i.emit(e,n,t)}var i=e("ee").get("handle");n.exports=r,r.ee=i},{}],id:[function(e,n,t){function r(e){var n=typeof e;return!e||"object"!==n&&"function"!==n?-1:e===window?0:a(e,o,function(){return i++})}var i=1,o="nr@id",a=e("gos");n.exports=r},{}],loader:[function(e,n,t){function r(){if(!x++){var e=E.info=NREUM.info,n=d.getElementsByTagName("script")[0];if(setTimeout(s.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&n))return s.abort();u(y,function(n,t){e[n]||(e[n]=t)}),c("mark",["onload",a()+E.offset],null,"api");var t=d.createElement("script");t.src="https://"+e.agent,n.parentNode.insertBefore(t,n)}}function i(){"complete"===d.readyState&&o()}function o(){c("mark",["domContent",a()+E.offset],null,"api")}function a(){return O.exists&&performance.now?Math.round(performance.now()):(f=Math.max((new Date).getTime(),f))-E.offset}var f=(new Date).getTime(),c=e("handle"),u=e(4),s=e("ee"),p=e(3),l=window,d=l.document,m="addEventListener",v="attachEvent",g=l.XMLHttpRequest,w=g&&g.prototype;NREUM.o={ST:setTimeout,SI:l.setImmediate,CT:clearTimeout,XHR:g,REQ:l.Request,EV:l.Event,PR:l.Promise,MO:l.MutationObserver};var h=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1169.min.js"},b=g&&w&&w[m]&&!/CriOS/.test(navigator.userAgent),E=n.exports={offset:f,now:a,origin:h,features:{},xhrWrappable:b,userAgent:p};e(1),e(2),d[m]?(d[m]("DOMContentLoaded",o,!1),l[m]("load",r,!1)):(d[v]("onreadystatechange",i),l[v]("onload",r)),c("mark",["firstbyte",f],null,"api");var x=0,O=e(6)},{}],"wrap-function":[function(e,n,t){function r(e){return!(e&&e instanceof Function&&e.apply&&!e[a])}var i=e("ee"),o=e(5),a="nr@original",f=Object.prototype.hasOwnProperty,c=!1;n.exports=function(e,n){function t(e,n,t,i){function nrWrapper(){var r,a,f,c;try{a=this,r=o(arguments),f="function"==typeof t?t(r,a):t||{}}catch(u){l([u,"",[r,a,i],f])}s(n+"start",[r,a,i],f);try{return c=e.apply(a,r)}catch(p){throw s(n+"err",[r,a,p],f),p}finally{s(n+"end",[r,a,c],f)}}return r(e)?e:(n||(n=""),nrWrapper[a]=e,p(e,nrWrapper),nrWrapper)}function u(e,n,i,o){i||(i="");var a,f,c,u="-"===i.charAt(0);for(c=0;c<n.length;c++)f=n[c],a=e[f],r(a)||(e[f]=t(a,u?f+i:i,o,f))}function s(t,r,i){if(!c||n){var o=c;c=!0;try{e.emit(t,r,i,n)}catch(a){l([a,t,r,i])}c=o}}function p(e,n){if(Object.defineProperty&&Object.keys)try{var t=Object.keys(e);return t.forEach(function(t){Object.defineProperty(n,t,{get:function(){return e[t]},set:function(n){return e[t]=n,n}})}),n}catch(r){l([r])}for(var i in e)f.call(e,i)&&(n[i]=e[i]);return n}function l(n){try{e.emit("internal-error",n)}catch(t){}}return e||(e=i),t.inPlace=u,t.flag=a,t}},{}]},{},["loader"]);</script><span
+                    class="aside-nav__main-menu__header__text">  Menu e-SAJ</span>
+                <a href="#" class="aside-nav__user__close-button close-offcanvas">
+                    <img src="https://esaj.tjsc.jus.br/esaj/img/icons/icon-close--light.png" alt="">
+                </a>
+            </header>
+            <nav class="aside-nav__main-menu">
+                <ul class="aside-nav__main-menu__list" id="conteudoMenuEsaj">
+                </ul>
+            </nav>
+            <div id="esaj-beta-switcher-placeholder"></div>
+        </div>
+    </aside>
+    <aside class="aside-nav aside-nav--right aside-nav__user">
+        <div class="aside-nav__inner">
+            <div class="aside-nav__user__sign">
+                <div class="aside-nav__user__sign__brand">
+                    <img src="https://esaj.tjsc.jus.br/esaj/img/aside/brasoes/br-tjsc.jpg" alt="">
+                </div>
+                <ul class="aside-nav__user__sign__list">
+                    <li><span class="aside-nav__user__sign__title">Tribunal de Justi&ccedil;a</span></li>
+                    <li><span class="aside-nav__user__sign__place">Estado de Santa Catarina</span></li>
+                </ul>
+                <a href="#" class="aside-nav__user__close-button close-offcanvas">
+                    <img src="https://esaj.tjsc.jus.br/esaj/img/icons/icon-close--dark.png" alt="">
+                </a>
+            </div>
+            <hr>
+            <div class="aside-nav__user__info">
+                <h4 class="aside-nav__user__title">Minha conta</h4>
+                <ul class="aside-nav__user__info__list">
+                    <li class="aside-nav__user__info__list__item"><span class="aside-nav__user__info__name" id="menuNmUsuarioLogado"></span></li>
+                    <li class="aside-nav__user__info__list__item"><span class="aside-nav__user__info__oab" id="menuUsuarioOabs">OAB: </span></li>
+                </ul>
+                <ul class="aside-nav__user__info__list-access">
+                    <li class="aside-nav__user__info__list-access__item"><a class="aside-nav__user__info__list-access__item__link" href="https://esaj.tjsc.jus.br/esaj/cadastro.do">Meu perfil</a></li>
+
+                    <li class="aside-nav__user__info__list-access__item"><a class="aside-nav__user__info__list-access__item__link" href="https://esaj.tjsc.jus.br/caixapostal">Caixa Postal</a></li>
+
+                    <li class="aside-nav__user__info__list-access__item"><a class="aside-nav__user__info__list-access__item__link" id="logoutLink" href="#">Sair</a></li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+    <header>
+        <link rel="shortcut icon" href="https://esaj.tjsc.jus.br/esaj/tema/padrao/clientes/SC/imagens/favicon.ico" type="image/x-icon"/>
+        <link href="https://esaj.tjsc.jus.br/esaj/app.css" rel="stylesheet" type="text/css"/>
+        <nav class="header__navbar">
+            <a class="header__navbar__menu-hamburger open__aside-nav--left navbar-menu-hamburger__item__link">
+                <span class="menu-hamburger__alert" style="display:none;"></span>
+                <span class="glyph glyph-hamburger"></span>
+            </a>
+
+            <h1 class="header__navbar__title" href=""><a class="linkLogo" href="https://esaj.tjsc.jus.br/esaj/redirecionarNovoEsaj.do"><strong>e-SAJ</strong></a> | Consulta de Processos - Turmas de Recursos e de Uniformização</h1>
+
+            <ul class="header__navbar__menu header__navbar__menu--right">
+                <li class="header__navbar__menu__item header__navbar__menu__item--initials">
+                    <a class="header__navbar__brand__initials" href="https://www.tjsc.jus.br"> TJSC </a>
+                </li>
+                <li class="header__navbar__menu__item header__navbar__menu__item--user">
+               <span class="header__navbar__name open__aside-nav--right">
+                     <span id="headerNmUsuarioLogado" class="header__navbar__name__text"></span>
+                     <span class="glyph glyph-contact header__navbar__name__icon"></span>
+               </span>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <div class="offcanvas-backdrop"></div>
+    <script>
+      var appEsajLayout = appEsajLayout || {};
+      appEsajLayout.urlNovoMenuHtml = 'https://esaj.tjsc.jus.br/esaj/menuPortalV2Html.do';
+
+      var appEsajCas = appEsajCas || {};
+      appEsajCas.urlServicoConteudoIdentificacao = 'https://esaj.tjsc.jus.br/sajcas/conteudoIdentificacaoJson?script=1592227830534';
+    </script>
+    <script src="https://esaj.tjsc.jus.br/esaj/js/portalV2-bundle.js?n=964344313"></script>
+
+    <script src="https://esaj.tjsc.jus.br/sajcas/seletorVersaoBeta.js?n=5d414c07-bc5c-4f22-9732-9b0d878a8a39&versao=2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Apensos / Vinculados</h2>
+
+
+    </div>
+    <!--  Tabela de (apensos) -->
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1">
+
+
+
+        <tr>
+            <td colspan="3" align="left" >Não há processos apensos ou vinculados para este processo.</td>
+        </tr>
+
+
+    </table>
+    <!-- Tabela de (apensos) -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Números de 1ª Instância</h2>
+
+
+    </div>
+
+
+    <table  style="margin-left:15px; margin-top:1px;"  align="center" width="98%" border="0" cellspacing="0" cellpadding="1">
+
+
+        <tr class="label">
+            <td align="left" valign="top" width="200" >Nº de 1ª instância</td>
+            <td align="left" valign="top" width="250" >Foro</td>
+            <td align="left" valign="top" width="200" >Vara</td>
+            <td align="left" valign="top" width="250" >Juiz</td>
+            <td align="left" valign="top" width="*" >Obs.</td>
+        </tr>
+        <tr class="fundoEscuro" height="2" >
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+
+
+    </table>
+
+
+
+    <table style="margin-left:15px; margin-top:1px;"  align="center" width="98%" border="0" cellspacing="0" cellpadding="1"  >
+
+        <tr class="fundoClaro">
+            <td align="left" valign="top" width="200">
+
+
+                <a href="https://esaj.tjsc.jus.br/cpopg/show.do?processo.codigo=1O0000NCW0000" target="_blank">0300683-76.2016.8.24.0060</a> (Principal)
+
+
+
+            </td>
+            <td align="left" valign="top" width="250">
+                São Domingos
+            </td>
+            <td align="left" valign="top" width="200">
+                Vara Única
+            </td>
+            <td align="left" valign="top" width="250">
+                Sirlene Daniela Puhl
+            </td>
+            <td align="left" valign="top">
+                -
+            </td>
+        </tr>
+
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+
+
+        <h2 class="subtitle">Partes do Processo</h2>
+
+
+    </div>
+
+    <!--  cabecalho da tabela de lista (partes) -->
+
+
+    <!--  dados da lista partes principais (partes) -->
+    <table id="tablePartesPrincipais" style="margin-left:15px; margin-top:1px;" align="center" border="0" cellPadding="0" cellSpacing="0" width="98%">
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro">
+            <td valign="top" width="141" style="padding-bottom: 5px" class="label">
+                <span class="mensagemExibindo">Recorrente:&nbsp;</span>
+            </td>
+            <td width="*" align="left" style="padding-bottom: 5px">
+
+                Claudete Inez Hennerich Lammel
+
+
+
+
+                <br/><span class="mensagemExibindo">Advogada:&nbsp</span>Mariele Adélia Lammel<input type="hidden" value="41175SC">&nbsp;
+
+
+                <br/><span class="mensagemExibindo">Advogada:&nbsp</span>Hildegardis Meneguzzi Griss<input type="hidden" value="2501SC">&nbsp;
+
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro">
+            <td valign="top" width="141" style="padding-bottom: 5px" class="label">
+                <span class="mensagemExibindo">Recorrido:&nbsp;</span>
+            </td>
+            <td width="*" align="left" style="padding-bottom: 5px">
+
+                Município de São Domingos
+
+
+
+
+                <br/><span class="mensagemExibindo">Advogado:&nbsp</span>Rudimar Borcioni<input type="hidden" value="15411SC">&nbsp;
+
+
+                <br/><span class="mensagemExibindo">Advogado:&nbsp</span>Luiz Henrique Maseto Zanovello<input type="hidden" value="33076SC">&nbsp;
+
+
+
+            </td>
+        </tr>
+
+
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+
+
+
+
+
+
+
+        <h2 class="subtitle">Movimentações</h2>
+
+
+    </div>
+
+
+
+
+    <table  style="margin-left:15px; margin-top:1px;" align="center" border="0" cellPadding="0" cellSpacing="0" width="98%">
+
+
+        <thead>
+        <tr>
+            <th width="120" class="label" style="vertical-align: bottom">Data</th>
+            <th vAlign="middle" width="20" aria-hidden="true">&nbsp;</th>
+            <th vAlign="middle"  class="label">Movimento</th>
+        </tr>
+        <tr class="fundoEscuro" height="2" aria-hidden="true">
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </thead>
+
+
+        <tbody id="tabelaUltimasMovimentacoes">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                16/03/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Encaminhado Ata de Distribuição para Publicação no DJE
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;"></span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                05/03/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Conclusão ao Relator
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;"></span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                05/03/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+                <a class="linkMovVincProc" title="Visualizar documento em inteiro teor" href="#?cdDocumento=6" name="M" cdDocumento="6">
+                    <img src="/cposg5/imagens/doc2.gif" width="16" height="16" border="0"/>
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+                <a class="linkMovVincProc" title="Visualizar documento em inteiro teor" href="#?cdDocumento=6" name="M" cdDocumento="6">
+                    Expedido Termo de Distribuição
+                </a>
+
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;">Termo de Distribui&ccedil;&atilde;o</span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                04/03/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Distribuição por Sorteio
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;">&Oacute;rg&atilde;o Julgador: 13 - Terceira Turma Recursal
+Relator: 5001 - Antonio Augusto Baggio e Ubaldo</span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                27/01/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Recebido para redistribuição entre as Turmas Recursais
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;"></span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                27/01/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Remessa para redistribuição entre as Turmas Recursais
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;">RESOLU&Ccedil;&Atilde;O TJ n. 13/2019. Origem: Terceira Turma de Recursos - Chapec&oacute;</span>
+
+
+            </td>
+        </tr>
+
+
+        </tbody>
+
+
+        <tbody style="display: none;" id="tabelaTodasMovimentacoes">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                16/03/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Encaminhado Ata de Distribuição para Publicação no DJE
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;"></span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                05/03/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Conclusão ao Relator
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;"></span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                05/03/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+                <a class="linkMovVincProc" title="Visualizar documento em inteiro teor" href="#?cdDocumento=6" name="M" cdDocumento="6">
+                    <img src="/cposg5/imagens/doc2.gif" width="16" height="16" border="0"/>
+                </a>
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+                <a class="linkMovVincProc" title="Visualizar documento em inteiro teor" href="#?cdDocumento=6" name="M" cdDocumento="6">
+                    Expedido Termo de Distribuição
+                </a>
+
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;">Termo de Distribui&ccedil;&atilde;o</span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                04/03/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Distribuição por Sorteio
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;">&Oacute;rg&atilde;o Julgador: 13 - Terceira Turma Recursal
+Relator: 5001 - Antonio Augusto Baggio e Ubaldo</span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                27/01/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Recebido para redistribuição entre as Turmas Recursais
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;"></span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                27/01/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Remessa para redistribuição entre as Turmas Recursais
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;">RESOLU&Ccedil;&Atilde;O TJ n. 13/2019. Origem: Terceira Turma de Recursos - Chapec&oacute;</span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoClaro" style="">
+            <td width="120" style="vertical-align: top">
+                15/01/2020
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Processo Cadastrado
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;">Distribuidor</span>
+
+
+            </td>
+        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <tr class="fundoEscuro" style="">
+            <td width="120" style="vertical-align: top">
+                05/11/2019
+            </td>
+            <td width="20" valign="top" aria-hidden="true">
+
+            </td>
+            <td style="vertical-align: top; padding-bottom: 5px" >
+
+
+
+
+
+                Recebidos os Autos pela Entrada de Recursos
+
+
+
+
+
+                <br/>
+                <span style="font-style: italic;">Foro de origem: S&atilde;o Domingos
+Vara de origem: Vara &Uacute;nica</span>
+
+
+            </td>
+        </tr>
+
+
+        </tbody>
+
+
+
+
+    </table>
+
+
+    <div id="divLinksTituloBlocoMovimentacoes" style="text-align:right">
+
+
+
+
+
+
+
+
+        <input id="mensagemNaoExibidamovimentacoes" type="hidden" value=""/>
+        <input id="linkNaoExibidomovimentacoes" type="hidden" value="Recolher"/>
+
+        <span id="mensagensExibindomovimentacoes" class="mensagemExibindo">
+
+</span> &nbsp;
+        <a id="linkmovimentacoes" href="javascript:" class="linkNaoSelecionado unj-link-collapse">
+    <span id="setasDireitamovimentacoes" class="setasDireita">
+        <i class="unj-link-collapse__icon glyph glyph-chevron-down"></i>
+    </span>
+            Mais</a>
+
+        <script>
+          $(function() {
+            var controlarLink = function() {
+              var $linkNaoExibido = $('input#linkNaoExibidomovimentacoes');
+              var conteudoLinkNaoApresentado = $linkNaoExibido.val();
+              var $link = $('a#linkmovimentacoes');
+
+              $linkNaoExibido.val($link.html());
+              $link.html(conteudoLinkNaoApresentado);
+            };
+
+            var controlarMensagem = function() {
+              var $mensagemNaoExibida = $('input#mensagemNaoExibidamovimentacoes');
+              var $spanMensagem = $('span#mensagensExibindomovimentacoes');
+              var mensagemExibida = $spanMensagem.html();
+              var mensagemNaoExibida = $mensagemNaoExibida.val();
+
+              $spanMensagem.html(mensagemNaoExibida);
+              $mensagemNaoExibida.val(mensagemExibida);
+            };
+
+            var controlarMensagemLink = function() {
+              controlarMensagem();
+              controlarLink();
+            };
+
+            var esconderElementosExtrasMostrarDefault = function() {
+              $('#tabelaTodasMovimentacoes').hide();
+              $('#tabelaUltimasMovimentacoes').show();
+            };
+
+            var mostrarElementosExtrasEsconderDefault = function() {
+              $('#tabelaUltimasMovimentacoes').hide();
+              $('#tabelaTodasMovimentacoes').show();
+            };
+
+            var initPagina = function() {
+              var setasDireita = '<span id="setasDireitamovimentacoes" class="setasDireita"><i class="unj-link-collapse__icon glyph glyph-chevron-up"></i></span>';
+              var $linkEscondido = $('input#linkNaoExibidomovimentacoes');
+              $linkEscondido.val(setasDireita+$linkEscondido.val());
+            };
+
+            var bindLink = function() {
+              var $link = $('a#linkmovimentacoes');
+              $link.funcToggle('click', mostrarElementosExtrasEsconderDefault, esconderElementosExtrasMostrarDefault);
+              $link.bind('click', controlarMensagemLink);
+            };
+
+            initPagina();
+            bindLink();
+            esconderElementosExtrasMostrarDefault();
+          });
+        </script>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Incidentes, ações incidentais, recursos e execuções de sentenças</h2>
+
+
+    </div>
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1"  >
+
+
+
+        <tr>
+            <td colspan="3" align="left">
+
+
+
+                Não há incidentes, ações incidentais, recursos ou execuções de sentenças vinculados a este processo.
+
+
+            </td>
+        </tr>
+
+
+    </table>
+    <!--  incidentes -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Petições diversas</h2>
+
+
+    </div>
+    <!--  Tabela de petições diversas -->
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1"  >
+
+
+
+        <tr>
+            <td colspan="2" align="left" >
+
+
+
+                Não há petições diversas vinculadas a este processo.
+
+
+            </td>
+        </tr>
+
+
+    </table>
+    <!--  Tabela de petições diversas -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="padding-top: 10px;">
+
+
+
+
+        <h2 class="subtitle">Julgamentos</h2>
+
+
+    </div>
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1">
+
+
+
+        <tr>
+            <td colspan="3" align="left" >Não há julgamentos para este processo.</td>
+        </tr>
+
+
+    </table>
+
+
+    <table style="margin-left:15px; margin-top:1px;" align="center" width="98%" border="0" cellspacing="0" cellpadding="1"  >
+
+    </table>
+
+
+
+
+
+
+
+
+    <br/>
+    <br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <footer>
+        <nav class="navbar__footer">
+            <div class="navbar__footer__container">
+
+                <ul class="navbar__footer__list-brand">
+                    <li class="navbar__footer__list-brand__item">
+                        <a href="#" class="navbar__footer__list-brand__item__link">
+                            <img src="https://esaj.tjsc.jus.br/esaj/img/brand/icon-saj.png" alt="SAJ">
+                        </a>
+                    </li>
+                    <li class="navbar__footer__list-brand__item">
+                        <a href="#" class="navbar__footer__list-brand__item__link">
+                            <img src="https://esaj.tjsc.jus.br/esaj/img/brand/icon-softplan.png" alt="Softplan">
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar__footer__list-actions">
+                </ul>
+            </div>
+        </nav>
+    </footer>
+
+
+
+
+
+
+
+
+
+</div>
+
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"errorBeacon":"bam.nr-data.net","licenseKey":"b61bdf610d","agent":"","beacon":"bam.nr-data.net","applicationTime":480,"applicationID":"158477763","transactionName":"MlZRN0QECkMAVERZDgscYBdEEBBDIFREWQ4LHFERGAYLXU9EX1YVFV9SDRgWBVpPVEBfEgIdQBdEEBBDT1ZTRAgKXR0wUwQWUwl2U0QICl0=","queueTime":0}</script></body>
+
+</html>
+
+

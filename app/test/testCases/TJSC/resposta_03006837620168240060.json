@@ -1,0 +1,100 @@
+{
+  "capa": {
+    "assunto": ["Equivalencia salarial"],
+    "uf": "SC",
+    "comarca": "Sao Domingos",
+    "classe": "Recurso Inominado"
+  },
+  "detalhes": {
+    "tipo": "cnj",
+    "numeroProcesso": "03006837620168240060",
+    "numeroProcessoMascara": "0300683-76.2016.8.24.0060",
+    "instancia": 3,
+    "ano": 2016,
+    "orgao": 8,
+    "tribunal": 24,
+    "origem": 60
+  },
+  "envolvidos": [
+    {
+      "tipo": "Recorrente",
+      "nome": "Claudete Inez Hennerich Lammel"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "Mariele Adelia Lammel"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "Hildegardis Meneguzzi Griss"
+    },
+    {
+      "tipo": "Recorrido",
+      "nome": "Municipio de Sao Domingos"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "Rudimar Borcioni"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "Luiz Henrique Maseto Zanovello"
+    }
+  ],
+  "oabs": [],
+  "andamentos": [
+    {
+      "data": "2020-03-16T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Encaminhado Ata de Distribuicao para Publicacao no DJE",
+      "numeroProcesso": "03006837620168240060"
+    },
+    {
+      "data": "2020-03-05T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Conclusao ao Relator",
+      "numeroProcesso": "03006837620168240060"
+    },
+    {
+      "data": "2020-03-05T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Expedido Termo de Distribuicao",
+      "numeroProcesso": "03006837620168240060",
+      "observacao": "Termo de Distribuicao"
+    },
+    {
+      "data": "2020-03-04T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Distribuicao por Sorteio",
+      "numeroProcesso": "03006837620168240060",
+      "observacao": "Orgao Julgador: 13 - Terceira Turma Recursal Relator: 5001 - Antonio Augusto Baggio e Ubaldo"
+    },
+    {
+      "data": "2020-01-27T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Recebido para redistribuicao entre as Turmas Recursais",
+      "numeroProcesso": "03006837620168240060"
+    },
+    {
+      "data": "2020-01-27T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Remessa para redistribuicao entre as Turmas Recursais",
+      "numeroProcesso": "03006837620168240060",
+      "observacao": "RESOLUCAO TJ N 13/2019. Origem: Terceira Turma de Recursos - Chapeco"
+    },
+    {
+      "data": "2020-01-15T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Processo Cadastrado",
+      "numeroProcesso": "03006837620168240060",
+      "observacao": "Distribuidor"
+    },
+    {
+      "data": "2019-11-05T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Recebidos os Autos pela Entrada de Recursos",
+      "numeroProcesso": "03006837620168240060",
+      "observacao": "Foro de origem: Sao Domingos Vara de origem: Vara Unica"
+    }
+  ]
+}

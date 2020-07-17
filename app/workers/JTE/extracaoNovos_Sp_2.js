@@ -46,13 +46,13 @@ var contador = 0;
   await puppet.iniciar()
   await puppet.acessar("https://jte.csjt.jus.br/")
   try {
-    await puppet.preencheTribunal('10000242020195020501')
+    await puppet.preencheTribunal('01004381120185010241')
   } catch (e) {
     console.log("falha ao logar");
     await puppet.fechar()
     await puppet.iniciar()
     await puppet.acessar("https://jte.csjt.jus.br/")
-    await puppet.preencheTribunal('10000242020195020501')
+    await puppet.preencheTribunal('01004381120185010241')
   }
 
 
@@ -142,11 +142,11 @@ var contador = 0;
       //   console.log(err);
       //   throw new Error(`JTE - Erro ao enviar resposta ao BigData - Processo: ${message.NumeroProcesso}`)
       // });
-      logger.info('Resposta enviada ao BigData');
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
+      // logger.info('Resposta enviada ao BigData');
+      // logger.info('Reconhecendo mensagem ao RabbitMQ');
 
-      logger.info('Mensagem reconhecida');
-      logger.info('Finalizando processo');
+      // logger.info('Mensagem reconhecida');
+      // logger.info('Finalizando processo');
       // tentar reativar codigo
       // await logarExecucao({
       //   Mensagem: message,

@@ -60,7 +60,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: node workers/JTE/extracaoNovos_Sp_15.js
+    command: node workers/JTE/extracaoNovos_Sp_15.2.js
     logging:
       driver: "json-file"
       options:

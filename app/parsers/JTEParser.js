@@ -36,6 +36,7 @@ class JTEParser extends BaseParser {
     let n = this.detalhes(cnj).numeroProcesso.trim()
     let dadosAndamento = this.andamento($2, n)
     // console.timeEnd('parse');
+    console.log("O processo possui " + this.numeroDeAndamentos($2) + " andamentos");
     return {
       processo: dadosProcesso,
       andamentos: dadosAndamento
@@ -134,13 +135,13 @@ class JTEParser extends BaseParser {
   }
 
   estado($, numeroProcesso) {
-    
+
 
     let resultado = 'Estado indeterminado'
-    
+
 
     let dados = this.detalhes(numeroProcesso).tribunal
-    
+
 
     if (dados == 2 || dados == 15) resultado = 'SP'
     if (dados == 1) resultado = 'RJ'
@@ -250,7 +251,7 @@ class JTEParser extends BaseParser {
   andamento($, n) {
     let resultado = []
     let texto = this.extraiAndamento($)
-    
+
     let data = this.extraiDataAndamento($)
     for (let j = 0; j < texto.length; j++) {
       // console.log(texto[j]);
@@ -330,20 +331,20 @@ class JTEParser extends BaseParser {
 
   // ajusta data brasil para Internacional recebe uma data por vez.
   ajustaData(datas) {
-    
-    
+
+
     let dia = datas.slice(0, 2);
     let mes = datas.slice(2, 5);
     let ano = datas.slice(5, 10);
     let data = ano + "-" + mes + "-" + dia
     return data
   }
-  mascaraNumero(numeroProcesso){
+  mascaraNumero(numeroProcesso) {
     let resultado = '';
-    resultado = numeroProcesso.slice(0,7)+'-'+numeroProcesso.slice(7,9)
-    +'.'+numeroProcesso.slice(9,13)+'.'+numeroProcesso.slice(13,14)
-    +'.'+numeroProcesso.slice(numeroProcesso.length-6,numeroProcesso.length-4)
-    +'.'+numeroProcesso.slice(numeroProcesso.length-4,numeroProcesso.length)
+    resultado = numeroProcesso.slice(0, 7) + '-' + numeroProcesso.slice(7, 9)
+      + '.' + numeroProcesso.slice(9, 13) + '.' + numeroProcesso.slice(13, 14)
+      + '.' + numeroProcesso.slice(numeroProcesso.length - 6, numeroProcesso.length - 4)
+      + '.' + numeroProcesso.slice(numeroProcesso.length - 4, numeroProcesso.length)
 
     return resultado
   }

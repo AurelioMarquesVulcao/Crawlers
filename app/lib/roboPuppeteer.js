@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 
-var timerSleep = 60
+var timerSleep = 30
 
 class RoboPuppeteer3 {
   async iniciar() {
@@ -10,8 +10,8 @@ class RoboPuppeteer3 {
       headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      args: ['--ignore-certificate-errors', '--no-sandbox']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      //args: ['--ignore-certificate-errors', '--no-sandbox']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
     });
     this.page = await this.browser.newPage();

@@ -12,6 +12,7 @@ const cron = require('node-cron');
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
+  SC: enums.nomesRobos.TJSC,
   JTE: enums.nomesRobos.JTE
 };
 

@@ -54,7 +54,7 @@ var contador = 0;
         await puppet.preencheTribunal('10014385020135020473')
     } catch (e) {
         console.log("falha ao logar");
-        worker()
+      
 
     }
 
@@ -109,7 +109,7 @@ var contador = 0;
                 processo = await dadosProcesso.processo.salvar()
             } catch (e) {
                 console.log(e);
-                worker()
+               
             }
             logger.info('Processos extraidos com sucesso');
             if (!!dadosProcesso) {
@@ -166,7 +166,7 @@ var contador = 0;
 
         } catch (e) {
             console.log(e);
-            worker()
+            
             // envia a mensagem para a fila de reprocessamento
             new GerenciadorFila().enviar(reConsumo, message);
             logger.info('Encontrado erro durante a execução');
@@ -191,6 +191,8 @@ var contador = 0;
             //   NomeRobo: enums.nomesRobos.JTE
             // });
             ch.ack(msg);
+        } finally{
+            worker()
         }
 
     });

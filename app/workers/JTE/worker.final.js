@@ -190,6 +190,7 @@ var contador = 0;
             //   logs: logger.logs,
             //   NomeRobo: enums.nomesRobos.JTE
             // });
+            worker()
             ch.ack(msg);
         } finally{
             worker()

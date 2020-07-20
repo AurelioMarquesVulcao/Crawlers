@@ -37,7 +37,7 @@ class TJSCParser extends BaseParser {
       detalhes: detalhes,
       envolvidos: envolvidos,
       oabs: oabs,
-      qtdAndamentos: 0,
+      qtdAndamentos: andamentos.length,
       origemExtracao: 'OabTJSP',
     });
 
@@ -125,7 +125,7 @@ class TJSCParser extends BaseParser {
       .strip();
 
     detalhes = Processo.identificarDetalhes(numeroProcesso);
-    detalhes.instancia = this.instancia;
+    detalhes['instancia'] = this.instancia;
     return detalhes;
   }
 

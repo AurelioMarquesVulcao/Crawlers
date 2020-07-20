@@ -22,7 +22,7 @@
     },
     {
       "tipo": "Advogado",
-      "nome": "Fernando Luz da Gama Lobo Deca"
+      "nome": "(15329SC) Fernando Luz da Gama Lobo Deca"
     },
     {
       "tipo": "Apelado",
@@ -30,7 +30,7 @@
     },
     {
       "tipo": "Advogado",
-      "nome": "Fabiano Henrique Souza"
+      "nome": "(27183SC) Fabiano Henrique Souza"
     },
     {
       "tipo": "Advogado",
@@ -42,7 +42,7 @@
     },
     {
       "tipo": "Advogado",
-      "nome": "Mauricio Tschumi Leao"
+      "nome": "(39370SC) Mauricio Tschumi Leao"
     },
     {
       "tipo": "Interessado",
@@ -50,7 +50,7 @@
     },
     {
       "tipo": "Advogado",
-      "nome": "Edvaldo Evaldo Florindo"
+      "nome": "(30646SC) Edvaldo Evaldo Florindo"
     },
     {
       "tipo": "Interessado",
@@ -58,7 +58,7 @@
     },
     {
       "tipo": "Advogado",
-      "nome": "Bruno Etore Capozzi"
+      "nome": "(32951SC) Bruno Etore Capozzi"
     },
     {
       "tipo": "Interessado",
@@ -69,7 +69,7 @@
       "nome": "Walber Avair Angelo"
     }
   ],
-  "oabs": [],
+  "oabs": ["15329SC", "27183SC", "39370SC", "30646SC", "32951SC"],
   "dataAtualizacao": "dataFormatada",
   "dataCriacao": "dataFormatada",
   "andamentos": [

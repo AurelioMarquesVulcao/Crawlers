@@ -181,27 +181,30 @@ class TJSCParser extends BaseParser {
     let advogados = [];
     let linha;
 
-    linha = $(
-      `${selector} > tbody > tr:nth-child(${upperIndex + 1}) > td:nth-child(2)`
-    )
-      .text()
+    selector = `${selector} > tbody > tr:nth-child(${upperIndex + 1}) > td:nth-child(2)`
+
+    linha = $(selector).text()
     linha = linha.match(/^[\t ]*(?<tipo>\w+):\W+(?<nome>.+)/gm)
     if (linha) {
-      advogados = linha.map((element) => {
+      advogados = linha.map((element, index) => {
         let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
         let adv = {
           tipo: '',
           nome: '',
         };
+        let oab;
         let resultado = re.exec(element.replace('\n', ' '), re(regex));
         // Extracao
         if (resultado) {
           adv.tipo = traduzir(resultado.tipo.strip());
           adv.nome = resultado.nome.strip();
 
-          //TODO fazer funcao de resgate da oab dentro das movimentações
-          let oab = this.resgatarOab(adv.nome, $);
-
+          oab = $(selector + `> input[type=hidden]:nth-child(${index + 1 * 3})`);
+          if (oab.length === 0) {
+            oab = this.resgatarOab(adv.nome, $);
+          } else {
+            oab = oab.attr('value');
+          }
           // Tratamento
           adv.nome = removerAcentos(adv.nome);
           if (oab) adv.nome = `(${oab}) ${adv.nome}`;
@@ -214,6 +217,8 @@ class TJSCParser extends BaseParser {
   }
 
   resgatarOab(nome, $) {
+    //TODO fazer resgate de oab dentro do input hidden.
+    //  Acontece de 3 em 3
     let movimentacoesEmTexto;
     let advMatch;
     let oab;
@@ -281,7 +286,6 @@ class TJSCParser extends BaseParser {
       } else {
         observacao = descricaoRaw.find('span').text().strip();
       }
-      //FIXME retornando com acento?
       let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
       observacao = observacao.replace(/\n/gm, ' ');
       observacao = re.replace(observacao, re(/\s\s+/gm), ' ');

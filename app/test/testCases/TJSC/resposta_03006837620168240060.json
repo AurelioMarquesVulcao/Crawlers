@@ -22,7 +22,7 @@
     },
     {
       "tipo": "Advogado",
-      "nome": "Mariele Adelia Lammel"
+      "nome": "(41175SC) Mariele Adelia Lammel"
     },
     {
       "tipo": "Advogado",
@@ -34,14 +34,14 @@
     },
     {
       "tipo": "Advogado",
-      "nome": "Rudimar Borcioni"
+      "nome": "(15411SC) Rudimar Borcioni"
     },
     {
       "tipo": "Advogado",
       "nome": "Luiz Henrique Maseto Zanovello"
     }
   ],
-  "oabs": [],
+  "oabs": ["41175SC", "15411SC"],
   "andamentos": [
     {
       "data": "2020-03-16T00:00:00.000Z",

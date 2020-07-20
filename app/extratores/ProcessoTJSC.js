@@ -147,13 +147,14 @@ class ProcessoTJSC extends ExtratorBase {
             `Pagina capturada com sucesso. [Tentativas: ${tentativas + 1}]`
           );
           this.logger.info('Iniciando processo de extração.');
-          extracao = await this.parser.parse(objResponse.responseBody);
+          extracao = await this.parser.parse(objResponse.responseBody, this.instancia);
           this.logger.info('Processo de extração concluído.');
           this.logger.info('Iniciando salvamento de Andamento');
           await Andamento.salvarAndamentos(extracao.andamentos);
           this.logger.info('Andamentos salvos');
 
           this.logger.info('Iniciando salvamento do Processo');
+          console.log(extracao.processo.detalhes.toString())
           resultado = await extracao.processo.salvar();
           this.logger.info(
             `Processo: ${this.numeroDoProcesso} salvo | Quantidade de andamentos: ${extracao.andamentos.length}`

@@ -21,6 +21,8 @@ Projeto que abrange todos os crawlers de acesso e extração de processos.
 | MONGO_CONNECTION_STRING | String descritiva de conexao no MongoDB  |
 | BIG_DATA_ADDRESS        | Endereco do bigdata                      |
 | PROXIES_ADDRESS         | Endereço do servidor de proxies          |
+| PUPPETEER_MEMORIA_MAX   | Memória maxima do puppeteer              |
+| PUPPETEER_MEMORIA_MIN   | Memória minima do puppeteer              |
 
 ## Filas
 
@@ -42,25 +44,43 @@ Projeto que abrange todos os crawlers de acesso e extração de processos.
 | IdLog            | String       | _id do Log de COnsulta que foi previamente enviado pelo BigData |
 | NumeroDoProcesso | String       | Numero do processo em que foi realizado a extração           |
 | NumeroDaOab      | String       | Numero da Oab em que foi realizado a extração                |
-| Resultado        | Array[obj] | Lista de Objetos do tipo ExtracaoResultados*                |
+| Resultado        | [ExtracaoResultados] | Lista de Objetos do tipo ExtracaoResultados. *              |
 | Sucesso          | Boolean      | Indicador se houve sucesso ao realizar a extração            |
 | Detalhes         | String       | Caso houve algum erro aqui entra a *message* do erro.        |
 
 * ExtracaoResultado
 
-  ```javascript
+  ```json
   {
-      idProcesso: String,
-      numeroProcesso: String,
-      temAndamentosNovos: Boolean,
-      qtdAndamentosNovos: Number
+      "idProcesso": "{String}",
+      "numeroProcesso": "{String}",
+      "temAndamentosNovos": "{Boolean}",
+      "qtdAndamentosNovos": "{Number}"
   }
   ```
 
 ## Endpoints
 
 ### /getProcessos
+
+Retorna o processo completo com capa, envolvidos e andamentos.
+
 **METHOD: GET**
+
 #### Params
-|Campo|Tipo| Descrição|
-|numeroProcesso|String|Numero do processo|
+| Campo          | Tipo   | Descricção                     |
+| -------------- | ------ | ------------------------------ |
+| numeroProcesso | String | Numero do processo sem mascara |
+
+### /getAndamentos
+
+Retorna somente os andamentos referente ao processo.
+
+**METHOD: GET**
+
+**Params**
+
+| Campo          | Tipo   | Descrição                      |
+| -------------- | ------ | ------------------------------ |
+| numeroProcesso | String | Numero do processo sem mascara |
+

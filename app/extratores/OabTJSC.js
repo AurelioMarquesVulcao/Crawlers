@@ -12,7 +12,8 @@ const { TJSCParser } = require('../parsers/TJSCParser');
 
 const { LogExecucao } = require('../lib/logExecucao');
 
-const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json').INSTANCIAS_URL;
+const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json')
+  .INSTANCIAS_URL;
 
 class OabTJSC extends ExtratorBase {
   constructor(url, isDebug) {
@@ -23,7 +24,6 @@ class OabTJSC extends ExtratorBase {
   }
 
   setInstanciaUrl(instancia) {
-    instancia = instancia;
     this.url = INSTANCIAS_URLS[instancia - 1];
   }
 
@@ -40,7 +40,7 @@ class OabTJSC extends ExtratorBase {
     // );
     this.numeroDaOab = numeroOab;
     this.instancia = Number(instancia);
-    this.setInstanciaUrl(this.instancia)
+    this.setInstanciaUrl(this.instancia);
     let cadastroConsulta = {
       SeccionalOab: 'SC',
       TipoConsulta: 'processo',

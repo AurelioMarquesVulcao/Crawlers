@@ -80,7 +80,7 @@ class Requisicao {
           }
         })
         .catch((err) => {
-          console.log('Robo erro', err);
+          // console.log('Robo erro', err);
           resolve({
             code: err.code,
             status: err.response.status,

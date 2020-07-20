@@ -11,8 +11,8 @@ const {
 const { ExtratorBase } = require('./extratores');
 const { TJSCParser } = require('../parsers/TJSCParser');
 
-const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json').INSTANCIAS_URL;
-
+const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json')
+  .INSTANCIAS_URL;
 
 class ProcessoTJSC extends ExtratorBase {
   constructor(url, isDebug) {
@@ -25,7 +25,6 @@ class ProcessoTJSC extends ExtratorBase {
   }
 
   setInstanciaUrl(instancia) {
-    instancia = instancia;
     this.url = INSTANCIAS_URLS[instancia - 1];
   }
 
@@ -33,9 +32,10 @@ class ProcessoTJSC extends ExtratorBase {
    *
    * @param {String} numeroDoProcesso o numero do processo
    * @param {String} numeroDaOab indica que a extração teve inicio com uma oab
+   * @param {Number} instancia instancia da pesquisa do processo
    * @returns {Promise<{sucesso: boolean, logs: [], numeroDoProcesso: string}|{sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: ("undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint")}|{resultado: (void|*|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos: *}|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos}), sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: string}>}
    */
-  async extrair(numeroDoProcesso, numeroDaOab = '', instancia=1) {
+  async extrair(numeroDoProcesso, numeroDaOab = '', instancia = 1) {
     const nomeRobo = 'ProcessoTJSC';
     this.numeroDaOab = numeroDaOab;
     this.numeroDoProcesso = numeroDoProcesso;
@@ -73,8 +73,14 @@ class ProcessoTJSC extends ExtratorBase {
     try {
       this.logger.info('Fazendo primeira conexão.');
 
-      url = `${this.url}/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(0, 15)}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${this.detalhes.numeroProcessoMascara}&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`
-
+      url = `${
+        this.url
+      }/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(
+        0,
+        15
+      )}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${
+        this.detalhes.numeroProcessoMascara
+      }&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`;
 
       console.log('PRE URL', url);
 
@@ -101,11 +107,19 @@ class ProcessoTJSC extends ExtratorBase {
 
         this.logger.info('Preparando para acessar site do processo.');
 
-        if (this.instancia === 1){
+        if (this.instancia === 1) {
           url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=${this.detalhes.origem}&processo.numero=${this.detalhes.numeroProcessoMascara}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-        }
-        else {
-          url = `${this.url}/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(0, 15)}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${this.detalhes.numeroProcessoMascara}&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`
+        } else {
+          url = `${
+            this.url
+          }/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(
+            0,
+            15
+          )}&foroNumeroUnificado=${
+            this.detalhes.origem
+          }&dePesquisaNuUnificado=${
+            this.detalhes.numeroProcessoMascara
+          }&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
         }
 
         console.log(url);

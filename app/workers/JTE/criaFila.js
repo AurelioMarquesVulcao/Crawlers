@@ -6,13 +6,7 @@ const sleep = require('await-sleep');
 
 const { enums } = require("../../configs/enums");
 const { GerenciadorFila } = require("../../lib/filaHandler");
-const { ExtratorFactory } = require("../../extratores/extratorFactory");
-const { Extracao } = require("../../models/schemas/extracao");
-const { Helper, Logger } = require("../../lib/util");
-const { LogExecucao } = require('../../lib/logExecucao');
 
-const { Andamento } = require('../../models/schemas/andamento');
-const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseException, } = require('../../models/exception/exception');
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 const { Processo } = require('../../models/schemas/processo');
@@ -24,101 +18,120 @@ class CriaFilaJTE {
         new GerenciadorFila().enviar(nome, message);
     }
 
-   
+    async buscaDb(quantidade, salto) {
+        const devDbConection = 'mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
+        mongoose.connect(devDbConection, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        var Processos = mongoose.model('consultasCadastradas', {
+            NumeroProcesso: String,
+            DataCadastro: Date,
+            AtivoParaAtualizacao: Boolean,
+            DataUltimaConsultaTribunal: Date,
+            Instancia: String,
+            TipoConsulta: String
+        }, 'consultasCadastradas');
+        return await Processos.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
+    }
+    async enviaFila(numeroProcesso) {
+        const sleep4 = 50;
+        const sleep1 = 250;
+        let filtro = numeroProcesso;
+        let conta1000 = 0;
+        console.log(filtro.length);
+        for (let i = 0; i < filtro.length; i++) {
+            let tribunal = 0
+            tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
+            if (tribunal == 15) {
+                await sleep(sleep1)
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
+                let message = criaPost(filtro[i].NumeroProcesso)
+
+                await this.enviarMensagem(nomeFila, message)
+                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                conta1000++
+                if (conta1000 == 2000) {
+                    await sleep(sleep4)
+                    conta1000 = 0
+                }
+            }
+            if (tribunal == 2) {
+                await sleep(sleep1)
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
+                let message = criaPost(filtro[i].NumeroProcesso)
+
+                await this.enviarMensagem(nomeFila, message)
+                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                conta1000++
+                if (conta1000 == 2000) {
+                    await sleep(sleep4)
+                    conta1000 = 0
+                }
+            }
+            if (tribunal == 3) {
+                await sleep(sleep1)
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-MG`;
+                let message = criaPost(filtro[i].NumeroProcesso)
+
+                await this.enviarMensagem(nomeFila, message)
+                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                conta1000++
+                if (conta1000 == 2000) {
+                    await sleep(sleep4)
+                    conta1000 = 0
+                }
+            }
+            if (tribunal == 1) {
+                await sleep(sleep1)
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-RJ`;
+                let message = criaPost(filtro[i].NumeroProcesso)
+
+                await this.enviarMensagem(nomeFila, message)
+                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                conta1000++
+                if (conta1000 == 2000) {
+                    await sleep(sleep4)
+                    conta1000 = 0
+                }
+            }
+            if (tribunal == 5) {
+                await sleep(sleep1)
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
+                let message = criaPost(filtro[i].NumeroProcesso)
+
+                await this.enviarMensagem(nomeFila, message)
+                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                conta1000++
+                if (conta1000 == 2000) {
+                    await sleep(sleep4)
+                    conta1000 = 0
+                }
+            }
+
+
+
+        }
+    }
 }
 
 
 (async () => {
     const fila = new CriaFilaJTE()
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-    const filaSP_2 = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-    const filaSP_15 = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
+   
+    let filtro = await fila.buscaDb(10, 145000)
+    await fila.enviaFila(filtro)
 
-    const devDbConection = 'mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
-    mongoose.connect(devDbConection, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    });
-    const Processos = mongoose.model('consultasCadastradas', {
-        NumeroProcesso: String,
-        DataCadastro: Date,
-        AtivoParaAtualizacao: Boolean,
-        DataUltimaConsultaTribunal: Date,
-        Instancia: String,
-        TipoConsulta: String
-    }, 'consultasCadastradas');
-    // busca direta por todos os processos
-    const filtro = await Processos.find({ "TipoConsulta": "processo" })
-
-    // inserir função de ativação da chamado do banco de dados
-
-    let processos_sp_2 = [];
-    let processos_sp_15 = [];
-    let processos_mg = [];
-    let processos_rj = [];
-    let processos_ba = [];
-    let conta1000 = 0
-    for (let i = 0; i < filtro.length; i++) {
-        let tribunal = 0
-        tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
-        if (tribunal == 2) {
-            // processos_sp_2.push(filtro[i].NumeroProcesso)
-            let message = criaPost(filtro[i].NumeroProcesso)
-            await sleep(2500)
-            await fila.enviarMensagem(nomeFila, message)
-            await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
-            conta1000++
-
-            if (conta1000 == 4000) {
-                await sleep(30000)
-                conta1000 = 0
-            }
-        }
-
-        // if (tribunal == 15) processos_sp_15.push(filtro[i].NumeroProcesso)
-        // if (tribunal == 1) processos_mg.push(filtro[i].NumeroProcesso)
-        // if (tribunal == 3) processos_rj.push(filtro[i].NumeroProcesso)
-        // if (tribunal == 5) processos_ba.push(filtro[i].NumeroProcesso)
-
-    }
-
-
-    // inserir função de ativação da fila
-    
-    // for (let i = 0; i < processos_sp_2.length; i++) {
-    //     let message = criaPost(processos_sp_2[i])
-    //     await sleep(5)
-    //     await fila.enviarMensagem(nomeFila, message)
-    //     await console.log('processo : ' + processos_sp_2[i] + ' adicionado');
-    //     conta1000++
-
-    //     if (conta1000 == 4000) {
-    //         await sleep(120000)
-    //         conta1000 = 0
-    //     }
-
-    // }
-
-
-
+    await sleep(5000)
     process.exit()
+    
+    console.log();
+
 
 
 })();
 
 // ------------------------------------funcoes complementares--------------------------------------
-const post = async () => {
-    for (let i = 0; i < processos.length; i++) {
-        await roboVersao1(processos[i])
-        await console.log('processo : ' + processos[i] + ' adicionado');
-
-    }
-}
-// post()
-
-//console.log("\033[31m Aqui esta o texto em vermelho.")
-
 function criaPost(numero) {
     let post = `{
         "ExecucaoConsultaId" : "${makeid()}",
@@ -164,18 +177,3 @@ function mascaraNumero(numeroProcesso) {
         + '.' + numeroProcesso.slice(numeroProcesso.length - 4, numeroProcesso.length)
     return resultado
 }
-
-
-
-
-// funcoes de teste usadas no desenvolvimento.
-    // await console.log(processos_sp_2.length); // exibe quantos processos filtrei para o tribunal sp2
-    // await  console.log(processos_sp_2[1]);
-    // await console.log(processos_sp_15.length); // exibe quantos processos filtrei para o tribunal sp2
-    // await  console.log(processos_sp_15[1]);
-    // await console.log(processos_mg.length); // exibe quantos processos filtrei para o tribunal sp2
-    // await  console.log(processos_mg[1]);
-    // await console.log(processos_rj.length); // exibe quantos processos filtrei para o tribunal sp2
-    // await  console.log(processos_rj[1]);
-    // await console.log(processos_ba.length); // exibe quantos processos filtrei para o tribunal sp2
-    // await  console.log(processos_ba[1]);

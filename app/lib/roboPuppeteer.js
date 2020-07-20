@@ -1,19 +1,34 @@
 const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 
-var timerSleep = 30
+var timerSleep = 100
 
 class RoboPuppeteer3 {
-  async iniciar() {
+  async start() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      //args: ['--ignore-certificate-errors', '--no-sandbox']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
     });
+    // this.page = await this.browser.newPage();
+    // this.acessar('https://www.google.com/');
+    // console.log('O Puppeteer foi Iniciado corretamente');
+  }
+
+  async iniciar() {
+    // para abrir o navegador use o headless: false
+    // this.browser = await puppeteer.launch({
+    //   headless: false,
+    //   slowMo: 1,
+    //   ignoreHTTPSErrors: true,
+    //   args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+    //   // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+    //   // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+    // });
     this.page = await this.browser.newPage();
     this.acessar('https://www.google.com/');
     console.log('O Puppeteer foi Iniciado corretamente');
@@ -54,7 +69,7 @@ class RoboPuppeteer3 {
     await this.page.click(`#mat-option-${escolheEstado(numero)}`)
     await sleep(timerSleep)
     await this.page.click('ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span')
-    await sleep(1200)
+    await sleep(2200)
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual')
     await sleep(timerSleep)
@@ -108,14 +123,29 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     await this.page.waitFor(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div`)
     await sleep(timerSleep)
+    // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
+    // click para pegar o assunto
+    await this.page.click(`mat-expansion-panel`)
+    // click para pegar audiencias
+    // #mat-expansion-panel-header-1 > span.mat-content > mat-panel-description
+    await this.page.click(`#mat-expansion-panel-header-1 > span.mat-content > mat-panel-description`)
+    await sleep(timerSleep)
+    await this.page.waitFor(`cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)`)
+    // click dos documentos
+    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)
+    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
+    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
+    await this.page.click(`cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)`)
     
+    await sleep(timerSleep)
+    await page.pdf({ path: 'app', format: 'A4' });
     let html1 = await this.page.evaluate(async () => {
       let text = await document.querySelector('html').innerHTML;
       return text
     })
-    
+
     //let html1 = await this.page.content();
-    
+
     await sleep(timerSleep)
     await console.log(`info: JTE - CNJ: ${numero} - html da capa do processo extraido do Puppeteer`);
     const divButon = '#listaProcessoEncontrado > mat-tab-group > mat-tab-header > div.mat-tab-label-container > div > div'
@@ -124,21 +154,23 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     await this.page.waitFor('#divMovBrowser1 > ion-grid > ion-row > ion-col')
     await sleep(timerSleep)
-    
+
     let html2 = await this.page.evaluate(async () => {
       let text = await document.querySelector('html').innerHTML;
       return text
     })
-    
+
     //let html2 = await this.page.content();
-    
+
     await console.log(`info: JTE - CNJ: ${numero} - html dos andamentos extraido do Puppeteer`);
     return { geral: html1, andamentos: html2 }
   }
 
 
   async fechar() {
-    await this.browser.close();
+    await this.browser.close()
+
+
   }
 }
 
@@ -147,10 +179,11 @@ function escolheEstado(numero) {
   let resultado;
   numero = numero.slice(numero.length - 6, numero.length - 4)
   if (numero == 01) resultado = 2     // Rio de Janeiro
-  if (numero == 02 || numero == 05) resultado = 03    // São Paulo
+  if (numero == 02 ) resultado = 03    // São Paulo
   if (numero == 21) resultado = 22    // Rio Grande do Norte
   if (numero == 15) resultado = 16    // São Paulo
-  if (numero == 03) resultado = 4    // São Paulo
+  if (numero == 03) resultado = 4    // Minas Gerais
+  if (numero == 05) resultado = 6    // Bahia
   return resultado
 }
 function processaNumero(numero) {
@@ -163,4 +196,15 @@ function processaNumero(numero) {
     vara: vara
   }
 }
+(async () => {
+  let puppet = new RoboPuppeteer3()
+  await puppet.start()
+  await puppet.iniciar()
+
+  //await sleep(10000)
+  await puppet.acessar("https://jte.csjt.jus.br/")
+  await puppet.preencheTribunal('00002225820175050017')
+  await sleep(1000)
+  await puppet.preencheProcesso("00002225820175050017" , 0)
+})()
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

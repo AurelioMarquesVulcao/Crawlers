@@ -10,13 +10,15 @@ const { ExtratorFactory } = require("../../extratores/extratorFactory");
 const { Extracao } = require("../../models/schemas/extracao");
 const { Helper, Logger } = require("../../lib/util");
 const { LogExecucao } = require('../../lib/logExecucao');
-const { RoboPuppeteer } = require('../../lib/roboPuppeteer-rev-000')
+
 const { Andamento } = require('../../models/schemas/andamento');
 const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseException, } = require('../../models/exception/exception');
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
+const sleep = require('await-sleep');
+
 
 
 /**
@@ -30,43 +32,41 @@ const logarExecucao = async (execucao) => {
 }
 
 
-
-
-
 var contador = 0;
 
-(async function worker() {
+let data = 1;
+
+if (data == 1){worker()}
+
+async function worker() {
     mongoose.connect(enums.mongo.connString, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });
 
-    mongoose.connection.on("error", (e) => { 
+    mongoose.connection.on("error", (e) => {
         console.log(e);
     });
-
     const puppet = new RoboPuppeteer3()
+    
+    var catchError = 0;
 
 
-    try {
-        await puppet.iniciar()
-        await puppet.acessar("https://jte.csjt.jus.br/")
-        await puppet.preencheTribunal('10014385020135020473')
-    } catch (e) {
-        console.log("falha ao logar");
-      
+    await puppet.start()
+    await puppet.iniciar()
 
-    }
-
-
+    //await sleep(10000)
+    await puppet.acessar("https://jte.csjt.jus.br/")
+    await puppet.preencheTribunal('10014385020135050473')
+    await sleep(1000)
 
     // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-Sp2`;
+    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
+    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
 
     // tudo que está abaixo é acionado para cada processo na fila.
-
-    new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+    contador = 0;
+    await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
         const dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
         let logger = new Logger(
@@ -109,7 +109,7 @@ var contador = 0;
                 processo = await dadosProcesso.processo.salvar()
             } catch (e) {
                 console.log(e);
-               
+
             }
             logger.info('Processos extraidos com sucesso');
             if (!!dadosProcesso) {
@@ -165,8 +165,8 @@ var contador = 0;
             ch.ack(msg);
 
         } catch (e) {
+            catchError++
             console.log(e);
-            
             // envia a mensagem para a fila de reprocessamento
             new GerenciadorFila().enviar(reConsumo, message);
             logger.info('Encontrado erro durante a execução');
@@ -190,12 +190,11 @@ var contador = 0;
             //   logs: logger.logs,
             //   NomeRobo: enums.nomesRobos.JTE
             // });
-            worker()
+
             ch.ack(msg);
-        } finally{
-            worker()
+            if(catchError == 2){process.exit()}
+
         }
-
     });
+};
 
-})();

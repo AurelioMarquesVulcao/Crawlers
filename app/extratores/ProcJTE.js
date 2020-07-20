@@ -1,6 +1,6 @@
 const cheerio = require('cheerio');
 const { Logger } = require('../lib/util');
-const { RoboPuppeteer } = require('../lib/roboPuppeteer-rev-000')
+
 const moment = require('moment');
 const { Andamento } = require('../models/schemas/andamento');
 const re = require('xregexp');
@@ -12,8 +12,8 @@ const enums = require('../configs/enums').enums;
 const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseException, } = require('../models/exception/exception');
 const { ExtratorBase } = require('./extratores');
 const { JTEParser } = require('../parsers/JTEParser');
+const { RoboPuppeteer3 } = require('../lib/roboPuppeteer');
 
-const { RoboPuppeteer3 } = require('../lib/roboPuppeteer_teste2')
 
 /**
  * Logger para console e arquivo

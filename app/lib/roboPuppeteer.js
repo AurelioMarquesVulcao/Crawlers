@@ -130,12 +130,12 @@ class RoboPuppeteer3 {
     // #mat-expansion-panel-header-1 > span.mat-content > mat-panel-description
     await this.page.click(`#mat-expansion-panel-header-1 > span.mat-content > mat-panel-description`)
     await sleep(timerSleep)
-    await this.page.waitFor(`cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)`)
+    //await this.page.waitFor(`ion-item:nth-child(1)`)
     // click dos documentos
     //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)
     //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
     //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
-    await this.page.click(`cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)`)
+    await this.page.click(`cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)`)
     
     await sleep(timerSleep)
     await page.pdf({ path: 'app', format: 'A4' });

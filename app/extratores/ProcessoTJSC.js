@@ -154,7 +154,6 @@ class ProcessoTJSC extends ExtratorBase {
           this.logger.info('Andamentos salvos');
 
           this.logger.info('Iniciando salvamento do Processo');
-          console.log(extracao.processo.detalhes.toString())
           resultado = await extracao.processo.salvar();
           this.logger.info(
             `Processo: ${this.numeroDoProcesso} salvo | Quantidade de andamentos: ${extracao.andamentos.length}`

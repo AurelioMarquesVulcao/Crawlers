@@ -166,8 +166,7 @@ class TJSCParser extends BaseParser {
       // Atribuição
       envolvidos.push(envolvido);
 
-      if (advogados)
-        envolvidos = [...envolvidos, ...advogados];
+      if (advogados) envolvidos = [...envolvidos, ...advogados];
     });
 
     // pegar os advogados
@@ -181,10 +180,12 @@ class TJSCParser extends BaseParser {
     let advogados = [];
     let linha;
 
-    selector = `${selector} > tbody > tr:nth-child(${upperIndex + 1}) > td:nth-child(2)`
+    selector = `${selector} > tbody > tr:nth-child(${
+      upperIndex + 1
+    }) > td:nth-child(2)`;
 
-    linha = $(selector).text()
-    linha = linha.match(/^[\t ]*(?<tipo>\w+):\W+(?<nome>.+)/gm)
+    linha = $(selector).text();
+    linha = linha.match(/^[\t ]*(?<tipo>\w+):\W+(?<nome>.+)/gm);
     if (linha) {
       advogados = linha.map((element, index) => {
         let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
@@ -199,7 +200,7 @@ class TJSCParser extends BaseParser {
           adv.tipo = traduzir(resultado.tipo.strip());
           adv.nome = resultado.nome.strip();
 
-          oab = $(selector + `> input[type=hidden]:nth-child(${index + 1 * 3})`);
+          oab = $(selector + `> input[type=hidden]:nth-child(${index + 3})`);
           if (oab.length === 0) {
             oab = this.resgatarOab(adv.nome, $);
           } else {
@@ -213,12 +214,10 @@ class TJSCParser extends BaseParser {
         }
       });
     }
-    return advogados.filter(x => Boolean(x));
+    return advogados.filter((x) => Boolean(x));
   }
 
   resgatarOab(nome, $) {
-    //TODO fazer resgate de oab dentro do input hidden.
-    //  Acontece de 3 em 3
     let movimentacoesEmTexto;
     let advMatch;
     let oab;
@@ -291,7 +290,7 @@ class TJSCParser extends BaseParser {
       observacao = re.replace(observacao, re(/\s\s+/gm), ' ');
       observacao = removerAcentos(observacao);
       descricao = descricao.replace(/\n/g, ' ');
-      descricao = descricao.replace(/\s\s+/g, ' ')
+      descricao = descricao.replace(/\s\s+/g, ' ');
 
       let andamento = {
         numeroProcesso: numeroProcesso,

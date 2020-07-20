@@ -68,9 +68,9 @@ Retorna o processo completo com capa, envolvidos e andamentos.
 **METHOD: GET**
 
 #### Params
-| Campo          | Tipo   | Descricção                     |
-| -------------- | ------ | ------------------------------ |
-| numeroProcesso | String | Numero do processo sem mascara |
+| Campo          | Descricção         |
+| -------------- | ------------------ |
+| numeroProcesso | Numero do processo |
 
 ### /getAndamentos
 
@@ -80,7 +80,7 @@ Retorna somente os andamentos referente ao processo.
 
 **Params**
 
-| Campo          | Tipo   | Descrição                      |
-| -------------- | ------ | ------------------------------ |
-| numeroProcesso | String | Numero do processo sem mascara |
+| Campo          | Descrição          |
+| -------------- | ------------------ |
+| numeroProcesso | Numero do processo |
 

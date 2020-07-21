@@ -62,7 +62,7 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
       const consultaSalva = await new ConsultasCadastradas(mensagemObj).save();
       mensagemObj.CadastroConsultaId = consultaSalva._id;
       console.log(`Criado documento com _id ${consultaSalva._id}`);
-      axios
+      const res = await axios
         .get(`${bigDataAddress}/consultaPublica/confirmarCadastro/${mensagemObj.CadastroConsultaId}`)
         .then(res => {
           console.log(res.data);
@@ -72,6 +72,7 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
           console.log(err);
           throw err;
         });
+        if (res.data);
     } else {
       console.log("Consulta já cadastrada no crawler.");
     }
@@ -108,7 +109,7 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
     // ch.ack(mensagem);
     // return;
   } finally {
-    console.log(`Liberando mensagem ${mensagem}!`);
+    console.log(`Liberando mensagem ${mensagem.TipoConsulta === 'processo' ? mensagem.NumeroProcesso : mensagem.NumeroOab}!`);
     ch.ack(mensagem);
   }
 });

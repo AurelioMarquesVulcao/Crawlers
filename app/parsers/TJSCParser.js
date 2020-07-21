@@ -18,8 +18,7 @@ class TJSCParser extends BaseParser {
    * @returns {{processo: Processo, andamentos: [Andamento]}}
    */
   parse(content, instancia) {
-    console.log('instancia', instancia);
-    this.instancia = instancia;
+    this.instancia = Number(instancia);
     const $ = cheerio.load(content);
     const dataAtual = moment().format('YYYY-MM-DD');
     const capa = this.extrairCapa($);
@@ -38,7 +37,7 @@ class TJSCParser extends BaseParser {
       detalhes: detalhes,
       envolvidos: envolvidos,
       oabs: oabs,
-      qtdAndamentos: 0,
+      qtdAndamentos: andamentos.length,
       origemExtracao: 'OabTJSP',
     });
 
@@ -63,20 +62,19 @@ class TJSCParser extends BaseParser {
   extrairComarca($) {
     let comarca;
 
-    comarca =
-      $(
-        'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-2.mb-2 > div'
-      )
-        .text()
-        .strip()
-    ;
+    comarca = $(
+      'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-2.mb-2 > div'
+    )
+      .text()
+      .strip();
 
     if (comarca === '') {
-      comarca = $('body > div.div-conteudo.container.unj-mb-40 > table:nth-child(12) > tbody > tr > td:nth-child(2)')
+      comarca = $(
+        'body > div.div-conteudo.container.unj-mb-40 > table:nth-child(12) > tbody > tr > td:nth-child(2)'
+      )
         .text()
-        .strip()
+        .strip();
     }
-
 
     return removerAcentos(comarca);
   }
@@ -127,7 +125,7 @@ class TJSCParser extends BaseParser {
       .strip();
 
     detalhes = Processo.identificarDetalhes(numeroProcesso);
-    detalhes.instancia = this.instancia;
+    detalhes['instancia'] = this.instancia;
     return detalhes;
   }
 
@@ -137,11 +135,10 @@ class TJSCParser extends BaseParser {
     let selector;
 
     table = $('#tableTodasPartes > tbody > tr');
-    console.log(table.length);
-    selector = "#tableTodasPartes";
+    selector = '#tableTodasPartes';
     if (table.length === 0) {
       table = $('#tablePartesPrincipais > tbody > tr');
-      selector = "#tablePartesPrincipais";
+      selector = '#tablePartesPrincipais';
     }
 
     // pegar personagens
@@ -155,13 +152,9 @@ class TJSCParser extends BaseParser {
           index + 1
         }) > td:nth-child(1).label > span`
       )[0].children[0].data.strip();
-      console.log('data1')
       envolvido.nome = $(
-        `${selector} > tbody > tr:nth-child(${
-          index + 1
-        }) > td:nth-child(2)`
+        `${selector} > tbody > tr:nth-child(${index + 1}) > td:nth-child(2)`
       )[0].children[0].data.strip();
-      console.log('data2')
       advogados = this.recuperaAdvogados(index, $, selector);
 
       // Tratamento
@@ -178,52 +171,50 @@ class TJSCParser extends BaseParser {
 
     // pegar os advogados
 
+    envolvidos = this.filtrarUnicosLista(envolvidos);
+
     return envolvidos;
   }
 
   recuperaAdvogados(upperIndex, $, selector) {
-    let advogados;
+    let advogados = [];
     let linha;
 
-    // 1 transformar tudo em linhas
-    linha = $(
-      `${selector} > tbody > tr:nth-child(${
-        upperIndex + 1
-      }) > td:nth-child(2)`
-    )
-      .text() // pega o texto
-      .strip() // tira os espacos vazios
-      .split(/\s\s+/) // list feita a partir das quebras de linha
-      .splice(1); // remove primeiro elemento que normalmente é o nome do envolvido
-    if (selector !== '#tableTodasPartes') {
-      linha = [linha.join(' ')];
+    selector = `${selector} > tbody > tr:nth-child(${
+      upperIndex + 1
+    }) > td:nth-child(2)`;
+
+    linha = $(selector).text();
+    linha = linha.match(/^[\t ]*(?<tipo>\w+):\W+(?<nome>.+)/gm);
+    if (linha) {
+      advogados = linha.map((element, index) => {
+        let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
+        let adv = {
+          tipo: '',
+          nome: '',
+        };
+        let oab;
+        let resultado = re.exec(element.replace('\n', ' '), re(regex));
+        // Extracao
+        if (resultado) {
+          adv.tipo = traduzir(resultado.tipo.strip());
+          adv.nome = resultado.nome.strip();
+
+          oab = $(selector + `> input[type=hidden]:nth-child(${index + 3})`);
+          if (oab.length === 0) {
+            oab = this.resgatarOab(adv.nome, $);
+          } else {
+            oab = oab.attr('value');
+          }
+          // Tratamento
+          adv.nome = removerAcentos(adv.nome);
+          if (oab) adv.nome = `(${oab}) ${adv.nome}`;
+
+          return adv;
+        }
+      });
     }
-    advogados = linha.map((element) => {
-      let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
-      let adv = {
-        tipo: '',
-        nome: '',
-      };
-
-      let resultado = re.exec(element.replace('\n', ' '), re(regex));
-      console.log('element', element, '\n');
-      // Extracao
-      if (resultado) {
-        adv.tipo = resultado.tipo.strip();
-        adv.nome = resultado.nome.strip();
-
-        //TODO fazer funcao de resgate da oab dentro das movimentações
-        let oab = this.resgatarOab(adv.nome, $);
-
-        // Tratamento
-        adv.nome = removerAcentos(adv.nome);
-        if (oab) adv.nome = `(${oab}) ${adv.nome}`;
-
-        return adv;
-      }
-    });
-
-    return advogados.filter(Boolean);
+    return advogados.filter((x) => Boolean(x));
   }
 
   resgatarOab(nome, $) {
@@ -274,7 +265,7 @@ class TJSCParser extends BaseParser {
     let table;
     let selector;
     table = $('#tabelaTodasMovimentacoes > tr');
-    selector = "#tabelaTodasMovimentacoes";
+    selector = '#tabelaTodasMovimentacoes';
     // if (table.length === 0) {
     //   table = $('#tabelaUltimasMovimentacoes > tr');
     //   selector = "#tabelaUltimasMovimentacoes";
@@ -282,15 +273,11 @@ class TJSCParser extends BaseParser {
 
     table.each((index) => {
       let data = $(
-        `${selector} > tr:nth-child(${
-          index + 1
-        }) > td:nth-child(1)`
+        `${selector} > tr:nth-child(${index + 1}) > td:nth-child(1)`
       );
       data = moment(data.text().strip(), 'DD/MM/YYYY').format('YYYY-MM-DD');
       let descricaoRaw = $(
-        `${selector} > tr:nth-child(${
-          index + 1
-        }) > td:nth-child(3)`
+        `${selector} > tr:nth-child(${index + 1}) > td:nth-child(3)`
       );
 
       if (descricaoRaw.find('span')[0].children.length > 0) {
@@ -298,11 +285,12 @@ class TJSCParser extends BaseParser {
       } else {
         observacao = descricaoRaw.find('span').text().strip();
       }
-      console.log('data3');
       let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
       observacao = observacao.replace(/\n/gm, ' ');
       observacao = re.replace(observacao, re(/\s\s+/gm), ' ');
       observacao = removerAcentos(observacao);
+      descricao = descricao.replace(/\n/g, ' ');
+      descricao = descricao.replace(/\s\s+/g, ' ');
 
       let andamento = {
         numeroProcesso: numeroProcesso,

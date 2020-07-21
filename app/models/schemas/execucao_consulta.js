@@ -10,6 +10,7 @@ const ExecucaoSchema = new mongoose.Schema({
   DataTermino: { type: Date, required: false },
   Log: { type: Array, default: new Array() },
   Mensagem: {type: Array, default: new Array() },
+  Instancia: { type: Number},
   NomeRobo: { type: String, required: true }
 });
 

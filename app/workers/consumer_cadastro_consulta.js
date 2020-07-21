@@ -15,7 +15,8 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
       NumeroOab: mensagemObj.NumeroOab,
       NumeroProcesso: mensagemObj.NumeroProcesso,
       TipoConsulta: mensagemObj.TipoConsulta,
-      SeccionalOab: mensagemObj.SeccionalOab
+      SeccionalOab: mensagemObj.SeccionalOab,
+      Instancia: mensagemObj.Instancia
     };
 
     const consulta = await ConsultasCadastradas.findOne(query);

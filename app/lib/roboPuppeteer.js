@@ -4,31 +4,33 @@ const sleep = require('await-sleep')
 var timerSleep = 100
 
 class RoboPuppeteer3 {
-  async start() {
+  // async start() {
+  //   // para abrir o navegador use o headless: false
+  //   this.browser = await puppeteer.launch({
+  //     headless: false,
+  //     slowMo: 1,
+  //     ignoreHTTPSErrors: true,
+  //     //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+  //     // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+  //     // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+      
+  //   });
+  //   // this.page = await this.browser.newPage();
+  //   // this.acessar('https://www.google.com/');
+  //   // console.log('O Puppeteer foi Iniciado corretamente');
+  // }
+
+  async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
       headless: false,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-    });
-    // this.page = await this.browser.newPage();
-    // this.acessar('https://www.google.com/');
-    // console.log('O Puppeteer foi Iniciado corretamente');
-  }
-
-  async iniciar() {
-    // para abrir o navegador use o headless: false
-    // this.browser = await puppeteer.launch({
-    //   headless: false,
-    //   slowMo: 1,
-    //   ignoreHTTPSErrors: true,
     //   args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
     //   // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
     //   // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-    // });
+    args: ['--ignore-certificate-errors']
+    });
     this.page = await this.browser.newPage();
     this.acessar('https://www.google.com/');
     console.log('O Puppeteer foi Iniciado corretamente');
@@ -123,22 +125,6 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     await this.page.waitFor(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div`)
     await sleep(timerSleep)
-    // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
-    // click para pegar o assunto
-    await this.page.click(`mat-expansion-panel`)
-    // click para pegar audiencias
-    // #mat-expansion-panel-header-1 > span.mat-content > mat-panel-description
-    await this.page.click(`#mat-expansion-panel-header-1 > span.mat-content > mat-panel-description`)
-    await sleep(timerSleep)
-    //await this.page.waitFor(`ion-item:nth-child(1)`)
-    // click dos documentos
-    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)
-    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
-    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
-    await this.page.click(`cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)`)
-    
-    await sleep(timerSleep)
-    await page.pdf({ path: 'app', format: 'A4' });
     let html1 = await this.page.evaluate(async () => {
       let text = await document.querySelector('html').innerHTML;
       return text
@@ -164,6 +150,42 @@ class RoboPuppeteer3 {
 
     await console.log(`info: JTE - CNJ: ${numero} - html dos andamentos extraido do Puppeteer`);
     return { geral: html1, andamentos: html2 }
+  }
+
+  pegaAudiencia(){
+        // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
+    // click para pegar o assunto
+    await this.page.click(`mat-expansion-panel`)
+    // click para pegar audiencias
+    // #mat-expansion-panel-header-1 > span.mat-content > mat-panel-description
+
+    await this.page.click(`#mat-expansion-panel-header-1 > span.mat-content > mat-panel-description`)
+    await sleep(timerSleep)
+    await sleep(2000)
+    //await this.page.waitFor(`ion-item:nth-child(1)`)
+    // click dos documentos
+    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)
+    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
+    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
+    await this.page.click(`#cdk-accordion-child-1 > div > ion-list > ion-item:nth-child(1) > div`)
+    await sleep(2000)
+    let html9 = await this.page.evaluate(async () => {
+      let text = await document.querySelector('#menu-content > detalhe-documento > ion-content').innerText;
+      return text
+    })
+    await console.log(html9);
+    await sleep(timerSleep)
+    
+    await sleep(2000)
+    await this.page.click(`#menu-content > detalhe-documento > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button > button`)
+    
+    await sleep(timerSleep)
+    //await page.pdf({ path: 'app', format: 'A4' });
+
+  }
+
+  pegaDespacho(){
+
   }
 
 
@@ -198,7 +220,7 @@ function processaNumero(numero) {
 }
 (async () => {
   let puppet = new RoboPuppeteer3()
-  await puppet.start()
+  
   await puppet.iniciar()
 
   //await sleep(10000)

@@ -34,11 +34,9 @@ const logarExecucao = async (execucao) => {
 
 var contador = 0;
 
-let data = 1;
 
-if (data == 1){worker()}
 
-async function worker() {
+(async () => {
     mongoose.connect(enums.mongo.connString, {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -48,11 +46,11 @@ async function worker() {
         console.log(e);
     });
     const puppet = new RoboPuppeteer3()
-    
+
     var catchError = 0;
 
 
-    await puppet.start()
+    //await puppet.start()
     await puppet.iniciar()
 
     //await sleep(10000)
@@ -192,9 +190,9 @@ async function worker() {
             // });
 
             ch.ack(msg);
-            if(catchError == 2){process.exit()}
+            if (catchError == 5) { process.exit() }
 
         }
     });
-};
+})();
 

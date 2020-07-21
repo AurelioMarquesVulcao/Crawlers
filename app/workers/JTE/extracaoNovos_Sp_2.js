@@ -16,7 +16,7 @@ const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseE
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const sleep = require('await-sleep');
 
 
@@ -53,7 +53,7 @@ async function worker() {
     var catchError = 0;
 
 
-    await puppet.start()
+    // await puppet.start()
     await puppet.iniciar()
 
     //await sleep(10000)
@@ -142,17 +142,18 @@ async function worker() {
 
             logger.info('Enviando resposta ao BigData');
             //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
-            // const resposta = await Helper.enviarFeedback(
-            //   extracao.prepararEnvio()
-            // ).catch((err) => {
-            //   console.log(err);
-            //   throw new Error(`JTE - Erro ao enviar resposta ao BigData - Processo: ${message.NumeroProcesso}`)
-            // });
-            // logger.info('Resposta enviada ao BigData');
-            // logger.info('Reconhecendo mensagem ao RabbitMQ');
+            const resposta = await Helper.enviarFeedback(
+              extracao.prepararEnvio()
+            ).catch((err) => {
+              console.log(err);
+              throw new Error(`JTE - Erro ao enviar resposta ao BigData - Processo: ${message.NumeroProcesso}`)
+            });
+            logger.info('Resposta enviada ao BigData');
+            logger.info('Reconhecendo mensagem ao RabbitMQ');
 
-            // logger.info('Mensagem reconhecida');
-            // logger.info('Finalizando processo');
+            logger.info('Mensagem reconhecida');
+            logger.info('Finalizando processo');
+
             // tentar reativar codigo
             // await logarExecucao({
             //   Mensagem: message,
@@ -167,7 +168,7 @@ async function worker() {
 
         } catch (e) {
             catchError++
-            console.log(e);
+            //console.log(e);
             // envia a mensagem para a fila de reprocessamento
             new GerenciadorFila().enviar(reConsumo, message);
             logger.info('Encontrado erro durante a execução');

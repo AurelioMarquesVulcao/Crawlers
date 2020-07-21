@@ -13,7 +13,19 @@ const { Processo } = require('../../models/schemas/processo');
 
 
 
+var consultaCadastradas = mongoose.model('consultasCadastradas', {
+    NumeroProcesso: String,
+    DataCadastro: Date,
+    AtivoParaAtualizacao: Boolean,
+    DataUltimaConsultaTribunal: Date,
+    Instancia: String,
+    TipoConsulta: String
+}, 'consultasCadastradas');
+
 class CriaFilaJTE {
+
+
+    
     enviarMensagem(nome, message) {
         new GerenciadorFila().enviar(nome, message);
     }
@@ -24,19 +36,19 @@ class CriaFilaJTE {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        var Processos = mongoose.model('consultasCadastradas', {
-            NumeroProcesso: String,
-            DataCadastro: Date,
-            AtivoParaAtualizacao: Boolean,
-            DataUltimaConsultaTribunal: Date,
-            Instancia: String,
-            TipoConsulta: String
-        }, 'consultasCadastradas');
-        return await Processos.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
+        // var consultaCadastradas = mongoose.model('consultasCadastradas', {
+        //     NumeroProcesso: String,
+        //     DataCadastro: Date,
+        //     AtivoParaAtualizacao: Boolean,
+        //     DataUltimaConsultaTribunal: Date,
+        //     Instancia: String,
+        //     TipoConsulta: String
+        // }, 'consultasCadastradas');
+        return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
     }
     async enviaFila(numeroProcesso) {
-        const sleep4 = 50;
-        const sleep1 = 250;
+        const sleep4 = 5;
+        const sleep1 = 2;
         let filtro = numeroProcesso;
         let conta1000 = 0;
         console.log(filtro.length);
@@ -118,16 +130,37 @@ class CriaFilaJTE {
 
 (async () => {
     const fila = new CriaFilaJTE()
-   
-    let filtro = await fila.buscaDb(10, 145000)
-    await fila.enviaFila(filtro)
 
-    await sleep(5000)
+    // let filtro = await fila.buscaDb(1, 0)
+    // await fila.enviaFila(filtro)
+    let Postagem = 1000
+    for (let i = 0; i < Postagem; i++) {
+        //await sleep(150)
+        await fila.enviaFila(await fila.buscaDb(1, i))    
+    };
+    await sleep(60000)
+    for (let i = 0; i < Postagem; i++) {
+        //await sleep(150)
+        await fila.enviaFila(await fila.buscaDb(1, i+30000))    
+    };
+    await sleep(60000)
+    for (let i = 0; i < Postagem; i++) {
+        //await sleep(150)
+        await fila.enviaFila(await fila.buscaDb(1, i+60000))    
+    };
+    await sleep(60000)
+    for (let i = 0; i < Postagem; i++) {
+        //await sleep(150)
+        await fila.enviaFila(await fila.buscaDb(1, i+90000))    
+    };
+    await sleep(60000)
+    for (let i = 0; i < Postagem; i++) {
+        //await sleep(150)
+        await fila.enviaFila(await fila.buscaDb(1, i+120000))    
+    };
+
+    await sleep(1000)
     process.exit()
-    
-    console.log();
-
-
 
 })();
 

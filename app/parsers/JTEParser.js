@@ -20,9 +20,11 @@ class JTEParser extends BaseParser {
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
   parse($, $2, numeroProcesso) {
-    let cnj = this.mascaraNumero(numeroProcesso)
-
-    //console.time('parse');
+    let cnj = this.mascaraNumero(numeroProcesso);
+    let n = this.detalhes(cnj).numeroProcesso.trim();
+    let dadosAndamento = this.andamento($2, n);
+    let primeiraDistribuicao = this.extraiPrimeiraDistribuicao(dadosAndamento);
+    console.log(primeiraDistribuicao);
     let dadosProcesso = new Processo({
       capa: this.capa($, cnj),
       oabs: this.removeVazios(this.Oabs($)),
@@ -33,9 +35,7 @@ class JTEParser extends BaseParser {
       // "origemDados": enums.nomesRobos.JTE,  // verificar esse campo.
       detalhes: this.detalhes(cnj)
     })
-    let n = this.detalhes(cnj).numeroProcesso.trim()
-    let dadosAndamento = this.andamento($2, n)
-    // console.timeEnd('parse');
+
     console.log("O processo possui " + this.numeroDeAndamentos($2) + " andamentos");
     return {
       processo: dadosProcesso,
@@ -53,6 +53,7 @@ class JTEParser extends BaseParser {
       assunto: [this.extraiAssunto($)], // inserir raspagem de assunto na fase de testes
       classe: this.extraiClasseCapa($).trim(),
       dataDistribuicao: Date(),
+      instancia: "",
     }
     return capa
   }
@@ -151,24 +152,57 @@ class JTEParser extends BaseParser {
     return resultado
   }
 
+
+  extraiPrimeiraDistribuicao(andamentos) {
+    // console.log(andamentos);
+
+    let dados;
+    let data;
+    for (let i = 0; i < andamentos.length; i++) {
+      if (andamentos[i].descricao.indexOf("Audiencia inicial designada") > -1) dados = andamentos[i].descricao
+      data = andamentos[i].data
+    }
+    if (!!dados) {
+      let vara = dados.split('-')[1].split('de')[0].trim();
+      let comarca = dados.split('-')[1].split('de')[1].replace(')', '').trim();
+      console.log(dados);
+      console.log(vara);
+      console.log(comarca);
+      let primeiraDistribuicao = data
+      return {
+        vara: vara,
+        comarca: comarca,
+        primeiraDistribuicao: primeiraDistribuicao,
+      }
+    }else{
+      let primeiraDistribuicao = data
+      return {
+        vara: "Não foi possivel obter",
+        comarca: "Não foi possivel obter",
+        primeiraDistribuicao: primeiraDistribuicao,
+      }
+    }
+
+    
+
+    console.log(primeiraDistribuicao);
+
+  }
+
   // precisa de melhorias
   extraiVaraCapa($) {
     let resultado = "não possui vara"
     $('detalhes-aba-geral p').each(async function (element) {
-      let advogados = $(this).text().split('\n');
-      //console.log(advogados);
-      advogados = new JTEParser().removeVazios(advogados)
-      let vara = 'não tem'//removerAcentos(advogados[1].split('-')[1].trim())
-      return vara
+      let datas = $(this).text().split('\n');
+
+      console.log(datas);
+
+
 
     })
-    // let advogados = $('detalhes-aba-geral').text().split('\n');
-    // advogados = this.removeVazios(advogados)
-    // console.log(advogados);
 
-    // let vara = removerAcentos(advogados[1].split('-')[1].trim())
-    // if (!!vara) return vara
-    // if (!vara) return "nao possui vara"
+    console.log(resultado + "------------------------------------------------------------------------------------");
+
     return resultado
   }
 

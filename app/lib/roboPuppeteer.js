@@ -124,6 +124,7 @@ class RoboPuppeteer3 {
     await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
     await sleep(timerSleep)
     await this.page.waitFor(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div`)
+    await this.page.click(`mat-expansion-panel`)
     await sleep(timerSleep)
     let html1 = await this.page.evaluate(async () => {
       let text = await document.querySelector('html').innerHTML;
@@ -139,8 +140,9 @@ class RoboPuppeteer3 {
     await this.page.click(`#mat-tab-label-${contador}-1`)
     await sleep(timerSleep)
     await this.page.waitFor('#divMovBrowser1 > ion-grid > ion-row > ion-col')
+    
     await sleep(timerSleep)
-
+    
     let html2 = await this.page.evaluate(async () => {
       let text = await document.querySelector('html').innerHTML;
       return text
@@ -238,15 +240,15 @@ function processaNumero(numero) {
     vara: vara
   }
 }
-(async () => {
-  let puppet = new RoboPuppeteer3()
+// (async () => {
+//   let puppet = new RoboPuppeteer3()
 
-  await puppet.iniciar()
+//   await puppet.iniciar()
 
-  //await sleep(10000)
-  await puppet.acessar("https://jte.csjt.jus.br/")
-  await puppet.preencheTribunal('00002225820175050017')
-  await sleep(1000)
-  await puppet.preencheProcesso("00002225820175050017", 0)
-})()
+//   //await sleep(10000)
+//   await puppet.acessar("https://jte.csjt.jus.br/")
+//   await puppet.preencheTribunal('00002225820175050017')
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00002225820175050017", 0)
+// })()
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

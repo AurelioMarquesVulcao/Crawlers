@@ -124,7 +124,11 @@ class RoboPuppeteer3 {
     await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
     await sleep(timerSleep)
     await this.page.waitFor(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div`)
+    // pega assunto
+    await sleep(timerSleep)
+    await sleep(timerSleep)
     await this.page.click(`mat-expansion-panel`)
+    //await sleep(1000)
     await sleep(timerSleep)
     let html1 = await this.page.evaluate(async () => {
       let text = await document.querySelector('html').innerHTML;

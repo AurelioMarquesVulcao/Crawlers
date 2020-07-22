@@ -23,10 +23,11 @@ class JTEParser extends BaseParser {
     let cnj = this.mascaraNumero(numeroProcesso);
     let n = this.detalhes(cnj).numeroProcesso.trim();
     let dadosAndamento = this.andamento($2, n);
-    let primeiraDistribuicao = this.extraiPrimeiraDistribuicao(dadosAndamento);
-    console.log(primeiraDistribuicao);
+    // extrai vara/ comarca/ e 1 distribuição
+    let primeiraDistribuicao = this.extraiDadosDosAndametos($, dadosAndamento);
+    // console.log(primeiraDistribuicao);
     let dadosProcesso = new Processo({
-      capa: this.capa($, cnj),
+      capa: this.capa($, cnj, primeiraDistribuicao),
       oabs: this.removeVazios(this.Oabs($)),
       qtdAndamentos: this.numeroDeAndamentos($2),
       origemExtracao: enums.nomesRobos.JTE,
@@ -44,17 +45,18 @@ class JTEParser extends BaseParser {
   }
 
   // funcao secundaria - organiza os dados da capa
-  capa($, numeroProcesso) {
+  capa($, numeroProcesso, datas) {
     let capa = {
       uf: this.estado($, numeroProcesso), // inserir uf na raspagem do puppeteer
-      comarca: "", // perguntar onde extraio a comarca
-      vara: this.extraiVaraCapa($).trim(),
-      fase: '', // perguntar onde extraio a comarca
-      assunto: [this.extraiAssunto($)], // inserir raspagem de assunto na fase de testes
+      comarca: datas.comarca, // perguntar onde extraio a comarca
+      vara: datas.vara,
+      fase: datas.fase, // perguntar onde extraio a comarca
+      assunto: this.extraiAssunto($), // inserir raspagem de assunto na fase de testes
       classe: this.extraiClasseCapa($).trim(),
-      dataDistribuicao: Date(),
-      instancia: "",
+      dataDistribuicao: datas.primeiraDistribuicao,
+      instancia: this.instancia($),
     }
+    // console.log(capa);
     return capa
   }
 
@@ -128,12 +130,22 @@ class JTEParser extends BaseParser {
   }
 
   extraiAssunto($) {
-    let assunto = $('detalhes-aba-geral').text().split('\n');
-    assunto = this.removeVazios(assunto)
-    let teste = assunto[100]
-    if (!teste) return "Assunto nao Especificado";
-    else return teste
+    let resultado = []
+    $('ion-chip').each(async function (element) {
+      let datas = $(this).text();//.split('\n');
+      if (!!datas) {
+        resultado.push(datas)
+      }
+    })
+    resultado = this.removeVazios(resultado)
+    if (!resultado) return "Assunto nao Especificado";
+    // console.log(resultado);
+    if (resultado.length==0) {
+      throw "Não pegou assunto, reprocessar"
+    }
+    return resultado
   }
+
 
   estado($, numeroProcesso) {
 
@@ -149,60 +161,80 @@ class JTEParser extends BaseParser {
     // if (dados == 15) resultado = 'SP'
     if (dados == 3) resultado = 'MG'
     if (dados == 21) resultado = 'RN'
+    if (dados == 5) resultado = 'BA'
     return resultado
   }
 
 
-  extraiPrimeiraDistribuicao(andamentos) {
-    // console.log(andamentos);
-
+  extraiDadosDosAndametos($, andamentos) {
     let dados;
     let data;
-    for (let i = 0; i < andamentos.length; i++) {
-      if (andamentos[i].descricao.indexOf("Audiencia inicial designada") > -1) dados = andamentos[i].descricao
-      data = andamentos[i].data
-    }
-    if (!!dados) {
-      let vara = dados.split('-')[1].split('de')[0].trim();
-      let comarca = dados.split('-')[1].split('de')[1].replace(')', '').trim();
-      console.log(dados);
-      console.log(vara);
-      console.log(comarca);
+    let fase = andamentos[0].descricao
+    if (!!this.extraiVaraCapa($)) {
+      for (let i = 0; i < andamentos.length; i++) {
+        data = andamentos[i].data
+      }
       let primeiraDistribuicao = data
       return {
-        vara: vara,
-        comarca: comarca,
+        vara: this.extraiVaraCapa($).vara,
+        comarca: this.extraiVaraCapa($).comarca,
         primeiraDistribuicao: primeiraDistribuicao,
+        fase: fase,
       }
-    }else{
-      let primeiraDistribuicao = data
-      return {
-        vara: "Não foi possivel obter",
-        comarca: "Não foi possivel obter",
-        primeiraDistribuicao: primeiraDistribuicao,
+    } else {
+      for (let i = 0; i < andamentos.length; i++) {
+        if (andamentos[i].descricao.indexOf("Audiencia inicial designada") > -1) dados = andamentos[i].descricao
+        data = andamentos[i].data
+      }
+      if (!!dados) {
+        let vara = dados.split('-')[1].split('de')[0].trim();
+        let comarca = dados.split('-')[1].split('de')[1].replace(')', '').trim();
+        let primeiraDistribuicao = data
+        return {
+          vara: vara,
+          comarca: comarca,
+          primeiraDistribuicao: primeiraDistribuicao,
+          fase: fase,
+        }
+      } else {
+        let primeiraDistribuicao = data
+        return {
+          vara: "Não foi possivel obter",
+          comarca: "Não foi possivel obter",
+          primeiraDistribuicao: primeiraDistribuicao,
+          fase: fase,
+        }
       }
     }
-
-    
-
-    console.log(primeiraDistribuicao);
-
   }
 
   // precisa de melhorias
   extraiVaraCapa($) {
-    let resultado = "não possui vara"
+    // let resultado = "não possui vara"
+    let resultado;
+    let vara;
+    let comarca;
     $('detalhes-aba-geral p').each(async function (element) {
       let datas = $(this).text().split('\n');
-
-      console.log(datas);
-
-
-
+      if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
+        vara = datas[0].split('-')[1].split('de')[0].trim()
+        comarca = datas[0].split('-')[1].split('de')[1].trim()
+        resultado = {
+          vara: vara,
+          comarca: comarca,
+        }
+      }
     })
-
-    console.log(resultado + "------------------------------------------------------------------------------------");
-
+    return resultado
+  }
+  instancia($) {
+    let resultado;
+    $('detalhes-aba-geral p').each(async function (element) {
+      let datas = $(this).text().split('\n');
+      // resultado.push(datas[0].split('-')[0].trim())
+      // console.log(resultado);
+      resultado = datas[0].split('-')[0].trim()
+    })
     return resultado
   }
 

@@ -19,7 +19,11 @@ var consultaCadastradas = mongoose.model('consultasCadastradas', {
     AtivoParaAtualizacao: Boolean,
     DataUltimaConsultaTribunal: Date,
     Instancia: String,
-    TipoConsulta: String
+    TipoConsulta: String,
+    Detalhes : {
+        Orgao : Number,
+        Tribunal : Number
+    }
 }, 'consultasCadastradas');
 
 class CriaFilaJTE {
@@ -125,13 +129,26 @@ class CriaFilaJTE {
 
         }
     }
+    async filtraTrunal() {
+        let recebeNumeros = [];
+        let dados = await this.buscaDb(30000, 0)
+        console.log(dados[0]);
+        console.log('');
+        for (let i = 0; i < dados.length; i++) {
+            let numero = dados[i].NumeroProcesso
+            let tribunal = numero.slice(numero.length - 4, numero.length)
+            if (recebeNumeros.indexOf(tribunal) < 0) {
+                recebeNumeros.push(tribunal)
+            }
+        }
+        return recebeNumeros
+    }
 }
 
 
 (async () => {
     const fila = new CriaFilaJTE()
-
-
+    await console.log(await fila.filtraTrunal());
 
     //await fila.enviaFila()
     await sleep(1000)

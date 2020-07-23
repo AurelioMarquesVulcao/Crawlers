@@ -128,6 +128,7 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     await sleep(timerSleep)
     await this.page.click(`mat-expansion-panel`)
+    await sleep(timerSleep)
     //await sleep(1000)
     await sleep(timerSleep)
     let html1 = await this.page.evaluate(async () => {
@@ -163,6 +164,8 @@ class RoboPuppeteer3 {
     // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
     // click para pegar o assunto
     await this.page.click(`mat-expansion-panel`)
+    await sleep(timerSleep)
+    await sleep(timerSleep)
     // click para pegar audiencias
     // #mat-expansion-panel-header-1 > span.mat-content > mat-panel-description
 

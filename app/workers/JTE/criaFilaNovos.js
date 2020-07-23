@@ -20,22 +20,26 @@ var consultaCadastradas = mongoose.model('consultasCadastradas', {
     DataUltimaConsultaTribunal: Date,
     Instancia: String,
     TipoConsulta: String,
-    Detalhes : {
-        Orgao : Number,
-        Tribunal : Number
+    Detalhes: {
+        Orgao: Number,
+        Tribunal: Number
     }
 }, 'consultasCadastradas');
 
+var insereUltimoProcesso1 = new mongoose.Schema({
+    NumeroProcesso: String,
+    DataCadastro: String,
+})
+var insereUltimoProcesso = mongoose.model('insereUltimoProcesso', insereUltimoProcesso1);
+
+
 class CriaFilaJTE {
-
-
-
     enviarMensagem(nome, message) {
         new GerenciadorFila().enviar(nome, message);
     }
 
     async buscaDb(quantidade, salto) {
-        const devDbConection = 'mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
+        let devDbConection = 'mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
         mongoose.connect(devDbConection, {
             useNewUrlParser: true,
             useUnifiedTopology: true
@@ -48,8 +52,28 @@ class CriaFilaJTE {
         //     Instancia: String,
         //     TipoConsulta: String
         // }, 'consultasCadastradas');
-        return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
+        return await consultaCadastradas.find({ "Detalhes.Tribunal": 15 }).limit(quantidade).skip(salto)
+        // return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
     }
+
+    async salvaUltimo(ultimo) {
+        let devDbConection = 'mongodb+srv://Impacta:dificil1234@vulcaotech-pdii4.mongodb.net/ultimoProcesso-SP-15?retryWrites=true&w=majority'
+        mongoose.connect(devDbConection, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        // var consultaCadastradas = mongoose.model('consultasCadastradas', {
+        //     NumeroProcesso: String,
+        //     DataCadastro: Date,
+        //     AtivoParaAtualizacao: Boolean,
+        //     DataUltimaConsultaTribunal: Date,
+        //     Instancia: String,
+        //     TipoConsulta: String
+        // }, 'consultasCadastradas');
+        return await new insereUltimoProcesso(ultimo).save()
+        // return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
+    }
+
     async enviaFila(numeroProcesso) {
         const sleep4 = 5;
         const sleep1 = 2;
@@ -131,24 +155,61 @@ class CriaFilaJTE {
     }
     async filtraTrunal() {
         let recebeNumeros = [];
-        let dados = await this.buscaDb(30000, 0)
+        let resultado = [];
+        let dados = await this.buscaDb(60000, 0);
         console.log(dados[0]);
-        console.log('');
+        //console.log('');
         for (let i = 0; i < dados.length; i++) {
             let numero = dados[i].NumeroProcesso
-            let tribunal = numero.slice(numero.length - 4, numero.length)
-            if (recebeNumeros.indexOf(tribunal) < 0) {
-                recebeNumeros.push(tribunal)
+            let sequencial = numero.slice(0, 7)
+            let varaTrabalho = numero.slice(numero.length - 4, numero.length)
+            if (recebeNumeros.indexOf(varaTrabalho) < 0) {
+                recebeNumeros.push(varaTrabalho,)
+                resultado.push([varaTrabalho,sequencial])
             }
         }
-        return recebeNumeros
+        console.log(recebeNumeros.length);
+        return resultado.sort()
+    }
+    async peganumero() {
+        let dados = await this.buscaDb(60000, 0)
+
+        for (let i = 0; i < dados.length; i++) {
+            let numero = dados[i].NumeroProcesso
+            
+            let varaTrabalho = numero.slice(numero.length - 4, numero.length)
+            if (recebeNumeros.indexOf(varaTrabalho) < 0) {
+                
+                recebeNumeros.push(varaTrabalho)
+            }
+        }
+
     }
 }
-
+// ------------------------------------funcoes complementares--------------------------------------------------------------------------------------------------------------------------------
 
 (async () => {
     const fila = new CriaFilaJTE()
-    await console.log(await fila.filtraTrunal());
+    let varaTrabalho = await fila.filtraTrunal()
+    for (let i = 0; i < varaTrabalho.length; i++) {
+        console.log(varaTrabalho[i]);
+
+    }
+    // await console.log(await fila.filtraTrunal());
+
+
+
+
+
+
+
+
+    //await fila.salvaUltimo({ NumeroProcesso: "0010981-48.2020.5.15.0001", DataCadastro: "2020-07-21T19:45:45.000Z" })
+
+
+
+
+
 
     //await fila.enviaFila()
     await sleep(1000)
@@ -156,7 +217,7 @@ class CriaFilaJTE {
 
 })();
 
-// ------------------------------------funcoes complementares--------------------------------------
+// ------------------------------------funcoes complementares----------------------------------------------------------------------------------------------------------------------------------
 function criaPost(numero) {
     let post = `{
         "ExecucaoConsultaId" : "${makeid()}",
@@ -202,3 +263,4 @@ function mascaraNumero(numeroProcesso) {
         + '.' + numeroProcesso.slice(numeroProcesso.length - 4, numeroProcesso.length)
     return resultado
 }
+module.exports.CriaFilaJTE = CriaFilaJTE;

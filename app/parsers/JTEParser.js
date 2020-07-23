@@ -72,7 +72,7 @@ class JTEParser extends BaseParser {
     let resultado = [];
     for (let i in this.extraiAdvogadoOab($)) {
       let advogado = {
-        nome: this.extraiAdvogadoOab($)[i][1],
+        nome: `(${this.extraiAdvogadoOab($)[i][0]})` + this.extraiAdvogadoOab($)[i][1],
         tipo: "Advogado",
         // Adaptado para incluir advogado nas partes envolvidas
         // oab: {
@@ -234,6 +234,9 @@ class JTEParser extends BaseParser {
       // resultado.push(datas[0].split('-')[0].trim())
       // console.log(resultado);
       resultado = datas[0].split('-')[0].trim()
+      if (resultado.match(/([0-9]{1})/)) {
+        resultado = (resultado.match(/([0-9]{1})/)[1]);
+      } else { resultado = null }
     })
     return resultado
   }

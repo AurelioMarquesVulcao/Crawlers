@@ -86,7 +86,6 @@ var contador = 0;
             var processo;
             let parser = new JTEParser();
             try {
-
                 logger = new Logger(
                     'info',
                     'logs/ProcJTE/ProcJTE.log', {

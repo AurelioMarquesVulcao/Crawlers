@@ -7,7 +7,7 @@ const { enums } = require('../configs/enums');
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
-  SC: enums.nomesRobos.TJSC
+  SC: enums.nomesRobos.TJSC,
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {

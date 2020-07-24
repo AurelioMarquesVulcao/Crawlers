@@ -32,7 +32,7 @@ class RoboPuppeteer3 {
       args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
-    this.acessar('https://www.google.com/');
+    //this.acessar('https://www.google.com/');
     console.log('O Puppeteer foi Iniciado corretamente');
   }
 
@@ -132,7 +132,7 @@ class RoboPuppeteer3 {
     //await sleep(1000)
     await sleep(timerSleep)
     let html1 = await this.page.evaluate(async () => {
-      let text = await document.querySelector('html').innerHTML;
+      let text = await document.querySelector('body').innerHTML;
       return text
     })
 
@@ -149,7 +149,7 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     
     let html2 = await this.page.evaluate(async () => {
-      let text = await document.querySelector('html').innerHTML;
+      let text = await document.querySelector('body').innerHTML;
       return text
     })
 

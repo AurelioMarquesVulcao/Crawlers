@@ -49,6 +49,7 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: node workers/JTE/extracaoNovos_Sp_2.js
+    restart: always
     logging:
       driver: "json-file"
       options:
@@ -61,6 +62,7 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: node workers/JTE/extracaoNovos_Sp_15.js
+    restart: always
     logging:
       driver: "json-file"
       options:

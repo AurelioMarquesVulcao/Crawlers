@@ -142,17 +142,17 @@ async function worker() {
 
             logger.info('Enviando resposta ao BigData');
             //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
-            const resposta = await Helper.enviarFeedback(
-              extracao.prepararEnvio()
-            ).catch((err) => {
-              console.log(err);
-              throw new Error(`JTE - Erro ao enviar resposta ao BigData - Processo: ${message.NumeroProcesso}`)
-            });
-            logger.info('Resposta enviada ao BigData');
-            logger.info('Reconhecendo mensagem ao RabbitMQ');
+            // const resposta = await Helper.enviarFeedback(
+            //   extracao.prepararEnvio()
+            // ).catch((err) => {
+            //   console.log(err);
+            //   throw new Error(`JTE - Erro ao enviar resposta ao BigData - Processo: ${message.NumeroProcesso}`)
+            // });
+            // logger.info('Resposta enviada ao BigData');
+            // logger.info('Reconhecendo mensagem ao RabbitMQ');
 
-            logger.info('Mensagem reconhecida');
-            logger.info('Finalizando processo');
+            // logger.info('Mensagem reconhecida');
+            // logger.info('Finalizando processo');
 
             // tentar reativar codigo
             // await logarExecucao({
@@ -194,7 +194,7 @@ async function worker() {
             // });
 
             ch.ack(msg);
-            if(catchError == 2){process.exit()}
+            // if(catchError == 10){process.exit()}
 
         }
     });

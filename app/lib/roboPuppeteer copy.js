@@ -9,16 +9,16 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       //   args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      //   // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       // args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
-    this.acessar('https://www.google.com/');
+    //this.acessar('https://www.google.com/');
     console.log('O Puppeteer foi Iniciado corretamente');
   }
 
@@ -110,9 +110,15 @@ class RoboPuppeteer3 {
     await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
     await sleep(timerSleep)
     await this.page.waitFor(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div`)
+    // pega assunto
+    await sleep(timerSleep)
+    await sleep(timerSleep)
+    await this.page.click(`mat-expansion-panel`)
+    await sleep(timerSleep)
+    await sleep(1000)
     await sleep(timerSleep)
     let html1 = await this.page.evaluate(async () => {
-      let text = await document.querySelector('html').innerHTML;
+      let text = await document.querySelector('body').innerHTML;
       return text
     })
 
@@ -128,7 +134,7 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
 
     let html2 = await this.page.evaluate(async () => {
-      let text = await document.querySelector('html').innerHTML;
+      let text = await document.querySelector('body').innerHTML;
       return text
     })
 

@@ -19,8 +19,8 @@ class JTEParser extends BaseParser {
 
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
-  parse($, $2, numeroProcesso) {
-    let cnj = this.mascaraNumero(numeroProcesso);
+  parse($, $2, contador) {
+    let cnj = this.extraiNumeroProcesso($, contador);
     let n = this.detalhes(cnj).numeroProcesso.trim();
     let dadosAndamento = this.andamento($2, n);
     // extrai vara/ comarca/ e 1 distribuição
@@ -140,8 +140,9 @@ class JTEParser extends BaseParser {
     resultado = this.removeVazios(resultado)
     if (!resultado) return "Assunto nao Especificado";
     // console.log(resultado);
-    if (resultado.length==0) {
-      throw "Não pegou assunto, reprocessar"
+    if (resultado.length == 0) {
+      resultado = 'Não foi possivel obter'
+      // throw "Não pegou assunto, reprocessar"
     }
     return resultado
   }
@@ -255,10 +256,10 @@ class JTEParser extends BaseParser {
   }
 
   // retorna array com numero do processo.
-  extraiNumeroProcesso($) {
+  extraiNumeroProcesso($, contador) {
     let datas = [];
     let resultado = ''
-    $('#mat-tab-content-0-0 > div > detalhes-aba-geral > div > span.item-painel-titulo').each(async function (element) {
+    $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > span.item-painel-titulo`).each(async function (element) {
       let numero = $(this).text().split("\n")[0];
       if (!!numero) resultado = numero
     })

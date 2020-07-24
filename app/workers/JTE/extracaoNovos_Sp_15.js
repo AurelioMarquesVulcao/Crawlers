@@ -17,8 +17,7 @@ const { JTEParser } = require('../../parsers/JTEParser');
 
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const sleep = require('await-sleep');
-
-
+const { CriaFilaJTE } = require('../../lib/criaFilaJTE')
 
 
 /**
@@ -36,7 +35,7 @@ var contador = 0;
 
 let data = 1;
 
-if (data == 1){worker()}
+if (data == 1) { worker() }
 
 async function worker() {
     mongoose.connect(enums.mongo.connString, {
@@ -48,7 +47,7 @@ async function worker() {
         console.log(e);
     });
     const puppet = new RoboPuppeteer3()
-    
+
     var catchError = 0;
 
 
@@ -87,30 +86,39 @@ async function worker() {
             let dadosProcesso;
             var processo;
             let parser = new JTEParser();
-            try {
 
-                logger = new Logger(
-                    'info',
-                    'logs/ProcJTE/ProcJTE.log', {
-                    nomeRobo: enums.nomesRobos.JTE,
-                    numeroProcesso: numeroProcesso,
-                }
-                );
 
-                let objResponse = await puppet.preencheProcesso(numeroProcesso, contador)
-
-                if (!!objResponse) contador++
-                let $ = cheerio.load(objResponse.geral);
-                let $2 = cheerio.load(objResponse.andamentos);
-                dadosProcesso = parser.parse($, $2, numeroProcesso)
-                // var processo = dadosProcesso.processo
-                await dadosProcesso.processo.salvar()
-                await Andamento.salvarAndamentos(dadosProcesso.andamentos)
-                processo = await dadosProcesso.processo.salvar()
-            } catch (e) {
-                console.log(e);
-
+            logger = new Logger(
+                'info',
+                'logs/ProcJTE/ProcJTE.log', {
+                nomeRobo: enums.nomesRobos.JTE,
+                numeroProcesso: numeroProcesso,
             }
+            );
+
+            let objResponse = await puppet.preencheProcesso(numeroProcesso, contador)
+
+            
+            let $ = cheerio.load(objResponse.geral);
+            let $2 = cheerio.load(objResponse.andamentos);
+            dadosProcesso = parser.parse($, $2, contador)
+            if (!!objResponse) contador++
+            // var processo = dadosProcesso.processo
+            await dadosProcesso.processo.salvar()
+            await Andamento.salvarAndamentos(dadosProcesso.andamentos)
+            processo = await dadosProcesso.processo.salvar()
+            console.log(new Date().getDate());
+            if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
+                console.log('ok');
+                await new CriaFilaJTE().salvaUltimo({
+                    NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
+                    DataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
+                    origem: dadosProcesso.processo.detalhes.origem,
+                    tribunal: dadosProcesso.processo.detalhes.tribunal,
+                    data: [dadosProcesso.processo.capa.dataDistribuicao.getDate(), dadosProcesso.processo.capa.dataDistribuicao.getMonth()],
+                })
+            }
+
             logger.info('Processos extraidos com sucesso');
             if (!!dadosProcesso) {
                 resultadoExtracao = {
@@ -141,17 +149,17 @@ async function worker() {
 
             logger.info('Enviando resposta ao BigData');
             //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
-            const resposta = await Helper.enviarFeedback(
-              extracao.prepararEnvio()
-            ).catch((err) => {
-              console.log(err);
-              throw new Error(`JTE - Erro ao enviar resposta ao BigData - Processo: ${message.NumeroProcesso}`)
-            });
-            logger.info('Resposta enviada ao BigData');
-            logger.info('Reconhecendo mensagem ao RabbitMQ');
+            // const resposta = await Helper.enviarFeedback(
+            //     extracao.prepararEnvio()
+            // ).catch((err) => {
+            //     //console.log(err);
+            //     //throw new Error(`JTE - Erro ao enviar resposta ao BigData - Processo: ${message.NumeroProcesso}`)
+            // });
+            // logger.info('Resposta enviada ao BigData');
+            // logger.info('Reconhecendo mensagem ao RabbitMQ');
 
-            logger.info('Mensagem reconhecida');
-            logger.info('Finalizando processo');
+            // logger.info('Mensagem reconhecida');
+            // logger.info('Finalizando processo');
 
             // tentar reativar codigo
             // await logarExecucao({
@@ -164,7 +172,10 @@ async function worker() {
             // });
 
             ch.ack(msg);
-
+            // await new CriaFilaJTE().salvaUltimo({
+            //     NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
+            //     DataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
+            // })
         } catch (e) {
             catchError++
             //console.log(e);
@@ -193,7 +204,7 @@ async function worker() {
             // });
 
             ch.ack(msg);
-            if(catchError == 2){process.exit()}
+            if (catchError == 100) { process.exit() }
 
         }
     });

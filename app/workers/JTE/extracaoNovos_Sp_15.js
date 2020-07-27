@@ -105,13 +105,13 @@ async function worker() {
             if (!!objResponse) contador++
             // var processo = dadosProcesso.processo
             await dadosProcesso.processo.salvar()
-            console.log(dadosProcesso.andamentos[0]);
+            //console.log(dadosProcesso.andamentos[0]);
             await Andamento.salvarAndamentos(dadosProcesso.andamentos)
             processo = await dadosProcesso.processo.salvar()
-            console.log(new Date().getDate());
+            //console.log(new Date().getDate());
             // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
             if (new Date(2020,6,20) < dadosProcesso.processo.capa.dataDistribuicao) {
-                console.log('ok');
+                //console.log('ok');
                 await new CriaFilaJTE().salvaUltimo({
                     NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
                     DataCadastro: dadosProcesso.processo.capa.dataDistribuicao,

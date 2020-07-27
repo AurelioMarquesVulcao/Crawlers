@@ -336,7 +336,6 @@ class JTEParser extends BaseParser {
       };
       let hash = Andamento.criarHash(obj);
       if (dadosHash.indexOf(hash) !== -1) {
-        
         let indices = [];
         let array = dadosHash;
         let elemento = hash;
@@ -351,20 +350,12 @@ class JTEParser extends BaseParser {
           numeroProcesso: n,
           observacao: ""
         };
-        
-        
-        
       }
       dadosHash.push(hash)
       resultado.push(
         new Andamento(obj)
       )
     }
-  
-    
-
-    // console.log(dadosHash.length);
-    // console.log(resultado.length);
     return resultado
   }
   numeroDeAndamentos($) {

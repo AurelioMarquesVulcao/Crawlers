@@ -20,14 +20,14 @@ const logarExecucao = async (execucao) => {
     console.log(e);
   });
 
-  const nomeFila = `${enums.tipoConsulta.Distribuicao}.${enums.nomesRobos.TJSP}.extracao`;
+  const nomeFila = `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}.extracao`;
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
-    let logger = new Logger('info', 'logs/DistribuicaoTJSP/DistribuicaoTJSPInfo.log', {
-      nomeRobo: `${enums.tipoConsulta.Distribuicao}.${enums.nomesRobos.TJSP}`,
-      NumeroOab: message.NumeroOab,
+    let logger = new Logger('info', 'logs/PeticaoTJSP/PeticaoTJSPInfo.log', {
+      nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}`,
+      NumeroDoProcesso: message.NumeroProcesso,
     });
     try {
       logger.info('Mensagem recebida');
@@ -35,8 +35,8 @@ const logarExecucao = async (execucao) => {
 
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(
-        message.NumeroOab,
-        message.ConsultaCadastradaId
+        message.NumeroProcesso,
+        message.Instancia
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
@@ -53,7 +53,7 @@ const logarExecucao = async (execucao) => {
       ).catch((err) => {
         console.log(err);
         throw new Error(
-          `DistribuicaoTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+          `PeticaoTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
         );
       });
       logger.info('Resposta enviada ao BigData');

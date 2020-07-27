@@ -29,9 +29,13 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
     // await fila.procura(11000,0008,100)
     // await fila.procura(11000,0009,100)
 
-    await fila.procura(11115, "0037", 900)
+    await fila.procura(10500, "0051", 400)
     //await fila.procura(11050, 0007, 200)
 
+    // for (let i = 51; i < 61; i++) {
+    //     await fila.procura(10500, `00${i}`, 400)
+    //     await sleep(60000)
+    // }
 
     //await fila.salvaUltimo({ NumeroProcesso: "0010981-48.2020.5.15.0001", DataCadastro: "2020-07-21T19:45:45.000Z" })
     // await fila.enviaFila(await fila.buscaDb(1,0))
@@ -45,7 +49,7 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
     // console.log(new Date(2020,6,20)<new Date());
 
     //console.log(fila.relogio());
-    await sleep(1000)
+    await sleep(5000)
     process.exit()
 
 })();

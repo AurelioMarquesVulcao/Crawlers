@@ -138,3 +138,17 @@ services:
       file: common-services.yml
       service: base_node
     command: node workers/consumer_cadastro_consulta.js
+
+  procura01:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: node workers/JTE/extracaoNovos_Sp_15.js
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

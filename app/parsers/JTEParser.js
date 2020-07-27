@@ -319,22 +319,52 @@ class JTEParser extends BaseParser {
   // ----------------------------------------fim da raspagem dos dados do processo-----------------------------------------------
 
   andamento($, n) {
-    let resultado = []
-    let texto = this.extraiAndamento($)
-
+    let resultado = [];
+    let dadosHash = [];
+    let contador = 0;
+    let texto = this.extraiAndamento($);
     let data = this.extraiDataAndamento($)
+
     for (let j = 0; j < texto.length; j++) {
       // console.log(texto[j]);
-      // console.log(data[j]);     
-      resultado.push(
-        new Andamento({
-          descricao: this.removeVazios(texto[j])[0],
+      // console.log(data[j]);
+      let obj = {
+        descricao: this.removeVazios(texto[j])[0],
+        data: this.ajustaData(this.removeVazios(data[j])[0]),
+        numeroProcesso: n,
+        observacao: ""
+      };
+      let hash = Andamento.criarHash(obj);
+      if (dadosHash.indexOf(hash) !== -1) {
+        
+        let indices = [];
+        let array = dadosHash;
+        let elemento = hash;
+        let idx = array.indexOf(elemento);
+        while (idx != -1) {
+          indices.push(idx);
+          idx = array.indexOf(elemento, idx + 1);
+        }
+        obj = {
+          descricao: this.removeVazios(texto[j])[0]+`[${indices.length}]`,
           data: this.ajustaData(this.removeVazios(data[j])[0]),
-          numeroProcesso: n
-
-        })
+          numeroProcesso: n,
+          observacao: ""
+        };
+        
+        
+        
+      }
+      dadosHash.push(hash)
+      resultado.push(
+        new Andamento(obj)
       )
     }
+  
+    
+
+    // console.log(dadosHash.length);
+    // console.log(resultado.length);
     return resultado
   }
   numeroDeAndamentos($) {
@@ -344,23 +374,36 @@ class JTEParser extends BaseParser {
   extraiAndamento($) {
     let resultado = [];
     let dados = [];
+
     $('ion-item p').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos)
       // console.log(andamentos.length);
-      if (andamentos.length > 0) dados.push(andamentos)
+      if (andamentos.length > 0) {
+
+        dados.push(andamentos)
+      }
     })
 
     // verifica duplicidade
-    let c = 0;
-    for (let i = 0; i < dados.length; i++) {
-      for (let j = 0; j < dados.length; j++) {
-        if (dados[i][0] === dados[j][0] && i != j) {
-          c++
-          dados[i][0] = dados[j] + ' [' + c + ']'
-        }
-      }
-    }
+    // let hash = Andamento.criarHash(andamento);
+
+    //   if (andamentosHash.indexOf(hash) !== -1) {
+    //     let count = andamentosHash.filter((element) => element === hash).length;
+    //     andamento.descricao = `${andamento.descricao} [${count + 1}]`;
+    //   }
+    //   andamentos.push(new Andamento(andamento));
+    //   andamentosHash.push(hash);
+    // });
+    // let c = 0;
+    // for (let i = 0; i < dados.length; i++) {
+    //   for (let j = 0; j < dados.length; j++) {
+    //     if (dados[i][0] === dados[j][0] && i != j) {
+    //       c++
+    //       dados[i][0] = dados[j] + ' [' + c + ']'
+    //     }
+    //   }
+    // }
     resultado = dados
     return resultado
   }

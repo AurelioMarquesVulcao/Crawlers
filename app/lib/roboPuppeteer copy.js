@@ -9,13 +9,13 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      args: ['--ignore-certificate-errors']
+      //args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     //this.acessar('https://www.google.com/');
@@ -27,7 +27,7 @@ class RoboPuppeteer3 {
     try {
       await this.page.goto(url, {
         waitUntil: "load",
-        timeout: 12000,
+        timeout: 9000,
         // waitUntil: 'networkidle2'
       });
       // isso me da o url completo

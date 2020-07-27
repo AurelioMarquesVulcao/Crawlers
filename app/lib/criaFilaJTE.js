@@ -33,7 +33,7 @@ var insereUltimoProcesso1 = new mongoose.Schema({
     tribunal: Number,
     data: [Number],
 })
-var insereUltimoProcesso = mongoose.model('Ultimos-Porcessos', insereUltimoProcesso1);
+var insereUltimoProcesso = mongoose.model("ultimosProcessos", insereUltimoProcesso1);
 
 class CriaFilaJTE {
     enviarMensagem(nome, message) {
@@ -51,6 +51,7 @@ class CriaFilaJTE {
     }
 
     async salvaUltimo(ultimo) {
+        //let devDbConection = 'mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
         let devDbConection = 'mongodb+srv://admin:1234@cluster0-9jhwf.mongodb.net/jte-processos?retryWrites=true&w=majority'
         mongoose.connect(devDbConection, {
             useNewUrlParser: true,
@@ -176,9 +177,10 @@ class CriaFilaJTE {
     async procura(sequencial, comarca, tentativas) {
         for (let i = 0; i < tentativas; i++) {
             let a = sequencial + i
-            console.log(`00${a}472020515000${comarca}`);
+            let processo = `00${a}472020515${comarca}`
+            console.log(processo);
             await this.enviaFila([{
-                NumeroProcesso: `00${a}472020515000${comarca}`
+                NumeroProcesso: processo
             }])
             //await this.enviaFila(`00109964720205150001`)
         }

@@ -55,7 +55,8 @@ class ProcJTE extends ExtratorBase {
       dadosProcesso = this.parser.parse($, $2)
       var processo = dadosProcesso.processo
       await dadosProcesso.processo.salvar()
-      await Andamento.salvarAndamentos(dadosProcesso.andamentos)
+      dadosProcesso.andamentos[0]
+      //await Andamento.salvarAndamentos(dadosProcesso.andamentos)
     } catch (e) {
       console.log(e);
     }

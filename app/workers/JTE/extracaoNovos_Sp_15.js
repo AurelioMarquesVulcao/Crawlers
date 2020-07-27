@@ -105,6 +105,7 @@ async function worker() {
             if (!!objResponse) contador++
             // var processo = dadosProcesso.processo
             await dadosProcesso.processo.salvar()
+            console.log(dadosProcesso.andamentos[0]);
             await Andamento.salvarAndamentos(dadosProcesso.andamentos)
             processo = await dadosProcesso.processo.salvar()
             console.log(new Date().getDate());

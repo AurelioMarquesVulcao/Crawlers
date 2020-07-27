@@ -42,7 +42,8 @@ module.exports.enums = Object.freeze({
   },
   tipoConsulta: {
     Oab: "oab",
-    Processo: "processo"
+    Processo: "processo",
+    Distribuicao: 'distribuicao'
   },
   bigdataUrls: {
     resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`,

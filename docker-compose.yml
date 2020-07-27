@@ -108,11 +108,22 @@ services:
   #       service: base_node
   #     command: node lib/criaFilaJTE.js
   #   command: node workers/TJSP/extracao.js
+  worker-tjsp-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSP/extracao.js
   worker-tjsp-processo:
     extends:
       file: common-services.yml
       service: base_node
     command: node workers/TJSP/extracaoProcesso.js
+  worker-tjsp-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSP/extracaoPeticao.js
+
 
   worker-tjsc-oab:
     extends:

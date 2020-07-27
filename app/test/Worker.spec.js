@@ -1,16 +1,6 @@
-const { enums } = require('../configs/enums');
-const { GerenciadorFila } = require('../lib/filaHandler');
-const { ExtratorFactory } = require('../extratores/extratorFactory');
-const { Extracao } = require('../models/schemas/extracao');
-const { Helper } = require('../lib/util');
-
-const tipoConsulta = 'oab';
-const nomeRobo = 'TJMG';
+const { PeticaoTJSP } = require("../extratores/PeticaoTJSP");
 
 describe('Worker', async () => {
-  const nomeFila = `${tipoConsulta}.${nomeRobo}.extracao.novos`;
-  const message = {numeroDaOab: '91357N'};
-  const extrator = ExtratorFactory.getExtrator(nomeFila);
-  const resultadoExtracao = await extrator.extrair(message.numeroDaOab);
-  console.log(resultadoExtracao);
+  await new PeticaoTJSP().extrair('1011131-88.2018.8.26.0562', 1);
+  console.log('x');
 });

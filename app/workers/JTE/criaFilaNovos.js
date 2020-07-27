@@ -14,16 +14,18 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
     // }
     // verifica banco!!!
-    await console.log(await fila.filtraTrunal());
+    // await console.log(await fila.filtraTrunal());
 
     // chuta Numeros!!!
-    // await fila.procura(11000,0002,100)
+    //await fila.procura(7000,0000,200)
+    //await fila.procura(11000,0002,300)
+    await fila.procura(10500,0001,500)
     //await fila.procura(11000,0003,100)
     //await fila.procura(10900, 0004, 550)
     // await fila.procura(10500,0005,500)
     // await fila.procura(10700,0006,200)
     // await fila.procura(10500,0006,200)
-    await fila.procura(10500,0007,900)
+    // await fila.procura(10500,0007,900)
     // await fila.procura(11000,0008,100)
     // await fila.procura(11000,0009,100)
 
@@ -33,6 +35,8 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
     //console.log(await fila.buscaDb(1, 0));
 
     //await fila.enviaFila()
+
+   console.log(new Date(2020,6,20)<new Date());
 
     //console.log(fila.relogio());
     await sleep(1000)

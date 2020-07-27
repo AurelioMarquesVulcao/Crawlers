@@ -98,7 +98,7 @@ async function worker() {
 
             let objResponse = await puppet.preencheProcesso(numeroProcesso, contador)
 
-            
+
             let $ = cheerio.load(objResponse.geral);
             let $2 = cheerio.load(objResponse.andamentos);
             dadosProcesso = parser.parse($, $2, contador)
@@ -108,7 +108,8 @@ async function worker() {
             await Andamento.salvarAndamentos(dadosProcesso.andamentos)
             processo = await dadosProcesso.processo.salvar()
             console.log(new Date().getDate());
-            if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
+            // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
+            if (new Date(2020,6,20) < dadosProcesso.processo.capa.dataDistribuicao) {
                 console.log('ok');
                 await new CriaFilaJTE().salvaUltimo({
                     NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,

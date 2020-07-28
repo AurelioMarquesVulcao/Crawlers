@@ -1,25 +1,10 @@
 const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
+require("dotenv/config");
 
 var timerSleep = 100
 
 class RoboPuppeteer3 {
-  // async start() {
-  //   // para abrir o navegador use o headless: false
-  //   this.browser = await puppeteer.launch({
-  //     headless: false,
-  //     slowMo: 1,
-  //     ignoreHTTPSErrors: true,
-  //     //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-  //     // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-  //     // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-
-  //   });
-  //   // this.page = await this.browser.newPage();
-  //   // this.acessar('https://www.google.com/');
-  //   // console.log('O Puppeteer foi Iniciado corretamente');
-  // }
-
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
@@ -29,7 +14,8 @@ class RoboPuppeteer3 {
       //   args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //   // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      args: ['--ignore-certificate-errors']
+      //args: ['--ignore-certificate-errors']
+      args: [process.env.ARGS_PUPPETTER_CONECTION]
     });
     this.page = await this.browser.newPage();
     //this.acessar('https://www.google.com/');

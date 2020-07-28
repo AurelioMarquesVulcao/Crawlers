@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
+require("dotenv/config");
 
 var timerSleep = 100
 
@@ -9,12 +10,12 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+      args: [process.env.ARGS_PUPPETTER_CONECTION]
       //args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();

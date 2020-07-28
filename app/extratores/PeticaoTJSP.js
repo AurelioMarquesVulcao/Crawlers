@@ -2,6 +2,8 @@ const puppeteer = require('puppeteer');
 const { ExtratorBase } = require('./extratores');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
+const Axios = require('axios');
+const fs = require('fs');
 
 const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json')
   .INSTANCIAS_URL;
@@ -32,6 +34,9 @@ class PeticaoTJSP extends ExtratorBase {
   }
 
   async extrair(numeroProcesso, instancia=1) {
+    this.numeroProcesso = numeroProcesso;
+    this.instancia = instancia;
+    console.log(this.numeroProcesso, this.instancia);
     if (!this.usuario)
       this.usuario = await this.getCredenciais('SP');
 
@@ -50,10 +55,37 @@ class PeticaoTJSP extends ExtratorBase {
 
     await this.consultaAutos();
 
-    await this.resgataDocumentos();
+    let docsPage = await this.resgataDocumentos();
 
-    // await this.finalizar()
+    // this.logger.info('Fechando browser');
+    // await this.browser.close();
+    // this.logger.info('Browser fechado');
+
+    await this.downloadDocumento(docsPage.pdfURL, docsPage.headers);
+
+    // console.log('finalizado');
+    // await this.finalizar();
     // await browser.close();
+  }
+  async downloadDocumento(pdfUrl, headers) {
+    let numeroProcesso = this.numeroProcesso;
+    let instancia = this.instancia;
+    console.log('headers', headers);
+    console.log('Iniciando processo de download do documento');
+    return await Axios({
+      url: pdfUrl,
+      method: 'GET',
+      responseType: 'stream'
+    }).then(function(response){
+      console.log('Salvando arquivo');
+      const path = `./temp/peticoes/tjsp/${numeroProcesso.replace(/\W/g, '')}_${instancia}.pdf`
+      // const path = `./${numeroProcesso.replace(/\W/g, '')}_${instancia}.pdf`
+      console.log(pdfUrl);
+      console.log(path);
+      console.log(response.data)
+      response.data.pipe(fs.createWriteStream(path));
+      console.log('salvo');
+    });
   }
 
   async iniciar() {
@@ -114,14 +146,14 @@ class PeticaoTJSP extends ExtratorBase {
 
     // url = INSTANCIAS_URLS[instancia - 1]+'/open.do';
 
-    this.logger.info(`Acessando pagina de consulta da ${instancia}a instancia`);
+    this.logger.info(`Acessando pagina de consulta da ${this.instancia}a instancia`);
     await this.acessar(url, this.pageOptions, false);
     this.logger.info('Aguardando o carregamento da pagina');
     await this.page.waitForSelector('#conpass-tag > div > button');
     this.logger.info('Pagina carregada');
     this.logger.info('Digitando numero do processo');
     await this.page.type('#numeroDigitoAnoUnificado', numeroProcesso);
-    this.logger.info( `PROCESSO: ${numeroProcesso}`);
+    this.logger.info( `PROCESSO: ${this.numeroProcesso}`);
 
     this.logger.info('Clicando no botão de consultar');
     const [response2] = await Promise.all([
@@ -149,6 +181,9 @@ class PeticaoTJSP extends ExtratorBase {
   }
 
   async resgataDocumentos () {
+    let pdfURL;
+    let headers;
+
     this.logger.info('Iniciando procedimento de resgate dos documentos');
     this.logger.info('Selecionando documentos de interessa para download');
     await this.page.evaluate(() => {
@@ -176,17 +211,37 @@ class PeticaoTJSP extends ExtratorBase {
     await this.page.waitForSelector('#popupGerarDocumentoOpcoes', {hidden: true})
     await this.page.waitForSelector('input.botaoPopupGeracaoDocumento.spwBotao.btBaixarDocumento')
 
-    await this.page._client.send('Page.setDownloadBehavior', {behavior: 'default', downloadPath: '../temp/peticoes/tjsp'});
+    // await this.page._client.send('Page.setDownloadBehavior', {behavior: 'allow', downloadPath: '../temp/peticoes/tjsp'});
     this.logger.info('Iniciando download');
+
+    // Definindo um comportamento para pegar a url de donwload
+    await this.page.setRequestInterception(true);
+    this.page.on('request', (request) => {
+      if(/getPDFImpressao.do/.test(request.url())) {
+        pdfURL = request.url();
+        headers = request.headers();
+        // TODO descobrir um jeito de pegar o headers + cookies
+        // let cookies = await this.page.cookies().map((cookie) => { return `${cookie.name}=${cookie.value}`; }).join('; ');
+        console.log('fk cookies', request.headers()['Cookie'])
+      }
+      request.continue();
+    });
+    console.log('Vem pra ca');
+
     await this.page.click('#btnDownloadDocumento');
-    await this.page.waitFor(60000);
+
+    await this.page.waitFor(5000);
     this.logger.info('Download concluido');
+
+    console.log('cookie', cookies);
+    return {pdfURL: pdfURL, headers: headers};
   }
 
   async getCredenciais(Seccional) {
     if (Seccional === 'SP')
       return { username: '103.890.517-64', password: 'Senh@TJ123' };
   }
+
 }
 
 module.exports.PeticaoTJSP = PeticaoTJSP;

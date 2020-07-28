@@ -1,15 +1,13 @@
 const mongoose = require("mongoose");
-const cheerio = require('cheerio');
 const re = require('xregexp');
-const fs = require('fs');
 const sleep = require('await-sleep');
-
 const { enums } = require("../configs/enums");
 const { GerenciadorFila } = require("../lib/filaHandler");
 
 const { ExtratorBase } = require('../extratores/extratores');
 const { JTEParser } = require('../parsers/JTEParser');
 const { Processo } = require('../models/schemas/processo');
+require("dotenv/config");
 
 
 
@@ -33,7 +31,7 @@ var insereUltimoProcesso1 = new mongoose.Schema({
     tribunal: Number,
     data: [Number],
 })
-var insereUltimoProcesso = mongoose.model("ultimosProcessos", insereUltimoProcesso1);
+var insereUltimoProcesso = mongoose.model("ultimosProcessos", insereUltimoProcesso1, "ultimosProcessos");
 
 class CriaFilaJTE {
     enviarMensagem(nome, message) {
@@ -41,7 +39,7 @@ class CriaFilaJTE {
     }
 
     async buscaDb(quantidade, salto) {
-        let devDbConection = 'mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
+        let devDbConection = process.env.MONGO_CONNECTION_STRING
         mongoose.connect(devDbConection, {
             useNewUrlParser: true,
             useUnifiedTopology: true
@@ -52,7 +50,7 @@ class CriaFilaJTE {
 
     async salvaUltimo(ultimo) {
         //let devDbConection = 'mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
-        let devDbConection = 'mongodb+srv://admin:1234@cluster0-9jhwf.mongodb.net/jte-processos?retryWrites=true&w=majority'
+        let devDbConection = process.env.MONGO_DEV_CONECTION
         mongoose.connect(devDbConection, {
             useNewUrlParser: true,
             useUnifiedTopology: true

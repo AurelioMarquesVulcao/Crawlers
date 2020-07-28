@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const cheerio = require('cheerio');
-const re = require('xregexp');
-const fs = require('fs');
-const axios = require('axios');
+
 
 const { enums } = require("../../configs/enums");
 const { GerenciadorFila } = require("../../lib/filaHandler");
@@ -17,7 +15,8 @@ const { JTEParser } = require('../../parsers/JTEParser');
 
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const sleep = require('await-sleep');
-const { CriaFilaJTE } = require('../../lib/criaFilaJTE')
+const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
+
 
 
 /**
@@ -117,7 +116,7 @@ async function worker() {
                     DataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
                     origem: dadosProcesso.processo.detalhes.origem,
                     tribunal: dadosProcesso.processo.detalhes.tribunal,
-                    data: [dadosProcesso.processo.capa.dataDistribuicao.getDate(), dadosProcesso.processo.capa.dataDistribuicao.getMonth()],
+                    data: { dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(), mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth() },
                 })
             }
 

@@ -109,7 +109,7 @@ async function worker() {
             processo = await dadosProcesso.processo.salvar()
             //console.log(new Date().getDate());
             // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
-            if (new Date(2020,6,20) < dadosProcesso.processo.capa.dataDistribuicao) {
+            if (new Date(2020,1,20) < dadosProcesso.processo.capa.dataDistribuicao) {
                 //console.log('ok');
                 await new CriaFilaJTE().salvaUltimo({
                     NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,

@@ -1,13 +1,36 @@
 const mongoose = require("mongoose");
 const cheerio = require('cheerio');
 const re = require('xregexp');
-const fs = require('fs');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
 
+
 (async () => {
     const fila = new CriaFilaJTE()
+
+    // função de criação de busca
+    let parametroBusca = {
+        "data.dia": 21
+    };
+    var buscar = await fila.abreUltimo(parametroBusca);
+
+    // for (let i = 0; i < buscar.length; i++) {
+    //     await console.log(buscar[i].numeroProcesso.slice(0 , 7))
+    //     await console.log(buscar[i].origem);
+    // };
+
+
+
+
+
+
+
+
+
+
+
+
     // let varaTrabalho = await fila.filtraTrunal()
     // for (let i = 0; i < varaTrabalho.length; i++) {
     //     console.log(varaTrabalho[i]);
@@ -15,6 +38,9 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
     // }
     // verifica banco!!!
     // await console.log(await fila.filtraTrunal());
+    // let busca = await fila.abreUltimo(2)
+    // await console.log(busca);
+    //await fila.salvaUltimo(busca)
 
     // chuta Numeros!!!
     //await fila.procura(7000,0000,200)
@@ -29,13 +55,14 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
     // await fila.procura(11000,0008,100)
     // await fila.procura(11000,0009,100)
 
-    await fila.procura(10500, "0051", 400)
-    //await fila.procura(11050, 0007, 200)
+    //await fila.procura(10500, "0052", 200)
+    // await fila.procura(11026, "0009", 3)
 
-    // for (let i = 51; i < 61; i++) {
-    //     await fila.procura(10500, `00${i}`, 400)
-    //     await sleep(60000)
-    // }
+    for (let i = 1; i < 100; i++) {
+        await fila.procura(10100, `00${i}`, 2)
+        // await sleep(60000*4)
+    }
+    // 00110262820205150009
 
     //await fila.salvaUltimo({ NumeroProcesso: "0010981-48.2020.5.15.0001", DataCadastro: "2020-07-21T19:45:45.000Z" })
     // await fila.enviaFila(await fila.buscaDb(1,0))

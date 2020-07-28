@@ -24,14 +24,16 @@ var consultaCadastradas = mongoose.model('consultasCadastradas', {
     }
 }, 'consultasCadastradas');
 
-var insereUltimoProcesso1 = new mongoose.Schema({
-    NumeroProcesso: String,
-    DataCadastro: String,
+var ultimoProcesso1 = new mongoose.Schema({
+    numeroProcesso: String,
+    dataCadastro: String,
     origem: Number,
     tribunal: Number,
-    data: [Number],
+    data: { dia: Number, mes: Number },
 })
-var insereUltimoProcesso = mongoose.model("ultimosProcessos", insereUltimoProcesso1, "ultimosProcessos");
+var ultimoProcesso = mongoose.model('ultimosProcessos', ultimoProcesso1, 'ultimosProcessos');
+var ultimoProcessodb1 = mongoose.model('ultimos-processos', ultimoProcesso1, 'ultimos-processos');
+var ultimoProcessodb2 = mongoose.model('ultimosprocessos', ultimoProcesso1, 'ultimosprocessos');
 
 class CriaFilaJTE {
     enviarMensagem(nome, message) {
@@ -49,16 +51,28 @@ class CriaFilaJTE {
     }
 
     async salvaUltimo(ultimo) {
-        //let devDbConection = 'mongodb://admin:admin@bigrj01mon01:19000,bigrj01mon02:19000/crawlersBigdata?authSource=admin&replicaSet=rsBigData&readPreference=primary&appname=MongoDB%20Compass&ssl=false'
-        let devDbConection = process.env.MONGO_DEV_CONECTION
+        //let devDbConection = process.env.MONGO_DEV_CONECTION
+        let devDbConection = process.env.MONGO_CONNECTION_STRING
         mongoose.connect(devDbConection, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        //let teste = await insereUltimoProcesso.find({ "NumeroProcesso": ultimo.NumeroProcesso })
-        return await new insereUltimoProcesso(ultimo).save()
-
-        // return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
+        let veirifica = this.abreUltimo({"numeroProcesso":ultimo.numeroProcesso})
+        if (!veirifica[0]){
+            return await new ultimoProcesso(ultimo).save()
+        }
+        
+    }
+    async abreUltimo(parametro) {
+        let devDbConection = process.env.MONGO_CONNECTION_STRING
+        let db=mongoose.connect(devDbConection, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        db
+        let busca =await ultimoProcesso.find(parametro)
+        let obj = busca;
+        return obj
     }
 
     async enviaFila(numeroProcesso) {

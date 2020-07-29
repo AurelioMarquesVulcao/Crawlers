@@ -94,7 +94,7 @@ class CriaFilaJTE {
             tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
             if (tribunal == 15) {
                 await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SPp-15`;
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)

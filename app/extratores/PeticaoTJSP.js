@@ -2,43 +2,44 @@ const puppeteer = require('puppeteer');
 const { ExtratorBase } = require('./extratores');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
-const Axios = require('axios');
 const fs = require('fs');
-
-const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json')
-  .INSTANCIAS_URL;
+const sleep = require('await-sleep');
 
 class PeticaoTJSP extends ExtratorBase {
-  constructor({ url='', debug=false, timeout = 50000, headless = false, usuario = null } = {}) {
+  constructor({
+    url = '',
+    debug = false,
+    timeout = 50000,
+    headless = false,
+    usuario = { username: '', password: '' },
+  } = {}) {
     super(url, debug);
     this.timeout = timeout;
     this.headless = headless;
-    if (usuario)
-      this.usuario = usuario;
+    if (usuario) this.usuario = usuario;
 
     this.args = [
-      "--no-sandbox",
+      '--no-sandbox',
       // `--proxy-server=http://proxy-proadv.7lan.net:8181`,
-      `--ignore-certificate-errors`
+      `--ignore-certificate-errors`,
     ];
-    this.ignore = ["--disable-extensions"];
+    this.ignore = ['--disable-extensions'];
     this.viewPort = { width: 1024, height: 768 };
-    this.pageOptions = { waitUntil: "load", timeout: 0 };
+    this.pageOptions = { waitUntil: 'load', timeout: 0 };
     this.launchOptions = {
       slowMo: 100,
       headless: this.headless,
       timeout: this.timeout,
       args: this.args,
-      ignoreDefaultArgs: this.ignore
+      ignoreDefaultArgs: this.ignore,
     };
   }
 
-  async extrair(numeroProcesso, instancia=1) {
+  async extrair(numeroProcesso, instancia = 1) {
     this.numeroProcesso = numeroProcesso;
     this.instancia = instancia;
     console.log(this.numeroProcesso, this.instancia);
-    if (!this.usuario)
-      this.usuario = await this.getCredenciais('SP');
+    if (!this.usuario.username) this.usuario = await this.getCredenciais('SP');
 
     this.logger = new Logger('info', 'logs/PeticaoTJSP/PeticaoTJSPInfo.log', {
       nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}`,
@@ -46,46 +47,30 @@ class PeticaoTJSP extends ExtratorBase {
     });
 
     await this.iniciar();
+    await sleep(100);
 
-    await this.acessar('https://esaj.tjsp.jus.br/esaj/portal.do', this.pageOptions);
+    await this.acessar(
+      'https://esaj.tjsp.jus.br/esaj/portal.do',
+      this.pageOptions
+    );
+    await sleep(100);
 
     await this.login();
+    await sleep(100);
 
     await this.consultarProcesso(numeroProcesso, instancia);
+    await sleep(100);
 
     await this.consultaAutos();
+    await sleep(100);
 
-    let docsPage = await this.resgataDocumentos();
+    await this.resgataDocumentos();
+    await sleep(100);
 
-    // this.logger.info('Fechando browser');
-    // await this.browser.close();
-    // this.logger.info('Browser fechado');
+    await this.aguardaDownload();
+    await sleep(1000);
 
-    await this.downloadDocumento(docsPage.pdfURL, docsPage.headers);
-
-    // console.log('finalizado');
-    // await this.finalizar();
-    // await browser.close();
-  }
-  async downloadDocumento(pdfUrl, headers) {
-    let numeroProcesso = this.numeroProcesso;
-    let instancia = this.instancia;
-    console.log('headers', headers);
-    console.log('Iniciando processo de download do documento');
-    return await Axios({
-      url: pdfUrl,
-      method: 'GET',
-      responseType: 'stream'
-    }).then(function(response){
-      console.log('Salvando arquivo');
-      const path = `./temp/peticoes/tjsp/${numeroProcesso.replace(/\W/g, '')}_${instancia}.pdf`
-      // const path = `./${numeroProcesso.replace(/\W/g, '')}_${instancia}.pdf`
-      console.log(pdfUrl);
-      console.log(path);
-      console.log(response.data)
-      response.data.pipe(fs.createWriteStream(path));
-      console.log('salvo');
-    });
+    await this.finalizar();
   }
 
   async iniciar() {
@@ -99,12 +84,21 @@ class PeticaoTJSP extends ExtratorBase {
   }
 
   async finalizar() {
+    const puppeteerPid = this.browser.process().pid;
     this.logger.info('Finalizando Puppeteer');
-    await this.browser.close();
+    await this.browser
+      .close()
+      .then(() => {
+        process.kill(puppeteerPid);
+      })
+      .catch(() => {});
     this.logger.info('Puppeteer finalizado');
   }
 
   async acessar(url, pageOptions, newPage = false) {
+    if (newPage) {
+      this.page = await this.browser.newPage();
+    }
     await this.page.setViewport(this.viewPort);
     await this.page.goto(url, pageOptions);
   }
@@ -112,36 +106,40 @@ class PeticaoTJSP extends ExtratorBase {
   async login() {
     this.logger.info('Iniciando procedimento de login');
     this.logger.info('Acessando pagina de login');
-    await this.acessar('https://esaj.tjsp.jus.br/sajcas/login?service', this.pageOptions, false);
+    await this.acessar(
+      'https://esaj.tjsp.jus.br/sajcas/login?service',
+      this.pageOptions,
+      false
+    );
     this.logger.info('Pagina de login acessada');
-    this.logger.info(`Credenciais: ${JSON.stringify(this.usuario)}`)
+    this.logger.info(`Credenciais: ${JSON.stringify(this.usuario)}`);
     this.logger.info('Digitando nome do usuario');
     await this.page.type('#usernameForm', this.usuario.username);
     this.logger.info('Digitando senha do usuario');
     await this.page.type('#passwordForm', this.usuario.password);
 
     this.logger.info('Clicando em entrar');
-    const [response2] = await Promise.all([
+    await Promise.all([
       this.page.waitForNavigation(),
-      this.page.click("#pbEntrar")
+      this.page.click('#pbEntrar'),
     ]);
     this.logger.info('Terminado procedimento de login');
   }
 
-  async consultarProcesso(numeroProcesso, instancia = 1){
+  async consultarProcesso(numeroProcesso, instancia = 1) {
     this.logger.info('Iniciando procedimento de consulta do processo');
-    numeroProcesso = numeroProcesso.replace('.8.26.', '.')
+    numeroProcesso = numeroProcesso.replace('.8.26.', '.');
     numeroProcesso = numeroProcesso.replace(/\W/gm, '');
     let url;
-    this.logger.info(`Escolhendo url para ${instancia}`)
-    if ( instancia === 1 ) {
+    this.logger.info(`Escolhendo url para ${instancia}`);
+    if (instancia === 1) {
       url = 'https://esaj.tjsp.jus.br/cpopg/open.do';
     }
-    if ( instancia === 2 ) {
+    if (instancia === 2) {
       url = 'https://esaj.tjsp.jus.br/cposg/open.do';
     }
     if (instancia === 3) {
-      url = 'https://esaj.tjsp.jus.br/cposgcr/open.do'
+      url = 'https://esaj.tjsp.jus.br/cposgcr/open.do';
     }
 
     // url = INSTANCIAS_URLS[instancia - 1]+'/open.do';
@@ -153,12 +151,12 @@ class PeticaoTJSP extends ExtratorBase {
     this.logger.info('Pagina carregada');
     this.logger.info('Digitando numero do processo');
     await this.page.type('#numeroDigitoAnoUnificado', numeroProcesso);
-    this.logger.info( `PROCESSO: ${this.numeroProcesso}`);
+    this.logger.info(`PROCESSO: ${this.numeroProcesso}`);
 
     this.logger.info('Clicando no botão de consultar');
-    const [response2] = await Promise.all([
+    await Promise.all([
       this.page.waitForNavigation(),
-      this.page.click('#botaoConsultarProcessos')
+      this.page.click('#botaoConsultarProcessos'),
     ]);
     this.logger.info('Finalizando procedimento de consulta de processo');
   }
@@ -169,10 +167,12 @@ class PeticaoTJSP extends ExtratorBase {
     await this.page.waitForSelector('#conpass-tag > div > button');
     this.logger.info('Pagina carregada');
     this.logger.info('Acessando pagina com documentos do processo');
-    const link = await this.page.$('#linkPasta')
+    const link = await this.page.$('#linkPasta');
 
-    const newPagePromise = new Promise(x => this.browser.once('targetcreated', target => x(target.page())));
-    await link.click( {button: 'middle'} );
+    const newPagePromise = new Promise((x) =>
+      this.browser.once('targetcreated', (target) => x(target.page()))
+    );
+    await link.click({ button: 'middle' });
     this.page = await newPagePromise;
     await this.page.bringToFront();
     this.logger.info('Pagina Acessada');
@@ -180,10 +180,7 @@ class PeticaoTJSP extends ExtratorBase {
     this.logger.info('Finalizando procedimento de consulta de Autos');
   }
 
-  async resgataDocumentos () {
-    let pdfURL;
-    let headers;
-
+  async resgataDocumentos() {
     this.logger.info('Iniciando procedimento de resgate dos documentos');
     this.logger.info('Selecionando documentos de interessa para download');
     await this.page.evaluate(() => {
@@ -208,33 +205,22 @@ class PeticaoTJSP extends ExtratorBase {
     // await this.page.waitForSelector('#popupGerarDocumentoFinalizadoComSucesso');
 
     await this.page.waitForSelector('#popupGerarDocumentoOpcoes');
-    await this.page.waitForSelector('#popupGerarDocumentoOpcoes', {hidden: true})
-    await this.page.waitForSelector('input.botaoPopupGeracaoDocumento.spwBotao.btBaixarDocumento')
+    await this.page.waitForSelector('#popupGerarDocumentoOpcoes', {
+      hidden: true,
+    });
+    await this.page.waitForSelector(
+      'input.botaoPopupGeracaoDocumento.spwBotao.btBaixarDocumento'
+    );
 
-    // await this.page._client.send('Page.setDownloadBehavior', {behavior: 'allow', downloadPath: '../temp/peticoes/tjsp'});
     this.logger.info('Iniciando download');
 
-    // Definindo um comportamento para pegar a url de donwload
-    await this.page.setRequestInterception(true);
-    this.page.on('request', (request) => {
-      if(/getPDFImpressao.do/.test(request.url())) {
-        pdfURL = request.url();
-        headers = request.headers();
-        // TODO descobrir um jeito de pegar o headers + cookies
-        // let cookies = await this.page.cookies().map((cookie) => { return `${cookie.name}=${cookie.value}`; }).join('; ');
-        console.log('fk cookies', request.headers()['Cookie'])
-      }
-      request.continue();
+    await this.page._client.send('Page.setDownloadBehavior', {
+      behavior: 'allow',
+      downloadPath: './temp/peticoes/tjsp',
     });
-    console.log('Vem pra ca');
 
     await this.page.click('#btnDownloadDocumento');
-
-    await this.page.waitFor(5000);
-    this.logger.info('Download concluido');
-
-    console.log('cookie', cookies);
-    return {pdfURL: pdfURL, headers: headers};
+    this.logger.info('Download iniciado');
   }
 
   async getCredenciais(Seccional) {
@@ -242,6 +228,22 @@ class PeticaoTJSP extends ExtratorBase {
       return { username: '103.890.517-64', password: 'Senh@TJ123' };
   }
 
+  async aguardaDownload() {
+    const path = `./temp/peticoes/tjsp/${this.numeroProcesso}.pdf`;
+    const tempPath = `./temp/peticoes/tjsp/${this.numeroProcesso}.pdf.crdownload`;
+
+    return new Promise(async (resolve) => {
+      do {
+        if (fs.existsSync(path) && !fs.existsSync(tempPath)) {
+          this.logger.info('Download finalizado');
+          return resolve(true);
+        }
+
+        this.logger.info('Download não finalizado');
+        await sleep(1000);
+      } while (true);
+    });
+  }
 }
 
 module.exports.PeticaoTJSP = PeticaoTJSP;

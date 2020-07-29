@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const sleep = require('await-sleep');
+
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
@@ -25,6 +27,7 @@ const logarExecucao = async (execucao) => {
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
+    console.table(message);
     let logger = new Logger('info', 'logs/PeticaoTJSP/PeticaoTJSPInfo.log', {
       nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}`,
       NumeroDoProcesso: message.NumeroProcesso,
@@ -49,7 +52,10 @@ const logarExecucao = async (execucao) => {
 
       logger.info('Enviando resposta ao BigData');
       await Helper.enviarFeedback(
-        extracao.prepararEnvio()
+        extracao.prepararEnvio(),
+        {
+          NumeroDoProcesso: resultadoExtracao.numeroProcesso,
+        }
       ).catch((err) => {
         console.log(err);
         throw new Error(
@@ -69,6 +75,8 @@ const logarExecucao = async (execucao) => {
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
+      console.log('\n\n\n\n')
+      await sleep(2000);
     } catch (e) {
       logger.info('Encontrado erro durante a execução');
       logger.log('error',e);
@@ -86,6 +94,8 @@ const logarExecucao = async (execucao) => {
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
+      console.log('\n\n\n\n')
+      await sleep(2000);
     }
   });
 })();

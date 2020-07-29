@@ -1,15 +1,15 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
+const sleep = require('await-sleep');
 const { ExtratorBase } = require('./extratores');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
-const fs = require('fs');
-const sleep = require('await-sleep');
 
 class PeticaoTJSP extends ExtratorBase {
   constructor({
     url = '',
     debug = false,
-    timeout = 50000,
+    timeout = 30000,
     headless = false,
     usuario = { username: '', password: '' },
   } = {}) {
@@ -36,41 +36,55 @@ class PeticaoTJSP extends ExtratorBase {
   }
 
   async extrair(numeroProcesso, instancia = 1) {
+    this.resposta = { numeroProcesso: numeroProcesso};
     this.numeroProcesso = numeroProcesso;
     this.instancia = instancia;
-    console.log(this.numeroProcesso, this.instancia);
     if (!this.usuario.username) this.usuario = await this.getCredenciais('SP');
 
     this.logger = new Logger('info', 'logs/PeticaoTJSP/PeticaoTJSPInfo.log', {
       nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}`,
       NumeroDoProcesso: numeroProcesso,
     });
+    try {
+      await this.iniciar();
+      await sleep(100);
 
-    await this.iniciar();
-    await sleep(100);
+      await this.acessar(
+        'https://esaj.tjsp.jus.br/esaj/portal.do',
+        this.pageOptions
+      );
+      await sleep(100);
 
-    await this.acessar(
-      'https://esaj.tjsp.jus.br/esaj/portal.do',
-      this.pageOptions
-    );
-    await sleep(100);
+      await this.login();
+      await sleep(100);
 
-    await this.login();
-    await sleep(100);
+      // throw new Error('oi');
 
-    await this.consultarProcesso(numeroProcesso, instancia);
-    await sleep(100);
+      await this.consultarProcesso(numeroProcesso, instancia);
+      await sleep(100);
 
-    await this.consultaAutos();
-    await sleep(100);
+      await this.consultaAutos();
+      await sleep(100);
 
-    await this.resgataDocumentos();
-    await sleep(100);
+      await this.resgataDocumentos();
+      await sleep(100);
 
-    await this.aguardaDownload();
-    await sleep(1000);
+      await this.aguardaDownload();
+      await sleep(1000);
 
-    await this.finalizar();
+      this.resposta.sucesso = true;
+      this.logger.log('info', `Finalizado processo de extração de documentos ${this.numeroProcesso}`);
+
+    } catch (e) {
+      this.logger.log('error', e);
+
+      this.resposta.sucesso = false;
+      this.resposta.detalhes = e;
+    } finally {
+      await this.finalizar();
+      this.resposta.logs = this.logger.logs;
+      return this.resposta;
+    }
   }
 
   async iniciar() {
@@ -79,7 +93,8 @@ class PeticaoTJSP extends ExtratorBase {
     this.logger.info('Puppeteer iniciado');
 
     this.logger.info('Criando nova pagina');
-    this.page = await this.browser.newPage();
+    this.page = await this.browser.pages().then(pages => pages[0]);
+    await this.page.setViewport(this.viewPort);
     this.logger.info('Nova pagina criada');
   }
 
@@ -99,7 +114,6 @@ class PeticaoTJSP extends ExtratorBase {
     if (newPage) {
       this.page = await this.browser.newPage();
     }
-    await this.page.setViewport(this.viewPort);
     await this.page.goto(url, pageOptions);
   }
 

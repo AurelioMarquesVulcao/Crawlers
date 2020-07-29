@@ -72,11 +72,8 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
-      logger.info('Mensagem reconhecida');
-      console.log('\n\n\n\n')
-      await sleep(2000);
+
+
     } catch (e) {
       logger.info('Encontrado erro durante a execução');
       logger.log('error',e);
@@ -91,6 +88,9 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
+
+
+    } finally {
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');

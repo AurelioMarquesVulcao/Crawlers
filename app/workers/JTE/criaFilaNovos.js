@@ -4,49 +4,71 @@ const re = require('xregexp');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
-
+const fila = new CriaFilaJTE();
 
 (async () => {
-    const fila = new CriaFilaJTE()
+    let second = 0;
+    let contaOrigem = 60;
 
-    // função de criação de busca
-    let parametroBusca = {
+    for (let w = 0; w < 1;) {
+        second++
+        // let relogio = fila.relogio();
+        let relogio = fila.relogio();
+        console.log(relogio);
+        //if (relogio.min == 39 && relogio.seg == 30) {
+        if ("a") {
+            try {
+                // string de busca no banco de dados
+                let parametroBusca = { "origem": contaOrigem };
+                let buscar = await fila.abreUltimo(parametroBusca);
+                console.log(buscar.length);
+                let sequencial = maiorSequencial(buscar)
+                let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
+                console.log(numeroSequencial);
+                let comarca = sequencial.numeroProcesso.slice(16, 20);
+                // isso que vai pegar os processos
+                if (sequencial.data.dia < relogio.dia && sequencial.data.mes < relogio.mes) {
+                    await fila.procura0(numeroSequencial, comarca, 10)
+                    await sleep()
+                }
+                console.log(sequencial);
+            } catch (e) { }
 
-    };
-   //await fila.procura5(10554,"0113",2)
 
-    var buscar = await fila.abreUltimo(parametroBusca);
-    console.log(buscar.length);
-    let mediaSequendial = [];
-    let maiorSequencial = [];
-    let menorSequencial = [];
-    for (let i = 0; i < buscar.length; i++) {
-        let sequencial = buscar[i].numeroProcesso.slice(0, 7);
-        let numero = buscar[i].numeroProcesso
-        let comarca = buscar[i].numeroProcesso.slice(16, 20);
-        let dia = buscar[i].data.dia;
-        let mes = buscar[i].data.mes;
-        if (mes < 4 && mes > 2) {
-            // console.log({ dia, mes, sequencial, comarca });
-            if (sequencial == "0010550") {
-                //console.log({ dia, mes, sequencial, comarca });
-                //await fila.procura(10900, comarca, 1)
-                //await fila.procura(10550,comarca,1)
-                // await fila.procura(10600,comarca,1)
 
-            }
-        }
-        if (comarca == "0113") {
-            console.log({ dia, mes, sequencial, comarca });
+
+
+
+
+
+            if (contaOrigem == 163) { contaOrigem = 0 } else { contaOrigem++ };
+
         };
-
+        await sleep(40000)
     };
+
+
+
 
 
     await sleep(5000)
     process.exit()
 
 })();
+
+function maiorSequencial(obj) {
+    let resultado;
+    let teste = obj[0].numeroProcesso.slice(0, 7);
+
+    for (let i = 0; i < obj.length; i++) {
+        let sequencial = obj[i].numeroProcesso.slice(0, 7);
+        if (sequencial > teste) {
+            teste = sequencial
+            resultado = obj[i]
+        }
+    };
+    return resultado
+}
 
 
 async function insert0(n) {
@@ -55,7 +77,7 @@ async function insert0(n) {
     }
 }
 async function insert1(n) {
-    for (let i = 1; i < 100; i++) {
+    for (let i = 10; i < 100; i++) {
         await fila.procura5(10000 + n, `00${i}`, 5)
     }
 }

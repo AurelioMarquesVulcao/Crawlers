@@ -63,11 +63,6 @@ class CriaFilaJTE {
 
         if (!veirifica[0]) {
             return await new ultimoProcesso(ultimo).save()
-            // estou validando 2 vezes devido a erros no banco de dados
-            // let veirifica = this.abreUltimo({"numeroProcesso":ultimo.numeroProcesso})
-            // if (!veirifica[0]){
-            //     return await new ultimoProcesso(ultimo).save()    
-            // }
         }
 
     }
@@ -166,7 +161,7 @@ class CriaFilaJTE {
         let recebeNumeros = [];
         let resultado = [];
         let dados = await this.buscaDb(60000, 0);
-        console.log(dados[0]);
+        //console.log(dados[0]);
         //console.log('');
         for (let i = 0; i < dados.length; i++) {
             let numero = dados[i].NumeroProcesso
@@ -177,7 +172,7 @@ class CriaFilaJTE {
                 resultado.push([varaTrabalho, sequencial])
             }
         }
-        console.log(recebeNumeros.length);
+        //console.log(recebeNumeros.length);
         return resultado.sort()
     }
     async peganumero() {
@@ -222,7 +217,20 @@ class CriaFilaJTE {
         for (let i = 0; i < tentativas; i++) {
             let a = sequencial + i
             let processo = `00${a}472020515${comarca}`
-            console.log(processo);
+            //console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    async procura0(sequencial, comarca, tentativas) {
+        for (let i = 0; i < tentativas; i++) {
+            sequencial = parseInt(sequencial)
+            console.log(sequencial);
+            let a = sequencial + 1 + i
+            let processo = `00${a}472020515${comarca}`
+            //console.log(processo);
             await this.enviaFila([{
                 NumeroProcesso: processo
             }])
@@ -243,7 +251,7 @@ class CriaFilaJTE {
         let mseg = data.getMilliseconds();   // 0-999
         let tz = data.getTimezoneOffset(); // em minutos
 
-        return dia
+        return { dia, mes, hora, min, seg }
     }
 }
 // ------------------------------------funcoes complementares--------------------------------------------------------------------------------------------------------------------------------

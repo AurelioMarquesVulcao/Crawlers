@@ -137,3 +137,35 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
 })();
 
+
+
+
+
+    // // função de criação de busca
+    // let parametroBusca = {};
+    // var buscar = await fila.abreUltimo(parametroBusca);
+    // console.log(buscar.length);
+    // let mediaSequendial = [];
+    // let maiorSequencial = [];
+    // let menorSequencial = [];
+    // for (let i = 0; i < buscar.length; i++) {
+    //     let sequencial = buscar[i].numeroProcesso.slice(0, 7);
+    //     let numero = buscar[i].numeroProcesso
+    //     let comarca = buscar[i].numeroProcesso.slice(16, 20);
+    //     let dia = buscar[i].data.dia;
+    //     let mes = buscar[i].data.mes;
+    //     if (mes < 4 && mes > 2) {
+    //         // console.log({ dia, mes, sequencial, comarca });
+    //         if (sequencial == "0010550") {
+    //             //console.log({ dia, mes, sequencial, comarca });
+    //             //await fila.procura(10900, comarca, 1)
+    //             //await fila.procura(10550,comarca,1)
+    //             // await fila.procura(10600,comarca,1)
+
+    //         }
+    //     }
+    //     if (comarca == "0113") {
+    //         console.log({ dia, mes, sequencial, comarca });
+    //     };
+
+    // };

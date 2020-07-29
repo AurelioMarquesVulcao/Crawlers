@@ -112,8 +112,8 @@ async function worker() {
             if (new Date(2020,1,20) < dadosProcesso.processo.capa.dataDistribuicao) {
                 //console.log('ok');
                 await new CriaFilaJTE().salvaUltimo({
-                    NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
-                    DataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
+                    numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
+                    dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
                     origem: dadosProcesso.processo.detalhes.origem,
                     tribunal: dadosProcesso.processo.detalhes.tribunal,
                     data: { dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(), mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth() },

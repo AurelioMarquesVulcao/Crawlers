@@ -186,10 +186,23 @@ class CriaFilaJTE {
         }
 
     }
-    async procura(sequencial, comarca, tentativas) {
+    // procura por numeros com 4 digitos de sequencial
+    async procura5(sequencial, comarca, tentativas) {
         for (let i = 0; i < tentativas; i++) {
             let a = sequencial + i
             let processo = `00${a}472020515${comarca}`
+            console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    // procura por numeros com 5 digitos de sequencial
+    async procura4(sequencial, comarca, tentativas) {
+        for (let i = 0; i < tentativas; i++) {
+            let a = sequencial + i
+            let processo = `000${a}472020515${comarca}`
             console.log(processo);
             await this.enviaFila([{
                 NumeroProcesso: processo

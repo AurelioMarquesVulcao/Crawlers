@@ -4,6 +4,7 @@ const sleep = require('await-sleep');
 const { ExtratorBase } = require('./extratores');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
+// const { CredenciaisAdvogados } = require('../models/schemas/credenciaisAdvogados'); // TODO fazer .env local
 
 class PeticaoTJSP extends ExtratorBase {
   constructor({
@@ -33,9 +34,14 @@ class PeticaoTJSP extends ExtratorBase {
       args: this.args,
       ignoreDefaultArgs: this.ignore,
     };
+
+    this.idsUsadas = [];
   }
 
   async extrair(numeroProcesso, instancia = 1) {
+
+    // await new CredenciaisAdvogados({ login: '103.890.517-64', senha: 'Senh@TJ123', estado: 'SP', nome: 'Karine Sensei' }).salvar();
+
     this.resposta = { numeroProcesso: numeroProcesso};
     this.numeroProcesso = numeroProcesso;
     this.instancia = instancia;
@@ -118,26 +124,49 @@ class PeticaoTJSP extends ExtratorBase {
   }
 
   async login() {
+    let continuar = 0;
     this.logger.info('Iniciando procedimento de login');
     this.logger.info('Acessando pagina de login');
-    await this.acessar(
-      'https://esaj.tjsp.jus.br/sajcas/login?service',
-      this.pageOptions,
-      false
-    );
-    this.logger.info('Pagina de login acessada');
-    this.logger.info(`Credenciais: ${JSON.stringify(this.usuario)}`);
-    this.logger.info('Digitando nome do usuario');
-    await this.page.type('#usernameForm', this.usuario.username);
-    this.logger.info('Digitando senha do usuario');
-    await this.page.type('#passwordForm', this.usuario.password);
 
-    this.logger.info('Clicando em entrar');
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.click('#pbEntrar'),
-    ]);
-    this.logger.info('Terminado procedimento de login');
+    await new Promise(async resolve => {
+      do {
+        await this.acessar(
+          'https://esaj.tjsp.jus.br/sajcas/login?service',
+          this.pageOptions,
+          false
+        );
+        this.logger.info('Pagina de login acessada');
+
+        this.logger.info(`Credenciais: ${JSON.stringify(this.usuario.login)} - ${this.usuario.senha}`);
+        this.logger.info('Digitando nome do usuario');
+        await this.page.type('#usernameForm', this.usuario.login);
+        this.logger.info('Digitando senha do usuario');
+        await this.page.type('#passwordForm', this.usuario.senha);
+
+        this.logger.info('Clicando em entrar');
+        await Promise.all([
+          this.page.waitForNavigation(),
+          this.page.click('#pbEntrar'),
+        ]);
+
+        continuar = await this.page.$$('#mensagemRetorno')
+          .then(selector => Boolean(selector.length));
+
+        if (continuar) {
+          this.logger.log('warning', `Usuário ou senha inválida. [${JSON.stringify(this.usuario)}]`);
+          this.logger.info('Realizando nova tentativa de Login');
+          this.usuario = await this.getCredenciais('SP');
+        } else {
+          this.logger.info('Terminado procedimento de login');
+          console.log('terminado login')
+          return resolve(true);
+        }
+
+        await sleep(500);
+
+      } while(true);
+    })
+
   }
 
   async consultarProcesso(numeroProcesso, instancia = 1) {
@@ -161,16 +190,23 @@ class PeticaoTJSP extends ExtratorBase {
     this.logger.info(`Acessando pagina de consulta da ${this.instancia}a instancia`);
     await this.acessar(url, this.pageOptions, false);
     this.logger.info('Aguardando o carregamento da pagina');
-    await this.page.waitForSelector('#conpass-tag > div > button');
+    // if (this.instancia === 1){
+    //   await this.page.waitForSelector('#conpass-tag > div > button');
+    // } else {
+    //
+    // }
+    await sleep(1500);
+
     this.logger.info('Pagina carregada');
     this.logger.info('Digitando numero do processo');
     await this.page.type('#numeroDigitoAnoUnificado', numeroProcesso);
     this.logger.info(`PROCESSO: ${this.numeroProcesso}`);
 
     this.logger.info('Clicando no botão de consultar');
+
     await Promise.all([
       this.page.waitForNavigation(),
-      this.page.click('#botaoConsultarProcessos'),
+      this.page.click('input[type="submit"]'),
     ]);
     this.logger.info('Finalizando procedimento de consulta de processo');
   }
@@ -178,17 +214,27 @@ class PeticaoTJSP extends ExtratorBase {
   async consultaAutos() {
     this.logger.info('Iniciando procedimento de consulta de Autos');
     this.logger.info('Aguardando carregamento da pagina');
-    await this.page.waitForSelector('#conpass-tag > div > button');
+    // await this.page.waitForSelector('#conpass-tag > div > button');
+    await sleep(1500);
     this.logger.info('Pagina carregada');
     this.logger.info('Acessando pagina com documentos do processo');
-    const link = await this.page.$('#linkPasta');
-
+    let link;
     const newPagePromise = new Promise((x) =>
       this.browser.once('targetcreated', (target) => x(target.page()))
     );
-    await link.click({ button: 'middle' });
+    if (this.instancia === 1){
+      link = await this.page.$('#linkPasta');
+      await link.click({ button: 'middle' });
+    }else {
+      link = await this.page.$('a[title="Pasta Digital"]')
+      await link.click();
+    }
     this.page = await newPagePromise;
     await this.page.bringToFront();
+
+
+
+
     this.logger.info('Pagina Acessada');
     await this.page.waitForSelector('#divDocumento');
     this.logger.info('Finalizando procedimento de consulta de Autos');
@@ -237,9 +283,12 @@ class PeticaoTJSP extends ExtratorBase {
     this.logger.info('Download iniciado');
   }
 
-  async getCredenciais(Seccional) {
-    if (Seccional === 'SP')
-      return { username: '103.890.517-64', password: 'Senh@TJ123' };
+  async getCredenciais(estado) {
+    // const credenciais = await CredenciaisAdvogados.getCredenciais(estado, this.idsUsadas);
+    // this.idsUsadas.push(credenciais._id);
+    const credenciais = {login: "103.890.517-64", senha: "Senh@TJ123"}
+
+    return credenciais;
   }
 
   async aguardaDownload() {

@@ -11,11 +11,11 @@ class RoboPuppeteer3 {
       headless: false,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      //   args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //   // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: ['--ignore-certificate-errors']
-      args: [process.env.ARGS_PUPPETTER_CONECTION]
+      //args: [process.env.ARGS_PUPPETTER_CONECTION]
     });
     this.page = await this.browser.newPage();
     //this.acessar('https://www.google.com/');

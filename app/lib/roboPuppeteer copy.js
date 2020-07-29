@@ -10,16 +10,17 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      args: [process.env.ARGS_PUPPETTER_CONECTION]
+      //args: [process.env.ARGS_PUPPETTER_CONECTION]
       //args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
-    //this.acessar('https://www.google.com/');
+    // this.acessar('https://www.meuip.com.br/');
+    // await sleep(30000)
     console.log('O Puppeteer foi Iniciado corretamente');
   }
 

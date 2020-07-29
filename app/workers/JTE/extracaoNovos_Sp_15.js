@@ -59,7 +59,7 @@ async function worker() {
     await sleep(1000)
 
     // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
+    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SPp-15`;
     const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-Sp15`;
 
     // tudo que está abaixo é acionado para cada processo na fila.
@@ -109,7 +109,7 @@ async function worker() {
             processo = await dadosProcesso.processo.salvar()
             //console.log(new Date().getDate());
             // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
-            if (new Date(2020,1,20) < dadosProcesso.processo.capa.dataDistribuicao) {
+            if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
                 //console.log('ok');
                 await new CriaFilaJTE().salvaUltimo({
                     numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,

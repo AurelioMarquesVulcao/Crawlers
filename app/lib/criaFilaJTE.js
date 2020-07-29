@@ -57,21 +57,29 @@ class CriaFilaJTE {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        let veirifica = this.abreUltimo({"numeroProcesso":ultimo.numeroProcesso})
-        if (!veirifica[0]){
+        let veirifica = await ultimoProcesso.find({ "numeroProcesso": ultimo.numeroProcesso })
+        //console.log(ultimo.numeroProcesso);
+        //await console.log(!verifica[0]);
+
+        if (!veirifica[0]) {
             return await new ultimoProcesso(ultimo).save()
+            // estou validando 2 vezes devido a erros no banco de dados
+            // let veirifica = this.abreUltimo({"numeroProcesso":ultimo.numeroProcesso})
+            // if (!veirifica[0]){
+            //     return await new ultimoProcesso(ultimo).save()    
+            // }
         }
-        
+
     }
     async abreUltimo(parametro) {
         let devDbConection = process.env.MONGO_CONNECTION_STRING
-        let db=mongoose.connect(devDbConection, {
+        mongoose.connect(devDbConection, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        db
-        let busca =await ultimoProcesso.find(parametro)
+        let busca = await ultimoProcesso.find(parametro)
         let obj = busca;
+        //console.log(obj);
         return obj
     }
 
@@ -86,7 +94,7 @@ class CriaFilaJTE {
             tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
             if (tribunal == 15) {
                 await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SPp-15`;
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
@@ -203,6 +211,17 @@ class CriaFilaJTE {
         for (let i = 0; i < tentativas; i++) {
             let a = sequencial + i
             let processo = `000${a}472020515${comarca}`
+            console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    async procura(sequencial, comarca, tentativas) {
+        for (let i = 0; i < tentativas; i++) {
+            let a = sequencial + i
+            let processo = `00${a}472020515${comarca}`
             console.log(processo);
             await this.enviaFila([{
                 NumeroProcesso: processo

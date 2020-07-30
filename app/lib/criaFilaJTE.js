@@ -46,7 +46,7 @@ class CriaFilaJTE {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        return await consultaCadastradas.find({ "Detalhes.Tribunal": 15 }).limit(quantidade).skip(salto)
+        return await consultaCadastradas.find({ "Detalhes.Tribunal": 2 }).limit(quantidade).skip(salto)
         // return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
     }
 
@@ -160,13 +160,27 @@ class CriaFilaJTE {
     //         //await this.enviaFila(`00109964720205150001`)
     //     }
     // }
-    async procura(sequencial, origem, tentativas, ) {
+    async procura(sequencial, origem, tentativas, tribunal) {
         let obj = corrigeSequencial(sequencial)
         origem = corrigeOrigem(origem)
         for (let i = 0; i < tentativas; i++) {
             sequencial = parseInt(obj.seq)
             let a = sequencial + 1 + i
-            let processo = `${obj.zero}${a}472020515${origem}`
+            let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+            //console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    async procura10(sequencial, origem, tentativas, tribunal) {
+        let obj = corrigeSequencial(sequencial)
+        origem = corrigeOrigem(origem)
+        for (let i = 0; i < tentativas; i++) {
+            sequencial = parseInt(obj.seq)
+            let a = sequencial + 50 + i
+            let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
             //console.log(processo);
             await this.enviaFila([{
                 NumeroProcesso: processo
@@ -279,28 +293,28 @@ class CriaFilaJTE {
 function corrigeSequencial(sequencial) {
     let novoSequencial = sequencial
     let zero = ''
-    for (let i=0;i<sequencial.length;i++){
+    for (let i = 0; i < sequencial.length; i++) {
         //console.log(sequencial[i]);
-        if (sequencial[i]=='0'){
-            novoSequencial= novoSequencial.slice(1,novoSequencial.length)
-            zero+="0"
-        } else{
+        if (sequencial[i] == '0') {
+            novoSequencial = novoSequencial.slice(1, novoSequencial.length)
+            zero += "0"
+        } else {
             break
         };
-    }; let seq =novoSequencial; 
-    return obj={seq, zero}
+    }; let seq = novoSequencial;
+    return obj = { seq, zero }
 }
-function corrigeOrigem(origem){
+function corrigeOrigem(origem) {
     let zero = ''
-    let n = 4-origem.length
-    for (let i=0;i<5;i++){
-        if (n > i){
-            zero+="0"
-        } else{
+    let n = 4 - origem.length
+    for (let i = 0; i < 5; i++) {
+        if (n > i) {
+            zero += "0"
+        } else {
             break
         };
     }
-    return zero+origem
+    return zero + origem
 }
 
 function criaPost(numero) {

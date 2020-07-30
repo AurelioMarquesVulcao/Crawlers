@@ -7,20 +7,21 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const fila = new CriaFilaJTE();
 
 (async () => {
-   
+
     let second = 0;
-    let contaOrigem = 0;
+    let contaOrigem = 90;
 
     for (let w = 0; w < 1;) {
         second++
-        // let relogio = fila.relogio();
-        let relogio = fila.relogio();
-        console.log(relogio);
-        //if (relogio.min == 39 && relogio.seg == 30) {
+        let timer = fila.relogio();
+        //console.log(timer.seg);
+        // if (timer.min == 20 && timer.seg == 01 || timer.min == 47) {
         if ("a") {
+            let relogio = fila.relogio();
+            console.log(relogio);
             try {
                 // string de busca no banco de dados
-                let parametroBusca = { "origem": contaOrigem };
+                let parametroBusca = { "tribunal": 15, "origem": contaOrigem };
                 let buscar = await fila.abreUltimo(parametroBusca);
                 console.log(buscar.length);
                 let sequencial = maiorSequencial(buscar)
@@ -30,45 +31,27 @@ const fila = new CriaFilaJTE();
                 // isso que vai pegar os processos
                 console.log("Estamos na comarca: " + contaOrigem);
 
-                if (contaOrigem == 0) {
-                    if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {
-                        if (sequencial.data.mes <= relogio.mes-2){
-                            await fila.procura(numeroSequencial, comarca, 2)    
-                        } else{
-                            await fila.procura(numeroSequencial, comarca, 3)
-                        };
-                        
-                        await sleep(500)
-                    };
-                } else {
-                    if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {
-                        if (sequencial.data.mes <= relogio.mes-1){
-                            await fila.procura(numeroSequencial, comarca, 15)
-                        } else{
-                            await fila.procura(numeroSequencial, comarca, 3)
-                        }
-                        
-                        await sleep(500)
-                    };
-                };
+                if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {
+                    if (sequencial.data.mes <= relogio.mes - 1) {
+                        await fila.procura10(numeroSequencial, comarca, 2, 15)
+                    } else {
+                        await fila.procura(numeroSequencial, comarca, 3, 15)
+                    }
 
+                    await sleep(500)
+                };
                 console.log(sequencial);
             } catch (e) {
                 console.log(e);
-                await fila.procura5('0010500', `${contaOrigem}` ,2)
-                await fila.procura5('0010300', `${contaOrigem}` ,2)
+                // await fila.procura5('0010500', `${contaOrigem}` ,2)
+                // await fila.procura5('0010300', `${contaOrigem}` ,2)
                 console.log("------------- A comarca :" + contaOrigem + ' falhou na busca------');
             }
 
-
-
             if (contaOrigem == 153) { contaOrigem = 0 } else { contaOrigem++ };
-
         };
         await sleep(5000)
     };
-
-
 
 
 
@@ -77,12 +60,59 @@ const fila = new CriaFilaJTE();
 
 })();
 
-function maiorSequencial(obj) {
-    let resultado;
-    let teste = obj[0].numeroProcesso.slice(0, 7);
 
+async function procuraUltimoProcesso(tribunal) {
+
+    let relogio = fila.relogio();
+    console.log(relogio);
+    try {
+        // string de busca no banco de dados
+        let parametroBusca = { "origem": contaOrigem };
+        let buscar = await fila.abreUltimo(parametroBusca);
+        console.log(buscar.length);
+        let sequencial = maiorSequencial(buscar)
+        let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
+        console.log(numeroSequencial);
+        let comarca = sequencial.numeroProcesso.slice(16, 20);
+        // isso que vai pegar os processos
+        console.log("Estamos na comarca: " + contaOrigem);
+
+        if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {
+            if (sequencial.data.mes <= relogio.mes - 1) {
+                await fila.procura10(numeroSequencial, comarca, 2, tribunal)
+            } else {
+                await fila.procura(numeroSequencial, comarca, 3, tribunal)
+            }
+
+            await sleep(500)
+        };
+
+
+        console.log(sequencial);
+    } catch (e) {
+        console.log(e);
+        // await fila.procura5('0010500', `${contaOrigem}` ,2)
+        // await fila.procura5('0010300', `${contaOrigem}` ,2)
+        console.log("------------- A comarca :" + contaOrigem + ' falhou na busca------');
+    }
+
+    if (contaOrigem == 153) { contaOrigem = 0 } else { contaOrigem++ };
+}
+
+
+
+
+
+
+
+function maiorSequencial(obj) {
+    let resultado=obj[0]
+    let teste = parseInt(obj[0].numeroProcesso.slice(0, 7));
+    //console.log(teste);
+    console.log(obj[0].numeroProcesso);
     for (let i = 0; i < obj.length; i++) {
-        let sequencial = obj[i].numeroProcesso.slice(0, 7);
+        let sequencial = parseInt(obj[i].numeroProcesso.slice(0, 7));
+        //console.log(sequencial);
         if (sequencial > teste) {
             teste = sequencial
             resultado = obj[i]

@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const cheerio = require('cheerio');
-const re = require('xregexp');
-const fs = require('fs');
-const axios = require('axios');
+
 
 const { enums } = require("../../configs/enums");
 const { GerenciadorFila } = require("../../lib/filaHandler");
@@ -17,7 +15,8 @@ const { JTEParser } = require('../../parsers/JTEParser');
 
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const sleep = require('await-sleep');
-const { CriaFilaJTE } = require('../../lib/criaFilaJTE')
+const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
+
 
 
 /**
@@ -56,7 +55,7 @@ async function worker() {
 
     //await sleep(10000)
     await puppet.acessar("https://jte.csjt.jus.br/")
-    await puppet.preencheTribunal('10014385020135150473')
+    await puppet.preencheTribunal('10014385020135020473')
     await sleep(1000)
 
     // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
@@ -108,16 +107,16 @@ async function worker() {
             //console.log(dadosProcesso.andamentos[0]);
             await Andamento.salvarAndamentos(dadosProcesso.andamentos)
             processo = await dadosProcesso.processo.salvar()
-            console.log(new Date().getDate());
+            //console.log(new Date().getDate());
             // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
-            if (new Date(2020,6,20) < dadosProcesso.processo.capa.dataDistribuicao) {
-                console.log('ok');
+            if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
+                //console.log('ok');
                 await new CriaFilaJTE().salvaUltimo({
-                    NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
-                    DataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
+                    numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
+                    dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
                     origem: dadosProcesso.processo.detalhes.origem,
                     tribunal: dadosProcesso.processo.detalhes.tribunal,
-                    data: [dadosProcesso.processo.capa.dataDistribuicao.getDate(), dadosProcesso.processo.capa.dataDistribuicao.getMonth()],
+                    data: { dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(), mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth() },
                 })
             }
 

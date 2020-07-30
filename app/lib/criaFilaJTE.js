@@ -112,61 +112,61 @@ class CriaFilaJTE {
         }
 
     }
-    // procura por numeros com 4 digitos de sequencial
-    async procura5(sequencial, comarca, tentativas) {
+    // // procura por numeros com 4 digitos de sequencial
+    // async procura5(sequencial, comarca, tentativas) {
+    //     for (let i = 0; i < tentativas; i++) {
+    //         let a = sequencial + i
+    //         let processo = `00${a}472020515${comarca}`
+    //         console.log(processo);
+    //         await this.enviaFila([{
+    //             NumeroProcesso: processo
+    //         }])
+    //         //await this.enviaFila(`00109964720205150001`)
+    //     }
+    // }
+    // // procura por numeros com 5 digitos de sequencial
+    // async procura4(sequencial, comarca, tentativas) {
+    //     for (let i = 0; i < tentativas; i++) {
+    //         let a = sequencial + i
+    //         let processo = `000${a}472020515${comarca}`
+    //         console.log(processo);
+    //         await this.enviaFila([{
+    //             NumeroProcesso: processo
+    //         }])
+    //         //await this.enviaFila(`00109964720205150001`)
+    //     }
+    // }
+    // async procura(sequencial, comarca, tentativas) {
+    //     for (let i = 0; i < tentativas; i++) {
+    //         let a = sequencial + i
+    //         let processo = `00${a}472020515${comarca}`
+    //         //console.log(processo);
+    //         await this.enviaFila([{
+    //             NumeroProcesso: processo
+    //         }])
+    //         //await this.enviaFila(`00109964720205150001`)
+    //     }
+    // }
+    // async procura0(sequencial, comarca, tentativas) {
+    //     for (let i = 0; i < tentativas; i++) {
+    //         sequencial = parseInt(sequencial)
+    //         //console.log(sequencial);
+    //         let a = sequencial + 1 + i
+    //         let processo = `00${a}472020515${comarca}`
+    //         //console.log(processo);
+    //         await this.enviaFila([{
+    //             NumeroProcesso: processo
+    //         }])
+    //         //await this.enviaFila(`00109964720205150001`)
+    //     }
+    // }
+    async procura(sequencial, origem, tentativas, ) {
+        let obj = corrigeSequencial(sequencial)
+        origem = corrigeOrigem(origem)
         for (let i = 0; i < tentativas; i++) {
-            let a = sequencial + i
-            let processo = `00${a}472020515${comarca}`
-            console.log(processo);
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }])
-            //await this.enviaFila(`00109964720205150001`)
-        }
-    }
-    // procura por numeros com 5 digitos de sequencial
-    async procura4(sequencial, comarca, tentativas) {
-        for (let i = 0; i < tentativas; i++) {
-            let a = sequencial + i
-            let processo = `000${a}472020515${comarca}`
-            console.log(processo);
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }])
-            //await this.enviaFila(`00109964720205150001`)
-        }
-    }
-    async procura(sequencial, comarca, tentativas) {
-        for (let i = 0; i < tentativas; i++) {
-            let a = sequencial + i
-            let processo = `00${a}472020515${comarca}`
-            //console.log(processo);
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }])
-            //await this.enviaFila(`00109964720205150001`)
-        }
-    }
-    async procura0(sequencial, comarca, tentativas) {
-        for (let i = 0; i < tentativas; i++) {
-            sequencial = parseInt(sequencial)
-            //console.log(sequencial);
+            sequencial = parseInt(obj.seq)
             let a = sequencial + 1 + i
-            let processo = `00${a}472020515${comarca}`
-            //console.log(processo);
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }])
-            //await this.enviaFila(`00109964720205150001`)
-        }
-    }
-    async procura00(sequencial, comarca, tentativas) {
-
-        for (let i = 0; i < tentativas; i++) {
-            sequencial = parseInt(sequencial)
-            //console.log(sequencial);
-            let a = sequencial + 1 + i
-            let processo = `000${a}472020515${comarca}`
+            let processo = `${obj.zero}${a}472020515${origem}`
             //console.log(processo);
             await this.enviaFila([{
                 NumeroProcesso: processo
@@ -278,14 +278,30 @@ class CriaFilaJTE {
 // ------------------------------------funcoes complementares----------------------------------------------------------------------------------------------------------------------------------
 function corrigeSequencial(sequencial) {
     let novoSequencial = sequencial
-    while (novoSequencial[0]=='0'){
-        novoSequencial = novoSequencial[0].replace('0','')
-    }
-    
-    return sequencial[2]
+    let zero = ''
+    for (let i=0;i<sequencial.length;i++){
+        //console.log(sequencial[i]);
+        if (sequencial[i]=='0'){
+            novoSequencial= novoSequencial.slice(1,novoSequencial.length)
+            zero+="0"
+        } else{
+            break
+        };
+    }; let seq =novoSequencial; 
+    return obj={seq, zero}
 }
-console.log(corrigeSequencial('0010500'));
-
+function corrigeOrigem(origem){
+    let zero = ''
+    let n = 4-origem.length
+    for (let i=0;i<5;i++){
+        if (n > i){
+            zero+="0"
+        } else{
+            break
+        };
+    }
+    return zero+origem
+}
 
 function criaPost(numero) {
     let post = `{

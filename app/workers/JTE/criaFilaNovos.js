@@ -7,8 +7,9 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const fila = new CriaFilaJTE();
 
 (async () => {
+   
     let second = 0;
-    let contaOrigem = 60;
+    let contaOrigem = 59;
 
     for (let w = 0; w < 1;) {
         second++
@@ -27,24 +28,44 @@ const fila = new CriaFilaJTE();
                 console.log(numeroSequencial);
                 let comarca = sequencial.numeroProcesso.slice(16, 20);
                 // isso que vai pegar os processos
-                if (sequencial.data.dia < relogio.dia && sequencial.data.mes < relogio.mes) {
-                    await fila.procura0(numeroSequencial, comarca, 10)
-                    await sleep()
-                }
+                console.log("Estamos na comarca: " + contaOrigem);
+
+                if (contaOrigem == 0) {
+                    if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {
+                        if (sequencial.data.mes <= relogio.mes-2){
+                            await fila.procura00(numeroSequencial, comarca, 15)    
+                        } else{
+                            await fila.procura00(numeroSequencial, comarca, 3)
+                        };
+                        
+                        await sleep(500)
+                    };
+                } else {
+                    if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {
+                        if (sequencial.data.mes <= relogio.mes-1){
+                            await fila.procura0(numeroSequencial, comarca, 15)
+                        } else{
+                            await fila.procura0(numeroSequencial, comarca, 3)
+                        }
+                        
+                        await sleep(500)
+                    };
+                };
+
                 console.log(sequencial);
-            } catch (e) { }
+            } catch (e) {
+                console.log(e);
+                //await fila.procura5(10500, `00${contaOrigem}` ,2)
+                //await fila.procura5(10300, `00${contaOrigem}` ,2)
+                console.log("------------- A comarca :" + contaOrigem + ' falhou na busca------');
+            }
 
 
 
-
-
-
-
-
-            if (contaOrigem == 163) { contaOrigem = 0 } else { contaOrigem++ };
+            if (contaOrigem == 153) { contaOrigem = 0 } else { contaOrigem++ };
 
         };
-        await sleep(40000)
+        await sleep(5000)
     };
 
 
@@ -77,8 +98,8 @@ async function insert0(n) {
     }
 }
 async function insert1(n) {
-    for (let i = 10; i < 100; i++) {
-        await fila.procura5(10000 + n, `00${i}`, 5)
+    for (let i = 102; i < 103; i++) {
+        await fila.procura5(10000 + n, `00${i}`, 15)
     }
 }
 

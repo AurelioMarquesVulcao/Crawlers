@@ -78,6 +78,119 @@ class CriaFilaJTE {
         return obj
     }
 
+
+
+    async filtraTrunal() {
+        let recebeNumeros = [];
+        let resultado = [];
+        let dados = await this.buscaDb(60000, 0);
+        //console.log(dados[0]);
+        //console.log('');
+        for (let i = 0; i < dados.length; i++) {
+            let numero = dados[i].NumeroProcesso
+            let sequencial = numero.slice(0, 7)
+            let varaTrabalho = numero.slice(numero.length - 4, numero.length)
+            if (recebeNumeros.indexOf(varaTrabalho) < 0) {
+                recebeNumeros.push(varaTrabalho,)
+                resultado.push([varaTrabalho, sequencial])
+            }
+        }
+        //console.log(recebeNumeros.length);
+        return resultado.sort()
+    }
+    async peganumero() {
+        let dados = await this.buscaDb(60000, 0)
+
+        for (let i = 0; i < dados.length; i++) {
+            let numero = dados[i].NumeroProcesso
+
+            let varaTrabalho = numero.slice(numero.length - 4, numero.length)
+            if (recebeNumeros.indexOf(varaTrabalho) < 0) {
+
+                recebeNumeros.push(varaTrabalho)
+            }
+        }
+
+    }
+    // procura por numeros com 4 digitos de sequencial
+    async procura5(sequencial, comarca, tentativas) {
+        for (let i = 0; i < tentativas; i++) {
+            let a = sequencial + i
+            let processo = `00${a}472020515${comarca}`
+            console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    // procura por numeros com 5 digitos de sequencial
+    async procura4(sequencial, comarca, tentativas) {
+        for (let i = 0; i < tentativas; i++) {
+            let a = sequencial + i
+            let processo = `000${a}472020515${comarca}`
+            console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    async procura(sequencial, comarca, tentativas) {
+        for (let i = 0; i < tentativas; i++) {
+            let a = sequencial + i
+            let processo = `00${a}472020515${comarca}`
+            //console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    async procura0(sequencial, comarca, tentativas) {
+        for (let i = 0; i < tentativas; i++) {
+            sequencial = parseInt(sequencial)
+            //console.log(sequencial);
+            let a = sequencial + 1 + i
+            let processo = `00${a}472020515${comarca}`
+            //console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    async procura00(sequencial, comarca, tentativas) {
+
+        for (let i = 0; i < tentativas; i++) {
+            sequencial = parseInt(sequencial)
+            //console.log(sequencial);
+            let a = sequencial + 1 + i
+            let processo = `000${a}472020515${comarca}`
+            //console.log(processo);
+            await this.enviaFila([{
+                NumeroProcesso: processo
+            }])
+            //await this.enviaFila(`00109964720205150001`)
+        }
+    }
+    relogio() {
+        let data = new Date();
+        // Guarda cada pedaço em uma variável
+        let dia = data.getDate();           // 1-31
+        let dia_sem = data.getDay();            // 0-6 (zero=domingo)
+        let mes = data.getMonth();          // 0-11 (zero=janeiro)
+        let ano2 = data.getYear();           // 2 dígitos
+        let ano4 = data.getFullYear();       // 4 dígitos
+        let hora = data.getHours();          // 0-23
+        let min = data.getMinutes();        // 0-59
+        let seg = data.getSeconds();        // 0-59
+        let mseg = data.getMilliseconds();   // 0-999
+        let tz = data.getTimezoneOffset(); // em minutos
+
+        return { dia, mes, hora, min, seg }
+    }
+
     async enviaFila(numeroProcesso) {
         const sleep4 = 5;
         const sleep1 = 2;
@@ -157,108 +270,23 @@ class CriaFilaJTE {
 
         }
     }
-    async filtraTrunal() {
-        let recebeNumeros = [];
-        let resultado = [];
-        let dados = await this.buscaDb(60000, 0);
-        //console.log(dados[0]);
-        //console.log('');
-        for (let i = 0; i < dados.length; i++) {
-            let numero = dados[i].NumeroProcesso
-            let sequencial = numero.slice(0, 7)
-            let varaTrabalho = numero.slice(numero.length - 4, numero.length)
-            if (recebeNumeros.indexOf(varaTrabalho) < 0) {
-                recebeNumeros.push(varaTrabalho,)
-                resultado.push([varaTrabalho, sequencial])
-            }
-        }
-        //console.log(recebeNumeros.length);
-        return resultado.sort()
-    }
-    async peganumero() {
-        let dados = await this.buscaDb(60000, 0)
-
-        for (let i = 0; i < dados.length; i++) {
-            let numero = dados[i].NumeroProcesso
-
-            let varaTrabalho = numero.slice(numero.length - 4, numero.length)
-            if (recebeNumeros.indexOf(varaTrabalho) < 0) {
-
-                recebeNumeros.push(varaTrabalho)
-            }
-        }
-
-    }
-    // procura por numeros com 4 digitos de sequencial
-    async procura5(sequencial, comarca, tentativas) {
-        for (let i = 0; i < tentativas; i++) {
-            let a = sequencial + i
-            let processo = `00${a}472020515${comarca}`
-            console.log(processo);
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }])
-            //await this.enviaFila(`00109964720205150001`)
-        }
-    }
-    // procura por numeros com 5 digitos de sequencial
-    async procura4(sequencial, comarca, tentativas) {
-        for (let i = 0; i < tentativas; i++) {
-            let a = sequencial + i
-            let processo = `000${a}472020515${comarca}`
-            console.log(processo);
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }])
-            //await this.enviaFila(`00109964720205150001`)
-        }
-    }
-    async procura(sequencial, comarca, tentativas) {
-        for (let i = 0; i < tentativas; i++) {
-            let a = sequencial + i
-            let processo = `00${a}472020515${comarca}`
-            //console.log(processo);
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }])
-            //await this.enviaFila(`00109964720205150001`)
-        }
-    }
-    async procura0(sequencial, comarca, tentativas) {
-        for (let i = 0; i < tentativas; i++) {
-            sequencial = parseInt(sequencial)
-            console.log(sequencial);
-            let a = sequencial + 1 + i
-            let processo = `00${a}472020515${comarca}`
-            //console.log(processo);
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }])
-            //await this.enviaFila(`00109964720205150001`)
-        }
-    }
-    relogio() {
-        let data = new Date();
-        // Guarda cada pedaço em uma variável
-        let dia = data.getDate();           // 1-31
-        let dia_sem = data.getDay();            // 0-6 (zero=domingo)
-        let mes = data.getMonth();          // 0-11 (zero=janeiro)
-        let ano2 = data.getYear();           // 2 dígitos
-        let ano4 = data.getFullYear();       // 4 dígitos
-        let hora = data.getHours();          // 0-23
-        let min = data.getMinutes();        // 0-59
-        let seg = data.getSeconds();        // 0-59
-        let mseg = data.getMilliseconds();   // 0-999
-        let tz = data.getTimezoneOffset(); // em minutos
-
-        return { dia, mes, hora, min, seg }
-    }
 }
 // ------------------------------------funcoes complementares--------------------------------------------------------------------------------------------------------------------------------
 
 
 
 // ------------------------------------funcoes complementares----------------------------------------------------------------------------------------------------------------------------------
+function corrigeSequencial(sequencial) {
+    let novoSequencial = sequencial
+    while (novoSequencial[0]=='0'){
+        novoSequencial = novoSequencial[0].replace('0','')
+    }
+    
+    return sequencial[2]
+}
+console.log(corrigeSequencial('0010500'));
+
+
 function criaPost(numero) {
     let post = `{
         "ExecucaoConsultaId" : "${makeid()}",

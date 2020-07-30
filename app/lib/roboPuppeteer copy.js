@@ -13,13 +13,14 @@ class RoboPuppeteer3 {
       headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      //args: ['--ignore-certificate-errors']
+      args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
-    // this.acessar('https://www.meuip.com.br/');
+    // await this.acessar('https://www.meuip.com.br/');
     // await sleep(30000)
     console.log('O Puppeteer foi Iniciado corretamente');
   }
@@ -29,7 +30,7 @@ class RoboPuppeteer3 {
     try {
       await this.page.goto(url, {
         waitUntil: "load",
-        timeout: 9000,
+        timeout: 30000,
         // waitUntil: 'networkidle2'
       });
       // isso me da o url completo

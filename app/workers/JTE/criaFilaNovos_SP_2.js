@@ -55,7 +55,7 @@ const fila = new CriaFilaJTE();
                 console.log("------------- A comarca :" + contaOrigem + ' falhou na busca------');
             }
 
-            if (contaOrigem == 153) { contaOrigem = 0 } else { contaOrigem++ };
+            if (contaOrigem == 90) { contaOrigem = 0 } else { contaOrigem++ };
         };
         await sleep(5000)
     };

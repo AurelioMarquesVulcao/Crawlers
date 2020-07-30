@@ -57,8 +57,8 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
     // }
     // verifica banco!!!
-    //let dados = await fila.filtraTrunal()
-    //for (i in dados) await console.log(dados[i]);
+    let dados = await fila.filtraTrunal()
+    for (i in dados) await console.log(dados[i]);
 
     // let busca = await fila.abreUltimo(2)
     // await console.log(busca);
@@ -104,7 +104,7 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
     }
     //await insert2(0)
     //await insert1(0)
-    await insert0(0)
+    //await insert0(0)
     //await insert2(400)
     // await insert1(400)
     //await insert0(400)

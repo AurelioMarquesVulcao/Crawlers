@@ -1,10 +1,15 @@
+require('../bootstrap');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const sleep = require('await-sleep');
 const { ExtratorBase } = require('./extratores');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
-// const { CredenciaisAdvogados } = require('../models/schemas/credenciaisAdvogados'); // TODO fazer .env local
+const {
+  CredenciaisAdvogados,
+} = require('../models/schemas/credenciaisAdvogados'); // TODO fazer .env local
+
+console.log(enums.mongo.connString);
 
 class PeticaoTJSP extends ExtratorBase {
   constructor({
@@ -39,13 +44,17 @@ class PeticaoTJSP extends ExtratorBase {
   }
 
   async extrair(numeroProcesso, instancia = 1) {
+    await new CredenciaisAdvogados({
+      login: '103.890.517-64',
+      senha: 'Senh@TJ123',
+      estado: 'SP',
+      nome: 'Karine Sensei',
+    }).salvar();
 
-    // await new CredenciaisAdvogados({ login: '103.890.517-64', senha: 'Senh@TJ123', estado: 'SP', nome: 'Karine Sensei' }).salvar();
-
-    this.resposta = { numeroProcesso: numeroProcesso};
+    this.resposta = { numeroProcesso: numeroProcesso };
     this.numeroProcesso = numeroProcesso;
     this.instancia = instancia;
-    if (!this.usuario.username) this.usuario = await this.getCredenciais('SP');
+    if (!this.usuario.login) this.usuario = await this.getCredenciais('SP');
 
     this.logger = new Logger('info', 'logs/PeticaoTJSP/PeticaoTJSPInfo.log', {
       nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}`,
@@ -79,8 +88,10 @@ class PeticaoTJSP extends ExtratorBase {
       await sleep(1000);
 
       this.resposta.sucesso = true;
-      this.logger.log('info', `Finalizado processo de extração de documentos ${this.numeroProcesso}`);
-
+      this.logger.log(
+        'info',
+        `Finalizado processo de extração de documentos ${this.numeroProcesso}`
+      );
     } catch (e) {
       this.logger.log('error', e);
 
@@ -99,7 +110,7 @@ class PeticaoTJSP extends ExtratorBase {
     this.logger.info('Puppeteer iniciado');
 
     this.logger.info('Criando nova pagina');
-    this.page = await this.browser.pages().then(pages => pages[0]);
+    this.page = await this.browser.pages().then((pages) => pages[0]);
     await this.page.setViewport(this.viewPort);
     this.logger.info('Nova pagina criada');
   }
@@ -128,7 +139,7 @@ class PeticaoTJSP extends ExtratorBase {
     this.logger.info('Iniciando procedimento de login');
     this.logger.info('Acessando pagina de login');
 
-    await new Promise(async resolve => {
+    await new Promise(async (resolve) => {
       do {
         await this.acessar(
           'https://esaj.tjsp.jus.br/sajcas/login?service',
@@ -137,7 +148,11 @@ class PeticaoTJSP extends ExtratorBase {
         );
         this.logger.info('Pagina de login acessada');
 
-        this.logger.info(`Credenciais: ${JSON.stringify(this.usuario.login)} - ${this.usuario.senha}`);
+        this.logger.info(
+          `Credenciais: ${JSON.stringify(this.usuario.login)} - ${
+            this.usuario.senha
+          }`
+        );
         this.logger.info('Digitando nome do usuario');
         await this.page.type('#usernameForm', this.usuario.login);
         this.logger.info('Digitando senha do usuario');
@@ -149,24 +164,26 @@ class PeticaoTJSP extends ExtratorBase {
           this.page.click('#pbEntrar'),
         ]);
 
-        continuar = await this.page.$$('#mensagemRetorno')
-          .then(selector => Boolean(selector.length));
+        continuar = await this.page
+          .$$('#mensagemRetorno')
+          .then((selector) => Boolean(selector.length));
 
         if (continuar) {
-          this.logger.log('warning', `Usuário ou senha inválida. [${JSON.stringify(this.usuario)}]`);
+          this.logger.log(
+            'warning',
+            `Usuário ou senha inválida. [${JSON.stringify(this.usuario)}]`
+          );
           this.logger.info('Realizando nova tentativa de Login');
           this.usuario = await this.getCredenciais('SP');
         } else {
           this.logger.info('Terminado procedimento de login');
-          console.log('terminado login')
+          console.log('terminado login');
           return resolve(true);
         }
 
         await sleep(500);
-
-      } while(true);
-    })
-
+      } while (true);
+    });
   }
 
   async consultarProcesso(numeroProcesso, instancia = 1) {
@@ -187,7 +204,9 @@ class PeticaoTJSP extends ExtratorBase {
 
     // url = INSTANCIAS_URLS[instancia - 1]+'/open.do';
 
-    this.logger.info(`Acessando pagina de consulta da ${this.instancia}a instancia`);
+    this.logger.info(
+      `Acessando pagina de consulta da ${this.instancia}a instancia`
+    );
     await this.acessar(url, this.pageOptions, false);
     this.logger.info('Aguardando o carregamento da pagina');
     // if (this.instancia === 1){
@@ -222,18 +241,15 @@ class PeticaoTJSP extends ExtratorBase {
     const newPagePromise = new Promise((x) =>
       this.browser.once('targetcreated', (target) => x(target.page()))
     );
-    if (this.instancia === 1){
+    if (this.instancia === 1) {
       link = await this.page.$('#linkPasta');
       await link.click({ button: 'middle' });
-    }else {
-      link = await this.page.$('a[title="Pasta Digital"]')
+    } else {
+      link = await this.page.$('a[title="Pasta Digital"]');
       await link.click();
     }
     this.page = await newPagePromise;
     await this.page.bringToFront();
-
-
-
 
     this.logger.info('Pagina Acessada');
     await this.page.waitForSelector('#divDocumento');
@@ -284,9 +300,12 @@ class PeticaoTJSP extends ExtratorBase {
   }
 
   async getCredenciais(estado) {
-    // const credenciais = await CredenciaisAdvogados.getCredenciais(estado, this.idsUsadas);
-    // this.idsUsadas.push(credenciais._id);
-    const credenciais = {login: "103.890.517-64", senha: "Senh@TJ123"}
+    const credenciais = await CredenciaisAdvogados.getCredenciais(
+      estado,
+      this.idsUsadas
+    );
+    this.idsUsadas.push(credenciais.id);
+    // const credenciais = {login: "103.890.517-64", senha: "Senh@TJ123"}
 
     return credenciais;
   }

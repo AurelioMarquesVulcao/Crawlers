@@ -70,7 +70,7 @@ const logarExecucao = async (execucao) => {
         DataTermino: new Date(),
         status: 'OK',
         logs: logger.logs,
-        NomeRobo: enums.nomesRobos.TJSP,
+        NomeRobo: 'PeticaoTJSP',
       });
 
 

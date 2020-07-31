@@ -55,12 +55,12 @@ async function worker() {
 
     //await sleep(10000)
     await puppet.acessar("https://jte.csjt.jus.br/")
-    await puppet.preencheTribunal('10014385020135020473')
+    await puppet.preencheTribunal('10014385020135050473')
     await sleep(1000)
 
     // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-Sp2`;
+    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
+    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
 
     // tudo que está abaixo é acionado para cada processo na fila.
     contador = 0;

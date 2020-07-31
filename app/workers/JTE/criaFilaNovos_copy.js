@@ -58,7 +58,19 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
     // }
     // verifica banco!!!
     let dados = await fila.filtraTrunal()
-    for (i in dados) await console.log(dados[i]);
+    organizado = []
+    for (i in dados) {
+        let origem = dados[i][0]
+        organizado.push(origem)
+        await await insert2(0, origem)
+        //await console.log(origem);
+    }
+
+    
+    // console.log(organizado.slice(1,50));
+    // console.log(organizado.slice(50,100));
+    //console.log(organizado.slice(170,250));
+    //console.log(organizado.length);
 
     // let busca = await fila.abreUltimo(2)
     // await console.log(busca);
@@ -88,18 +100,21 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
     async function insert0(n) {
         for (let i = 0; i < 1; i++) {
-            await fila.procura(1000501 , `${i}`, 2,"02")
+            await fila.procura(1000250, `${i}`, 2, "02")
         }
     }
     async function insert1(n) {
-        for (let i = 10; i < 91; i++) {
-            await fila.procura(1000501 , `${i}`, 2,"02")
+        for (let i = 601; i < 615; i++) {
+            await fila.procura(1000550, `${i}`, 2, "02")
         }
     }
 
-    async function insert2(n) {
-        for (let i = 201; i < 206; i++) {
-            await fila.procura(1000501 , `${i}`, 2,"02")
+    async function insert2(n, origem) {
+        //console.log(origem);
+        origem = parseInt(origem)
+        console.log(origem);
+        for (let i = origem; i < origem + 1; i++) {
+            await fila.procura(1000570, `${i}`, 2, "02")
         }
     }
     //await insert2(0)

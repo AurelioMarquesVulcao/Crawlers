@@ -46,7 +46,7 @@ class CriaFilaJTE {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        return await consultaCadastradas.find({ "Detalhes.Tribunal": 2 }).limit(quantidade).skip(salto)
+        return await consultaCadastradas.find({ "Detalhes.Tribunal": 5 }).limit(quantidade).skip(salto)
         // return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
     }
 
@@ -84,8 +84,6 @@ class CriaFilaJTE {
         let recebeNumeros = [];
         let resultado = [];
         let dados = await this.buscaDb(60000, 0);
-        //console.log(dados[0]);
-        //console.log('');
         for (let i = 0; i < dados.length; i++) {
             let numero = dados[i].NumeroProcesso
             let sequencial = numero.slice(0, 7)
@@ -110,56 +108,7 @@ class CriaFilaJTE {
                 recebeNumeros.push(varaTrabalho)
             }
         }
-
     }
-    // // procura por numeros com 4 digitos de sequencial
-    // async procura5(sequencial, comarca, tentativas) {
-    //     for (let i = 0; i < tentativas; i++) {
-    //         let a = sequencial + i
-    //         let processo = `00${a}472020515${comarca}`
-    //         console.log(processo);
-    //         await this.enviaFila([{
-    //             NumeroProcesso: processo
-    //         }])
-    //         //await this.enviaFila(`00109964720205150001`)
-    //     }
-    // }
-    // // procura por numeros com 5 digitos de sequencial
-    // async procura4(sequencial, comarca, tentativas) {
-    //     for (let i = 0; i < tentativas; i++) {
-    //         let a = sequencial + i
-    //         let processo = `000${a}472020515${comarca}`
-    //         console.log(processo);
-    //         await this.enviaFila([{
-    //             NumeroProcesso: processo
-    //         }])
-    //         //await this.enviaFila(`00109964720205150001`)
-    //     }
-    // }
-    // async procura(sequencial, comarca, tentativas) {
-    //     for (let i = 0; i < tentativas; i++) {
-    //         let a = sequencial + i
-    //         let processo = `00${a}472020515${comarca}`
-    //         //console.log(processo);
-    //         await this.enviaFila([{
-    //             NumeroProcesso: processo
-    //         }])
-    //         //await this.enviaFila(`00109964720205150001`)
-    //     }
-    // }
-    // async procura0(sequencial, comarca, tentativas) {
-    //     for (let i = 0; i < tentativas; i++) {
-    //         sequencial = parseInt(sequencial)
-    //         //console.log(sequencial);
-    //         let a = sequencial + 1 + i
-    //         let processo = `00${a}472020515${comarca}`
-    //         //console.log(processo);
-    //         await this.enviaFila([{
-    //             NumeroProcesso: processo
-    //         }])
-    //         //await this.enviaFila(`00109964720205150001`)
-    //     }
-    // }
     async procura(sequencial, origem, tentativas, tribunal) {
         let obj = corrigeSequencial(sequencial)
         origem = corrigeOrigem(origem)
@@ -185,7 +134,6 @@ class CriaFilaJTE {
             await this.enviaFila([{
                 NumeroProcesso: processo
             }])
-            //await this.enviaFila(`00109964720205150001`)
         }
     }
     relogio() {
@@ -335,6 +283,7 @@ function numeroAleatorio(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 // gera id aleatorio não unico
 function makeid() {
     let text = "5ed9";

@@ -32,6 +32,33 @@ class ProcessoController {
       res.status(500).send('Um erro inesperado aconteceu');
     }
   }
+
+  static async processoBigdata(req, res) {
+    const context = req.params;
+    let status, data;
+    const dao = new ProcessoMongoDAO();
+
+    try {
+
+      if (!context || !context.cnj)
+        throw new Error("Parametro id não enviado!");
+
+      const response = await dao.encontrarPorCNJ(context.cnj);
+
+      if (!response) 
+        throw new Error("Processo não encontrado!");
+
+      const processoBigdata = new Mapper(response).translate();
+
+      status = 200;
+      data = processoBigdata;
+    } catch (e) {
+      status = 500;    
+    } finally {
+      res.status(status).send(data);
+      // Helper.pred('---processoController---');
+    }
+  }
 }
 
 module.exports.ProcessoController = ProcessoController;

@@ -131,3 +131,6 @@ mongodb/*
 
 # arquivos de captcha de audio #
 *.wav
+
+# arquivos de pdf de processos
+*.pdf

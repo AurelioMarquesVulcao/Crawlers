@@ -34,6 +34,7 @@ Projeto que abrange todos os crawlers de acesso e extração de processos.
 | **NumeroDoProcesso***  | String | Numero do processo para se realizar a extração |
 | **NumeroDaOab***       | Number | Numero da Oab para se realizar a extração      |
 | DataHoraEnfileiramento | Date   | Data do envio a fila                           |
+| Instancia              | Number | Instancia de consulta (default: 1)             |
 
 * Deve-se conter ou NumeroDoProcesso ou NumeroDaOab.
 
@@ -47,7 +48,6 @@ Projeto que abrange todos os crawlers de acesso e extração de processos.
 | Resultado        | [ExtracaoResultados] | Lista de Objetos do tipo ExtracaoResultados. *              |
 | Sucesso          | Boolean      | Indicador se houve sucesso ao realizar a extração            |
 | Detalhes         | String       | Caso houve algum erro aqui entra a *message* do erro.        |
-
 * ExtracaoResultado
 
   ```json

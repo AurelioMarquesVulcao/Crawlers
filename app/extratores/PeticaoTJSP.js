@@ -90,16 +90,31 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       await this.consultarProcesso(numeroProcesso, instancia);
       await sleep(100);
 
-      await this.consultaAutos();
-      await sleep(100);
+      let processos;
+      if(await this.page.$('a.linkProcesso') !== null)
+        processos = await this.page.$$eval('a.linkProcesso', as => as.map(a => a.href));
 
-      await this.fecharOutrasPaginas();
+      let tam =  processos ? processos.length : 1;
+      let count = 0;
 
-      await this.resgataDocumentos();
-      await sleep(100);
+      do{
+        if (processos) {
+          await this.acessar(processos[count], this.pageOptions, false);
+        }
+        await this.consultaAutos();
+        await sleep(100);
 
-      await this.aguardaDownload();
-      await sleep(1000);
+        await this.fecharOutrasPaginas();
+
+        await this.resgataDocumentos();
+        await sleep(100);
+
+        await this.aguardaDownload();
+        await sleep(1000);
+
+        count++;
+      } while(count < tam)
+
 
       this.resposta.sucesso = true;
       this.logger.log(

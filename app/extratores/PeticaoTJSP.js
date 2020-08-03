@@ -348,9 +348,9 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.logger.info('Download finalizado');
           return resolve(true);
         }
-
-        this.logger.info('Download não finalizado');
-        await sleep(1000);
+        const size = fs.statSync(`./temp/peticoes/tjsp/${this.numeroProcesso}.pdf.crdownload`).size / 1000000.0
+        this.logger.info(`Download não finalizado | ${size} Mb baixados`);
+        await sleep(5000);
       } while (true);
     });
   }

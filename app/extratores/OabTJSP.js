@@ -13,6 +13,8 @@ const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
 const { ProcessoTJSP } = require('./ProcessoTJSP');
 
+const INSTANCIAS_URLS = require('../assets/TJSP/instancias_urls.json').INSTANCIAS_URL;
+
 const {
   BaseException,
   RequestException,
@@ -24,6 +26,7 @@ const { TJSPParser } = require('../parsers/TJSPParser');
 
 const { LogExecucao } = require('../lib/logExecucao');
 
+
 class OabTJSP extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
@@ -32,13 +35,18 @@ class OabTJSP extends ExtratorBase {
     this.logger = null;
   }
 
-  async extrair(numeroOab, cadastroConsultaId) {
-    console.log('cadastroConsultaId', cadastroConsultaId);
+  setInstanciaUrl(instancia) {
+    this.url = INSTANCIAS_URLS[instancia - 1];
+  }
+
+  async extrair(numeroOab, cadastroConsultaId, instancia=1) {
     this.numeroDaOab = numeroOab;
+    this.instancia = Number(instancia);
     let cadastroConsulta = {
       SeccionalOab: 'SP',
       TipoConsulta: 'processo',
       NumeroOab: numeroOab,
+      Instancia: instancia,
       _id: cadastroConsultaId,
     };
 
@@ -90,13 +98,18 @@ class OabTJSP extends ExtratorBase {
       this.logger.info('Recuperando lista de processos');
       let tentativa = 0;
       do {
+        this.logger.info(
+          `Tentativa de recuperacao da lista de processos [TENTATIVA: ${
+            tentativa + 1
+          }]`
+        );
         listaProcessos = await this.getListaProcessos(
           numeroOab,
           cookies,
           uuidCaptcha,
           gResponse
         );
-        console.log(listaProcessos);
+
         this.logger.info('Lista de processos recuperada');
 
         // Terceira parte: passar a lista, pegar cada um dos codigos
@@ -242,9 +255,9 @@ class OabTJSP extends ExtratorBase {
   }
 
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
-
+    let url = '';
     await this.robo.acessar({
-      url: 'https://esaj.tjsp.jus.br/cpopg/manterSessao.do?conversationId=',
+      url: '${this.urk}manterSessao.do?conversationId=',
       headers: {
         Cookie: cookies,
         Accept:
@@ -261,6 +274,10 @@ class OabTJSP extends ExtratorBase {
 
     let condition = false;
     let processos = [];
+
+    if(this.instancia === 1)
+
+
     let url = `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
     console.log('cookies', cookies);
     console.log(url);

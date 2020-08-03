@@ -150,7 +150,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: node workers/JTE/criaFilaNovos_SP_15
+    command: node workers/JTE/criaFilaNovos_BA
     restart: always
     logging:
       driver: "json-file"

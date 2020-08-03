@@ -72,18 +72,24 @@ const fila = new CriaFilaJTE();
                     } else {
                         await fila.procura(numeroSequencial, comarca, 2, '15')
                     }
-
                     await sleep(500)
-                };
-                if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {
+                } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes) {
-                        await fila.procura10(numeroSequencial, comarca, 4, '15')
+                        await fila.procura10(numeroSequencial, comarca, 3, '15')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 2, '15')
+                        await fila.procura(numeroSequencial, comarca, 3, '15')
                     }
                     await sleep(500)
-                };
+                } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes)  {
+                    if (sequencial.data.mes < relogio.mes) {
+                        await fila.procura10(numeroSequencial, comarca, 3, '15')
+                        console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+                    } else {
+                        await fila.procura(numeroSequencial, comarca, 3, '15')
+                    }
+                    await sleep(500)
+                }
                 console.log(sequencial);
             } catch (e) {
                 console.log(e);
@@ -91,7 +97,7 @@ const fila = new CriaFilaJTE();
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };
             let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
-            if (contaOrigem == 219) { contaOrigem = 0; await sleep(100) } else { contaOrigem++ };
+            if (contaOrigem == 219) { contaOrigem = 0; await sleep(pausaNaConsulta) } else { contaOrigem++ };
         };
         await sleep(1000)
     };

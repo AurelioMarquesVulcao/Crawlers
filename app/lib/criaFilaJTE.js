@@ -58,8 +58,7 @@ class CriaFilaJTE {
             useUnifiedTopology: true
         });
         let veirifica = await ultimoProcesso.find({ "numeroProcesso": ultimo.numeroProcesso })
-        //console.log(ultimo.numeroProcesso);
-        //await console.log(!verifica[0]);
+       
 
         if (!veirifica[0]) {
             return await new ultimoProcesso(ultimo).save()
@@ -74,7 +73,7 @@ class CriaFilaJTE {
         });
         let busca = await ultimoProcesso.find(parametro)
         let obj = busca;
-        //console.log(obj);
+        
         return obj
     }
 
@@ -93,7 +92,7 @@ class CriaFilaJTE {
                 resultado.push([varaTrabalho, sequencial])
             }
         }
-        //console.log(recebeNumeros.length);
+        
         return resultado.sort()
     }
     async peganumero() {
@@ -116,7 +115,7 @@ class CriaFilaJTE {
             sequencial = parseInt(obj.seq)
             let a = sequencial + 1 + i
             let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
-            //console.log(processo);
+            
             await this.enviaFila([{
                 NumeroProcesso: processo
             }])
@@ -128,9 +127,9 @@ class CriaFilaJTE {
         origem = corrigeOrigem(origem)
         for (let i = 0; i < tentativas; i++) {
             sequencial = parseInt(obj.seq)
-            let a = sequencial + 50 + i
+            let a = sequencial + 5 + i
             let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
-            //console.log(processo);
+            
             await this.enviaFila([{
                 NumeroProcesso: processo
             }])
@@ -158,7 +157,7 @@ class CriaFilaJTE {
         const sleep1 = 2;
         let filtro = numeroProcesso;
         let conta1000 = 0;
-        console.log(filtro.length);
+        
         for (let i = 0; i < filtro.length; i++) {
             let tribunal = 0
             tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
@@ -168,7 +167,7 @@ class CriaFilaJTE {
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
-                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
                 conta1000++
                 if (conta1000 == 2000) {
                     await sleep(sleep4)
@@ -181,7 +180,7 @@ class CriaFilaJTE {
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
-                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
                 conta1000++
                 if (conta1000 == 2000) {
                     await sleep(sleep4)
@@ -194,7 +193,7 @@ class CriaFilaJTE {
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
-                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
                 conta1000++
                 if (conta1000 == 2000) {
                     await sleep(sleep4)
@@ -207,7 +206,7 @@ class CriaFilaJTE {
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
-                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
                 conta1000++
                 if (conta1000 == 2000) {
                     await sleep(sleep4)
@@ -220,7 +219,7 @@ class CriaFilaJTE {
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
-                await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
                 conta1000++
                 if (conta1000 == 2000) {
                     await sleep(sleep4)
@@ -242,7 +241,6 @@ function corrigeSequencial(sequencial) {
     let novoSequencial = sequencial
     let zero = ''
     for (let i = 0; i < sequencial.length; i++) {
-        //console.log(sequencial[i]);
         if (sequencial[i] == '0') {
             novoSequencial = novoSequencial.slice(1, novoSequencial.length)
             zero += "0"

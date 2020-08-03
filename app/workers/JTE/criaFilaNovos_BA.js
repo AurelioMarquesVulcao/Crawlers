@@ -22,8 +22,8 @@ const fila = new CriaFilaJTE();
         '0462', '0463', '0464', '0491', '0492', '0493', '0511',
         '0521', '0531', '0551', '0561', '0581', '0611', '0612',
         '0621', '0631', '0641', '0651', '0661'
-      ]
-      
+    ]
+
     let contaOrigem = 0;
     for (let w = 0; w < 1;) {
         second++
@@ -49,27 +49,27 @@ const fila = new CriaFilaJTE();
                 // console.log(sequencial.data.dia == relogio.dia);
                 // console.log(sequencial.data.mes < relogio.mes);
                 if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
-                    if (sequencial.data.mes < relogio.mes) {
+                    if (sequencial.data.mes < relogio.mes - 1) {
                         await fila.procura10(numeroSequencial, comarca, 4, '05')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 2, '05')
+                        await fila.procura(numeroSequencial, comarca, 1, '05')
                     }
                     await sleep(500)
                 } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
-                    if (sequencial.data.mes < relogio.mes) {
+                    if (sequencial.data.mes < relogio.mes - 1) {
                         await fila.procura10(numeroSequencial, comarca, 3, '05')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 3, '05')
+                        await fila.procura(numeroSequencial, comarca, 1, '05')
                     }
                     await sleep(500)
-                } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes)  {
-                    if (sequencial.data.mes < relogio.mes) {
+                } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
+                    if (sequencial.data.mes < relogio.mes - 1) {
                         await fila.procura10(numeroSequencial, comarca, 3, '05')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 3, '05')
+                        await fila.procura(numeroSequencial, comarca, 1, '05')
                     }
                     await sleep(500)
                 }

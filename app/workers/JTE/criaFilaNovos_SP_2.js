@@ -67,27 +67,27 @@ const fila = new CriaFilaJTE();
                 console.log("Estamos na comarca: " + origens[contaOrigem]);
                 //console.log(sequencial.data.dia, relogio.dia, sequencial.data.mes, relogio.mes);
                 if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
-                    if (sequencial.data.mes < relogio.mes) {
+                    if (sequencial.data.mes < relogio.mes - 1) {
                         await fila.procura10(numeroSequencial, comarca, 4, '02')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 2, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, '02')
                     }
                     await sleep(500)
                 } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
-                    if (sequencial.data.mes < relogio.mes) {
+                    if (sequencial.data.mes < relogio.mes - 1) {
                         await fila.procura10(numeroSequencial, comarca, 4, '02')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 2, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, '02')
                     }
                     await sleep(500)
-                } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes)  {
-                    if (sequencial.data.mes < relogio.mes) {
+                } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
+                    if (sequencial.data.mes < relogio.mes - 1) {
                         await fila.procura10(numeroSequencial, comarca, 4, '02')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 2, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, '02')
                     }
                     await sleep(500)
                 }

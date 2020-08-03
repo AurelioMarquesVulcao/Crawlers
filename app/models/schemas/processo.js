@@ -10,6 +10,7 @@ const capaSchema = new Schema(
     assunto: [String],
     classe: String,
     dataDistribuicao: Date,
+    instancia: String,
   },
   { _id: false, versionKey: false }
 );

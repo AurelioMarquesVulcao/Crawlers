@@ -49,6 +49,7 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: node workers/JTE/extracaoNovos_Sp_2.js
+    restart: always
     logging:
       driver: "json-file"
       options:
@@ -61,18 +62,19 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: node workers/JTE/extracaoNovos_Sp_15.js
+    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "5"
-  worker-jte-rj:
+  worker-jte-ba:
     extends:
       file: common-services.yml
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: node workers/JTE/extracaoNovos_Rj.js
+    command: node workers/JTE/extracaoNovos_Ba.js
     logging:
       driver: "json-file"
       options:
@@ -90,24 +92,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  worker-jte-teste:
-    extends:
-      file: common-services.yml
-      service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: node workers/JTE/extracaoNovos.js
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-  # gera-fila:
-  #     extends:
-  #       file: common-services.yml
-  #       service: base_node
-  #     command: node lib/criaFilaJTE.js
-  #   command: node workers/TJSP/extracao.js
+  
   worker-tjsp-oab:
     extends:
       file: common-services.yml
@@ -149,3 +134,39 @@ services:
       file: common-services.yml
       service: base_node
     command: node workers/consumer_cadastro_consulta.js
+
+  novos-processos-jte-sp-2:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/JTE/criaFilaNovos_SP_2
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+  
+  novos-processos-jte-sp-15:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/JTE/criaFilaNovos_SP_15
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+      
+  novos-processos-jte-ba:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/JTE/criaFilaNovos_BA
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"

@@ -85,19 +85,32 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       this.debug(`Usuario: ${JSON.stringify(this.usuario)}`);
       await sleep(100);
 
-      // throw new Error('oi');
-
       await this.consultarProcesso(numeroProcesso, instancia);
       await sleep(100);
 
-      let processos;
-      if(await this.page.$('a.linkProcesso') !== null)
-        processos = await this.page.$$eval('a.linkProcesso', as => as.map(a => a.href));
+      // Tratamento caso resultado da consulta retorne algo invalido
+      let alert = await this.page.$eval('#mensagemRetorno', (element) => {
+        return {
+          role: element.getAttribute('role'),
+          msg: element.textContent,
+        };
+      });
+      if (alert.role === 'alert') {
+        throw new Error(alert.msg.trim());
+      }
 
-      let tam =  processos ? processos.length : 1;
+      // Tratamento caso resultado da consulta retorne uma lista de processos
+      let processos;
+      if ((await this.page.$('a.linkProcesso')) !== null)
+        processos = await this.page.$$eval('a.linkProcesso', (as) =>
+          as.map((a) => a.href)
+        );
+
+      let tam = processos ? processos.length : 1;
       let count = 0;
 
-      do{
+      // Programação normal
+      do {
         if (processos) {
           await this.acessar(processos[count], this.pageOptions, false);
         }
@@ -113,8 +126,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
         await sleep(1000);
 
         count++;
-      } while(count < tam)
-
+      } while (count < tam);
 
       this.resposta.sucesso = true;
       this.logger.log(
@@ -126,7 +138,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       this.debug(`ERRO OCORRIDO:\n ${e}`);
 
       this.resposta.sucesso = false;
-      this.resposta.detalhes = e;
+      this.resposta.detalhes = e.message;
     } finally {
       await this.finalizar();
       this.resposta.instancia = this.instancia;

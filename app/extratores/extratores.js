@@ -13,6 +13,12 @@ class ExtratorBase {
     this.url = url;
     this.robo = new Robo();
   }
+
+  debug(msg) {
+    if (this.isDebug) {
+      console.log(`DEBUG: ${msg}`);
+    }
+  }
   
 }
 
@@ -29,7 +35,7 @@ class ExtratorPuppeteer extends ExtratorBase {
     this.logger.info('Iniciando Puppeteer');
     this.browser = await puppeteer.launch(this.launchOptions);
     this.logger.info('Puppeteer iniciado');
-    console.log('puppeteer inciado')
+    console.log('Iniciando Puppeteer');
     this.logger.info('Criando nova pagina');
     this.page = await this.browser.pages().then((pages) => pages[0]);
     await this.page.setViewport(this.viewPort);

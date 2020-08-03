@@ -19,9 +19,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     usuario = { username: '', password: '' },
   } = {}) {
     super(url, debug);
-    if(this.isDebug){
-      console.log('MODO DEBUG ATIVADO');
-    }
+    this.debug('MODO DEBUG ATIVADO');
     this.timeout = timeout;
     this.headless = headless;
     if (usuario) this.usuario = usuario;
@@ -70,25 +68,21 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     });
     try {
       await this.iniciar();
-      if(this.isDebug){
-        console.log('Puppeteer iniciado');
-        console.log('Paginas:', this.browser.pages().length);
-      }
+      this.debug('Puppeteer iniciado');
+      this.debug(`Paginas: ${this.browser.pages().length}`);
       await sleep(100);
 
       await this.acessar(
         'https://esaj.tjsp.jus.br/esaj/portal.do',
         this.pageOptions
       );
-      if(this.isDebug){
-        console.log('pageOptions:', JSON.stringify(this.pageOptions));
-      }
+
+      this.debug(`pageoptions: ${JSON.stringify(this.pageOptions)}`);
       await sleep(100);
 
       await this.login();
-      if(this.isDebug){
-        console.log('usuario:', JSON.stringify(this.usuario));
-      }
+
+      this.debug(`Usuario: ${JSON.stringify(this.usuario)}`);
       await sleep(100);
 
       // throw new Error('oi');
@@ -114,9 +108,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       );
     } catch (e) {
       this.logger.log('error', e);
-      if (this.isDebug) {
-        console.log('Opa! Deu ruim:\n', e);
-      }
+      this.debug(`ERRO OCORRIDO:\n ${e}`);
 
       this.resposta.sucesso = false;
       this.resposta.detalhes = e;
@@ -175,7 +167,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.usuario = await this.getCredenciais('SP');
         } else {
           this.logger.info('Terminado procedimento de login');
-          console.log('terminado login');
+          this.debug('Terminado Login');
           return resolve(true);
         }
 
@@ -200,20 +192,17 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       url = 'https://esaj.tjsp.jus.br/cposgcr/open.do';
     }
 
-    // url = INSTANCIAS_URLS[instancia - 1]+'/open.do';
-
     this.logger.info(
       `Acessando pagina de consulta da ${this.instancia}a instancia`
     );
     await this.acessar(url, this.pageOptions, false);
     this.logger.info('Aguardando o carregamento da pagina');
-    // if (this.instancia === 1){
-    //   await this.page.waitForSelector('#conpass-tag > div > button');
-    // } else {
-    //
-    // }
-    await sleep(1500);
 
+    this.debug('Aguardando carregamento da pagina');
+    // Esse sleep é pq pode aleatoriamente ter uma mudança no dom que bloqueia a
+    // tela até que ela esteja completa.
+    await sleep(1500);
+    this.debug('Pagina carregada');
     this.logger.info('Pagina carregada');
     this.logger.info('Digitando numero do processo');
     await this.page.type('#numeroDigitoAnoUnificado', numeroProcesso);
@@ -231,21 +220,23 @@ class PeticaoTJSP extends ExtratorPuppeteer {
   async consultaAutos() {
     this.logger.info('Iniciando procedimento de consulta de Autos');
     this.logger.info('Aguardando carregamento da pagina');
-    // await this.page.waitForSelector('#conpass-tag > div > button');
-    await sleep(1500);
+    let selector = '#linkPasta';
+
     this.logger.info('Pagina carregada');
     this.logger.info('Acessando pagina com documentos do processo');
-    let link;
+    let btn;
     const newPagePromise = new Promise((x) =>
       this.browser.once('targetcreated', (target) => x(target.page()))
     );
-    if (this.instancia === 1) {
-      link = await this.page.$('#linkPasta');
-      await link.click({ button: 'middle' });
-    } else {
-      link = await this.page.$('a[title="Pasta Digital"]');
-      await link.click();
-    }
+
+    if (this.instancia !== 1) selector = 'a[title="Pasta Digital"]';
+
+    if ((await this.page.$(selector)) === null)
+      throw new Error('Não há link para peticao inicial');
+
+    btn = await this.page.$(selector);
+    await btn.click();
+
     this.page = await newPagePromise;
     await this.page.bringToFront();
 
@@ -279,8 +270,6 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     await this.page.click('#opcao1');
 
     await this.page.click('#botaoContinuar');
-
-    // await this.page.waitForSelector('#popupGerarDocumentoFinalizadoComSucesso');
 
     await this.page.waitForSelector('#popupGerarDocumentoOpcoes');
     await this.page.waitForSelector('#popupGerarDocumentoOpcoes', {

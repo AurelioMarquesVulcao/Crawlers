@@ -59,13 +59,17 @@ const fila = new CriaFilaJTE();
             try {
                 // string de busca no banco de dados
                 let parametroBusca = { "tribunal": 2, "origem": origens[contaOrigem] };
+                // console.log(origens.length);
                 let buscar = await fila.abreUltimo(parametroBusca);
+                console.log(buscar.length);
                 let sequencial = maiorSequencial(buscar)
                 let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
+                console.log(numeroSequencial);
                 let comarca = sequencial.numeroProcesso.slice(16, 20);
                 // isso que vai pegar os processos
                 console.log("Estamos na comarca: " + origens[contaOrigem]);
-                //console.log(sequencial.data.dia, relogio.dia, sequencial.data.mes, relogio.mes);
+                // console.log(sequencial.data.dia == relogio.dia);
+                // console.log(sequencial.data.mes < relogio.mes);
                 if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
                         await fila.procura10(numeroSequencial, comarca, 4, '02')
@@ -76,7 +80,7 @@ const fila = new CriaFilaJTE();
                     await sleep(500)
                 } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
-                        await fila.procura10(numeroSequencial, comarca, 4, '02')
+                        await fila.procura10(numeroSequencial, comarca, 3, '02')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
                         await fila.procura(numeroSequencial, comarca, 1, '02')
@@ -84,7 +88,7 @@ const fila = new CriaFilaJTE();
                     await sleep(500)
                 } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
-                        await fila.procura10(numeroSequencial, comarca, 4, '02')
+                        await fila.procura10(numeroSequencial, comarca, 3, '02')
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
                         await fila.procura(numeroSequencial, comarca, 1, '02')
@@ -98,9 +102,9 @@ const fila = new CriaFilaJTE();
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };
             let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
-            if (contaOrigem == 219) { contaOrigem = 0; await sleep(pausaNaConsulta) } else { contaOrigem++ };
+            if (contaOrigem == 160) { contaOrigem = 0; await sleep(pausaNaConsulta) } else { contaOrigem++ };
         };
-        await sleep(7000)
+        await sleep(1000)
     };
     await sleep(2000)
 })();

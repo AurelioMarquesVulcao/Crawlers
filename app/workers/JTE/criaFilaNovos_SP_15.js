@@ -54,10 +54,7 @@ const fila = new CriaFilaJTE();
                 // console.log(origens.length);
                 let buscar = await fila.abreUltimo(parametroBusca);
                 console.log(buscar.length);
-                //console.log(buscar);
                 let sequencial = maiorSequencial(buscar)
-
-                //console.log(sequencial);
                 let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
                 console.log(numeroSequencial);
                 let comarca = sequencial.numeroProcesso.slice(16, 20);
@@ -97,7 +94,7 @@ const fila = new CriaFilaJTE();
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };
             let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
-            if (contaOrigem == 219) { contaOrigem = 0; await sleep(pausaNaConsulta) } else { contaOrigem++ };
+            if (contaOrigem == 160) { contaOrigem = 0; await sleep(pausaNaConsulta) } else { contaOrigem++ };
         };
         await sleep(1000)
     };

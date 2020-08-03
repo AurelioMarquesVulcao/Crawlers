@@ -26,7 +26,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
 
     this.args = [
       '--no-sandbox',
-      // `--proxy-server=http://proxy-proadv.7lan.net:8181`,
+      `--proxy-server=http://proxy-proadv.7lan.net:8181`,
       `--ignore-certificate-errors`,
     ];
     this.ignore = ['--disable-extensions'];

@@ -1,0 +1,117 @@
+{
+  "capa": {
+    "assunto": ["Indenizacao por Dano Material"],
+    "uf": "SC",
+    "comarca": "Capital",
+    "classe": "Apelacao Civel"
+  },
+  "detalhes": {
+    "tipo": "cnj",
+    "numeroProcesso": "00468204820128240023",
+    "numeroProcessoMascara": "0046820-48.2012.8.24.0023",
+    "instancia": 2,
+    "ano": 2012,
+    "orgao": 8,
+    "tribunal": 24,
+    "origem": 23
+  },
+  "envolvidos": [
+    {
+      "tipo": "Apelante",
+      "nome": "Andre Felipe Adriano"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "(15329SC) Fernando Luz da Gama Lobo Deca"
+    },
+    {
+      "tipo": "Apelado",
+      "nome": "Ismael Pedro Cardoso"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "(27183SC) Fabiano Henrique Souza"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "Valter Luiz de Souza"
+    },
+    {
+      "tipo": "Interessado",
+      "nome": "Abayan Inacio Marcellino"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "(39370SC) Mauricio Tschumi Leao"
+    },
+    {
+      "tipo": "Interessado",
+      "nome": "Nikson Silvano Vieira"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "(30646SC) Edvaldo Evaldo Florindo"
+    },
+    {
+      "tipo": "Interessado",
+      "nome": "Peterson Martins Goncalves"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "(32951SC) Bruno Etore Capozzi"
+    },
+    {
+      "tipo": "Interessado",
+      "nome": "Vitor Angelo"
+    },
+    {
+      "tipo": "Interessado",
+      "nome": "Walber Avair Angelo"
+    }
+  ],
+  "oabs": ["15329SC", "27183SC", "39370SC", "30646SC", "32951SC"],
+  "dataAtualizacao": "dataFormatada",
+  "dataCriacao": "dataFormatada",
+  "andamentos": [
+    {
+      "data": "2019-10-29T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Conclusao ao Relator",
+      "numeroProcesso": "00468204820128240023"
+    },
+    {
+      "data": "2019-10-29T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Expedido Termo de Distribuicao",
+      "numeroProcesso": "00468204820128240023",
+      "observacao": "[TJSC] Termo de Distribuicao - Gabinete"
+    },
+    {
+      "data": "2019-10-29T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Distribuicao por Sorteio",
+      "numeroProcesso": "00468204820128240023",
+      "observacao": "Orgao Julgador: 82 - Sexta Camara de Direito Civil Relator: 31101 - Desembargador Andre Carvalho"
+    },
+    {
+      "data": "2019-10-28T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Remessa a Secao de Preparo, Custas e Recolhimento/DCDP",
+      "numeroProcesso": "00468204820128240023"
+    },
+    {
+      "data": "2019-10-28T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Processo Cadastrado",
+      "numeroProcesso": "00468204820128240023",
+      "observacao": "DCDP - Assessoria de Cadastramento"
+    },
+    {
+      "data": "2019-10-23T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Recebido recurso eletronico no Tribunal de Justica de Santa Catarina",
+      "numeroProcesso": "00468204820128240023",
+      "observacao": "Foro de origem: Capital Vara de origem: 5a Vara Civel"
+    }
+  ]
+}

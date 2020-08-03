@@ -10,6 +10,7 @@ const capaSchema = new Schema(
     assunto: [String],
     classe: String,
     dataDistribuicao: Date,
+    instancia: String,
   },
   { _id: false, versionKey: false }
 );
@@ -64,7 +65,8 @@ processoSchema.methods.salvar = async function salvar() {
   let processoObject = this.toObject();
   let pesquisaAndamentos = 0;
   delete processoObject['_id'];
-  var pesquisa = await new Promise((resolve, reject) => {
+  // verificando se há processos já salvos
+  let pesquisa = await new Promise((resolve, reject) => {
     Processo.findOne(
       {
         'detalhes.numeroProcesso': this.detalhes.numeroProcesso,
@@ -79,9 +81,10 @@ processoSchema.methods.salvar = async function salvar() {
     );
   });
 
-  var doc = await new Promise((resolve, reject) => {
+  // verificando a quantidade de andamentos dentro do banco
+  let doc = await new Promise((resolve, reject) => {
     processoObject.temAndamentosNovos = true;
-    if (pesquisa && this.qtdAndamentos == pesquisa.qtdAndamentos) {
+    if (pesquisa && this.qtdAndamentos === pesquisa.qtdAndamentos) {
       processoObject.temAndamentosNovos = false;
     }
     let doc = Processo.updateOne(
@@ -98,6 +101,7 @@ processoSchema.methods.salvar = async function salvar() {
     );
   });
 
+  // Verifica se o processo foi atualizado
   if (doc.upserted) {
     return {
       numeroProcesso: processoObject.detalhes.numeroProcesso,
@@ -107,7 +111,10 @@ processoSchema.methods.salvar = async function salvar() {
   }
 
   if (pesquisa) {
-    pesquisaAndamentos = pesquisa.qtdAndamentos;
+    if (pesquisa.qtdAndamentos) {
+      pesquisaAndamentos = pesquisa.qtdAndamentos;
+    }
+    pesquisaAndamentos = 0;
   }
 
   return {
@@ -132,6 +139,27 @@ processoSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
   detalhes['origem'] = parseInt(cnjPartes[4]);
 
   return detalhes;
+};
+
+processoSchema.statics.listarProcessos = async function listarProcessos(dias) {
+  let numeroProcessos = [];
+
+  let docs = await Processo.find(
+    {
+      dataAtualizacao: {
+        $gte: new Date(new Date().getTime() - dias * 24 * 3600 * 1000),
+      },
+    },
+    {
+      'detalhes.numeroProcessoMascara': 1,
+    }
+  );
+
+  docs.forEach((doc) => {
+    numeroProcessos.push(doc.detalhes.numeroProcessoMascara);
+  });
+
+  return numeroProcessos;
 };
 
 processoSchema.index({ 'detalhes.numeroProcesso': 1, type: -1 });

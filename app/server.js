@@ -7,7 +7,6 @@ const bodyParser = require("body-parser");
 const { Processo } = require("./models/schemas/processo");
 const { Andamento } = require("./models/schemas/andamento");
 const { enums } = require("./configs/enums");
-const axios = require("axios");
 
 const routes = require("./api/routes/routes");
 
@@ -28,15 +27,17 @@ app.get("/", (req, res) => {
 });
 
 app.get("/getProcesso", (req, res) => {
+  const numeroProcesso = req.query.numeroProcesso.replace(/\W/g, '');
   Processo.findOne(
-    { "detalhes.numeroProcesso": req.query.numeroProcesso },
+    { "detalhes.numeroProcesso": numeroProcesso },
     function (err, result) {
       if (err) {
         console.log(err);
         res.status(220).send(err);
       }
+      console.log('resposta', result);
       let resposta = result.toJSON();
-      Andamento.find({ numeroProcesso: req.query.numeroProcesso }, function (
+      Andamento.find({ numeroProcesso: numeroProcesso }, function (
         err,
         result
       ) {
@@ -44,10 +45,9 @@ app.get("/getProcesso", (req, res) => {
           console.log(err);
           res.status(220).send(err);
         }
-        let andamentos = result.map((element, index) => {
+        resposta.andamentos = result.map((element) => {
           return element.toJSON();
         });
-        resposta.andamentos = andamentos;
         res.status(200).send(resposta);
       });
     }
@@ -55,10 +55,11 @@ app.get("/getProcesso", (req, res) => {
 });
 
 app.get("/getAndamentos", (req, res) => {
-  Andamento.retornaAndamentos(req.query.numeroProcesso).then((andamentos) => {
+  const numeroProcesso = req.query.numeroProcesso.replace(/\W/g, '');
+  Andamento.retornaAndamentos(numeroProcesso).then((andamentos) => {
     res
       .status(200)
-      .send({ processo: req.query.numeroProcesso, andamentos: andamentos });
+      .send({ processo: numeroProcesso, andamentos: andamentos });
   });
 });
 

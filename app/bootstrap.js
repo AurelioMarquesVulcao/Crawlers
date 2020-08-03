@@ -9,6 +9,7 @@ if (!process.env.RABBITMQ_CONNECTION_STRING)
   throw Error("RABBITMQ_CONNECTION_STRING é uma variável obrigatória");
   
 mongoose.connect(enums.mongo.connString, {
+  useCreateIndex: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

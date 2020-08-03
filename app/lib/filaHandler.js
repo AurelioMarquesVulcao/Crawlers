@@ -1,12 +1,12 @@
-const amqp = require("amqplib/callback_api");
-const { enums } = require("../configs/enums");
+const amqp = require('amqplib/callback_api');
+const { enums } = require('../configs/enums');
 
 class GerenciadorFila {
   /** Handler que envia e consome mensagens de uma fila do RabbitMq.
    * @param {number} prefetch int com número de consumidores da fila.
    */
-  constructor(prefetch = 1) {
-    this.host = enums.rabbitmq.connString;
+  constructor(host = null, prefetch = 1) {
+    this.host = host ? host : enums.rabbitmq.connString;
     this.prefetch = prefetch;
   }
 
@@ -16,7 +16,7 @@ class GerenciadorFila {
    * @param {String} mensagem   Mensagem em JSON
    */
   enviarMensagem(ch, fila, mensagem) {
-    console.log(`${mensagem} -> ${fila}`);
+    //console.log(`${mensagem} -> ${fila}`);
     const buffer = Buffer.from(mensagem);
     ch.sendToQueue(fila, buffer);
   }
@@ -26,7 +26,7 @@ class GerenciadorFila {
    * @param {any} mensagem    Mensagem a ser enviada.
    */
   enviar(fila, mensagem) {
-    if (typeof mensagem === "object") mensagem = JSON.stringify(mensagem);
+    if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
 
     amqp.connect(this.host, (err, conn) => {
       if (err) throw new Error(err);
@@ -37,7 +37,7 @@ class GerenciadorFila {
         ch.assertQueue(fila, {
           durable: true,
           noAck: false,
-          maxPriority: 9
+          maxPriority: 9,
         });
 
         this.enviarMensagem(ch, fila, mensagem);
@@ -82,7 +82,7 @@ class GerenciadorFila {
         ch.assertQueue(fila, {
           durable: true,
           noAck: false,
-          maxPriority: 9
+          maxPriority: 9,
         });
         ch.prefetch(this.prefetch);
 
@@ -113,7 +113,7 @@ class GerenciadorFila {
         ch.assertQueue(filaOrigem, {
           durable: true,
           noAck: false,
-          maxPriority: 9
+          maxPriority: 9,
         });
         ch.prefetch(this.prefetch);
 
@@ -131,7 +131,7 @@ class GerenciadorFila {
           ch.assertQueue(filaDestino, {
             durable: true,
             noAck: false,
-            maxPriority: 9
+            maxPriority: 9,
           });
           ch.sendToQueue(filaDestino, buffer);
 

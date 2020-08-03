@@ -34,27 +34,44 @@ const ExtracaoSchema = new Schema(
   }
 );
 
+/**
+ * Cria (ou atualiza) e retorna um objeto do tipo Extracao.
+ * @param {{ExecucaoConsultaId: String, NumeroProcesso: String, NumeroOab: String}}message
+ * @param {{resultado: [Object], sucesso: Boolean, detalhes: [String]}} extracao
+ * @param {String} uf
+ * @returns {Promise<Extracao>}
+ */
 ExtracaoSchema.statics.criarExtracao = async function criarExtracao(
   message,
   extracao,
   uf
 ) {
-  return await Extracao.create({
-    idLog: message.ExecucaoConsultaId,
-    numeroProcesso: message.NumeroProcesso,
-    oab: message.NumeroOab,
-    resultado: extracao.resultado,
-    sucesso: extracao.sucesso,
-    detalhes: extracao.detalhes,
-    uf: uf,
-  });
+  await Extracao.updateOne(
+    { idLog: message.ExecucaoConsultaId },
+    {
+      idLog: message.ExecucaoConsultaId,
+      numeroProcesso: message.NumeroProcesso,
+      oab: message.NumeroOab,
+      resultado: extracao.resultado,
+      sucesso: extracao.sucesso,
+      detalhes: extracao.detalhes,
+      uf: uf,
+    },
+    { upsert: true }
+  );
+
+  return Extracao.findOne({ idLog: message.ExecucaoConsultaId });
 };
 
+/**
+ * Prepara um json com a formatação referente ao bigdata
+ * @returns {{Resultado: (null|[Object]), Sucesso: Boolean, Detalhes: [String], IdLog: String, NumeroDoProcesso: (null|String), NumeroOab: (null|String)}}
+ */
 ExtracaoSchema.methods.prepararEnvio = function prepararEnvio() {
   return {
     IdLog: this.idLog,
-    NumeroDoProcesso: this.NumeroProcesso,
-    NumeroOab: this.NumeroOab,
+    NumeroDoProcesso: this.numeroProcesso,
+    NumeroOab: this.oab,
     Resultado: this.resultado,
     Sucesso: this.sucesso,
     Detalhes: this.detalhes,

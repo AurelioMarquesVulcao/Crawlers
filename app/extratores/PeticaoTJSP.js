@@ -89,15 +89,18 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       await sleep(100);
 
       // Tratamento caso resultado da consulta retorne algo invalido
-      let alert = await this.page.$eval('#mensagemRetorno', (element) => {
-        return {
-          role: element.getAttribute('role'),
-          msg: element.textContent,
-        };
-      });
-      if (alert.role === 'alert') {
-        throw new Error(alert.msg.trim());
+      if (await this.page.$('#mensagemRetorno') !== null){
+        let alert = await this.page.$eval('#mensagemRetorno', (element) => {
+          return {
+            role: element.getAttribute('role'),
+            msg: element.textContent,
+          };
+        });
+        if (alert.role === 'alert') {
+          throw new Error(alert.msg.trim());
+        }
       }
+
 
       // Tratamento caso resultado da consulta retorne uma lista de processos
       let processos;
@@ -181,9 +184,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.page.click('#pbEntrar'),
         ]);
 
-        continuar = await this.page
-          .$$('#mensagemRetorno')
-          .then((selector) => Boolean(selector.length));
+        continuar = await this.page.$$('#mensagemRetorno').then((selector) => Boolean(selector.length));
 
         if (continuar) {
           this.logger.log(

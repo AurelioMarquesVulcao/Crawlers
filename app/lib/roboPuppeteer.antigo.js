@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 require("dotenv/config");
 
-var timerSleep = 100
+var timerSleep = 150
 
 class RoboPuppeteer3 {
 
@@ -11,7 +11,7 @@ class RoboPuppeteer3 {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
       headless: false,
-      slowMo: 1,
+      slowMo: 50,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
@@ -20,6 +20,7 @@ class RoboPuppeteer3 {
       args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
+    // await this.page.setViewport({width: 1280, height: 1920});
     // await this.acessar('https://www.meuip.com.br/');
     // await sleep(30000)
     console.log('O Puppeteer foi Iniciado corretamente');
@@ -47,7 +48,7 @@ class RoboPuppeteer3 {
 
   async preencheTribunal(numero) {
     // await console.log(`foi escolhido o estado numero ${escolheEstado(numero)}`);
-    await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
+    //await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
     // para esperar carregar o elemento onde fica o tribunal
     await sleep(timerSleep)
     await this.page.waitFor('mat-form-field');
@@ -60,12 +61,34 @@ class RoboPuppeteer3 {
     await this.page.click(`#mat-option-${escolheEstado(numero)}`)
     await sleep(timerSleep)
     await this.page.click('ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span')
-    await sleep(2200)
+    await sleep(5200)
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual')
     await sleep(timerSleep)
     await console.log("Logado ao tribunal desejado");
+  }
 
+  async loga(){
+    let login = "10389051764";
+    let senha = "Senh@JTE123";
+    console.log('Login iniciado');
+    await this.page.click("#inner > ion-toolbar > ion-buttons:nth-child(5)")
+    console.log('clicado no item de login');
+    await sleep(2000) 
+    await this.page.type("#formLogin > ion-item > ion-input > input", login)
+    console.log('digido login');
+    await sleep(1000) 
+    await this.page.click("#formLogin > ion-toolbar > ion-button")
+    console.log('clicado no primeiro botão');
+    await sleep(1000)
+    await this.page.type("#senha > input", senha)
+    console.log('digitando senha');
+    await sleep(2000)
+    await this.page.click("#formLogin > ion-toolbar > ion-button")
+    console.log('confirmando senha');
+    await sleep(9000)
+    await this.page.click('#consultaProcessual > ion-card')
+    console.log('clicado no botão de busca');
   }
 
 
@@ -145,6 +168,8 @@ class RoboPuppeteer3 {
     //let html2 = await this.page.content();
 
     await console.log(`info: JTE - CNJ: ${numero} - html dos andamentos extraido do Puppeteer`);
+    await sleep(timerSleep)
+    await this.page.click("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated:nth-child(2)")
     return { geral: html1, andamentos: html2 }
   }
 

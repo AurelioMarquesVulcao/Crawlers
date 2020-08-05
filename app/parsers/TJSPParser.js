@@ -221,8 +221,6 @@ class TJSPParser extends BaseParser {
     const isBaixa = this.extrairBaixa(status);
     capa.dataDistribuicao = this.extrairDataDistribuicao(content, andamentos);
 
-    console.log(capa.dataDistribuicao, this.extrairDataDistribuicao(content, andamentos))
-
     const processo = new Processo({
       capa: capa,
       detalhes: detalhes,
@@ -230,7 +228,7 @@ class TJSPParser extends BaseParser {
       oabs: oabs,
       qtdAndamentos: andamentos.length,
       origemExtracao: 'OabTJSP',
-      statu: status,
+      status: status,
       isBaixa: isBaixa
     });
 
@@ -259,7 +257,7 @@ class TJSPParser extends BaseParser {
     let data ;
     let distribuicao;
 
-    distribuicao = removerAcentos($('tr:contains("Distribuição:")').next('tr').text().strip());
+    distribuicao = removerAcentos($('body > div > table:nth-child(4) > tbody > tr > td > div:nth-child(9) > table.secaoFormBody > tbody > tr:nth-child(5) > td:nth-child(2) > span').text().strip());
 
     distribuicao = distribuicao.replace(/(?<data>\d{2}\/\d{2}\/\d{4})\sas\s(?<hora>\d{2}\:\d{2})(.*)/gm, '$1 $2')
     console.log('distribuicao', distribuicao);

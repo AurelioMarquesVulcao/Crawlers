@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 require("dotenv/config");
 
-var timerSleep = 100
+var timerSleep = 300
 
 class RoboPuppeteer3 {
 
@@ -209,20 +209,66 @@ class RoboPuppeteer3 {
   }
 
   async pegaInicial() {
+
     //await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active')
     await sleep(1000)
-    await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(4)')
-    //await sleep(3000)
-    let htmlDoc = await this.page.evaluate(async () => {
-      // let text = await document.querySelector('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div').innerHTML;
-      let text = document.getElementsByTagName('iframe')[0].src
+    let numeroMovimentacoes = await this.page.evaluate(async () => {
+      let numero = document.querySelectorAll('ion-item ion-label').length - 1;
+      let numero2 = [];
+      console.log(numero);
+      let numero2 = [];
+    console.log(numero);
+    for (let i = 0; i < numero; i++) {
+      let buscaInicio = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item > ion-label > div > p:nth-child(${i})`).innerText
+      let inicioTexto = "Distribuído por sorteio"
+      console.log(buscaInicio);
+      if (buscaInicio == inicioTexto) { numero2.push(i) };
+      if (numero2[0] > i) {
+        if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`)) {
+          numero2.push(i)
+        };
+      }
+    };
 
-      return text
-    })
-    await console.log(htmlDoc);
+      return {numero,numero2}
+    });
+
+    await console.log("temos essas movimentações ===>" + numeroMovimentacoes);
+
+
+    // await console.log(numerosIniciaisLaco);
+
+    // await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item > ion-label > div > p:nth-child(2)')
+    // // await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item > ion-icon:nth-child(2)')
+    // //document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(3) > ion-icon").shadowRoot.querySelector("div > svg")
+    // await sleep(1000)
+    // let htmlDoc = await this.page.evaluate(async () => {
+    //   // let text = await document.querySelector('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div').innerHTML;
+    //   let text = document.getElementsByTagName('iframe')[0].src
+
+    //   return text
+    // })
+    // await console.log(htmlDoc);
     //#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe
 
   }
+  numerosIniciaisLaco(numeroMovimentacoes) {
+    let numero2 = [];
+    console.log(numero);
+    for (let i = 0; i < numero; i++) {
+      let buscaInicio = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item > ion-label > div > p:nth-child(${i})`).innerText
+      let inicioTexto = "Distribuído por sorteio"
+      console.log(buscaInicio);
+      if (buscaInicio == inicioTexto) { numero2.push(i) };
+      if (numero2[0] > i) {
+        if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`)) {
+          numero2.push(i)
+        };
+      }
+    };
+    return numero
+  };
+
 
 
   async pegaDespacho() {
@@ -258,6 +304,22 @@ function processaNumero(numero) {
     vara: vara
   }
 }
+// (async () => {
+//   let puppet = new RoboPuppeteer3()
+
+//   await puppet.iniciar()
+
+//   await sleep(1000)
+//   await puppet.acessar("https://jte.csjt.jus.br/")
+//   await sleep(1000)
+//   await puppet.preencheTribunal('00002954820205050462')
+//   await sleep(2000)
+//   await puppet.loga()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00002954820205050462", 0)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+// })()
 (async () => {
   let puppet = new RoboPuppeteer3()
 
@@ -266,12 +328,13 @@ function processaNumero(numero) {
   await sleep(1000)
   await puppet.acessar("https://jte.csjt.jus.br/")
   await sleep(1000)
-  await puppet.preencheTribunal('00002954820205050462')
+  await puppet.preencheTribunal('00105492920205150001')
   await sleep(2000)
   await puppet.loga()
   await sleep(1000)
-  await puppet.preencheProcesso("00002954820205050462", 0)
+  await puppet.preencheProcesso("00109936220205150001", 0)
   await sleep(1000)
   await puppet.pegaInicial()
 })()
+// 0011051-65.2020.5.15.0001  
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

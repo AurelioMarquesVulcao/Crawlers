@@ -5,6 +5,13 @@ const re = require('xregexp');
 const { BaseParser, removerAcentos, traduzir } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
+
+const possiveisStatusBaixa = [
+  'Arquivamento com baixa',
+  'Arquivamento',
+  'Baixa Definitiva'
+]
+
 class TJSPParser extends BaseParser {
   /**
    * TJSPParser
@@ -142,9 +149,22 @@ class TJSPParser extends BaseParser {
     return oabs.filter(Boolean);
   }
 
-  // extrairStatus(content) {
-  //   return 'Não informado.';
-  // }
+  /**
+   * @param {[Andamento]} andamentos
+   * @returns {string}
+   */
+  extrairStatus(andamentos) {
+    const tam = andamentos.length
+
+    for (let i = 0; i < tam; i++){
+      let statusIndex = possiveisStatusBaixa.indexOf(andamentos[i].descricao);
+      if (statusIndex !== -1) {
+        return possiveisStatusBaixa[statusIndex];
+      }
+    }
+
+    return 'Aberto'
+  }
 
   extrairAndamentos($, dataAtual, numeroProcesso) {
     let andamentos = [];
@@ -192,12 +212,16 @@ class TJSPParser extends BaseParser {
     const detalhes = this.extrairDetalhes(content);
     const envolvidos = this.extrairEnvolvidos(content);
     const oabs = this.extrairOabs(envolvidos);
-    // const status = this.extrairStatus(content); //ainda nao encontrado uma ocorrencia em que apareça, mas se precisar ta ai
     const andamentos = this.extrairAndamentos(
       content,
       dataAtual,
       detalhes.numeroProcesso
     );
+    const status = this.extrairStatus(andamentos); //ainda nao encontrado uma ocorrencia em que apareça, mas se precisar ta ai
+    const isBaixa = this.extrairBaixa(status);
+    capa.dataDistribuicao = this.extrairDataDistribuicao(content, andamentos);
+
+    console.log(capa.dataDistribuicao, this.extrairDataDistribuicao(content, andamentos))
 
     const processo = new Processo({
       capa: capa,
@@ -206,12 +230,45 @@ class TJSPParser extends BaseParser {
       oabs: oabs,
       qtdAndamentos: andamentos.length,
       origemExtracao: 'OabTJSP',
+      statu: status,
+      isBaixa: isBaixa
     });
 
     return {
       processo: processo,
       andamentos: andamentos,
     };
+  }
+
+  /**
+   *
+   * @param {String} status
+   * @return {boolean}
+   */
+  extrairBaixa(status) {
+    return possiveisStatusBaixa.indexOf(status) !== -1;
+  }
+
+  /**
+   *
+   * @param {cheerio} $
+   * @param {[Andamento]} andamentos
+   * @returns {Date}
+   */
+  extrairDataDistribuicao($, andamentos) {
+    let data ;
+    let distribuicao;
+
+    distribuicao = removerAcentos($('tr:contains("Distribuição:")').next('tr').text().strip());
+    distribuicao = distribuicao.replace(/(?<data>\d{2}\/\d{2}\/\d{4})\sas\s(?<hora>\d{2}\:\d{2})(.*)/, '$1 $2:00')
+
+    if(distribuicao.replace(/\W/g, '')) {
+      data = moment(distribuicao, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:SS');
+      return data
+    }
+
+    let tam = andamentos.length;
+    return andamentos[tam-1].data;
   }
 }
 

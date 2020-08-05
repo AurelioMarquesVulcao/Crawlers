@@ -278,7 +278,7 @@ class OabTJSP extends ExtratorBase {
     if(this.instancia === 1)
 
 
-    let url = `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    // let url = `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
     console.log('cookies', cookies);
     console.log(url);
     let problema;

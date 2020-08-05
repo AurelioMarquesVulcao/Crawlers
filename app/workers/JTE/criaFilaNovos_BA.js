@@ -79,7 +79,7 @@ const fila = new CriaFilaJTE();
                 console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };
-            let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
+            let pausaNaConsulta = 5000 // Tempo de espera entre consultas no momento está 1 hora.
             if (contaOrigem == 88) { contaOrigem = 0; await sleep(pausaNaConsulta) } else { contaOrigem++ };
         };
         await sleep(7000)

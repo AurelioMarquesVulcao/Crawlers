@@ -130,6 +130,9 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     await console.log(`info: JTE - CNJ: ${numero} - html da capa do processo extraido do Puppeteer`);
     const divButon = '#listaProcessoEncontrado > mat-tab-group > mat-tab-header > div.mat-tab-label-container > div > div'
+    // esta travando a carregamento dos elementos aqui.
+    await sleep(2000)
+    await this.page.click(`#mat-tab-label-${contador}-1`)
     await sleep(timerSleep)
     await this.page.click(`#mat-tab-label-${contador}-1`)
     await sleep(timerSleep)
@@ -148,6 +151,7 @@ class RoboPuppeteer3 {
     return { geral: html1, andamentos: html2 }
   }
 
+  
   async pegaAudiencia() {
     // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
     // click para pegar o assunto
@@ -176,37 +180,45 @@ class RoboPuppeteer3 {
     await this.page.click(`#menu-content > detalhe-documento > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button > button`)
 
     await sleep(timerSleep)
-    //await page.pdf({ path: 'app', format: 'A4' });
+  }
+
+  async loga(){
+    let login = "10389051764";
+    let senha = "Senh@JTE123";
+    console.log('Login iniciado');
+    await this.page.click("#inner > ion-toolbar > ion-buttons:nth-child(5)")
+    console.log('clicado no item de login');
+    await sleep(2000) 
+    await this.page.type("#formLogin > ion-item > ion-input > input", login)
+    console.log('digido login');
+    await sleep(1000) 
+    await this.page.click("#formLogin > ion-toolbar > ion-button")
+    console.log('clicado no primeiro botão');
+    await sleep(1000)
+    await this.page.type("#senha > input", senha)
+    console.log('digitando senha');
+    await sleep(2000)
+    await this.page.click("#formLogin > ion-toolbar > ion-button")
+    console.log('confirmando senha');
+    await sleep(9000)
+    await this.page.click('#consultaProcessual > ion-card')
+    console.log('clicado no botão de busca');
+  }
+
+  async pegaInicial(){
 
   }
 
+
   async pegaDespacho() {
-    // #divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active > ion-icon
-
-    // #divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active
-    // #divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(6)
-
-
-    // #divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div
-
-
-    await sleep(timerSleep)
-    await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(11)`)
-    await sleep(1000)
-    let html8 = await this.page.evaluate(async () => {
-      let text = await document.querySelector('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div').innerText;
-      return text
-    });
-    await console.log(html8)
-
-
-
+    
+    await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active')
+    
   }
 
 
   async fechar() {
     await this.browser.close()
-
 
   }
 }
@@ -233,15 +245,20 @@ function processaNumero(numero) {
     vara: vara
   }
 }
-// (async () => {
-//   let puppet = new RoboPuppeteer3()
+(async () => {
+  let puppet = new RoboPuppeteer3()
 
-//   await puppet.iniciar()
+  await puppet.iniciar()
 
-//   //await sleep(10000)
-//   await puppet.acessar("https://jte.csjt.jus.br/")
-//   await puppet.preencheTribunal('00002225820175050017')
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00002225820175050017", 0)
-// })()
+  await sleep(1000)
+  await puppet.acessar("https://jte.csjt.jus.br/")
+  await sleep(1000)
+  await puppet.preencheTribunal('00002954820205050462')
+  await sleep(2000)
+  await puppet.loga()
+  await sleep(1000)
+  await puppet.preencheProcesso("00002954820205050462", 0)
+  await sleep(1000)
+  await puppet.pegaInicial()
+})()
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

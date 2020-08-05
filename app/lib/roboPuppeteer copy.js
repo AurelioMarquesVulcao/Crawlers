@@ -14,7 +14,7 @@ class RoboPuppeteer3 {
       slowMo: 1,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
       //args: ['--ignore-certificate-errors']
@@ -130,6 +130,9 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     await console.log(`info: JTE - CNJ: ${numero} - html da capa do processo extraido do Puppeteer`);
     const divButon = '#listaProcessoEncontrado > mat-tab-group > mat-tab-header > div.mat-tab-label-container > div > div'
+    // esta travando a carregamento dos elementos aqui.
+    await sleep(2000)
+    await this.page.click(`#mat-tab-label-${contador}-1`)
     await sleep(timerSleep)
     await this.page.click(`#mat-tab-label-${contador}-1`)
     await sleep(timerSleep)
@@ -180,34 +183,8 @@ class RoboPuppeteer3 {
 
   }
 
-  async pegaDespacho() {
-    // #divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active > ion-icon
-
-    // #divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active
-    // #divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(6)
-
-
-    // #divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div
-
-
-    await sleep(timerSleep)
-    await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(11)`)
-    await sleep(1000)
-    let html8 = await this.page.evaluate(async () => {
-      let text = await document.querySelector('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div').innerText;
-      return text
-    });
-    await console.log(html8)
-
-
-
-  }
-
-
   async fechar() {
     await this.browser.close()
-
-
   }
 }
 

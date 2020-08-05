@@ -12,7 +12,7 @@ const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
 const { ProcessoTJSP } = require('./ProcessoTJSP');
-
+const { Helper } = require('../lib/util');
 const INSTANCIAS_URLS = require('../assets/TJSP/instancias_urls.json').INSTANCIAS_URL;
 
 const {
@@ -71,8 +71,9 @@ class OabTJSP extends ExtratorBase {
       // Primeira parte: para pegar cookies e uuidcaptcha
 
       this.logger.info('Fazendo primeira conexão ao website');
+      console.log(`-----------------${this.url}-----------------`);
       objResponse = await this.robo.acessar({
-        url: this.url,
+        url: `${this.url}/open.do`,
         method: 'GET',
         usaProxy: true,
         encoding: 'latin1',
@@ -203,7 +204,7 @@ class OabTJSP extends ExtratorBase {
       captcha = await captchaHandler
         .resolveRecaptchaV2(
           // captcha = await antiCaptchaHandler(
-          'https://esaj.tjsp.jus.br/cpopg/open.do',
+          `${this.url}/open.do`,
           this.dataSiteKey,
           '/'
         )
@@ -222,7 +223,7 @@ class OabTJSP extends ExtratorBase {
       }
 
       return captcha.gResponse;
-    } catch (error) {
+    }catch (error) {
       if (error instanceof AntiCaptchaResponseException) {
         throw new AntiCaptchaResponseException(error.code, error.message);
       }
@@ -232,9 +233,8 @@ class OabTJSP extends ExtratorBase {
 
   async getCaptchaUuid(cookies) {
     let objResponse = {};
-    // TODO remover comentario caso funfe
     objResponse = await this.robo.acessar({
-      url: 'https://esaj.tjsp.jus.br/cpopg/captchaControleAcesso.do',
+      url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
       encoding: 'latin1',
       usaProxy: true,
@@ -246,7 +246,7 @@ class OabTJSP extends ExtratorBase {
         'Accept-Encoding': 'gzip, deflate, br',
         DNT: '1',
         Connection: 'keep-alive',
-        Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
+        Referer: `${this.url}/search.do`,
         'Upgrade-Insecure-Requests': '1',
       },
     });
@@ -257,7 +257,7 @@ class OabTJSP extends ExtratorBase {
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
     let url = '';
     await this.robo.acessar({
-      url: '${this.urk}manterSessao.do?conversationId=',
+      url: `${this.ulr}manterSessao.do?conversationId=`,
       headers: {
         Cookie: cookies,
         Accept:
@@ -266,7 +266,7 @@ class OabTJSP extends ExtratorBase {
         'Accept-Encoding': 'gzip, deflate, br',
         DNT: '1',
         Connection: 'keep-alive',
-        Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
+        Referer: `${this.url}search.do`,
         'Upgrade-Insecure-Requests': '1',
       },
       usaProxy: true
@@ -275,16 +275,16 @@ class OabTJSP extends ExtratorBase {
     let condition = false;
     let processos = [];
 
-    if(this.instancia === 1)
+    // primeira instancia
+    url = `${this.url}/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}`
+    if (this.instancia === 2)
+      url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=1&localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&tipoNuProcesso=UNIFICADO&dePesquisa=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    if (this.instancia === 3)
+      url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=1&localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&tipoNuProcesso=UNIFICADO&dePesquisa=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
 
-
-    // let url = `https://esaj.tjsp.jus.br/cpopg/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-    console.log('cookies', cookies);
     console.log(url);
-    let problema;
     do {
       let objResponse = {};
-      // TODO remover caso o codigo funfe
       objResponse = await this.robo.acessar({
         url: url,
         method: 'GET',
@@ -298,7 +298,7 @@ class OabTJSP extends ExtratorBase {
           'Accept-Encoding': 'gzip, deflate, br',
           DNT: '1',
           Connection: 'keep-alive',
-          Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
+          Referer: `${this.url}/search.do`,
           'Upgrade-Insecure-Requests': '1',
         },
       });
@@ -399,7 +399,7 @@ class OabTJSP extends ExtratorBase {
             'Accept-Encoding': 'gzip, deflate, br',
             DNT: '1',
             Connection: 'keep-alive',
-            Referer: 'https://esaj.tjsp.jus.br/cpopg/search.do',
+            Referer: `${this.url}/search.do`,
             'Upgrade-Insecure-Requests': '1',
           },
           usaProxy: true

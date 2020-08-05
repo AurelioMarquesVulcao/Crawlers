@@ -130,7 +130,10 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     await console.log(`info: JTE - CNJ: ${numero} - html da capa do processo extraido do Puppeteer`);
     const divButon = '#listaProcessoEncontrado > mat-tab-group > mat-tab-header > div.mat-tab-label-container > div > div'
-    await sleep(1500)
+    // esta travando a carregamento dos elementos aqui.
+    await sleep(2000)
+    await this.page.click(`#mat-tab-label-${contador}-1`)
+    await sleep(timerSleep)
     await this.page.click(`#mat-tab-label-${contador}-1`)
     await sleep(timerSleep)
     await this.page.waitFor('#divMovBrowser1 > ion-grid > ion-row > ion-col')

@@ -144,6 +144,7 @@ class TJBAPortalParser extends BaseParser {
       dataAtual,
       detalhes.numeroProcesso
     );
+    capa['dataDistribuicao'] = this.extrairDataDistribuicao(andamentos);
 
     const processo = new Processo({
       capa: capa,
@@ -158,6 +159,20 @@ class TJBAPortalParser extends BaseParser {
       processo: processo,
       andamentos: andamentos,
     };
+  }
+
+  /**
+   *
+   * @param {[Andamento]} andamentos
+   * @returns {*}
+   */
+  extrairDataDistribuicao(andamentos) {
+    let data;
+    let tam = andamentos.length;
+
+    data = andamentos[tam - 1].data;
+
+    return data;
   }
 }
 

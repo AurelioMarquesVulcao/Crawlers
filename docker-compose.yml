@@ -85,7 +85,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: node worker/TJBAPortal/extracaoNovos.js
+    command: node workers/TJBAPortal/extracaoNovos.js
 
   worker-tjsp-oab:
     extends:

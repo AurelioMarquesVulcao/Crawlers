@@ -257,7 +257,7 @@ class OabTJSP extends ExtratorBase {
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
     let url = '';
     await this.robo.acessar({
-      url: `${this.ulr}manterSessao.do?conversationId=`,
+      url: `${this.url}manterSessao.do?conversationId=`,
       headers: {
         Cookie: cookies,
         Accept:

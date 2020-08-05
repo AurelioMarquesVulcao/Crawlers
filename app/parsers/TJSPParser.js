@@ -260,10 +260,11 @@ class TJSPParser extends BaseParser {
     let distribuicao;
 
     distribuicao = removerAcentos($('tr:contains("Distribuição:")').next('tr').text().strip());
-    distribuicao = distribuicao.replace(/(?<data>\d{2}\/\d{2}\/\d{4})\sas\s(?<hora>\d{2}\:\d{2})(.*)/, '$1 $2:00')
 
-    if(distribuicao.replace(/\W/g, '')) {
-      data = moment(distribuicao, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:SS');
+    distribuicao = distribuicao.replace(/(?<data>\d{2}\/\d{2}\/\d{4})\sas\s(?<hora>\d{2}\:\d{2})(.*)/gm, '$1 $2')
+    console.log('distribuicao', distribuicao);
+    if(/\d{2}\/\d{2}\/\d{4} \d{2}\:\d{2}/g.test(distribuicao)) {
+      data = moment(distribuicao, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm');
       return data
     }
 

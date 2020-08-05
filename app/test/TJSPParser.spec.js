@@ -27,7 +27,7 @@ describe('Testes do TJSP', () => {
     const extracao = new TJSPParser().parse(rawdata);
     it('capa', () => {
       const capa = extracao.processo.capa.toJSON();
-      console.table(capa);
+      console.log(capa.dataDistribuicao);
       chai.expect(resultado.capa).to.eql(capa);
     });
 

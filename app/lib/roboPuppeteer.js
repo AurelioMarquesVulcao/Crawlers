@@ -1,3 +1,4 @@
+const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 require("dotenv/config");
@@ -99,6 +100,8 @@ class RoboPuppeteer3 {
     await this.page.type('#campoVara', `${entrada.vara}`)
     await sleep(timerSleep)
     await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
+    await sleep(1000)
+    await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
     console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
 
     //await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
@@ -151,7 +154,7 @@ class RoboPuppeteer3 {
     return { geral: html1, andamentos: html2 }
   }
 
-  
+
   async pegaAudiencia() {
     // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
     // click para pegar o assunto
@@ -182,16 +185,16 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
   }
 
-  async loga(){
+  async loga() {
     let login = "10389051764";
     let senha = "Senh@JTE123";
     console.log('Login iniciado');
     await this.page.click("#inner > ion-toolbar > ion-buttons:nth-child(5)")
     console.log('clicado no item de login');
-    await sleep(2000) 
+    await sleep(2000)
     await this.page.type("#formLogin > ion-item > ion-input > input", login)
     console.log('digido login');
-    await sleep(1000) 
+    await sleep(1000)
     await this.page.click("#formLogin > ion-toolbar > ion-button")
     console.log('clicado no primeiro botão');
     await sleep(1000)
@@ -205,15 +208,25 @@ class RoboPuppeteer3 {
     console.log('clicado no botão de busca');
   }
 
-  async pegaInicial(){
+  async pegaInicial() {
+    //await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active')
+    await sleep(1000)
+    await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(4)')
+    //await sleep(3000)
+    let htmlDoc = await this.page.evaluate(async () => {
+      // let text = await document.querySelector('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div').innerHTML;
+      let text = document.getElementsByTagName('iframe')[0].src
+
+      return text
+    })
+    await console.log(htmlDoc);
+    //#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe
 
   }
 
 
   async pegaDespacho() {
-    
-    await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active')
-    
+
   }
 
 

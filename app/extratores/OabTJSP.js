@@ -13,7 +13,8 @@ const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
 const { ProcessoTJSP } = require('./ProcessoTJSP');
 const { Helper } = require('../lib/util');
-const INSTANCIAS_URLS = require('../assets/TJSP/instancias_urls.json').INSTANCIAS_URL;
+const INSTANCIAS_URLS = require('../assets/TJSP/instancias_urls.json')
+  .INSTANCIAS_URL;
 
 const {
   BaseException,
@@ -25,7 +26,6 @@ const { ExtratorBase } = require('./extratores');
 const { TJSPParser } = require('../parsers/TJSPParser');
 
 const { LogExecucao } = require('../lib/logExecucao');
-
 
 class OabTJSP extends ExtratorBase {
   constructor(url, isDebug) {
@@ -39,7 +39,7 @@ class OabTJSP extends ExtratorBase {
     this.url = INSTANCIAS_URLS[instancia - 1];
   }
 
-  async extrair(numeroOab, cadastroConsultaId, instancia=1) {
+  async extrair(numeroOab, cadastroConsultaId, instancia = 1) {
     this.numeroDaOab = numeroOab;
     this.instancia = Number(instancia);
     let cadastroConsulta = {
@@ -75,7 +75,7 @@ class OabTJSP extends ExtratorBase {
       objResponse = await this.robo.acessar({
         url: `${this.url}/open.do`,
         method: 'GET',
-        usaProxy: true,
+        usaProxy: false,
         encoding: 'latin1',
       });
 
@@ -116,6 +116,7 @@ class OabTJSP extends ExtratorBase {
         // Terceira parte: passar a lista, pegar cada um dos codigos
         // resultantes e mandar para o parser
         if (listaProcessos.length > 0) {
+          console.log('------listaProcessos', listaProcessos.length);
           this.logger.info('Inicio do processo de extração de processos');
 
           let lista = await Processo.listarProcessos(2);
@@ -126,20 +127,24 @@ class OabTJSP extends ExtratorBase {
             this.logger.info(
               `Verificando log de execução para o processo ${processo}.`
             );
-            let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
+            let logExec = await LogExecucao.cadastrarConsultaPendente(
+              cadastroConsulta
+            );
             this.logger.info(
               `Log de execução do processo ${processo} verificado com sucesso`
             );
 
             this.logger.info(logExec.mensagem);
             if (logExec.enviado)
-              resultados.push(Promise.resolve({numeroProcesso: processo}));
+              resultados.push(Promise.resolve({ numeroProcesso: processo }));
           }
 
           //resultados = await this.extrairProcessos(listaProcessos, cookies);
           return Promise.all(resultados)
             .then((resultados) => {
-              this.logger.info(`${resultados.length} Processos enviados para extração com sucesso`);
+              this.logger.info(
+                `${resultados.length} Processos enviados para extração com sucesso`
+              );
               return {
                 resultado: resultados,
                 sucesso: true,
@@ -157,9 +162,10 @@ class OabTJSP extends ExtratorBase {
                 logs: this.logger.logs,
               };
             });
+        } else {
+          gResponse = await this.getCaptcha();
+          tentativa++;
         }
-        gResponse = await this.getCaptcha();
-        tentativa++;
       } while (tentativa < 5);
 
       this.logger.info('Lista de processos vazia;');
@@ -223,7 +229,7 @@ class OabTJSP extends ExtratorBase {
       }
 
       return captcha.gResponse;
-    }catch (error) {
+    } catch (error) {
       if (error instanceof AntiCaptchaResponseException) {
         throw new AntiCaptchaResponseException(error.code, error.message);
       }
@@ -237,7 +243,7 @@ class OabTJSP extends ExtratorBase {
       url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
       encoding: 'latin1',
-      usaProxy: true,
+      usaProxy: false,
       headers: {
         Cookie: cookies,
         Accept:
@@ -269,27 +275,28 @@ class OabTJSP extends ExtratorBase {
         Referer: `${this.url}search.do`,
         'Upgrade-Insecure-Requests': '1',
       },
-      usaProxy: true
+      usaProxy: false,
     });
 
     let condition = false;
     let processos = [];
 
     // primeira instancia
-    url = `${this.url}/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}`
+    url = `${this.url}/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
     if (this.instancia === 2)
       url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=1&localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&tipoNuProcesso=UNIFICADO&dePesquisa=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
     if (this.instancia === 3)
       url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=1&localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&tipoNuProcesso=UNIFICADO&dePesquisa=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
 
     console.log(url);
+    this.logger.info('Iniciando acesso a lista de processos');
     do {
       let objResponse = {};
       objResponse = await this.robo.acessar({
         url: url,
         method: 'GET',
         enconding: 'latin1',
-        usaProxy: true,
+        usaProxy: false,
         headers: {
           Cookie: cookies,
           Accept:
@@ -402,7 +409,7 @@ class OabTJSP extends ExtratorBase {
             Referer: `${this.url}/search.do`,
             'Upgrade-Insecure-Requests': '1',
           },
-          usaProxy: true
+          usaProxy: false,
         });
         const $ = cheerio.load(objResponse.responseBody);
         if ($('#tabelaTodasMovimentacoes').length === 0) {

@@ -435,8 +435,6 @@ class JTEParser extends BaseParser {
 
   // ajusta data brasil para Internacional recebe uma data por vez.
   ajustaData(datas) {
-
-
     let dia = datas.slice(0, 2);
     let mes = datas.slice(2, 5);
     let ano = datas.slice(5, 10);

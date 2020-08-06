@@ -2,6 +2,9 @@ const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 require("dotenv/config");
+const { JTEParser } = require('../parsers/JTEParser');
+
+const ajustes = new JTEParser();
 
 var timerSleep = 300
 
@@ -212,19 +215,55 @@ class RoboPuppeteer3 {
     let links = [];
     let iniciaisArray = await this.numerosIniciaisLaco();
     console.log(iniciaisArray)
-    for (let i = 0;i<(await iniciaisArray).length;i++){
-      console.log(i)
+    for (let i = 0; i < (await iniciaisArray).length; i++) {
+      await sleep(timerSleep)
+      await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`)
+      await sleep(timerSleep)
+      let link = await this.page.evaluate(async (i, iniciaisArray) => {
+        console.log(i);
+        console.log(iniciaisArray);
+        // function iniciaisArrayFunction() {
+        //   let numero = document.querySelectorAll('ion-item ion-label').length;
+        //   let numero2 = [];
+        //   for (let i = 1; i < numero; i++) {
+        //     if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`)) {
+        //       // busca o texto dos movimentos
+        //       let buscaInicio = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
+        //       let inicioTexto = "Distribuído por sorteio";
+        //       // se o texto for distribuido para sorteio sei que é uma inicial e que devo iniciar a minha busca por documentos
+        //       if (buscaInicio == inicioTexto) { numero2.push(i) };
+        //     }
+        //     // só inicia a busca por iniciais depois de achar o primeiro movimento
+        //     if (numero2[0] < i) {
+        //       let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
+        //       // regex que verifica o seguinte: 94ac08d ]
+        //       // assim só obtenhos os anexos simples
+        //       if (!!movimentacao.match(/[a-z0-9]{7} ]/gmi)) {
+        //         // verifica se possui icone para clicar assim sei que possuo anexo
+        //         if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`)) {
+        //           numero2.push(i)
+        //         };
+        //       }
+        //     }
+        //   };
+        //   return numero2.slice(1, numero2.length)
+        // }
+        // let iniciaisArray = iniciaisArrayFunction();
+
+
+        let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
+        let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
+        let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
+        let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
+        console.log({ numeroProcesso, data, movimentacao, link })
+        return { numeroProcesso, data, movimentacao, link }
+      },i, iniciaisArray );
+      //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
+      // ajustes.mascaraNumero(
+      // ajustes.ajustaData(
+      links.push(link)
     }
-    await this.page.click("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(3) > ion-icon")
-    let link = await this.page.evaluate(async () => {
-      let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
-      let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
-      let data = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(3) > ion-label > ion-text > h4").innerText;
-      let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
-      return {}
-    });
-    links.push(links)
-    
+    console.log(links);
     return links
   }
 
@@ -327,7 +366,10 @@ function processaNumero(numero) {
   await puppet.pegaInicial()
   // await puppet.numerosIniciaisLaco()
   await sleep(1000)
-  
+  await puppet.preencheProcesso("00107936220205150001", 1)
+  await sleep(1000)
+  await puppet.pegaInicial()
+
 
 
 })()

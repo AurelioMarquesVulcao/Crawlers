@@ -209,66 +209,56 @@ class RoboPuppeteer3 {
   }
 
   async pegaInicial() {
-
-    //await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item.ng-star-inserted.item.md.ion-focusable.item-label.hydrated.active')
-    await sleep(1000)
-    let numeroMovimentacoes = await this.page.evaluate(async () => {
-      let numero = document.querySelectorAll('ion-item ion-label').length - 1;
-      let numero2 = [];
-      console.log(numero);
-      let numero2 = [];
-    console.log(numero);
-    for (let i = 0; i < numero; i++) {
-      let buscaInicio = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item > ion-label > div > p:nth-child(${i})`).innerText
-      let inicioTexto = "Distribuído por sorteio"
-      console.log(buscaInicio);
-      if (buscaInicio == inicioTexto) { numero2.push(i) };
-      if (numero2[0] > i) {
-        if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`)) {
-          numero2.push(i)
-        };
-      }
-    };
-
-      return {numero,numero2}
+    let links = [];
+    let iniciaisArray = await this.numerosIniciaisLaco();
+    console.log(iniciaisArray)
+    for (let i = 0;i<(await iniciaisArray).length;i++){
+      console.log(i)
+    }
+    await this.page.click("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(3) > ion-icon")
+    let link = await this.page.evaluate(async () => {
+      let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
+      let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
+      let data = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(3) > ion-label > ion-text > h4").innerText;
+      let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
+      return {}
     });
-
-    await console.log("temos essas movimentações ===>" + numeroMovimentacoes);
-
-
-    // await console.log(numerosIniciaisLaco);
-
-    // await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item > ion-label > div > p:nth-child(2)')
-    // // await this.page.click('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item > ion-icon:nth-child(2)')
-    // //document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(3) > ion-icon").shadowRoot.querySelector("div > svg")
-    // await sleep(1000)
-    // let htmlDoc = await this.page.evaluate(async () => {
-    //   // let text = await document.querySelector('#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div').innerHTML;
-    //   let text = document.getElementsByTagName('iframe')[0].src
-
-    //   return text
-    // })
-    // await console.log(htmlDoc);
-    //#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe
-
+    links.push(links)
+    
+    return links
   }
-  numerosIniciaisLaco(numeroMovimentacoes) {
-    let numero2 = [];
-    console.log(numero);
-    for (let i = 0; i < numero; i++) {
-      let buscaInicio = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item > ion-label > div > p:nth-child(${i})`).innerText
-      let inicioTexto = "Distribuído por sorteio"
-      console.log(buscaInicio);
-      if (buscaInicio == inicioTexto) { numero2.push(i) };
-      if (numero2[0] > i) {
-        if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`)) {
-          numero2.push(i)
-        };
-      }
-    };
-    return numero
-  };
 
+  // busca os numeros dos filhos da lista de movimentacaoes que possuem:  documentos anexos, e estão antes da petição inicial
+  // dessa forma pego apenas os anexos das iníciais.
+  async numerosIniciaisLaco() {
+    let numeros = await this.page.evaluate(async () => {
+      let numero = document.querySelectorAll('ion-item ion-label').length;
+      let numero2 = [];
+      for (let i = 1; i < numero; i++) {
+        if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`)) {
+          // busca o texto dos movimentos
+          let buscaInicio = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
+          let inicioTexto = "Distribuído por sorteio";
+          // se o texto for distribuido para sorteio sei que é uma inicial e que devo iniciar a minha busca por documentos
+          if (buscaInicio == inicioTexto) { numero2.push(i) };
+        }
+        // só inicia a busca por iniciais depois de achar o primeiro movimento
+        if (numero2[0] < i) {
+          let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
+          // regex que verifica o seguinte: 94ac08d ]
+          // assim só obtenhos os anexos simples
+          if (!!movimentacao.match(/[a-z0-9]{7} ]/gmi)) {
+            // verifica se possui icone para clicar assim sei que possuo anexo
+            if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`)) {
+              numero2.push(i)
+            };
+          }
+        }
+      };
+      return numero2.slice(1, numero2.length)
+    })
+    return numeros
+  };
 
 
   async pegaDespacho() {
@@ -335,6 +325,11 @@ function processaNumero(numero) {
   await puppet.preencheProcesso("00109936220205150001", 0)
   await sleep(1000)
   await puppet.pegaInicial()
+  // await puppet.numerosIniciaisLaco()
+  await sleep(1000)
+  
+
+
 })()
 // 0011051-65.2020.5.15.0001  
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

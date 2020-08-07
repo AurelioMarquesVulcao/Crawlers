@@ -50,6 +50,8 @@ class OabTJSP extends ExtratorBase {
       _id: cadastroConsultaId,
     };
 
+    this.setInstanciaUrl(this.instancia);
+
     const nomeRobo = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}`;
     this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
       nomeRobo: nomeRobo,
@@ -282,9 +284,10 @@ class OabTJSP extends ExtratorBase {
     let processos = [];
 
     // primeira instancia
-    url = `${this.url}/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+      url = `${this.url}/search.do?conversationId=&dadosConsulta.localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&dadosConsulta.tipoNuProcesso=UNIFICADO&dadosConsulta.valorConsulta=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
     if (this.instancia === 2)
-      url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=1&localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&tipoNuProcesso=UNIFICADO&dePesquisa=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+      url = `${this.url}/search.do?conversationId=&paginaConsulta=1&localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&tipoNuProcesso=UNIFICADO&dePesquisa=${numeroOab}&uuidCaptcha=${uuidCaptcha}&pbEnviar=Pesquisar&g-recaptcha-response=${gResponse}`
+      // url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=1&localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&tipoNuProcesso=UNIFICADO&dePesquisa=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
     if (this.instancia === 3)
       url = `${this.url}/search.do;${cookies}?conversationId=&paginaConsulta=1&localPesquisa.cdLocal=-1&cbPesquisa=NUMOAB&tipoNuProcesso=UNIFICADO&dePesquisa=${numeroOab}SP&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
 
@@ -318,7 +321,7 @@ class OabTJSP extends ExtratorBase {
         if (!proximaPagina.text()) return processos;
 
         condition = true;
-        url = 'https://esaj.tjsp.jus.br' + proximaPagina.attr('href');
+        url = `${this.url}/${proximaPagina.attr('href')}`;
       } catch (error) {
         console.log('Problema ao pegar processos da página');
         console.log(error);

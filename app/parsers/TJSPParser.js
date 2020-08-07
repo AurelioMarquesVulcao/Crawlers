@@ -33,16 +33,22 @@ class TJSPParser extends BaseParser {
   extrairComarca($) {
     let comarca;
 
-    comarca = $('tr:contains("Distribuição:")').next('tr').text().strip();
+    comarca = $('td:contains("Origem:")').next('td').text().strip();
+    comarca = removerAcentos(comarca);
+    comarca = comarca.replace(/(Comarca\sde\s|Foro\sde\s)(\w+)\s\/\s(.*)/, '$1$2');
+
+    if (/Comarca|Foro/.test(comarca) === false){
+      comarca = $('tr:contains("Distribuição:")').next('tr').text().strip();
+    }
     comarca = comarca.replace(/.*\s-\s/g, '');
 
     return removerAcentos(comarca);
   }
 
   extrairAssunto($) {
-    return removerAcentos(
-      $('td:contains("Assunto:")').next('td').text().strip()
-    );
+    let assunto = $('td:contains("Assunto:")').next('td').text().strip();
+    assunto = assunto.split(' - ')
+    return assunto.map(element => removerAcentos(element));
   }
 
   extrairClasse($) {
@@ -59,52 +65,95 @@ class TJSPParser extends BaseParser {
   }
 
   extrairEnvolvidos($) {
-    let rawEnvolvidosString;
-    let rawEnvolvidosList;
-    let envolvidos;
+    let envolvidos = [];
+    let table;
+    let selector;
 
-    rawEnvolvidosString = $('#tablePartesPrincipais > tbody').text().strip();
-    rawEnvolvidosString = re.replace(rawEnvolvidosString, re(/\s\s\s+/g), ' ');
-    rawEnvolvidosString = re.replace(
-      rawEnvolvidosString,
-      re(/(\s)(\w+:)/g),
-      'xa0$2'
-    );
+    table = $('#tableTodasPartes > tbody > tr');
+    selector = '#tableTodasPartes';
+    if (table.length === 0) {
+      table = $('#tablePartesPrincipais > tbody > tr');
+      selector = '#tablePartesPrincipais';
+    }
 
-    rawEnvolvidosList = rawEnvolvidosString.split('xa0');
+    // pegar personagens
+    table.map((index) => {
+      let envolvido = { tipo: '', nome: '' };
+      let advogados;
 
-    envolvidos = rawEnvolvidosList.map((element) => {
-      const match = re.exec(element, re(/(?<tipo>\w+):\s(?<nome>.*)/));
-      let envolvido = {
-        tipo: traduzir(match.groups.tipo),
-        nome: match.groups.nome,
-      };
-      return JSON.parse(JSON.stringify(envolvido));
+      // Extracao
+      envolvido.tipo = $(
+        `${selector} > tbody > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(1) > span`
+      )[0].children[0].data.strip();
+      envolvido.nome = $(
+        `${selector} > tbody > tr:nth-child(${index + 1}) > td:nth-child(2)`
+      )[0].children[0].data.strip();
+      advogados = this.recuperaAdvogados(index, $, selector);
+
+      // Tratamento
+      envolvido.tipo = envolvido.tipo.replace(':', '').split(/\W/)[0];
+      envolvido.tipo = traduzir(envolvido.tipo);
+      // if (tradutor[envolvido.tipo]) envolvido.tipo = tradutor[envolvido.tipo];
+      envolvido.nome = removerAcentos(envolvido.nome.trim());
+
+      // Atribuição
+      envolvidos.push(envolvido);
+
+      if (advogados) envolvidos = [...envolvidos, ...advogados];
     });
 
-    // envolvidos = this.preencherOabs($, envolvidos);
-    envolvidos = envolvidos.map(element => {
-      let oab = this.resgatarOab(element.nome, $);
+    // pegar os advogados
 
-      if (oab) {
-        return {
-          tipo: element.tipo,
-          nome: `(${oab}) ${element.nome}`
-        }
-      }
-
-      return element;
-    });
-
-    envolvidos = envolvidos.map((element) => {
-      return {
-        tipo: element.tipo,
-        nome: removerAcentos(element.nome)
-      }
-    });
+    envolvidos = this.filtrarUnicosLista(envolvidos);
 
     return envolvidos;
   }
+
+
+  recuperaAdvogados(upperIndex, $, selector) {
+    let advogados = [];
+    let linha;
+
+    selector = `${selector} > tbody > tr:nth-child(${
+      upperIndex + 1
+    }) > td:nth-child(2)`;
+
+    linha = $(selector).text();
+    linha = linha.match(/^[\t ]*(?<tipo>\w+):\W+(?<nome>.+)/gm);
+    if (linha) {
+      advogados = linha.map((element, index) => {
+        let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
+        let adv = {
+          tipo: '',
+          nome: '',
+        };
+        let oab;
+        let resultado = re.exec(element.replace('\n', ' '), re(regex));
+        // Extracao
+        if (resultado) {
+          adv.tipo = traduzir(resultado.tipo.strip());
+          adv.nome = resultado.nome.strip();
+
+          oab = $(selector + `> input[type=hidden]:nth-child(${index + 3})`);
+          if (oab.length === 0) {
+            oab = this.resgatarOab(adv.nome, $);
+          } else {
+            oab = oab.attr('value');
+          }
+          // Tratamento
+          adv.nome = removerAcentos(adv.nome);
+          if (oab) adv.nome = `(${oab}) ${adv.nome}`;
+
+          return adv;
+        }
+      });
+    }
+    return advogados.filter((x) => Boolean(x));
+  }
+
+
 
   /**
    * Verifica se há uma oab correspondente ao nome na tabela de andamentos
@@ -168,26 +217,37 @@ class TJSPParser extends BaseParser {
 
   extrairAndamentos($, dataAtual, numeroProcesso) {
     let andamentos = [];
-    const table = $('#tabelaTodasMovimentacoes');
-    const tdsList = table.find('tr');
+    let andamentosHash = [];
+    let observacao;
+    let table;
+    let selector;
+    table = $('#tabelaTodasMovimentacoes > tr');
+    selector = '#tabelaTodasMovimentacoes';
+    // if (table.length === 0) {
+    //   table = $('#tabelaUltimasMovimentacoes > tr');
+    //   selector = "#tabelaUltimasMovimentacoes";
+    // }
 
-    tdsList.each((index) => {
+    table.each((index) => {
       let data = $(
-        `#tabelaTodasMovimentacoes > tr:nth-child(${
-          index + 1
-        }) > td:nth-child(1)`
+        `${selector} > tr:nth-child(${index + 1}) > td:nth-child(1)`
       );
       data = moment(data.text().strip(), 'DD/MM/YYYY').format('YYYY-MM-DD');
       let descricaoRaw = $(
-        `#tabelaTodasMovimentacoes > tr:nth-child(${
-          index + 1
-        }) > td:nth-child(3)`
+        `${selector} > tr:nth-child(${index + 1}) > td:nth-child(3)`
       );
 
-      let observacao = descricaoRaw.find('span')[0].children[0].data.strip();
+      if (descricaoRaw.find('span')[0].children.length > 0) {
+        observacao = descricaoRaw.find('span')[0].children[0].data.strip();
+      } else {
+        observacao = descricaoRaw.find('span').text().strip();
+      }
       let descricao = re.replace(descricaoRaw.text(), observacao, '').strip();
-      observacao = re.replace(observacao, re(/\s\s+/g), ' ');
+      observacao = observacao.replace(/\n/gm, ' ');
+      observacao = re.replace(observacao, re(/\s\s+/gm), ' ');
       observacao = removerAcentos(observacao);
+      descricao = descricao.replace(/\n/g, ' ');
+      descricao = descricao.replace(/\s\s+/g, ' ');
 
       let andamento = {
         numeroProcesso: numeroProcesso,
@@ -195,16 +255,24 @@ class TJSPParser extends BaseParser {
         dataInclusao: dataAtual,
         descricao: removerAcentos(descricao),
       };
+
       if (observacao) {
-        andamento['observacao'] = observacao;
+        andamento.observacao = observacao;
+      }
+
+      let hash = Andamento.criarHash(andamento);
+
+      if (andamentosHash.indexOf(hash) !== -1) {
+        let count = andamentosHash.filter((element) => element === hash).length;
+        andamento.descricao = `${andamento.descricao} [${count + 1}]`;
       }
       andamentos.push(new Andamento(andamento));
+      andamentosHash.push(hash);
     });
-
     return andamentos;
   }
 
-  parse(content) {
+  parse(content, instancia=1) {
     content = cheerio.load(content);
     const dataAtual = moment().format('YYYY-MM-DD');
 
@@ -219,6 +287,7 @@ class TJSPParser extends BaseParser {
     );
     const status = this.extrairStatus(andamentos); //ainda nao encontrado uma ocorrencia em que apareça, mas se precisar ta ai
     const isBaixa = this.extrairBaixa(status);
+    detalhes.instancia = instancia;
     capa.dataDistribuicao = this.extrairDataDistribuicao(content, andamentos);
 
     const processo = new Processo({
@@ -260,14 +329,15 @@ class TJSPParser extends BaseParser {
     distribuicao = removerAcentos($('body > div > table:nth-child(4) > tbody > tr > td > div:nth-child(9) > table.secaoFormBody > tbody > tr:nth-child(5) > td:nth-child(2) > span').text().strip());
 
     distribuicao = distribuicao.replace(/(?<data>\d{2}\/\d{2}\/\d{4})\sas\s(?<hora>\d{2}\:\d{2})(.*)/gm, '$1 $2')
-    console.log('distribuicao', distribuicao);
     if(/\d{2}\/\d{2}\/\d{4} \d{2}\:\d{2}/g.test(distribuicao)) {
       data = moment(distribuicao, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm');
       return data
     }
 
+
     let tam = andamentos.length;
-    return andamentos[tam-1].data;
+    if (tam > 0)
+      return andamentos[tam-1].data;
   }
 }
 

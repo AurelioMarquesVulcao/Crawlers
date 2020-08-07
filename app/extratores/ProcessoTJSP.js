@@ -26,7 +26,9 @@ class ProcessoTJSP extends ExtratorBase {
 
   setInstanciaUrl(instancia) {
     this.url = INSTANCIAS_URLS[instancia - 1];
+    console.log('instancia:', instancia, '/// url:', this.url);
   }
+
 
   /**
    *
@@ -40,6 +42,7 @@ class ProcessoTJSP extends ExtratorBase {
     this.numeroDaOab = numeroDaOab;
     this.numeroDoProcesso = numeroDoProcesso;
     this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
+    console.log('INSTANCIA ', instancia);
     this.instancia = Number(instancia);
     this.setInstanciaUrl(this.instancia);
 
@@ -63,12 +66,14 @@ class ProcessoTJSP extends ExtratorBase {
         'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
       'Sec-Fetch-Site': 'same-origin',
       'Sec-Fetch-Mode': 'navigate',
-      Referer: `${this.url}/search.do`,
+      Referer: `${this.url}/esaj/portal.do`,
       'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
     };
     let tentativas = 0;
     let extracao;
     let limite = 5;
+
+    console.log(headers);
 
     try {
       this.logger.info('Fazendo primeira conexão.');
@@ -88,6 +93,7 @@ class ProcessoTJSP extends ExtratorBase {
         url: url,
         usaProxy: true,
       });
+
       this.logger.info('Conexão ao website concluido.');
       cookies = objResponse.cookies;
       cookies = cookies.map((element) => {
@@ -134,6 +140,16 @@ class ProcessoTJSP extends ExtratorBase {
           usaProxy: true,
         });
         const $ = cheerio.load(objResponse.responseBody);
+        // Verifica se input é valido
+        console.log('TEXTO DE MENSAGEM RETORNO', $('#mensagemRetorno').text().strip());
+        if(/Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test($('#mensagemRetorno').text())) {
+          this.logger.info('Não existem informações disponíveis para o processo informado.')
+          return {
+            sucesso: false,
+            numeroDoProcesso: this.numeroDoProcesso,
+            logs: this.logger.logs,
+          };
+        }
         // verifica se há uma tabela de movimentação dentro da pagina.
         if ($('#tabelaTodasMovimentacoes').length === 0) {
           this.logger.info(
@@ -178,6 +194,7 @@ class ProcessoTJSP extends ExtratorBase {
         logs: this.logger.logs,
       };
     } catch (err) {
+      console.log(err);
       this.logger.log('error', err);
       return {
         sucesso: false,

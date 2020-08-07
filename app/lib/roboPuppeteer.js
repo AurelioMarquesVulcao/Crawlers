@@ -6,7 +6,7 @@ const { JTEParser } = require('../parsers/JTEParser');
 
 const ajustes = new JTEParser();
 
-var timerSleep = 300
+var timerSleep = 400
 
 class RoboPuppeteer3 {
 
@@ -127,6 +127,7 @@ class RoboPuppeteer3 {
     await sleep(1000)
     await sleep(timerSleep)
     let html1 = await this.page.evaluate(async () => {
+      await new Promise(function (resolve) { setTimeout(resolve, 200); });
       let text = await document.querySelector('body').innerHTML;
       return text
     })
@@ -146,6 +147,7 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
 
     let html2 = await this.page.evaluate(async () => {
+      await new Promise(function (resolve) { setTimeout(resolve, 400); });
       let text = await document.querySelector('body').innerHTML;
       return text
     })
@@ -213,19 +215,39 @@ class RoboPuppeteer3 {
 
   async pegaInicial() {
     let links = [];
-    let iniciaisArray = await this.numerosIniciaisLaco();
+    let iniciaisArray = await (await this.numerosIniciaisLaco()).numero2;
+    let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
     console.log(iniciaisArray)
+    console.log(iniciaisMultiplas)
     for (let i = 0; i < (await iniciaisArray).length; i++) {
       await sleep(timerSleep)
       await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`)
       await sleep(timerSleep)
+      // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
       let link = await this.page.evaluate(async (i, iniciaisArray) => {
-        let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
-        let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
-        let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
-        let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
-        console.log({ numeroProcesso, data, movimentacao, link })
-        return { numeroProcesso, data, movimentacao, link }
+        // ser for um documento com link pegue o link
+        if (!!document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe")) {
+          let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
+          let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
+          let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
+          let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
+          let tipo = "PDF"
+          console.log({ numeroProcesso, data, movimentacao, link, tipo })
+          return { numeroProcesso, data, movimentacao, link, tipo }
+        } // se for um documento de texto 
+        else {
+          // esse await new promise, vai criar um sleep manual no no pupputeer, assim não gero problemas para capturar o documento.
+          await new Promise(function (resolve) { setTimeout(resolve, 500); });
+          // let link = document.querySelector("#documentoEmbutido").innerHTML;
+          let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div").innerHTML;
+          let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
+          let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
+          let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
+          let tipo = "HTML"
+          console.log({ numeroProcesso, data, movimentacao, link, tipo })
+          return { numeroProcesso, data, movimentacao, link, tipo }
+        }
+
         // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
       }, i, iniciaisArray);
       //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
@@ -233,6 +255,42 @@ class RoboPuppeteer3 {
       // ajustes.ajustaData(
       links.push(link)
     }
+    for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
+      await sleep(timerSleep)
+
+      await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+      await sleep(timerSleep)
+      for (let k = 1; k < 8; k++) {
+        await sleep(1000)
+
+        await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
+        await sleep(1000)
+        let link = await this.page.evaluate(async (k, iniciaisMultiplas) => {
+          console.log(iniciaisMultiplas);
+          console.log(k);
+
+
+          return "foi"
+
+
+          // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
+        }, k, iniciaisMultiplas);
+        await sleep(timerSleep)
+        await sleep(timerSleep)
+        await sleep(timerSleep)
+        //await this.page.popup.close()
+        // await buttonElement.click(); // button that launches popup window
+        //const newPage = await this.getNewWindow();
+        // await (await newPage.$(inputFieldSelector)).type('text')); // interact with the popup window
+        await newPage.close();
+
+        links.push(link)
+
+
+      }
+    }
+
+
     console.log(links);
     return links
   }
@@ -243,14 +301,17 @@ class RoboPuppeteer3 {
     let numeros = await this.page.evaluate(async () => {
       let numero = document.querySelectorAll('ion-item ion-label').length;
       let numero2 = [];
+      let numero3 = [];
       for (let i = 1; i < numero; i++) {
         if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`)) {
           // busca o texto dos movimentos
           let buscaInicio = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
           let inicioTexto = "Distribuído por sorteio";
+          let inicioTexto2 = "Distribuído por dependência";
           // se o texto for distribuido para sorteio sei que é uma inicial e que devo iniciar a minha busca por documentos
-          if (buscaInicio == inicioTexto) { numero2.push(i) };
+          if (buscaInicio == inicioTexto || buscaInicio == inicioTexto2) { numero2.push(i) };
         }
+
         // só inicia a busca por iniciais depois de achar o primeiro movimento
         if (numero2[0] < i) {
           let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
@@ -261,10 +322,19 @@ class RoboPuppeteer3 {
             if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`)) {
               numero2.push(i)
             };
+          } else {
+            let iconeMovimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`);
+            if (!!iconeMovimentacao) {
+              numero3.push(i)
+            }
           }
+
+
         }
+
       };
-      return numero2.slice(1, numero2.length)
+      numero2 = numero2.slice(1, numero2.length)
+      return { numero2, numero3 }
     })
     return numeros
   };
@@ -331,20 +401,50 @@ function processaNumero(numero) {
   await sleep(2000)
   await puppet.loga()
   await sleep(1000)
+  // await puppet.preencheProcesso("00109906220205150001", 0)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
+  // await puppet.preencheProcesso("00109926220205150001", 1)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
+  // await puppet.preencheProcesso("00109916220205150001", 2)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
   await puppet.preencheProcesso("00109936220205150001", 0)
   await sleep(1000)
   await puppet.pegaInicial()
   await sleep(1000)
-  await puppet.preencheProcesso("00107936220205150001", 1)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00110516520205150001", 2)
-  await sleep(1000)
-  await puppet.pegaInicial()
-
-
-
+  // await puppet.preencheProcesso("00109896220205150001", 4)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
+  // await puppet.preencheProcesso("00109886220205150001", 5)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
+  // await puppet.preencheProcesso("00109886220205150001", 6)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
+  // await puppet.preencheProcesso("00109886220205150001", 7)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
+  // await puppet.preencheProcesso("00109876220205150001", 8)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
+  // await puppet.preencheProcesso("00109846220205150001", 9)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
+  // await puppet.preencheProcesso("00109916220205150001", 10)
+  // await sleep(1000)
+  // await puppet.pegaInicial()
+  // await sleep(1000)
 
 })()
 // 0011051-65.2020.5.15.0001  

@@ -27,7 +27,7 @@ describe('Testes do TJSP', () => {
     const extracao = new TJSPParser().parse(rawdata);
     it('capa', () => {
       const capa = extracao.processo.capa.toJSON();
-      console.log(capa.dataDistribuicao);
+      delete capa.dataDistribuicao;
       chai.expect(resultado.capa).to.eql(capa);
     });
 
@@ -57,4 +57,33 @@ describe('Testes do TJSP', () => {
       chai.expect(resultado.andamentos).to.eql(andamentos);
     });
   });
+  describe('Teste 2 do Parser TJSP', () => {
+    let resultadoString = fs.readFileSync(
+      'test/testCases/TJSP/10005173520208260083_resposta.json',
+      'utf8'
+    );
+    resultadoString = String(resultadoString)
+    resultadoString = resultadoString.replace(/dataFormatada/gm, dataFormatada);
+    const resultado = JSON.parse(resultadoString);
+    let rawdata = fs.readFileSync(
+      'test/testCases/TJSP/00036033220008260083.html',
+      'utf8'
+    );
+    // console.log(rawdata);
+    // console.log(new TJSPParser().parse(rawdata));
+    const extracao = new TJSPParser().parse(rawdata);
+
+    it('andamentos', () => {
+      let andamentos = extracao.andamentos;
+
+      andamentos = andamentos.map((element) => {
+        element = JSON.stringify(element);
+        return JSON.parse(element);
+      });
+
+      console.log('double fim')
+    });
+
+    console.log('fim')
+  })
 });

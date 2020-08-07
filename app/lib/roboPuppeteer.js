@@ -283,7 +283,8 @@ class RoboPuppeteer3 {
         //const newPage = await this.getNewWindow();
         // await (await newPage.$(inputFieldSelector)).type('text')); // interact with the popup window
         await newPage.close();
-
+        // https://github.com/puppeteer/puppeteer/issues/1830
+        // https://www.codota.com/code/javascript/functions/puppeteer/Browser/close
         links.push(link)
 
 

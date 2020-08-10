@@ -50,6 +50,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
    * @returns {Promise<{numeroProcesso: *}>}
    */
   async extrair(numeroProcesso, instancia = 1) {
+    instancia = Number(instancia);
     await new CredenciaisAdvogados({
       login: '103.890.517-64',
       senha: 'Senh@TJ123',

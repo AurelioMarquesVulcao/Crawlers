@@ -35,7 +35,7 @@ const identificarDetalhes = (cnj) => {
 }
 
 gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
-  
+  let tribunal;
   const mensagemObj = JSON.parse(mensagem.content);
 
   try {
@@ -48,7 +48,8 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
       Instancia: mensagemObj.Instancia
     };    
 
-    const tribunal = identificarDetalhes(mensagemObj.NumeroProcesso);
+    if (mensagemObj.NumeroProcesso)
+      tribunal = identificarDetalhes(mensagemObj.NumeroProcesso);
 
     if (tribunal) {
       mensagemObj.Detalhes = tribunal;

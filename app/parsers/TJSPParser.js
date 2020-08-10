@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
+const { COMARCAS } = require('../assets/TJSP/comarcas.js');
 
 const { BaseParser, removerAcentos, traduzir } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
@@ -39,15 +40,19 @@ class TJSPParser extends BaseParser {
 
     if (/Comarca|Foro/.test(comarca) === false){
       comarca = $('tr:contains("Distribuição:")').next('tr').text().strip();
+      comarca = removerAcentos(comarca);
     }
-    comarca = comarca.replace(/.*\s-\s/g, '');
+    // comarca = comarca.replace(/.*\s-\s/g, '');
 
+
+    comarca = COMARCAS.filter(c => c.test(comarca))
+    comarca = comarca[0].source;
     return removerAcentos(comarca);
   }
 
   extrairAssunto($) {
     let assunto = $('td:contains("Assunto:")').next('td').text().strip();
-    assunto = assunto.split(' - ')
+    assunto = assunto.split(/\s\W\s/);
     return assunto.map(element => removerAcentos(element));
   }
 
@@ -328,8 +333,8 @@ class TJSPParser extends BaseParser {
 
     distribuicao = removerAcentos($('body > div > table:nth-child(4) > tbody > tr > td > div:nth-child(9) > table.secaoFormBody > tbody > tr:nth-child(5) > td:nth-child(2) > span').text().strip());
 
-    distribuicao = distribuicao.replace(/(?<data>\d{2}\/\d{2}\/\d{4})\sas\s(?<hora>\d{2}\:\d{2})(.*)/gm, '$1 $2')
-    if(/\d{2}\/\d{2}\/\d{4} \d{2}\:\d{2}/g.test(distribuicao)) {
+    distribuicao = distribuicao.replace(/(?<data>\d{2}\/\d{2}\/\d{4})\sas\s(?<hora>\d{2}:\d{2})(.*)/gm, '$1 $2')
+    if(/\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}/g.test(distribuicao)) {
       data = moment(distribuicao, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm');
       return data
     }

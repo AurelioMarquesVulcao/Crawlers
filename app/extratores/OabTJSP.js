@@ -85,7 +85,7 @@ class OabTJSP extends ExtratorBase {
       cookies = cookies.map((element) => {
         return element.replace(/\;.*/, '');
       });
-      cookies = cookies.join('; ');
+      cookies = cookies.join(';');
 
       this.logger.info('Fazendo pré-analise do website em busca de captchas');
       preParse = await this.preParse(objResponse.responseBody, cookies);
@@ -168,9 +168,11 @@ class OabTJSP extends ExtratorBase {
           gResponse = await this.getCaptcha();
           tentativa++;
         }
+        this.logger.info('Lista de Processos vazia');
+        this.logger.info('Fazendo tentativa', tentativa, 'de 5');
       } while (tentativa < 5);
 
-      this.logger.info('Lista de processos vazia;');
+      this.logger.info('Nenhum processo recuperado;');
       return {
         resultado: [],
         sucesso: false,
@@ -264,6 +266,7 @@ class OabTJSP extends ExtratorBase {
 
   async getListaProcessos(numeroOab, cookies, uuidCaptcha, gResponse) {
     let url = '';
+    let msgSelector;
     await this.robo.acessar({
       url: `${this.url}/manterSessao.do?conversationId=`,
       headers: {
@@ -313,6 +316,14 @@ class OabTJSP extends ExtratorBase {
         },
       });
       const $ = cheerio.load(objResponse.responseBody);
+      if (this.instancia === 3)
+        msgSelector = '#spwTabelaMensagem'
+      else
+        msgSelector = '#mensagemRetorno';
+      if(/Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test($(msgSelector).text())) {
+        this.logger.info('Não existem informações disponíveis para o processo informado.')
+        throw new Error('Não existem informações disponiveis para a oab informada.')
+      }
       try {
         //processos = [...processos, ...this.extrairLinksProcessos($)];
         processos = [...processos, ...this.extrairNumeroProcessos($)];
@@ -328,6 +339,7 @@ class OabTJSP extends ExtratorBase {
         condition = false;
       }
     } while (condition);
+
     return processos;
   }
 

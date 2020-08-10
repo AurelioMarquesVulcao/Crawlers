@@ -214,104 +214,103 @@ class RoboPuppeteer3 {
   }
 
   async pegaInicial() {
-    let links = [];
-    let iniciaisArray = await (await this.numerosIniciaisLaco()).numero2;
-    let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
-    console.log(iniciaisArray)
-    console.log(iniciaisMultiplas)
-    for (let i = 0; i < (await iniciaisArray).length; i++) {
-      await sleep(timerSleep)
-      await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`)
-      await sleep(timerSleep)
-      // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
-      let link = await this.page.evaluate(async (i, iniciaisArray) => {
-        // ser for um documento com link pegue o link
-        if (!!document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe")) {
-          let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
-          let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
-          let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
-          let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
-          let tipo = "PDF"
-          console.log({ numeroProcesso, data, movimentacao, link, tipo })
-          return { numeroProcesso, data, movimentacao, link, tipo }
-        } // se for um documento de texto 
-        else {
-          // esse await new promise, vai criar um sleep manual no no pupputeer, assim não gero problemas para capturar o documento.
-          await new Promise(function (resolve) { setTimeout(resolve, 500); });
-          // let link = document.querySelector("#documentoEmbutido").innerHTML;
-          let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div").innerHTML;
-          let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
-          let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
-          let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
-          let tipo = "HTML"
-          console.log({ numeroProcesso, data, movimentacao, link, tipo })
-          return { numeroProcesso, data, movimentacao, link, tipo }
-        }
-
-        // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
-      }, i, iniciaisArray);
-      //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
-      links.push(link)
-    }
-    // entra na 3 forma de apresentação de documentos.
-    // documentos multiplus.
-    for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
-      await sleep(timerSleep)
-      let dataEProcesso = await this.page.evaluate(async (j, iniciaisMultiplas) => {
-        return {
-          data: document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-label > ion-text > h4`).innerText,
-          numeroProcesso: document.querySelector("#numeroProcessoFormatado > div").innerText
-        }
-      },j, iniciaisMultiplas)
-      await sleep(timerSleep)
-      await sleep(timerSleep)
-      // entra no documento multiplo
-      await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
-      await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
-      await sleep(timerSleep)
-      // conta quantos documentos devo raspar
-      let quantidadeDocumentos = await this.page.evaluate(async () => {
-        return document.querySelectorAll('#popover-marcador-filtro > ion-item').length;
-      })
-      for (let k = 1; k < quantidadeDocumentos+1; k++) {
-        await sleep(1000)
-        // abro o popup e abro o link do documento
-        await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
-        await sleep(2000)
-        let link = await this.page.evaluate(async (k, dataEProcesso) => {
-          await new Promise(function (resolve) { setTimeout(resolve, 500); });
-
-          let link = document.querySelector("#linkPDF").href;
-          let movimentacao = document.querySelector(`#popover-marcador-filtro > ion-item:nth-child(${k}) > span`).innerText.replace("\n"," ");
-          let data = dataEProcesso.data;
-          let numeroProcesso = dataEProcesso.numeroProcesso;
-          let tipo = "PDF"
-          console.log({ numeroProcesso, data, movimentacao, link, tipo })
-          return { numeroProcesso, data, movimentacao, link, tipo }
-
-
+    try {
+      let links = [];
+      let iniciaisArray = await (await this.numerosIniciaisLaco()).numero2;
+      let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
+      console.log(iniciaisArray)
+      console.log(iniciaisMultiplas)
+      for (let i = 0; i < (await iniciaisArray).length; i++) {
+        await sleep(timerSleep)
+        await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`)
+        await sleep(timerSleep)
+        // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
+        let link = await this.page.evaluate(async (i, iniciaisArray) => {
+          // ser for um documento com link pegue o link
+          if (!!document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe")) {
+            let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
+            let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
+            let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
+            let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
+            let tipo = "PDF"
+            console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            return { numeroProcesso, data, movimentacao, link, tipo }
+          } // se for um documento de texto 
+          else {
+            // esse await new promise, vai criar um sleep manual no no pupputeer, assim não gero problemas para capturar o documento.
+            await new Promise(function (resolve) { setTimeout(resolve, 500); });
+            // let link = document.querySelector("#documentoEmbutido").innerHTML;
+            let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div").innerHTML;
+            let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
+            let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
+            let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
+            let tipo = "HTML"
+            console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            return { numeroProcesso, data, movimentacao, link, tipo }
+          }
 
           // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
-        }, k, dataEProcesso);
-        await sleep(timerSleep)
-        // codigo que que fecha a ultima aba do puppeteer.
-        // com esse codigo consigo fechar os popup
-        const pages = await this.browser.pages();
-        const popup = pages[pages.length - 1];
-        await popup.close();
-        await sleep(timerSleep)
+        }, i, iniciaisArray);
+        //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
         links.push(link)
       }
-      // volta a pagina principal de busca de processos
-      await sleep(timerSleep)
-      await sleep(timerSleep)
-      await sleep(timerSleep)
-      await sleep(timerSleep)
-      await this.page.click("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button")
-      await sleep(timerSleep)
-    }
-    console.log(links);
-    return links
+      // entra na 3 forma de apresentação de documentos.
+      // documentos multiplus.
+      for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
+        await sleep(timerSleep)
+        let dataEProcesso = await this.page.evaluate(async (j, iniciaisMultiplas) => {
+          return {
+            data: document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-label > ion-text > h4`).innerText,
+            numeroProcesso: document.querySelector("#numeroProcessoFormatado > div").innerText
+          }
+        }, j, iniciaisMultiplas)
+        await sleep(timerSleep)
+        await sleep(timerSleep)
+        // entra no documento multiplo
+        await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+        await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+        await sleep(timerSleep)
+        // conta quantos documentos devo raspar
+        let quantidadeDocumentos = await this.page.evaluate(async () => {
+          return document.querySelectorAll('#popover-marcador-filtro > ion-item').length;
+        })
+        for (let k = 1; k < quantidadeDocumentos + 1; k++) {
+          await sleep(1000)
+          // abro o popup e abro o link do documento
+          await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
+          await sleep(2000)
+          let link = await this.page.evaluate(async (k, dataEProcesso) => {
+            await new Promise(function (resolve) { setTimeout(resolve, 500); });
+
+            let link = document.querySelector("#linkPDF").href;
+            let movimentacao = document.querySelector(`#popover-marcador-filtro > ion-item:nth-child(${k}) > span`).innerText.replace("\n", " ");
+            let data = dataEProcesso.data;
+            let numeroProcesso = dataEProcesso.numeroProcesso;
+            let tipo = "PDF"
+            console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            return { numeroProcesso, data, movimentacao, link, tipo }
+            // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
+          }, k, dataEProcesso);
+          await sleep(timerSleep)
+          // codigo que que fecha a ultima aba do puppeteer.
+          // com esse codigo consigo fechar os popup
+          const pages = await this.browser.pages();
+          const popup = pages[pages.length - 1];
+          await popup.close();
+          await sleep(timerSleep)
+          links.push(link)
+        }
+        // volta a pagina principal de busca de processos
+        await sleep(timerSleep)
+        await sleep(timerSleep)
+        await sleep(timerSleep)
+        await sleep(timerSleep)
+        await this.page.click("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button")
+        await sleep(timerSleep)
+      }
+      console.log(links);
+      return links
+    } catch (e) { console.log("Não pegou os Docuemntos") }
   }
 
   // busca os numeros dos filhos da lista de movimentacaoes que possuem:  documentos anexos, e estão antes da petição inicial
@@ -336,7 +335,7 @@ class RoboPuppeteer3 {
           let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-label > div > p`).innerText;
           // regex que verifica o seguinte: 94ac08d ]
           // assim só obtenhos os anexos simples
-          if (!!movimentacao.match(/[a-z0-9]{7} ]/gmi)) {
+          if (!!movimentacao.match(/\[\s[a-z0-9]{7}\s\]/gmi)) {
             // verifica se possui icone para clicar assim sei que possuo anexo
             if (document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${i}) > ion-icon`)) {
               numero2.push(i)
@@ -413,63 +412,63 @@ function processaNumero(numero) {
 //   await sleep(1000)
 //   await puppet.pegaInicial()
 // })()
-(async () => {
-  let puppet = new RoboPuppeteer3()
+// (async () => {
+//   let puppet = new RoboPuppeteer3()
 
-  await puppet.iniciar()
+//   await puppet.iniciar()
 
-  await sleep(1000)
-  await puppet.acessar("https://jte.csjt.jus.br/")
-  await sleep(1000)
-  await puppet.preencheTribunal('00105492920205150001')
-  await sleep(2000)
-  await puppet.loga()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109906220205150001", 0)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109926220205150001", 1)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109916220205150001", 2)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109936220205150001", 3)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109896220205150001", 4)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109886220205150001", 5)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109886220205150001", 6)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109886220205150001", 7)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109876220205150001", 8)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109846220205150001", 9)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109916220205150001", 10)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
+//   await sleep(1000)
+//   await puppet.acessar("https://jte.csjt.jus.br/")
+//   await sleep(1000)
+//   await puppet.preencheTribunal('00105492920205150001')
+//   await sleep(2000)
+//   await puppet.loga()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109906220205150001", 0)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109926220205150001", 1)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109916220205150001", 2)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109936220205150001", 3)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109896220205150001", 4)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109886220205150001", 5)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109886220205150001", 6)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109886220205150001", 7)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109876220205150001", 8)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109846220205150001", 9)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109916220205150001", 10)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
 
-})()
+// })()
 // 0011051-65.2020.5.15.0001  
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

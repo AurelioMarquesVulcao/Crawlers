@@ -280,7 +280,20 @@ class PeticaoTJSP extends ExtratorPuppeteer {
    */
   async resgataDocumentos() {
     this.logger.info('Iniciando procedimento de resgate dos documentos');
+    this.logger.info('Verificando se existe o documento "DECISAO"');
+    let docs = await this.page.$$('#arvore_principal > ul > li > a');
+    let tam = docs.length;
+    let encontrado = false;
+    for (let i; i < tam; i++) {
+      if(docs[i].innerText == 'Decisão') {
+        encontrado = true;
+        break;
+      }
+    }
     this.logger.info('Selecionando documentos de interessa para download');
+
+    if (encontrado) //TODO colocar tudo isso dependente do if
+
     await this.page.evaluate(() => {
       let elements = $('#arvore_principal > ul > li > a');
       let tam = elements.length;

@@ -13,7 +13,7 @@ const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseE
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
@@ -118,6 +118,13 @@ async function worker() {
                     tribunal: dadosProcesso.processo.detalhes.tribunal,
                     data: { dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(), mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth() },
                 })
+            }
+            let link = await puppet.pegaInicial()
+            await console.log(link.length);
+            for (let w = 0; w < link.length; w++) {
+                console.log("entrou no laço");
+                await new CriaFilaJTE().salvaDocumentoLink(link[w])
+                await console.log("O link " + w + " Foi salvo");
             }
 
             logger.info('Processos extraidos com sucesso');

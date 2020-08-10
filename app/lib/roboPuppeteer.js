@@ -14,14 +14,14 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      args: ['--ignore-certificate-errors']
+      // args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -304,11 +304,11 @@ class RoboPuppeteer3 {
         await sleep(timerSleep)
         await sleep(timerSleep)
         await sleep(timerSleep)
-        await sleep(timerSleep)
+        await sleep(2000)
         await this.page.click("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button")
         await sleep(timerSleep)
       }
-      console.log(links);
+      // console.log(links);
       return links
     } catch (e) { console.log("Não pegou os Docuemntos") }
   }

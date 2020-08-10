@@ -251,47 +251,65 @@ class RoboPuppeteer3 {
         // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
       }, i, iniciaisArray);
       //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
-      // ajustes.mascaraNumero(
-      // ajustes.ajustaData(
       links.push(link)
     }
+    // entra na 3 forma de apresentação de documentos.
+    // documentos multiplus.
     for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
       await sleep(timerSleep)
-
+      let dataEProcesso = await this.page.evaluate(async (j, iniciaisMultiplas) => {
+        return {
+          data: document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-label > ion-text > h4`).innerText,
+          numeroProcesso: document.querySelector("#numeroProcessoFormatado > div").innerText
+        }
+      },j, iniciaisMultiplas)
+      await sleep(timerSleep)
+      await sleep(timerSleep)
+      // entra no documento multiplo
+      await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
       await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
       await sleep(timerSleep)
-      for (let k = 1; k < 8; k++) {
+      // conta quantos documentos devo raspar
+      let quantidadeDocumentos = await this.page.evaluate(async () => {
+        return document.querySelectorAll('#popover-marcador-filtro > ion-item').length;
+      })
+      for (let k = 1; k < quantidadeDocumentos+1; k++) {
         await sleep(1000)
-
+        // abro o popup e abro o link do documento
         await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
-        await sleep(1000)
-        let link = await this.page.evaluate(async (k, iniciaisMultiplas) => {
-          console.log(iniciaisMultiplas);
-          console.log(k);
+        await sleep(2000)
+        let link = await this.page.evaluate(async (k, dataEProcesso) => {
+          await new Promise(function (resolve) { setTimeout(resolve, 500); });
 
+          let link = document.querySelector("#linkPDF").href;
+          let movimentacao = document.querySelector(`#popover-marcador-filtro > ion-item:nth-child(${k}) > span`).innerText.replace("\n"," ");
+          let data = dataEProcesso.data;
+          let numeroProcesso = dataEProcesso.numeroProcesso;
+          let tipo = "PDF"
+          console.log({ numeroProcesso, data, movimentacao, link, tipo })
+          return { numeroProcesso, data, movimentacao, link, tipo }
 
-          return "foi"
 
 
           // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
-        }, k, iniciaisMultiplas);
+        }, k, dataEProcesso);
         await sleep(timerSleep)
+        // codigo que que fecha a ultima aba do puppeteer.
+        // com esse codigo consigo fechar os popup
+        const pages = await this.browser.pages();
+        const popup = pages[pages.length - 1];
+        await popup.close();
         await sleep(timerSleep)
-        await sleep(timerSleep)
-        //await this.page.popup.close()
-        // await buttonElement.click(); // button that launches popup window
-        //const newPage = await this.getNewWindow();
-        // await (await newPage.$(inputFieldSelector)).type('text')); // interact with the popup window
-        await newPage.close();
-        // https://github.com/puppeteer/puppeteer/issues/1830
-        // https://www.codota.com/code/javascript/functions/puppeteer/Browser/close
         links.push(link)
-
-
       }
+      // volta a pagina principal de busca de processos
+      await sleep(timerSleep)
+      await sleep(timerSleep)
+      await sleep(timerSleep)
+      await sleep(timerSleep)
+      await this.page.click("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button")
+      await sleep(timerSleep)
     }
-
-
     console.log(links);
     return links
   }
@@ -347,8 +365,13 @@ class RoboPuppeteer3 {
 
 
   async fechar() {
-    await this.browser.close()
-
+    // codigo que que fecha a ultima aba do puppeteer.
+    // com esse codigo consigo fechar os popup
+    const pages = await this.browser.pages();
+    const popup = pages[pages.length - 1];
+    await popup.close();
+    // https://github.com/puppeteer/puppeteer/issues/1830
+    // https://www.codota.com/code/javascript/functions/puppeteer/Browser/close
   }
 }
 
@@ -402,50 +425,50 @@ function processaNumero(numero) {
   await sleep(2000)
   await puppet.loga()
   await sleep(1000)
-  // await puppet.preencheProcesso("00109906220205150001", 0)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  // await puppet.preencheProcesso("00109926220205150001", 1)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  // await puppet.preencheProcesso("00109916220205150001", 2)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  await puppet.preencheProcesso("00109936220205150001", 0)
+  await puppet.preencheProcesso("00109906220205150001", 0)
   await sleep(1000)
   await puppet.pegaInicial()
   await sleep(1000)
-  // await puppet.preencheProcesso("00109896220205150001", 4)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  // await puppet.preencheProcesso("00109886220205150001", 5)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  // await puppet.preencheProcesso("00109886220205150001", 6)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  // await puppet.preencheProcesso("00109886220205150001", 7)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  // await puppet.preencheProcesso("00109876220205150001", 8)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  // await puppet.preencheProcesso("00109846220205150001", 9)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
-  // await puppet.preencheProcesso("00109916220205150001", 10)
-  // await sleep(1000)
-  // await puppet.pegaInicial()
-  // await sleep(1000)
+  await puppet.preencheProcesso("00109926220205150001", 1)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109916220205150001", 2)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109936220205150001", 3)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109896220205150001", 4)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109886220205150001", 5)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109886220205150001", 6)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109886220205150001", 7)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109876220205150001", 8)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109846220205150001", 9)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109916220205150001", 10)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
 
 })()
 // 0011051-65.2020.5.15.0001  

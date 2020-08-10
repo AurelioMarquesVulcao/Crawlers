@@ -56,6 +56,8 @@ async function worker() {
     //await sleep(10000)
     await puppet.acessar("https://jte.csjt.jus.br/")
     await puppet.preencheTribunal('10014385020135020473')
+    await sleep(2000)
+    await puppet.loga()
     await sleep(1000)
 
     // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;

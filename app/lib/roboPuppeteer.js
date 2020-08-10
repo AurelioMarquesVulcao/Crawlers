@@ -6,7 +6,7 @@ const { JTEParser } = require('../parsers/JTEParser');
 
 const ajustes = new JTEParser();
 
-var timerSleep = 400
+var timerSleep = 100
 
 class RoboPuppeteer3 {
 
@@ -14,7 +14,7 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
@@ -220,6 +220,7 @@ class RoboPuppeteer3 {
       let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
       console.log(iniciaisArray)
       console.log(iniciaisMultiplas)
+
       for (let i = 0; i < (await iniciaisArray).length; i++) {
         await sleep(timerSleep)
         await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`)
@@ -278,7 +279,7 @@ class RoboPuppeteer3 {
           await sleep(1000)
           // abro o popup e abro o link do documento
           await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
-          await sleep(2000)
+          //await sleep(2000)
           let link = await this.page.evaluate(async (k, dataEProcesso) => {
             await new Promise(function (resolve) { setTimeout(resolve, 500); });
 
@@ -291,10 +292,17 @@ class RoboPuppeteer3 {
             return { numeroProcesso, data, movimentacao, link, tipo }
             // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
           }, k, dataEProcesso);
-          await sleep(timerSleep)
           // codigo que que fecha a ultima aba do puppeteer.
           // com esse codigo consigo fechar os popup
-          const pages = await this.browser.pages();
+          //await sleep(timerSleep)
+          let pages = await this.browser.pages();
+          while (pages.length == 2) {
+            await sleep(timerSleep)
+            await console.log(pages.length)
+            await console.log("Aguarde mais um pouco")
+            pages = await this.browser.pages();
+          }
+          console.log(pages.length)
           const popup = pages[pages.length - 1];
           await popup.close();
           await sleep(timerSleep)
@@ -308,9 +316,9 @@ class RoboPuppeteer3 {
         await this.page.click("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button")
         await sleep(timerSleep)
       }
-      // console.log(links);
+      console.log(links);
       return links
-    } catch (e) { console.log("Não pegou os Docuemntos") }
+    } catch (e) { console.log("Não pegou os Documentos"); console.log(e); }
   }
 
   // busca os numeros dos filhos da lista de movimentacaoes que possuem:  documentos anexos, e estão antes da petição inicial
@@ -412,63 +420,68 @@ function processaNumero(numero) {
 //   await sleep(1000)
 //   await puppet.pegaInicial()
 // })()
-// (async () => {
-//   let puppet = new RoboPuppeteer3()
+(async () => {
+  let puppet = new RoboPuppeteer3()
 
-//   await puppet.iniciar()
+  await puppet.iniciar()
 
-//   await sleep(1000)
-//   await puppet.acessar("https://jte.csjt.jus.br/")
-//   await sleep(1000)
-//   await puppet.preencheTribunal('00105492920205150001')
-//   await sleep(2000)
-//   await puppet.loga()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109906220205150001", 0)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109926220205150001", 1)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109916220205150001", 2)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109936220205150001", 3)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109896220205150001", 4)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109886220205150001", 5)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109886220205150001", 6)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109886220205150001", 7)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109876220205150001", 8)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109846220205150001", 9)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109916220205150001", 10)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
+  await sleep(1000)
+  await puppet.acessar("https://jte.csjt.jus.br/")
+  await sleep(1000)
+  await puppet.preencheTribunal('00105492920205150001')
+  await sleep(2000)
+  await puppet.loga()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109906220205150001", 0)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109936220205150001", 1)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109916220205150001", 2)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109936220205150001", 3)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109896220205150001", 4)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109886220205150001", 5)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109886220205150001", 6)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109886220205150001", 7)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109876220205150001", 8)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109846220205150001", 9)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109916220205150001", 10)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
 
-// })()
+})()
 // 0011051-65.2020.5.15.0001  
+// 00109474720205150042   -- verificar esse numero
+// 00109364720205150069
+// 10007714720205020045
+// 00106894720205150101
+// 00079274720205150000
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

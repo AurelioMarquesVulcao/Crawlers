@@ -96,7 +96,7 @@ class Enfileirador {
       Promise.all(cadastros).then(res => {
         console.log('consultas cadastradas');
         mongoose.connection.close();
-      }).catch(e => throw e);
+      });
 
     } catch (e) {
       console.log(e);

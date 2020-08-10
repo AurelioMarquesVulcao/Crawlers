@@ -5,6 +5,7 @@ const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
+const sleep = require('await-sleep');
 
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
@@ -50,8 +51,7 @@ const logarExecucao = async (execucao) => {
       logger.info('Resultado da extracao salva');
 
       logger.info('Enviando resposta ao BigData');
-      process.exit(0);
-      const resposta = await Helper.enviarFeedback(
+      await Helper.enviarFeedback(
         extracao.prepararEnvio()
       ).catch((err) => {
         console.log(err);
@@ -60,10 +60,6 @@ const logarExecucao = async (execucao) => {
         );
       });
       logger.info('Resposta enviada ao BigData');
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
-      logger.info('Mensagem reconhecida');
-      logger.info('Finalizando processo');
       console.log('\n\n');
       await logarExecucao({
         Mensagem: message,
@@ -77,10 +73,6 @@ const logarExecucao = async (execucao) => {
       console.log('ERRU', e.code, e.message, '\n\n', e);
       logger.info('Encontrado erro durante a execução');
       logger.info(`Error: ${e.message}`);
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
-      logger.info('Mensagem reconhecida');
-      logger.info('Finalizando proceso');
       console.log('\n\n');
 
       await logarExecucao({
@@ -93,6 +85,14 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
+    } finally {
+      logger.info('Reconhecendo mensagem ao RabbitMQ');
+      ch.ack(msg);
+      logger.info('Mensagem reconhecida');
+      logger.info('Finalizando proceso');
+      console.log('\n\n\n\n');
+      await sleep(2000);
+
     }
   });
 })();

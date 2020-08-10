@@ -104,6 +104,36 @@ class Helper {
     });
   }
 
+  static async feedbackDocumentos(msg) {
+    const robo = new Robo();
+    let resposta = await Token.hasValid();
+    let token;
+
+    if (resposta.sucesso) {
+      token = resposta.token;
+    } else {
+      resposta = await this.resgatarNovoToken();
+      if (resposta.responseBody.Sucesso) {
+        await new Token({ token: resposta.responseBody.Token }).save();
+      } else {
+        console.log("Não foi possivel recuperar o Token");
+        process.exit(1);
+      }
+    }
+
+    return await robo.acessar({
+      url: enums.bigdataUrls.resultadoDocumentos,
+      method: "POST",
+      encoding: "",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      usaProxy: false,
+      usaJson: true,
+      params: msg
+    });
+  }
+
   static async downloadImage(url, headers) {
     return await Axios({
       url,

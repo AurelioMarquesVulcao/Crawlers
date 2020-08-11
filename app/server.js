@@ -23,7 +23,7 @@ mongoose.connect(enums.mongo.connString, {
   useUnifiedTopology: true
 });
 
-app.listen(port, () => {
+app.listen(3300, () => {
   console.log(`API rodando em: http://localhost:${port}`);
   console.log();
 });

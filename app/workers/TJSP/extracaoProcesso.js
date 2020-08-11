@@ -5,6 +5,7 @@ const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
+const sleep = require('await-sleep');
 
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
@@ -29,7 +30,7 @@ const logarExecucao = async (execucao) => {
       nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSP}`,
       NumeroOab: message.NumeroProcesso,
     });
-    console.log(message);
+    console.table(message);
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
@@ -37,7 +38,8 @@ const logarExecucao = async (execucao) => {
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(
         message.NumeroProcesso,
-        message.NumeroOab
+        message.NumeroOab,
+        message.Instancia
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
@@ -58,7 +60,6 @@ const logarExecucao = async (execucao) => {
         );
       });
       logger.info('Resposta enviada ao BigData');
-      logger.info('Finalizando processo');
       console.log('\n\n');
       await logarExecucao({
         Mensagem: message,
@@ -68,14 +69,10 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
-      logger.info('Mensagem reconhecida');
     } catch (e) {
       console.log('ERRU', e.code, e.message, '\n\n', e);
       logger.info('Encontrado erro durante a execução');
-      logger.log('error', e);
-      logger.info('Finalizando proceso');
+      logger.info(`Error: ${e.message}`);
       console.log('\n\n');
 
       await logarExecucao({
@@ -88,9 +85,14 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
+    } finally {
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
+      logger.info('Finalizando proceso');
+      console.log('\n\n\n\n');
+      await sleep(2000);
+
     }
   });
 })();

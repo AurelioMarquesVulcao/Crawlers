@@ -2,6 +2,7 @@ const router = require("express").Router();
 const bigdataRoutes = require("./bigdata");
 const feedbackRoutes = require("./feedback");
 const mockRoutes = require("./mock");
+const { LogCaptcha } = require("../../models/schemas/logCaptcha");
 
 router.get('/', (req, res) => {
     res.send('Não há rota padrao para /api');

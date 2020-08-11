@@ -4,19 +4,19 @@ const re = require('xregexp');
 const fs = require('fs');
 const axios = require('axios');
 
-const { enums } = require("../../configs/enums");
-const { GerenciadorFila } = require("../../lib/filaHandler");
-const { ExtratorFactory } = require("../../extratores/extratorFactory");
-const { Extracao } = require("../../models/schemas/extracao");
-const { Helper, Logger } = require("../../lib/util");
-const { LogExecucao } = require('../../lib/logExecucao');
-const { RoboPuppeteer } = require('../../lib/roboPuppeteer')
-const { Andamento } = require('../../models/schemas/andamento');
-const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseException, } = require('../../models/exception/exception');
-const { ExtratorBase } = require('../../extratores/extratores');
-const { JTEParser } = require('../../parsers/JTEParser');
+const { enums } = require("../../../configs/enums");
+const { GerenciadorFila } = require("../../../lib/filaHandler");
+const { ExtratorFactory } = require("../../../extratores/extratorFactory");
+const { Extracao } = require("../../../models/schemas/extracao");
+const { Helper, Logger } = require("../../../lib/util");
+const { LogExecucao } = require('../../../lib/logExecucao');
+const { RoboPuppeteer } = require('../../../lib/roboPuppeteer')
+const { Andamento } = require('../../../models/schemas/andamento');
+const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseException, } = require('../../../models/exception/exception');
+const { ExtratorBase } = require('../../../extratores/extratores');
+const { JTEParser } = require('../../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer_teste2')
+const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer_teste2')
 const sleep = require('await-sleep');
 
 

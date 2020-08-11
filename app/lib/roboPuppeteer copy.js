@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 require("dotenv/config");
 
-var timerSleep = 150
+var timerSleep = 100
 
 class RoboPuppeteer3 {
 
@@ -10,14 +10,14 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']      
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      args: ['--ignore-certificate-errors']
+      //args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -47,7 +47,7 @@ class RoboPuppeteer3 {
 
   async preencheTribunal(numero) {
     // await console.log(`foi escolhido o estado numero ${escolheEstado(numero)}`);
-    //await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
+    await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
     // para esperar carregar o elemento onde fica o tribunal
     await sleep(timerSleep)
     await this.page.waitFor('mat-form-field');
@@ -60,44 +60,12 @@ class RoboPuppeteer3 {
     await this.page.click(`#mat-option-${escolheEstado(numero)}`)
     await sleep(timerSleep)
     await this.page.click('ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span')
-    await sleep(5200)
+    await sleep(2200)
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual')
     await sleep(timerSleep)
     await console.log("Logado ao tribunal desejado");
-    await sleep(timerSleep)
-    this.loga()
 
-  }
-
-  async loga(){
-    let login = "10389051764";
-    let senha = "Senh@JTE123";
-    await this.page.click("#inner > ion-toolbar > ion-buttons:nth-child(5)")
-    await sleep(500) 
-    await this.page.type("#formLogin > ion-item > ion-input > input", login)
-    await this.page.click("#formLogin > ion-toolbar > ion-button")
-    await sleep(500)
-    await this.page.type("#senha > input", senha)
-    await sleep(500)
-    await this.page.click("#formLogin > ion-toolbar > ion-button")
-    await sleep(20000)
-    await this.page.click('#consultaProcessual')
-    // await this.page.waitFor('mat-form-field');
-    // await sleep(timerSleep)
-    // await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper')
-    // await sleep(timerSleep)
-    // // console.log(!! await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper'));
-    // await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper')
-    // await sleep(timerSleep)
-    // await this.page.click(`#mat-option-${escolheEstado(numero)}`)
-    // await sleep(timerSleep)
-    // await this.page.click('ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span')
-    // await sleep(2200)
-    // // await this.page.waitFor('#consultaProcessual')
-    // await this.page.click('#consultaProcessual')
-    // await sleep(timerSleep)
-    // await console.log("Logado ao tribunal desejado");
   }
 
 
@@ -162,6 +130,9 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
     await console.log(`info: JTE - CNJ: ${numero} - html da capa do processo extraido do Puppeteer`);
     const divButon = '#listaProcessoEncontrado > mat-tab-group > mat-tab-header > div.mat-tab-label-container > div > div'
+    // esta travando a carregamento dos elementos aqui.
+    await sleep(2000)
+    await this.page.click(`#mat-tab-label-${contador}-1`)
     await sleep(timerSleep)
     await this.page.click(`#mat-tab-label-${contador}-1`)
     await sleep(timerSleep)

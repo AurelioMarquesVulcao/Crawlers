@@ -1,6 +1,6 @@
 const cheerio = require('cheerio');
 const { Logger } = require('../lib/util');
-const { RoboPuppeteer } = require('../lib/roboPuppeteer')
+
 const moment = require('moment');
 const { Andamento } = require('../models/schemas/andamento');
 const re = require('xregexp');
@@ -12,8 +12,8 @@ const enums = require('../configs/enums').enums;
 const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseException, } = require('../models/exception/exception');
 const { ExtratorBase } = require('./extratores');
 const { JTEParser } = require('../parsers/JTEParser');
+const { RoboPuppeteer3 } = require('../lib/roboPuppeteer');
 
-const { RoboPuppeteer3 } = require('../lib/roboPuppeteer_teste2')
 
 /**
  * Logger para console e arquivo
@@ -55,7 +55,8 @@ class ProcJTE extends ExtratorBase {
       dadosProcesso = this.parser.parse($, $2)
       var processo = dadosProcesso.processo
       await dadosProcesso.processo.salvar()
-      await Andamento.salvarAndamentos(dadosProcesso.andamentos)
+      dadosProcesso.andamentos[0]
+      //await Andamento.salvarAndamentos(dadosProcesso.andamentos)
     } catch (e) {
       console.log(e);
     }

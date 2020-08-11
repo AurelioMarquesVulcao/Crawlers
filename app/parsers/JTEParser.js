@@ -19,12 +19,15 @@ class JTEParser extends BaseParser {
 
   // Extract all processes for a given Process number
   // Funcao central da raspagem.
-  parse($, $2, numeroProcesso) {
-    let cnj = this.mascaraNumero(numeroProcesso)
-
-    //console.time('parse');
+  parse($, $2, contador) {
+    let cnj = this.extraiNumeroProcesso($, contador);
+    let n = this.detalhes(cnj).numeroProcesso.trim();
+    let dadosAndamento = this.andamento($2, n);
+    // extrai vara/ comarca/ e 1 distribuição
+    let primeiraDistribuicao = this.extraiDadosDosAndametos($, dadosAndamento);
+    // console.log(primeiraDistribuicao);
     let dadosProcesso = new Processo({
-      capa: this.capa($, cnj),
+      capa: this.capa($, cnj, primeiraDistribuicao),
       oabs: this.removeVazios(this.Oabs($)),
       qtdAndamentos: this.numeroDeAndamentos($2),
       origemExtracao: enums.nomesRobos.JTE,
@@ -33,9 +36,8 @@ class JTEParser extends BaseParser {
       // "origemDados": enums.nomesRobos.JTE,  // verificar esse campo.
       detalhes: this.detalhes(cnj)
     })
-    let n = this.detalhes(cnj).numeroProcesso.trim()
-    let dadosAndamento = this.andamento($2, n)
-    // console.timeEnd('parse');
+
+    console.log("O processo possui " + this.numeroDeAndamentos($2) + " andamentos");
     return {
       processo: dadosProcesso,
       andamentos: dadosAndamento
@@ -43,16 +45,18 @@ class JTEParser extends BaseParser {
   }
 
   // funcao secundaria - organiza os dados da capa
-  capa($, numeroProcesso) {
+  capa($, numeroProcesso, datas) {
     let capa = {
       uf: this.estado($, numeroProcesso), // inserir uf na raspagem do puppeteer
-      comarca: "", // perguntar onde extraio a comarca
-      vara: this.extraiVaraCapa($).trim(),
-      fase: '', // perguntar onde extraio a comarca
-      assunto: [this.extraiAssunto($)], // inserir raspagem de assunto na fase de testes
+      comarca: datas.comarca, // perguntar onde extraio a comarca
+      vara: datas.vara,
+      fase: datas.fase, // perguntar onde extraio a comarca
+      assunto: this.extraiAssunto($), // inserir raspagem de assunto na fase de testes
       classe: this.extraiClasseCapa($).trim(),
-      dataDistribuicao: Date(),
+      dataDistribuicao: datas.primeiraDistribuicao,
+      instancia: this.instancia($),
     }
+    // console.log(capa);
     return capa
   }
 
@@ -68,7 +72,7 @@ class JTEParser extends BaseParser {
     let resultado = [];
     for (let i in this.extraiAdvogadoOab($)) {
       let advogado = {
-        nome: this.extraiAdvogadoOab($)[i][1],
+        nome: `(${this.extraiAdvogadoOab($)[i][0]})` + this.extraiAdvogadoOab($)[i][1],
         tipo: "Advogado",
         // Adaptado para incluir advogado nas partes envolvidas
         // oab: {
@@ -84,6 +88,7 @@ class JTEParser extends BaseParser {
 
   // funcao secundaria - organiza os dados dos envolvidos
   envolvidos($) {
+    let advogados = this.advogados($)
     let resultado = [];
     // comitado para padronizar o advogado no Banco de dados.
     // for (let i in this.extraiAdvogadoOab($)) {
@@ -102,6 +107,10 @@ class JTEParser extends BaseParser {
       }
       resultado.push(envolvido)
     }
+    for (let i in advogados) {
+      resultado.push(advogados[i])
+    }
+
     //console.log(resultado);
     return resultado
   }
@@ -121,48 +130,115 @@ class JTEParser extends BaseParser {
   }
 
   extraiAssunto($) {
-    let assunto = $('detalhes-aba-geral').text().split('\n');
-    assunto = this.removeVazios(assunto)
-    let teste = assunto[100]
-    if (!teste) return "Assunto nao Especificado";
-    else return teste
+    let resultado = []
+    $('ion-chip').each(async function (element) {
+      let datas = $(this).text();//.split('\n');
+      if (!!datas) {
+        resultado.push(datas)
+      }
+    })
+    resultado = this.removeVazios(resultado)
+    if (!resultado) return "Assunto nao Especificado";
+    // console.log(resultado);
+    if (resultado.length == 0) {
+      resultado = 'Não foi possivel obter'
+      // throw "Não pegou assunto, reprocessar"
+    }
+    return resultado
   }
 
+
   estado($, numeroProcesso) {
-    console.log('olhe aqui---------------------------------------------------');
+
 
     let resultado = 'Estado indeterminado'
-    console.log(numeroProcesso);
+
 
     let dados = this.detalhes(numeroProcesso).tribunal
-    console.log(dados);
+
 
     if (dados == 2 || dados == 15) resultado = 'SP'
     if (dados == 1) resultado = 'RJ'
     // if (dados == 15) resultado = 'SP'
     if (dados == 3) resultado = 'MG'
     if (dados == 21) resultado = 'RN'
+    if (dados == 5) resultado = 'BA'
     return resultado
+  }
+
+
+  extraiDadosDosAndametos($, andamentos) {
+    let dados;
+    let data;
+    let fase = andamentos[0].descricao
+    if (!!this.extraiVaraCapa($)) {
+      for (let i = 0; i < andamentos.length; i++) {
+        data = andamentos[i].data
+      }
+      let primeiraDistribuicao = data
+      return {
+        vara: this.extraiVaraCapa($).vara,
+        comarca: this.extraiVaraCapa($).comarca,
+        primeiraDistribuicao: primeiraDistribuicao,
+        fase: fase,
+      }
+    } else {
+      for (let i = 0; i < andamentos.length; i++) {
+        if (andamentos[i].descricao.indexOf("Audiencia inicial designada") > -1) dados = andamentos[i].descricao
+        data = andamentos[i].data
+      }
+      if (!!dados) {
+        let vara = dados.split('-')[1].split('de')[0].trim();
+        let comarca = dados.split('-')[1].split('de')[1].replace(')', '').trim();
+        let primeiraDistribuicao = data
+        return {
+          vara: vara,
+          comarca: comarca,
+          primeiraDistribuicao: primeiraDistribuicao,
+          fase: fase,
+        }
+      } else {
+        let primeiraDistribuicao = data
+        return {
+          vara: "Não foi possivel obter",
+          comarca: "Não foi possivel obter",
+          primeiraDistribuicao: primeiraDistribuicao,
+          fase: fase,
+        }
+      }
+    }
   }
 
   // precisa de melhorias
   extraiVaraCapa($) {
-    let resultado = "não possui vara"
+    // let resultado = "não possui vara"
+    let resultado;
+    let vara;
+    let comarca;
     $('detalhes-aba-geral p').each(async function (element) {
-      let advogados = $(this).text().split('\n');
-      //console.log(advogados);
-      advogados = new JTEParser().removeVazios(advogados)
-      let vara = 'não tem'//removerAcentos(advogados[1].split('-')[1].trim())
-      return vara
-
+      let datas = $(this).text().split('\n');
+      if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
+        vara = datas[0].split('-')[1].split('de')[0].trim()
+        comarca = datas[0].split('-')[1].split('de')[1].trim()
+        resultado = {
+          vara: vara,
+          comarca: comarca,
+        }
+      }
     })
-    // let advogados = $('detalhes-aba-geral').text().split('\n');
-    // advogados = this.removeVazios(advogados)
-    // console.log(advogados);
-
-    // let vara = removerAcentos(advogados[1].split('-')[1].trim())
-    // if (!!vara) return vara
-    // if (!vara) return "nao possui vara"
+    return resultado
+  }
+  instancia($) {
+    let resultado;
+    $('detalhes-aba-geral p').each(async function (element) {
+      let datas = $(this).text().split('\n');
+      // resultado.push(datas[0].split('-')[0].trim())
+      // console.log(resultado);
+      resultado = datas[0].split('-')[0].trim()
+      if (resultado.match(/([0-9]{1})/)) {
+        resultado = (resultado.match(/([0-9]{1})/)[1]);
+      } else { resultado = null }
+    })
     return resultado
   }
 
@@ -180,10 +256,10 @@ class JTEParser extends BaseParser {
   }
 
   // retorna array com numero do processo.
-  extraiNumeroProcesso($) {
+  extraiNumeroProcesso($, contador) {
     let datas = [];
     let resultado = ''
-    $('#mat-tab-content-0-0 > div > detalhes-aba-geral > div > span.item-painel-titulo').each(async function (element) {
+    $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > span.item-painel-titulo`).each(async function (element) {
       let numero = $(this).text().split("\n")[0];
       if (!!numero) resultado = numero
     })
@@ -243,17 +319,41 @@ class JTEParser extends BaseParser {
   // ----------------------------------------fim da raspagem dos dados do processo-----------------------------------------------
 
   andamento($, n) {
-    let resultado = []
-    let texto = this.extraiAndamento($)
+    let resultado = [];
+    let dadosHash = [];
+    let contador = 0;
+    let texto = this.extraiAndamento($);
     let data = this.extraiDataAndamento($)
-    for (let j = 0; j < texto.length; j++) {
-      resultado.push(
-        new Andamento({
-          descricao: this.removeVazios(texto[j])[0],
-          data: this.ajustaData(this.removeVazios(data[j])[0]),
-          numeroProcesso: n
 
-        })
+    for (let j = 0; j < texto.length; j++) {
+      // console.log(texto[j]);
+      // console.log(data[j]);
+      let obj = {
+        descricao: this.removeVazios(texto[j])[0],
+        data: this.ajustaData(this.removeVazios(data[j])[0]),
+        numeroProcesso: n,
+        observacao: ""
+      };
+      let hash = Andamento.criarHash(obj);
+      if (dadosHash.indexOf(hash) !== -1) {
+        let indices = [];
+        let array = dadosHash;
+        let elemento = hash;
+        let idx = array.indexOf(elemento);
+        while (idx != -1) {
+          indices.push(idx);
+          idx = array.indexOf(elemento, idx + 1);
+        }
+        obj = {
+          descricao: this.removeVazios(texto[j])[0]+`[${indices.length}]`,
+          data: this.ajustaData(this.removeVazios(data[j])[0]),
+          numeroProcesso: n,
+          observacao: ""
+        };
+      }
+      dadosHash.push(hash)
+      resultado.push(
+        new Andamento(obj)
       )
     }
     return resultado
@@ -265,23 +365,36 @@ class JTEParser extends BaseParser {
   extraiAndamento($) {
     let resultado = [];
     let dados = [];
-    $('ion-item div').each(async function (element) {
+
+    $('ion-item p').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos)
       // console.log(andamentos.length);
-      if (andamentos.length > 0) dados.push(andamentos)
+      if (andamentos.length > 0) {
+
+        dados.push(andamentos)
+      }
     })
 
     // verifica duplicidade
-    let c = 0;
-    for (let i = 0; i < dados.length; i++) {
-      for (let j = 0; j < dados.length; j++) {
-        if (dados[i][0] === dados[j][0] && i != j) {
-          c++
-          dados[i][0] = dados[j] + ' [' + c + ']'
-        }
-      }
-    }
+    // let hash = Andamento.criarHash(andamento);
+
+    //   if (andamentosHash.indexOf(hash) !== -1) {
+    //     let count = andamentosHash.filter((element) => element === hash).length;
+    //     andamento.descricao = `${andamento.descricao} [${count + 1}]`;
+    //   }
+    //   andamentos.push(new Andamento(andamento));
+    //   andamentosHash.push(hash);
+    // });
+    // let c = 0;
+    // for (let i = 0; i < dados.length; i++) {
+    //   for (let j = 0; j < dados.length; j++) {
+    //     if (dados[i][0] === dados[j][0] && i != j) {
+    //       c++
+    //       dados[i][0] = dados[j] + ' [' + c + ']'
+    //     }
+    //   }
+    // }
     resultado = dados
     return resultado
   }
@@ -322,29 +435,26 @@ class JTEParser extends BaseParser {
 
   // ajusta data brasil para Internacional recebe uma data por vez.
   ajustaData(datas) {
+
+
     let dia = datas.slice(0, 2);
     let mes = datas.slice(2, 5);
     let ano = datas.slice(5, 10);
     let data = ano + "-" + mes + "-" + dia
     return data
   }
-  mascaraNumero(numeroProcesso){
+  mascaraNumero(numeroProcesso) {
     let resultado = '';
-    resultado = numeroProcesso.slice(0,7)+'-'+numeroProcesso.slice(7,9)
-    +'.'+numeroProcesso.slice(9,13)+'.'+numeroProcesso.slice(13,14)
-    +'.'+numeroProcesso.slice(numeroProcesso.length-6,numeroProcesso.length-4)
-    +'.'+numeroProcesso.slice(numeroProcesso.length-4,numeroProcesso.length)
+    resultado = numeroProcesso.slice(0, 7) + '-' + numeroProcesso.slice(7, 9)
+      + '.' + numeroProcesso.slice(9, 13) + '.' + numeroProcesso.slice(13, 14)
+      + '.' + numeroProcesso.slice(numeroProcesso.length - 6, numeroProcesso.length - 4)
+      + '.' + numeroProcesso.slice(numeroProcesso.length - 4, numeroProcesso.length)
 
     return resultado
   }
 
 
 } // Fim da classe TJPRParser
-
-// START'S FOR PROJECT TEST and development
-// (async ()=>{
-//   await new TJPRParser().extraiOAB($)
-// })()
 
 
 

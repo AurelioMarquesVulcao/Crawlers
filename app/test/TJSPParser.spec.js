@@ -27,6 +27,7 @@ describe('Testes do TJSP', () => {
     const extracao = new TJSPParser().parse(rawdata);
     it('capa', () => {
       const capa = extracao.processo.capa.toJSON();
+      delete capa.dataDistribuicao;
       chai.expect(resultado.capa).to.eql(capa);
     });
 
@@ -56,4 +57,56 @@ describe('Testes do TJSP', () => {
       chai.expect(resultado.andamentos).to.eql(andamentos);
     });
   });
+  describe('Teste 2 do Parser TJSP', () => {
+    let resultadoString = fs.readFileSync(
+      'test/testCases/TJSP/00036033220008260083.json',
+      'utf8'
+    );
+    resultadoString = String(resultadoString)
+    resultadoString = resultadoString.replace(/dataFormatada/gm, dataFormatada);
+    const resultado = JSON.parse(resultadoString);
+    let rawdata = fs.readFileSync(
+      'test/testCases/TJSP/00036033220008260083.html',
+      'utf8'
+    );
+    // console.log(rawdata);
+    // console.log(new TJSPParser().parse(rawdata));
+
+    const extracao = new TJSPParser().parse(rawdata, 2);
+    it('capa', () => {
+      const capa = extracao.processo.capa.toJSON();
+      delete capa.dataDistribuicao;
+      chai.expect(resultado.capa).to.eql(capa);
+    });
+
+    it('detalhes', () => {
+      const detalhes = extracao.processo.detalhes.toJSON();
+      chai.expect(resultado.detalhes).to.eql(detalhes);
+    });
+
+    it('envolvidos', () => {
+      const envolvidos = extracao.processo.envolvidos.toObject();
+      chai.expect(resultado.envolvidos).to.eql(envolvidos);
+    });
+
+    it('oabs', () => {
+      const oabs = extracao.processo.oabs.toObject();
+      chai.expect(resultado.oabs).to.eql(oabs);
+    });
+
+    it('andamentos', () => {
+      let andamentos = extracao.andamentos;
+
+      andamentos = andamentos.map((element) => {
+        element = JSON.stringify(element);
+        return JSON.parse(element);
+      });
+
+      chai.expect(resultado.andamentos).to.eql(andamentos);
+    });
+
+    console.log(JSON.stringify(extracao.processo.toJSON()));
+
+    console.log('fim')
+  })
 });

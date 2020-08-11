@@ -58,9 +58,11 @@ const logarExecucao = async (execucao) => {
       logger.info('Arquivo preparado');
 
       logger.info('Enviando resposta ao BigData');
-      await Helper.feedbackDocumentos(
-        {ArquivoB64: data, NumeroProcesso: message.NumeroProcesso, Instancia: message.Instancia}
-      ).catch((err) => {
+      await Helper.feedbackDocumentos({
+        ArquivoB64: data,
+        NumeroProcesso: message.NumeroProcesso,
+        Instancia: message.Instancia,
+      }).catch((err) => {
         console.log(err);
         throw new Error(
           `PeticaoTJSP - Erro ao enviar resposta ao BigData - Processo: ${message.Processo}`
@@ -77,10 +79,9 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: 'PeticaoTJSP',
       });
-
     } catch (e) {
       logger.info('Encontrado erro durante a execução');
-      logger.log('error',e);
+      logger.log('error', e);
       logger.info('Finalizando proceso');
       await logarExecucao({
         LogConsultaId: message.LogConsultaId,
@@ -92,19 +93,17 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
-
-
     } finally {
-      if (fs.existsSync(arquivoPath)){
+      if (fs.existsSync(arquivoPath)) {
         logger.info('Apagando arquivo temporario');
         await fs.unlinkSync(arquivoPath);
-        logger.info('Arquivo apagado')
+        logger.info('Arquivo apagado');
       }
 
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
-      console.log('\n\n\n\n')
+      console.log('\n\n\n\n');
       await sleep(2000);
     }
   });

@@ -26,7 +26,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
 
     this.args = [
       '--no-sandbox',
-      `--proxy-server=http://proxy-proadv.7lan.net:8181`,
+      // `--proxy-server=http://proxy-proadv.7lan.net:8181`,
       `--ignore-certificate-errors`,
     ];
     this.ignore = ['--disable-extensions'];
@@ -55,7 +55,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       login: '103.890.517-64',
       senha: 'Senh@TJ123',
       estado: 'SP',
-      nome: 'Karine Sensei',
+      nome: 'Karine',
     }).salvar();
 
     this.resposta = { numeroProcesso: numeroProcesso };
@@ -90,7 +90,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       await sleep(100);
 
       // Tratamento caso resultado da consulta retorne algo invalido
-      if (await this.page.$('#mensagemRetorno') !== null){
+      if ((await this.page.$('#mensagemRetorno')) !== null) {
         let alert = await this.page.$eval('#mensagemRetorno', (element) => {
           return {
             role: element.getAttribute('role'),
@@ -101,7 +101,6 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           throw new Error(alert.msg.trim());
         }
       }
-
 
       // Tratamento caso resultado da consulta retorne uma lista de processos
       let processos;
@@ -185,7 +184,9 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.page.click('#pbEntrar'),
         ]);
 
-        continuar = await this.page.$$('#mensagemRetorno').then((selector) => Boolean(selector.length));
+        continuar = await this.page
+          .$$('#mensagemRetorno')
+          .then((selector) => Boolean(selector.length));
 
         if (continuar) {
           this.logger.log(
@@ -285,15 +286,16 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     let tam = docs.length;
     let encontrado = false;
     for (let i; i < tam; i++) {
-      if(docs[i].innerText == 'Decisão') {
+      if (docs[i].innerText == 'Decisão') {
         encontrado = true;
         break;
       }
     }
     this.logger.info('Selecionando documentos de interessa para download');
 
-    if (encontrado) //TODO colocar tudo isso dependente do if
-
+    if (encontrado) {
+      //TODO colocar tudo isso dependente do if
+    }
     await this.page.evaluate(() => {
       let elements = $('#arvore_principal > ul > li > a');
       let tam = elements.length;
@@ -362,7 +364,10 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.logger.info('Download finalizado');
           return resolve(true);
         }
-        const size = fs.statSync(`./temp/peticoes/tjsp/${this.numeroProcesso}.pdf.crdownload`).size / 1000000.0
+        const size =
+          fs.statSync(
+            `./temp/peticoes/tjsp/${this.numeroProcesso}.pdf.crdownload`
+          ).size / 1000000.0;
         this.logger.info(`Download não finalizado | ${size} Mb baixados`);
         await sleep(5000);
       } while (true);

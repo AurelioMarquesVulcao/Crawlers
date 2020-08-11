@@ -154,8 +154,9 @@ class ProcessoController {
     let response = {};
 
     try {
+      const res = await Processo.countDocuments({});
       response.status = 200;
-      response.data = await Processo.countDocuments({});
+      response.data = res.data;
       response.error = null;
     } catch (e) {
       response.status = 500;
@@ -238,6 +239,31 @@ class ProcessoController {
 
       response.status = 200;
       response.data = new Tradutor().traduzirAndamentos(resAndamentos);
+      response.error = null;
+    } catch (e) {
+      console.log(e);
+      response.status = 500;
+      response.data = '';
+      response.error = e.message;       
+    }
+
+    res.status(response.status).send(response.data);
+  }
+
+  static async obterProcessos(req, res) {
+    const response = {};
+
+    try {
+      const data = req.params.data;
+      const resProcessos = await Processo.find({ 
+        dataCriacao: {
+          $lte: moment(data, 'YYYY-MM-DD').format('YYYY-MM-DDT00:00:00Z'),
+          $gt: moment(data, 'YYYY-MM-DD').add(1, 'days').format('YYYY-MM-DDT00:00:00Z'),
+        } 
+      });
+
+      response.status = 200;
+      response.data = resProcessos;
       response.error = null;
     } catch (e) {
       console.log(e);

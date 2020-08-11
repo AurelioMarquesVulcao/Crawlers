@@ -18,10 +18,10 @@ class RoboPuppeteer3 {
       slowMo: 1,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      // args: ['--ignore-certificate-errors']
+       args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -233,7 +233,8 @@ class RoboPuppeteer3 {
             let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
             let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
             let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
-            let tipo = "PDF"
+            // if (!! document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > pdf-viewer")){ "pdf"};
+            let tipo = "pdf"
             console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
           } // se for um documento de texto 
@@ -294,12 +295,11 @@ class RoboPuppeteer3 {
           }, k, dataEProcesso);
           // codigo que que fecha a ultima aba do puppeteer.
           // com esse codigo consigo fechar os popup
-          //await sleep(timerSleep)
           let pages = await this.browser.pages();
           while (pages.length == 2) {
             await sleep(timerSleep)
-            await console.log(pages.length)
-            await console.log("Aguarde mais um pouco")
+            // await console.log(pages.length)
+            // await console.log("Aguarde mais um pouco")
             pages = await this.browser.pages();
           }
           console.log(pages.length)
@@ -370,6 +370,12 @@ class RoboPuppeteer3 {
 
   }
 
+  processaNumero(numero) {
+    let numeroProcesso = numero.trim().slice(0, 7);
+    let ano = numero.trim().slice(9, 13);
+    let vara = numero.trim().slice(numero.length - 4, numero.length);
+    return {numeroProcesso,ano,vara}
+  }
 
   async fechar() {
     // codigo que que fecha a ultima aba do puppeteer.
@@ -420,64 +426,64 @@ function processaNumero(numero) {
 //   await sleep(1000)
 //   await puppet.pegaInicial()
 // })()
-(async () => {
-  let puppet = new RoboPuppeteer3()
+// (async () => {
+//   let puppet = new RoboPuppeteer3()
 
-  await puppet.iniciar()
+//   await puppet.iniciar()
 
-  await sleep(1000)
-  await puppet.acessar("https://jte.csjt.jus.br/")
-  await sleep(1000)
-  await puppet.preencheTribunal('00105492920205150001')
-  await sleep(2000)
-  await puppet.loga()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109906220205150001", 0)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109936220205150001", 1)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109916220205150001", 2)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109936220205150001", 3)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109896220205150001", 4)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109886220205150001", 5)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109886220205150001", 6)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109886220205150001", 7)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109876220205150001", 8)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109846220205150001", 9)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
-  await puppet.preencheProcesso("00109916220205150001", 10)
-  await sleep(1000)
-  await puppet.pegaInicial()
-  await sleep(1000)
+//   await sleep(1000)
+//   await puppet.acessar("https://jte.csjt.jus.br/")
+//   await sleep(1000)
+//   await puppet.preencheTribunal('00105492920205150001')
+//   await sleep(2000)
+//   await puppet.loga()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109906220205150001", 0)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00109936220205150001", 1)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   await puppet.preencheProcesso("00079274720205150000", 2)
+//   await sleep(1000)
+//   await puppet.pegaInicial()
+//   await sleep(1000)
+//   // await puppet.preencheProcesso("00109936220205150001", 3)
+//   // await sleep(1000)
+//   // await puppet.pegaInicial()
+//   // await sleep(1000)
+//   // await puppet.preencheProcesso("00109364720205150069", 4)
+//   // await sleep(1000)
+//   // await puppet.pegaInicial()
+//   // await sleep(1000)
+//   // await puppet.preencheProcesso("00109886220205150001", 5)
+//   // await sleep(1000)
+//   // await puppet.pegaInicial()
+//   // await sleep(1000)
+//   // await puppet.preencheProcesso("00109886220205150001", 6)
+//   // await sleep(1000)
+//   // await puppet.pegaInicial()
+//   // await sleep(1000)
+//   // await puppet.preencheProcesso("00109886220205150001", 7)
+//   // await sleep(1000)
+//   // await puppet.pegaInicial()
+//   // await sleep(1000)
+//   // await puppet.preencheProcesso("00109876220205150001", 8)
+//   // await sleep(1000)
+//   // await puppet.pegaInicial()
+//   // await sleep(1000)
+//   // await puppet.preencheProcesso("00109846220205150001", 9)
+//   // await sleep(1000)
+//   // await puppet.pegaInicial()
+//   // await sleep(1000)
+//   // await puppet.preencheProcesso("00109916220205150001", 10)
+//   // await sleep(1000)
+//   // await puppet.pegaInicial()
+//   // await sleep(1000)
 
-})()
+// })()
 // 0011051-65.2020.5.15.0001  
 // 00109474720205150042   -- verificar esse numero
 // 00109364720205150069

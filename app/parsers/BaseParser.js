@@ -61,6 +61,8 @@ const tradutor = {
   "Apdo": "Apelado",
   "Apte": "Apelante",
   "Autor": "Autor",
+  "Credor": "Credor",
+  "Devedor": "Devedor",
   "Embargdo": "Embargado",
   "Embargte": "Embargante",
   "Exectdo": "Executado",

@@ -133,6 +133,7 @@ class AntiCaptchaHandler {
             sucesso: true,
             captchaId: captchaId,
             gResponse: objResponse.responseBody.solution.gRecaptchaResponse,
+            body: objResponse.responseBody
           };
         }
       } while (tentativa < 5);
@@ -532,7 +533,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
       );
       if (resultado.sucesso) {
         logCaptcha.Servico = 'AntiCaptcha';
-        logCaptcha.CaptchaBody = resultado;
+        logCaptcha.CaptchaBody = resultado.body;
         new LogCaptcha(logCaptcha).save();
         return resultado;
       }
@@ -549,13 +550,20 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     let resultado = {
       sucesso: false,
       detalhes: [],
+      body: {}
     };
     let captcha = await tipoCaptcha.resolverV2(website, websiteKey, pageAction);
 
+
+
     if (captcha.sucesso) {
+      // data padrão vindo de 1970
+      captcha.body.createTime = new Date(captcha.body.createTime);
+      captcha.body.endTime = new Date(captcha.body.endTime);
       resultado.sucesso = true;
       resultado.gResponse = captcha.gResponse;
       resultado.captchaId = captcha.captchaId;
+      resultado.body = captcha.body;
     } else {
       resultado.detalhes.push(captcha.detalhes);
     }

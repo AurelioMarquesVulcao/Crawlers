@@ -24,7 +24,7 @@ class JTEParser extends BaseParser {
     let n = this.detalhes(cnj).numeroProcesso.trim();
     let dadosAndamento = this.andamento($2, n);
     // extrai vara/ comarca/ e 1 distribuição
-    let primeiraDistribuicao = this.extraiDadosDosAndametos($, dadosAndamento);
+    let primeiraDistribuicao = this.extraiDadosDosAndametos($, dadosAndamento, contador);
     // console.log(primeiraDistribuicao);
     let dadosProcesso = new Processo({
       capa: this.capa($, cnj, primeiraDistribuicao),
@@ -167,18 +167,18 @@ class JTEParser extends BaseParser {
   }
 
 
-  extraiDadosDosAndametos($, andamentos) {
+  extraiDadosDosAndametos($, andamentos, contador) {
     let dados;
     let data;
     let fase = andamentos[0].descricao
-    if (!!this.extraiVaraCapa($)) {
+    if (!!this.extraiVaraCapa($, contador)) {
       for (let i = 0; i < andamentos.length; i++) {
         data = andamentos[i].data
       }
       let primeiraDistribuicao = data
       return {
-        vara: this.extraiVaraCapa($).vara,
-        comarca: this.extraiVaraCapa($).comarca,
+        vara: this.extraiVaraCapa($, contador).vara,
+        comarca: this.extraiVaraCapa($, contador).comarca,
         primeiraDistribuicao: primeiraDistribuicao,
         fase: fase,
       }
@@ -210,12 +210,14 @@ class JTEParser extends BaseParser {
   }
 
   // precisa de melhorias
-  extraiVaraCapa($) {
+  extraiVaraCapa($, contador) {
     // let resultado = "não possui vara"
     let resultado;
     let vara;
     let comarca;
-    $('detalhes-aba-geral p').each(async function (element) {
+
+    $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > p`).each(async function (element) {
+      // $('detalhes-aba-geral p').each(async function (element) {
       let datas = $(this).text().split('\n');
       if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
         vara = datas[0].split('-')[1].split('de')[0].trim()
@@ -345,7 +347,7 @@ class JTEParser extends BaseParser {
           idx = array.indexOf(elemento, idx + 1);
         }
         obj = {
-          descricao: this.removeVazios(texto[j])[0]+`[${indices.length}]`,
+          descricao: this.removeVazios(texto[j])[0] + `[${indices.length}]`,
           data: this.ajustaData(this.removeVazios(data[j])[0]),
           numeroProcesso: n,
           observacao: ""

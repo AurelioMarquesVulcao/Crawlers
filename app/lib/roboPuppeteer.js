@@ -21,7 +21,7 @@ class RoboPuppeteer3 {
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-       args: ['--ignore-certificate-errors']
+      args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -160,35 +160,97 @@ class RoboPuppeteer3 {
   }
 
 
-  async pegaAudiencia() {
-    // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
-    // click para pegar o assunto
-    await this.page.click(`mat-expansion-panel`)
-    // click para pegar audiencias
-    // #mat-expansion-panel-header-1 > span.mat-content > mat-panel-description
+  // async pegaAudiencia() {
+  //   // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
+  //   // click para pegar o assunto
+  //   await this.page.click(`mat-expansion-panel`)
+  //   // click para pegar audiencias
+  //   // #mat-expansion-panel-header-1 > span.mat-content > mat-panel-description
 
-    await this.page.click(`#mat-expansion-panel-header-1 > span.mat-content > mat-panel-description`)
-    await sleep(timerSleep)
-    await sleep(2000)
-    //await this.page.waitFor(`ion-item:nth-child(1)`)
-    // click dos documentos
-    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)
-    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
-    //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
-    await this.page.click(`#cdk-accordion-child-1 > div > ion-list > ion-item:nth-child(1) > div`)
-    await sleep(2000)
-    let html9 = await this.page.evaluate(async () => {
-      let text = await document.querySelector('#menu-content > detalhe-documento > ion-content').innerText;
-      return text
-    })
-    await console.log(html9);
-    await sleep(timerSleep)
+  //   await this.page.click(`#mat-expansion-panel-header-1 > span.mat-content > mat-panel-description`)
+  //   await sleep(timerSleep)
+  //   await sleep(2000)
+  //   //await this.page.waitFor(`ion-item:nth-child(1)`)
+  //   // click dos documentos
+  //   //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)
+  //   //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
+  //   //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
+  //   await this.page.click(`#cdk-accordion-child-1 > div > ion-list > ion-item:nth-child(1) > div`)
+  //   await sleep(2000)
+  //   let html9 = await this.page.evaluate(async () => {
+  //     let text = await document.querySelector('#menu-content > detalhe-documento > ion-content').innerText;
+  //     return text
+  //   })
+  //   await console.log(html9);
+  //   await sleep(timerSleep)
 
-    await sleep(2000)
-    await this.page.click(`#menu-content > detalhe-documento > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button > button`)
+  //   await sleep(2000)
+  //   await this.page.click(`#menu-content > detalhe-documento > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button > button`)
 
-    await sleep(timerSleep)
+  //   await sleep(timerSleep)
+  // }
+
+
+  async mudaTribunal(estado) {
+    let timerSleep2 = 1000
+    this.page.deleteCookie(...cookies)
+    console.log("iniciando troca de estado");
+    await this.iniciar()
+    //this.browser.close();
+
+    await this.acessar("https://jte.csjt.jus.br/")
+
+    //const pages = await this.browser.pages();
+    await sleep(timerSleep2)
+    console.log("------------------------------------------" + pages.length)
+    const popup = pages[pages.length - 1];
+    await sleep(timerSleep2)
+    await popup.close();
+    await sleep(timerSleep2)
+    // this.page = await this.browser.newPage();
+
+    await sleep(timerSleep2)
   }
+
+  // o site do tribunal não funciona a troca de tribunal
+
+  // async mudaTribunal(estado) {
+  //   let child = estado + 1
+  //   console.log("o estado para mudar é : " + estado);
+  //   let contador = 1;
+  //   let timerSleep2 = 2000
+  //   try {
+  //     console.log("Tentando alterar o estado, Tentativa " + contador);
+  //     await sleep(timerSleep2)
+  //     await this.page.click("#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button");
+  //     await sleep(timerSleep2)
+  //     await this.page.click("ng-component > div > mat-form-field:nth-child(4) > div > div > div > mat-select");
+  //     await sleep(timerSleep2)
+  //     await this.page.click(`body > div > div > div > div > div > mat-option:nth-child(${child})`); // "body > div[2] > div[4] > div > div > div"
+  //     await sleep(timerSleep2)
+  //     await this.page.click("body>div>div>div>mat-dialog-container>ng-component>div>button:nth-child(2)")
+  //     await sleep(timerSleep2)
+  //     let tribunalAtual = await this.page.evaluate(async (i, iniciaisArray) => {
+  //       await new Promise(function (resolve) { setTimeout(resolve, 500); });
+  //       let tribunal = document.querySelector("#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button > ion-label").innerText;
+  //       return tribunal
+  //     })
+  //     console.log("tribunal capturado" + tribunalAtual);
+
+  //     await sleep(timerSleep2)
+  //     let tribunalDesejado = "TRT" + estado;
+  //     console.log("tribunal desejado" + tribunalDesejado);
+  //     await sleep(timerSleep2)
+  //     if (tribunalDesejado != tribunalAtual) {
+  //       throw "O estado não foi alterado"
+  //     }
+  //   } catch (e) {
+  //     contador++
+  //     this.mudaTribunal(estado)
+  //   }
+  //   await sleep(timerSleep2)
+  // }
+
 
   async loga() {
     let login = "10389051764";
@@ -374,7 +436,9 @@ class RoboPuppeteer3 {
     let numeroProcesso = numero.trim().slice(0, 7);
     let ano = numero.trim().slice(9, 13);
     let vara = numero.trim().slice(numero.length - 4, numero.length);
-    return {numeroProcesso,ano,vara}
+    let estado = numero.trim().slice(numero.length - 6, numero.length - 4);
+    estado = parseInt(estado)
+    return { numeroProcesso, ano, vara, estado }
   }
 
   async fechar() {

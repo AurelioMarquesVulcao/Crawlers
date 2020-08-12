@@ -285,23 +285,14 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     let docs = await this.page.$$('#arvore_principal > ul > li > a');
     let tam = docs.length;
     let encontrado = false;
-    for (let i; i < tam; i++) {
-      if (docs[i].innerText == 'Decisão') {
-        encontrado = true;
-        break;
-      }
-    }
     this.logger.info('Selecionando documentos de interessa para download');
 
-    if (encontrado) {
-      //TODO colocar tudo isso dependente do if
-    }
     await this.page.evaluate(() => {
       let elements = $('#arvore_principal > ul > li > a');
       let tam = elements.length;
 
       for (let i = 0; i < tam; i++) {
-        if (elements[i].innerText === 'Decisão') break;
+        if (elements[i].innerText === 'Decisão' || elements[i].innerText === 'Despachos') break;
         elements[i].firstElementChild.click();
       }
     });

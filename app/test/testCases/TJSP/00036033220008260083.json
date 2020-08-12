@@ -1,0 +1,90 @@
+{
+  "oabs" : ["265434SP"],
+  "detalhes": {
+    "tipo": "cnj",
+    "numeroProcesso": "00036033220008260083",
+    "numeroProcessoMascara": "0003603-32.2000.8.26.0083",
+    "instancia": 2,
+    "ano": 2000,
+    "orgao": 8,
+    "tribunal": 26,
+    "origem": 83
+  },
+  "capa" : {
+    "classe": "Apelacao Civel",
+    "assunto": ["DIREITO TRIBUTARIO", "Impostos", "IPTU/ Imposto Predial e Territorial Urbano"],
+    "uf": "SP",
+    "comarca": "Aguai"
+  },
+  "dataAtualizacao": "dataFormatada",
+  "dataCriacao": "dataFormatada",
+  "envolvidos": [
+    {
+      "tipo": "Apelante",
+      "nome": "Prefeitura Municipal de Aguai"
+    },
+    {
+      "tipo": "Advogado",
+      "nome": "(265434SP) Michelle Menezes Lucas"
+    },
+    {
+      "tipo": "Apelado",
+      "nome": "Nelson Sanches da Silva"
+    }
+  ],
+  "andamentos": [
+    {
+      "data": "2020-07-31T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Publicado em",
+      "numeroProcesso": "00036033220008260083",
+      "observacao": "Disponibilizado em 30/07/2020 Tipo de publicacao: Distribuidos Numero do Diario Eletronico: 3095"
+    },
+    {
+      "data": "2020-07-30T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Recebidos os Autos pelo Relator",
+      "numeroProcesso": "00036033220008260083",
+      "observacao": "Beatriz Braga"
+    },
+    {
+      "data": "2020-07-29T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Remetidos os Autos para Relator (Conclusao)",
+      "numeroProcesso": "00036033220008260083"
+    },
+    {
+      "data": "2020-07-29T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Distribuicao por Dependencia",
+      "observacao": "Processo dependente ao processo : 0004151-81.2005.8.26.0083 Orgao Julgador: 819 - 18a Camara de Direito Publico Relator: 12788 - Beatriz Braga",
+      "numeroProcesso": "00036033220008260083"
+    },
+    {
+      "data": "2020-03-20T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Publicado em",
+      "observacao": "Disponibilizado em 19/03/2020 Tipo de publicacao: Entrados Numero do Diario Eletronico: 3008",
+      "numeroProcesso": "00036033220008260083"
+    },
+    {
+      "data": "2020-03-10T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Recebidos os Autos pelo Distribuidor de Recursos",
+      "numeroProcesso": "00036033220008260083"
+    },
+    {
+      "data": "2020-03-10T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Remetidos os Autos para Distribuicao de Recursos",
+      "numeroProcesso": "00036033220008260083"
+    },
+    {
+      "data": "2020-03-09T00:00:00.000Z",
+      "dataInclusao": "dataFormatada",
+      "descricao": "Processo Cadastrado",
+      "observacao": "SJ 2.1.4 - Servico de Entrada de Autos de Direito Publico",
+      "numeroProcesso": "00036033220008260083"
+    }
+  ]
+}

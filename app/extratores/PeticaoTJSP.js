@@ -55,7 +55,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       login: '103.890.517-64',
       senha: 'Senh@TJ123',
       estado: 'SP',
-      nome: 'Karine',
+      nome: 'Karine Impacta Teste',
     }).salvar();
 
     this.resposta = { numeroProcesso: numeroProcesso };

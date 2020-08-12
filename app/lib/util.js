@@ -165,7 +165,112 @@ class Helper {
       params: { captcha: captchaString, tipp: tipo },
     });
   }
+
+  /**
+   * Ordenar uma por uma propriedade ASC
+   * @param {Array} lista Lista de que deseja ordenar
+   * @param {string} prop String do nome da propriedade
+   * @param {number} sortOrder int indicando a ordem de classificacao
+   */
+  static ordenar(lista, prop, sortOrder) {
+    if (sortOrder == 0) this.ordenarCrescente(lista, prop);
+    else if (sortOrder == 1) this.ordenarDecrescente(lista, prop);
+    else null;
+  }
+
+  /**
+   * Ordenar uma por uma propriedade ASC
+   * @param {Array} lista Lista de que deseja ordenar
+   * @param {string} prop String do nome da propriedade
+   */
+  static ordenarCrescente(lista, prop) {
+    return lista.sort((a, b) => {
+      if (a[prop] < b[prop]) {
+        return -1;
+      }
+      if (a[prop] > b[prop]) {
+        return 1;
+      }
+    });
+  }
+
+  /**
+   * Ordenar uma por uma propriedade DESC
+   * @param {Array} lista Lista de que deseja ordenar
+   * @param {string} prop String do nome da propriedade
+   */
+  static ordenarDecrescente(lista, prop) {
+    return lista.sort((a, b) => {
+      if (a[prop] < b[prop]) {
+        return 1;
+      }
+      if (a[prop] > b[prop]) {
+        return -1;
+      }
+    });
+  }  
 }
+
+class CnjValidator {
+  static calcula_mod97(NNNNNNN, AAAA, JTR, OOOO) {
+    let valor1 = "";
+    let resto1 = 0;
+    let valor2 = "";
+    let resto2 = 0;
+    let valor3 = "";
+    valor1 = this.preencheZeros(NNNNNNN, 7);
+    resto1 = parseInt(valor1) % 97;
+    valor2 =
+      this.preencheZeros(resto1, 2) +
+      this.preencheZeros(AAAA, 4) +
+      this.preencheZeros(JTR, 3);
+    resto2 = parseInt(valor2) % 97;
+    valor3 = this.preencheZeros(resto2, 2) + this.preencheZeros(OOOO, 4) + "00";
+    return this.preencheZeros(98 - (parseInt(valor3) % 97), 2);
+  }
+
+  static valida_mod97(NNNNNNN, DD, AAAA, JTR, OOOO) {
+    let valor1 = "";
+    let resto1 = 0;
+    let valor2 = "";
+    let resto2 = 0;
+    let valor3 = "";
+    valor1 = this.preencheZeros(NNNNNNN, 7);
+    resto1 = parseInt(valor1) % 97;
+    valor2 =
+      this.preencheZeros(resto1, 2) +
+      this.preencheZeros(AAAA, 4) +
+      this.preencheZeros(JTR, 3);
+    resto2 = parseInt(valor2) % 97;
+    valor3 =
+      this.preencheZeros(resto2, 2) +
+      this.preencheZeros(OOOO, 4) +
+      this.preencheZeros(DD, 2);
+    return parseInt(valor3) % 97 == 1;
+  }
+
+  static preencheZeros(numero, quantidade) {
+    let temp = `${numero}`;
+    let retorno = "";
+    if (quantidade < temp.length) return temp;
+    else {
+      for (let i = 0; i < quantidade - temp.length; i++)
+        retorno = "0" + retorno;
+      return retorno + temp;
+    }
+  }
+
+  static validar(cnj) {    
+    let sub = cnj.replace("-", ".").split(".");
+    let NNNNNNN = sub[0];
+    let DD = sub[1];
+    let AAAA = sub[2];
+    let JTR = sub[3] + sub[4];
+    let OOOO = sub[5];
+
+    return this.valida_mod97(NNNNNNN, DD, AAAA, JTR, OOOO);
+  }
+};
 
 class Logger {
   constructor(
@@ -218,5 +323,6 @@ class Logger {
   }
 }
 
-module.exports.Logger = Logger;
 module.exports.Helper = Helper;
+module.exports.CnjValidator = CnjValidator;
+module.exports.Logger = Logger;

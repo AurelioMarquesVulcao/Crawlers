@@ -23,7 +23,7 @@ class ExtratorFactory {
     }
 
     if (/oab.TJSP/.test(fila)) {
-      extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg/open.do', isDebug);
+      extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg', isDebug);
     }
 
     if (/oab.TJRS/.test(fila)) {      

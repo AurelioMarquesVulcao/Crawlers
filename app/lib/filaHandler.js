@@ -1,5 +1,13 @@
-const amqp = require('amqplib/callback_api');
+const amqpCA = require('amqplib/callback_api');
+const amqp = require('amqplib');
 const { enums } = require('../configs/enums');
+
+const pred = (params) => {
+
+  console.log(params);
+  process.exit();
+
+};
 
 class GerenciadorFila {
   /** Handler que envia e consome mensagens de uma fila do RabbitMq.
@@ -28,7 +36,7 @@ class GerenciadorFila {
   enviar(fila, mensagem) {
     if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
 
-    amqp.connect(this.host, (err, conn) => {
+    amqpCA.connect(this.host, (err, conn) => {
       if (err) throw new Error(err);
 
       conn.createChannel((err, ch) => {
@@ -50,7 +58,7 @@ class GerenciadorFila {
    * @param {Array} lista Array de JSON
    */
   enviarLista(fila, lista) {
-    amqp.connect(this.host, (err, conn) => {
+    amqpCA.connect(this.host, (err, conn) => {
       if (err) throw new Error(err);
 
       conn.createChannel((err, ch) => {
@@ -68,12 +76,40 @@ class GerenciadorFila {
     });
   }
 
+  /**
+   * Enfileirar um lote de mensagens para uma fila
+   * @param {string} fila String com o nome da fila
+   * @param {Array} lote Array com o lote de mensagens
+   */
+  async enfileirarLote(fila, lote) {
+    try {
+      
+      const conn = await amqp.connect(this.host);
+      const channel = await conn.createChannel();
+  
+      channel.assertQueue(fila, {
+        durable: true,
+        noAck: false,
+        maxPriority: 9,
+      });
+  
+      for (let i = 0, si = lote.length; i < si; i++) {
+        channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
+
+        }));
+      }
+  
+    } catch (e) {
+      pred(e);
+    }
+  }
+
   /** Consome de uma fila espeficia.
    * @param {String} fila String com o nome da fila.
    * @param {function} callback Callback
    */
   consumir(fila, callback) {
-    amqp.connect(this.host, (err, conn) => {
+    amqpCA.connect(this.host, (err, conn) => {
       if (err) throw new Error(err);
 
       conn.createChannel((err, ch) => {
@@ -104,7 +140,7 @@ class GerenciadorFila {
    * @param {string} filaDestino  String contendo o nome da fila de destino.
    */
   transferir(filaOrigem, filaDestino) {
-    amqp.connect(this.host, (err, conn) => {
+    amqpCA.connect(this.host, (err, conn) => {
       if (err) throw new Error(err);
 
       conn.createChannel((err, ch) => {

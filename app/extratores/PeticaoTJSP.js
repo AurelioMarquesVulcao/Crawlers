@@ -8,7 +8,6 @@ const {
   CredenciaisAdvogados,
 } = require('../models/schemas/credenciaisAdvogados');
 
-console.log(enums.mongo.connString);
 
 class PeticaoTJSP extends ExtratorPuppeteer {
   constructor({

@@ -121,6 +121,7 @@ class RoboPuppeteer3 {
     await sleep(1000)
     await sleep(timerSleep)
     let html1 = await this.page.evaluate(async () => {
+      await new Promise(function (resolve) { setTimeout(resolve, 500); });
       let text = await document.querySelector('body').innerHTML;
       return text
     })
@@ -140,6 +141,7 @@ class RoboPuppeteer3 {
     await sleep(timerSleep)
 
     let html2 = await this.page.evaluate(async () => {
+      await new Promise(function (resolve) { setTimeout(resolve, 500); });
       let text = await document.querySelector('body').innerHTML;
       return text
     })
@@ -169,6 +171,7 @@ class RoboPuppeteer3 {
     await this.page.click(`#cdk-accordion-child-1 > div > ion-list > ion-item:nth-child(1) > div`)
     await sleep(2000)
     let html9 = await this.page.evaluate(async () => {
+      await new Promise(function (resolve) { setTimeout(resolve, 500); });
       let text = await document.querySelector('#menu-content > detalhe-documento > ion-content').innerText;
       return text
     })

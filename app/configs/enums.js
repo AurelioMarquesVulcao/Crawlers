@@ -49,7 +49,8 @@ module.exports.enums = Object.freeze({
     resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`,
     login: `http://${bigdataAddress}/login/`,
     captchaDecoder: 'http://172.16.16.8:5000/api/solve',
-    resultadoDocumentos: `http://${bigdataAddress}/documentos/feedbackDocumentos`
+    // resultadoDocumentos: `http://${bigdataAddress}/documentos/feedbackDocumentos`
+    resultadoDocumentos: `https://ptsv2.com/t/ve7h3-1597268048/post`
   },
   proxy: {
     proxiesUrl: process.env.PROXY_ADDRESS

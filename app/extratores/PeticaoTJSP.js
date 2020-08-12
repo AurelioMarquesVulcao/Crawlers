@@ -8,7 +8,6 @@ const {
   CredenciaisAdvogados,
 } = require('../models/schemas/credenciaisAdvogados');
 
-
 class PeticaoTJSP extends ExtratorPuppeteer {
   constructor({
     url = '',
@@ -281,9 +280,6 @@ class PeticaoTJSP extends ExtratorPuppeteer {
   async resgataDocumentos() {
     this.logger.info('Iniciando procedimento de resgate dos documentos');
     this.logger.info('Verificando se existe o documento "DECISAO"');
-    let docs = await this.page.$$('#arvore_principal > ul > li > a');
-    let tam = docs.length;
-    let encontrado = false;
     this.logger.info('Selecionando documentos de interessa para download');
 
     await this.page.evaluate(() => {
@@ -291,7 +287,11 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       let tam = elements.length;
 
       for (let i = 0; i < tam; i++) {
-        if (elements[i].innerText === 'Decisão' || elements[i].innerText === 'Despachos') break;
+        if (
+          elements[i].innerText === 'Decisão' ||
+          elements[i].innerText === 'Despachos'
+        )
+          break;
         elements[i].firstElementChild.click();
       }
     });

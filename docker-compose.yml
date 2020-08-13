@@ -8,28 +8,28 @@ services:
     ports:
       - ${API_PORT}:3300
     restart: on-failure
-  mongodb:
-    image: mongo
-    ports:
-      - ${MONGO_PORT}:27017
-    restart: always  
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-  rabbitmq:
-    image: rabbitmq:3.8.0-management
-    hostname: crawlers-rabbitmq
-    ports:
-      - 1${RABBITMQ_PORT}:15672
-      - ${RABBITMQ_PORT}:5672
-    expose:
-      - 1${RABBITMQ_PORT}
-    restart: always
-    environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+  # mongodb:
+  #   image: mongo
+  #   ports:
+  #     - ${MONGO_PORT}:27017
+  #   restart: always  
+  #   environment:
+  #     - MONGO_DATA_DIR=/data/db
+  #     - MONGO_LOG_DIR=/dev/null
+  #     - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+  #     - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+  # rabbitmq:
+  #   image: rabbitmq:3.8.0-management
+  #   hostname: crawlers-rabbitmq
+  #   ports:
+  #     - 1${RABBITMQ_PORT}:15672
+  #     - ${RABBITMQ_PORT}:5672
+  #   expose:
+  #     - 1${RABBITMQ_PORT}
+  #   restart: always
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+  #     - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
   nginx:
     image: nginx:1.17.3
     ports:
@@ -55,105 +55,203 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  worker-jte-sp-15:
-    extends:
-      file: common-services.yml
-      service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: node workers/JTE/extracaoNovos_Sp_15.js
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-  worker-jte-ba:
-    extends:
-      file: common-services.yml
-      service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: node workers/JTE/extracaoNovos_Ba.js
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-  worker-jte-mg:
-    extends:
-      file: common-services.yml
-      service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: node workers/JTE/extracaoNovos_Mg.js
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-  worker-tjsp-processo:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJSP/extracaoProcesso.js
+  # worker-jte-sp-15:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: node workers/JTE/extracaoNovos_Sp_15.js
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+  # worker-jte-ba:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: node workers/JTE/extracaoNovos_Ba.js
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+  # worker-jte-mg:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: node workers/JTE/extracaoNovos_Mg.js
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+  # worker-tjsp-processo:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJSP/extracaoProcesso.js
 
-  worker-tjsc-oab:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJSC/extracaoNovos.js
+  # worker-tjsc-oab:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJSC/extracaoNovos.js
 
-  worker-tjsc-processo:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJSC/extracaoProcesso.js
+  # worker-tjsc-processo:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJSC/extracaoProcesso.js
 
-  worker-tjmg-oab:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJMG/extracaoNovos.js
+  # worker-tjmg-oab:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJMG/extracaoNovos.js
 
-  cadastro-consulta:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/consumer_cadastro_consulta.js
+  # cadastro-consulta:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/consumer_cadastro_consulta.js
 
-  novos-processos-jte-sp-2:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/JTE/criaFilaNovos_SP_2
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "2"
+  # novos-processos-jte-sp-2:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/JTE/criaFilaNovos_SP_2
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
   
-  novos-processos-jte-sp-15:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/JTE/criaFilaNovos_SP_15
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "2"
+  # novos-processos-jte-sp-15:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/JTE/criaFilaNovos_SP_15
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
       
-  novos-processos-jte-ba:
+  # novos-processos-jte-ba:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/JTE/criaFilaNovos_BA
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
+  
+  worker-jte-01:
     extends:
       file: common-services.yml
       service: base_node
-    command: node workers/JTE/criaFilaNovos_BA
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon 
     restart: always
     logging:
       driver: "json-file"
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: "10m"
+        max-file: "5"
+
+  # worker-jte-02:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: pm2 start workers/JTE/extracaoNovos_documentos.js
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+
+  # worker-jte-03:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: pm2 start workers/JTE/extracaoNovos_documentos.js
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+
+  # worker-jte-04:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: pm2 start workers/JTE/extracaoNovos_documentos.js
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+
+  # worker-jte-05:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: pm2 start workers/JTE/extracaoNovos_documentos.js
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+
+  # worker-jte-06:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: pm2 start workers/JTE/extracaoNovos_documentos.js
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"
+
+  # worker-jte-07:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
+  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+  #   command: pm2 start workers/JTE/extracaoNovos_documentos.js
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "5"

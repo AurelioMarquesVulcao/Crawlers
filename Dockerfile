@@ -12,5 +12,5 @@ RUN  apt-get update \
      && chmod +x /usr/sbin/wait-for-it.sh
 
 
-RUN npm install
+RUN npm install && npm install -g pm2
 CMD ["node", "server"]

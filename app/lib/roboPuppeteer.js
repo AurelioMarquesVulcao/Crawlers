@@ -14,12 +14,12 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
       args: ['--ignore-certificate-errors']
     });
@@ -34,7 +34,7 @@ class RoboPuppeteer3 {
     try {
       await this.page.goto(url, {
         waitUntil: "load",
-        timeout: 30000,
+        timeout: 20000,
         // waitUntil: 'networkidle2'
       });
       // isso me da o url completo
@@ -43,8 +43,30 @@ class RoboPuppeteer3 {
       console.log(e);
       process.exit();
     }
-    console.log(`Tentando carretagar a url => ${url}`);
+    console.log(`Tentando carregar a url => ${url}`);
     return content;
+  }
+
+
+  async mudaTribunal(estado) {
+    let timerSleep2 = 1000
+    console.log("iniciando troca de estado");
+    // //await this.iniciar()
+    // //this.browser.close();
+    // //await this.acessar("https://jte.csjt.jus.br/")
+    // const pages = await this.browser.pages();
+    // await sleep(timerSleep2)
+    // console.log("------------------------------------------" + pages.length)
+    
+    // const popup = pages[pages.length - 1];
+    // console.log(popup)
+    // await sleep(timerSleep2)
+    // await popup.close();
+    // await sleep(timerSleep2)
+    // // this.page = await this.browser.newPage();
+
+    // await sleep(timerSleep2)
+    process.exit()
   }
 
 
@@ -191,29 +213,9 @@ class RoboPuppeteer3 {
   // }
 
 
-  async mudaTribunal(estado) {
-    let timerSleep2 = 1000
-    this.page.deleteCookie(...cookies)
-    console.log("iniciando troca de estado");
-    await this.iniciar()
-    //this.browser.close();
 
-    await this.acessar("https://jte.csjt.jus.br/")
 
-    //const pages = await this.browser.pages();
-    await sleep(timerSleep2)
-    console.log("------------------------------------------" + pages.length)
-    const popup = pages[pages.length - 1];
-    await sleep(timerSleep2)
-    await popup.close();
-    await sleep(timerSleep2)
-    // this.page = await this.browser.newPage();
-
-    await sleep(timerSleep2)
-  }
-
-  // o site do tribunal não funciona a troca de tribunal
-
+  // No site do TJE não funciona a troca de tribunal em 100% das vezes, pela provável instrabilidade. O cõdigo está perfeitamente funcionando.
   // async mudaTribunal(estado) {
   //   let child = estado + 1
   //   console.log("o estado para mudar é : " + estado);
@@ -301,7 +303,7 @@ class RoboPuppeteer3 {
             return { numeroProcesso, data, movimentacao, link, tipo }
           } // se for um documento de texto 
           else {
-            // esse await new promise, vai criar um sleep manual no no pupputeer, assim não gero problemas para capturar o documento.
+            // esse await new promise, vai criar um sleep manual no pupputeer, assim não gero problemas para capturar o documento.
             await new Promise(function (resolve) { setTimeout(resolve, 500); });
             // let link = document.querySelector("#documentoEmbutido").innerHTML;
             let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div").innerHTML;
@@ -318,7 +320,7 @@ class RoboPuppeteer3 {
         //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
         links.push(link)
       }
-      // entra na 3 forma de apresentação de documentos.
+      // entra na terceira forma de apresentação de documentos.
       // documentos multiplus.
       for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
         await sleep(timerSleep)
@@ -355,7 +357,7 @@ class RoboPuppeteer3 {
             return { numeroProcesso, data, movimentacao, link, tipo }
             // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
           }, k, dataEProcesso);
-          // codigo que que fecha a ultima aba do puppeteer.
+          // codigo que fecha a ultima aba do puppeteer.
           // com esse codigo consigo fechar os popup
           let pages = await this.browser.pages();
           while (pages.length == 2) {
@@ -383,7 +385,7 @@ class RoboPuppeteer3 {
     } catch (e) { console.log("Não pegou os Documentos"); console.log(e); }
   }
 
-  // busca os numeros dos filhos da lista de movimentacaoes que possuem:  documentos anexos, e estão antes da petição inicial
+  // busca os numeros dos filhos da lista de movimentacoes que possuem:  documentos anexos e estão antes da petição inicial
   // dessa forma pego apenas os anexos das iníciais.
   async numerosIniciaisLaco() {
     let numeros = await this.page.evaluate(async () => {
@@ -442,7 +444,7 @@ class RoboPuppeteer3 {
   }
 
   async fechar() {
-    // codigo que que fecha a ultima aba do puppeteer.
+    // codigo que fecha a ultima aba do puppeteer.
     // com esse codigo consigo fechar os popup
     const pages = await this.browser.pages();
     const popup = pages[pages.length - 1];

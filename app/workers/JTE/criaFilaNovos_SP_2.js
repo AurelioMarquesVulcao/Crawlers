@@ -49,7 +49,7 @@ const fila = new CriaFilaJTE();
         '0712', '0713', '0714', '0715', '0716',
         '0717', '0718', '0719', '0720'
     ]
-    let contaOrigem = 0;
+    let contaOrigem = 60;
     for (let w = 0; w < 1;) {
         second++
         let timer = fila.relogio();
@@ -66,7 +66,7 @@ const fila = new CriaFilaJTE();
                 let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
                 console.log(numeroSequencial);
                 let comarca = sequencial.numeroProcesso.slice(16, 20);
-                // isso que vai pegar os processos
+                // Pegará os processos
                 console.log("Estamos na comarca: " + origens[contaOrigem]);
                 // console.log(sequencial.data.dia == relogio.dia);
                 // console.log(sequencial.data.mes < relogio.mes);

@@ -6,9 +6,8 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
 const fila = new CriaFilaJTE();
 
-(async () => {
-    let second = 0;
-    let origens = [
+const origens = {
+    "sp2": [
         '0000', '0001', '0002', '0003', '0004', '0005',
         '0006', '0007', '0008', '0009', '0010',
         '0011', '0012', '0013', '0014', '0015',
@@ -48,8 +47,113 @@ const fila = new CriaFilaJTE();
         '0707', '0708', '0709', '0710', '0711',
         '0712', '0713', '0714', '0715', '0716',
         '0717', '0718', '0719', '0720'
+    ],
+    "sp15": [
+        '0000', '0001', '0002', '0003', '0004', '0005',
+        '0006', '0007', '0008', '0009', '0010',
+        '0011', '0012', '0013', '0014', '0015',
+        '0016', '0017', '0018', '0019', '0020',
+        '0021', '0022', '0023', '0024', '0025',
+        '0026', '0027', '0028', '0029', '0030',
+        '0031', '0032', '0033', '0034', '0035',
+        '0036', '0037', '0038', '0039', '0040',
+        '0041', '0042', '0043', '0044', '0045',
+        '0046', '0047', '0048', '0049',
+        '0050', '0051', '0052', '0053', '0054',
+        '0055', '0056', '0057', '0058', '0059',
+        '0060', '0061', '0062', '0063', '0064',
+        '0065', '0066', '0067', '0068', '0069',
+        '0070', '0071', '0072', '0073', '0074',
+        '0075', '0076', '0077', '0078', '0079',
+        '0080', '0081', '0082', '0083', '0084',
+        '0085', '0086', '0087', '0088', '0089',
+        '0090', '0091', '0092', '0093', '0094',
+        '0095', '0096', '0097', '0098', '0099',
+        '0100', '0101', '0102', '0103', '0104', '0105',
+        '0106', '0107', '0108', '0109', '0110', '0111',
+        '0112', '0113', '0114', '0115', '0116', '0117',
+        '0118', '0119', '0120', '0121', '0122', '0123',
+        '0124', '0125', '0126', '0127', '0128', '0129',
+        '0130', '0131', '0132', '0133', '0134', '0135',
+        '0136', '0137', '0138', '0139', '0140', '0141',
+        '0142', '0143', '0144', '0145', '0146', '0147',
+        '0148', '0149', '0150', '0151', '0152', '0153',
+        '0154', '0156', '0157', '0159', '0161', '0162',
+        '0898'
+    ],
+    // Bahia é código 5
+    "ba": [
+        '0000', '0001', '0002', '0003', '0004', '0005', '0006',
+        '0007', '0008', '0009', '0010', '0011', '0012', '0013',
+        '0014', '0015', '0016', '0017', '0018', '0019', '0020',
+        '0021', '0022', '0023', '0024', '0025', '0026', '0027',
+        '0028', '0029', '0030', '0031', '0032', '0033', '0034',
+        '0035', '0036', '0037', '0038', '0039', '0101', '0102',
+        '0121', '0122', '0131', '0132', '0133', '0134', '0161',
+        '0191', '0192', '0193', '0194', '0195', '0196', '0201',
+        '0221', '0222', '0251', '0271', '0281', '0291', '0311',
+        '0341', '0342', '0371', '0401', '0421', '0431', '0461',
+        '0462', '0463', '0464', '0491', '0492', '0493', '0511',
+        '0521', '0531', '0551', '0561', '0581', '0611', '0612',
+        '0621', '0631', '0641', '0651', '0661'
     ]
-    let contaOrigem = 60;
+    "mg": [
+        '0000', '0001', '0002', '0003', '0004', '0005', '0006',
+        '0007', '0008', '0009', '0010', '0011', '0012', '0013',
+        '0014', '0015', '0016', '0017', '0018', '0019', '0020',
+        '0021', '0022', '0023', '0024', '0025', '0026', '0027',
+        '0028', '0029', '0030', '0031', '0032', '0033', '0034',
+        '0035', '0036', '0037', '0038', '0039', '0040', '0041',
+        '0042', '0043', '0044', '0045', '0046', '0047', '0048',
+        '0049', '0050', '0051', '0052', '0053', '0054', '0055',
+        '0056', '0057', '0058', '0059', '0060', '0061', '0062',
+        '0063', '0064', '0065', '0066', '0067', '0068', '0069',
+        '0070', '0071', '0072', '0073', '0074', '0075', '0076',
+        '0077', '0078', '0079', '0080', '0081', '0082', '0083',
+        '0084', '0085', '0086', '0087', '0089', '0090', '0091',
+        '0092', '0093', '0094', '0095', '0096', '0097', '0098',
+        '0099', '0100', '0101', '0102', '0103', '0104', '0105', '0106',
+        '0107', '0108', '0109', '0110', '0111', '0112',
+        '0113', '0114', '0129', '0131', '0132', '0134',
+        '0135', '0136', '0137', '0138', '0139', '0140',
+        '0141', '0142', '0143', '0144', '0145', '0146',
+        '0147', '0148', '0149', '0150', '0151', '0152',
+        '0153', '0156', '0157', '0158', '0160', '0162',
+        '0163', '0164', '0165', '0167', '0168', '0169',
+        '0171', '0173', '0174', '0176', '0178', '0179',
+        '0180', '0181', '0182', '0183', '0184', '0185',
+        '0186'
+      ],
+    "es": [
+        '0000', '0001', '0002', '0003',
+        '0004', '0005', '0006', '0007',
+        '0008', '0009', '0010', '0011',
+        '0012', '0013', '0014', '0101',
+        '0121', '0131', '0132', '0141',
+        '0151', '0152', '0161', '0181',
+        '0191'
+      ],
+    // codigo 07
+    "pr": [
+        '0000', '0001', '0002', '0003',
+        '0004', '0005', '0006', '0007',
+        '0008', '0009', '0010', '0011',
+        '0012', '0013', '0014', '0101',
+        '0121', '0131', '0132', '0141',
+        '0151', '0152', '0161', '0181',
+        '0191'
+      ]
+    
+};
+(async () => {
+    // await criador(origens.ba, 2, "05", origens.ba.length)
+    await criador(origens.sp15, 15, "15", origens.sp15.length)
+    await criador(origens.sp2, 2, "02", origens.sp2.length)
+})()
+
+async function criador(origem, tribunal, codigo, max) {
+    let second = 0;
+    let contaOrigem = 0;
     for (let w = 0; w < 1;) {
         second++
         let timer = fila.relogio();
@@ -58,56 +162,59 @@ const fila = new CriaFilaJTE();
             let relogio = fila.relogio();
             try {
                 // string de busca no banco de dados
-                let parametroBusca = { "tribunal": 2, "origem": origens[contaOrigem] };
-                // console.log(origens.length);
+                let parametroBusca = { "tribunal": tribunal, "origem": origem[contaOrigem] };
+                // console.log(origem.length);
                 let buscar = await fila.abreUltimo(parametroBusca);
                 console.log(buscar.length);
                 let sequencial = maiorSequencial(buscar)
                 let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
                 console.log(numeroSequencial);
                 let comarca = sequencial.numeroProcesso.slice(16, 20);
-                // isso que vai pegar os processos
-                console.log("Estamos na comarca: " + origens[contaOrigem]);
+                // Pegara os processos
+                console.log("Estamos na comarca: " + origem[contaOrigem]);
                 // console.log(sequencial.data.dia == relogio.dia);
                 // console.log(sequencial.data.mes < relogio.mes);
                 if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
-                        await fila.procura10(numeroSequencial, comarca, 4, '02')
+                        await fila.procura10(numeroSequencial, comarca, 4, codigo)
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 1, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, codigo)
                     }
                     await sleep(500)
                 } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
-                        await fila.procura10(numeroSequencial, comarca, 3, '02')
+                        await fila.procura10(numeroSequencial, comarca, 3, codigo)
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 1, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, codigo)
                     }
                     await sleep(500)
                 } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
-                        await fila.procura10(numeroSequencial, comarca, 3, '02')
+                        await fila.procura10(numeroSequencial, comarca, 3, codigo)
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 1, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, codigo)
                     }
                     await sleep(500)
                 }
                 console.log(sequencial);
             } catch (e) {
                 console.log(e);
-                console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
+                console.log("------------- A comarca :" + origem[contaOrigem] + ' falhou na busca--------------------');
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };
             let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
-            if (contaOrigem == 160) { contaOrigem = 0; await sleep(pausaNaConsulta) } else { contaOrigem++ };
+            if (contaOrigem == max) {
+                contaOrigem = 0;
+                // await sleep(pausaNaConsulta) 
+            } else { contaOrigem++ };
         };
         await sleep(1000)
     };
     await sleep(2000)
-})();
+};
 
 
 function maiorSequencial(obj) {

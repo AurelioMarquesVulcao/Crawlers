@@ -192,7 +192,7 @@ async function worker() {
             // envia a mensagem para a fila de reprocessamento
             new GerenciadorFila().enviar(reConsumo, message);
             logger.info('Encontrado erro durante a execução');
-            // trata erro especifico para falha na estração
+            // trata erro especifico para falha na extração
             let error01 = "TypeError: Cannot read property 'length' of undefined at /app/workers/JTE/extracaoNovos_Sp_2.js:48:25 at async /app/lib/filaHandler.js:96:11";
             if (e = error01) {
                 logger.info(erro01 = "\033[31m" + 'Extração Falhou')
@@ -200,7 +200,7 @@ async function worker() {
             logger.info(`Error: ${e.message}`);
             logger.info('Reconhecendo mensagem ao RabbitMQ');
             logger.info('Mensagem reconhecida');
-            logger.info('Finalizando proceso');
+            logger.info('Finalizando processo');
             console.log(message.LogConsultaId);
             // await logarExecucao({
             //   LogConsultaId: message.LogConsultaId,

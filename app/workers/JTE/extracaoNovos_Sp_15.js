@@ -201,7 +201,7 @@ async function worker() {
             logger.info(`Error: ${e.message}`);
             logger.info('Reconhecendo mensagem ao RabbitMQ');
             logger.info('Mensagem reconhecida');
-            logger.info('Finalizando proceso');
+            logger.info('Finalizando processo');
             console.log(message.LogConsultaId);
             // await logarExecucao({
             //   LogConsultaId: message.LogConsultaId,

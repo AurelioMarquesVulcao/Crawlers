@@ -146,17 +146,17 @@ services:
   #       max-size: "5m"
   #       max-file: "2"
       
-  # novos-processos-jte-ba:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/JTE/criaFilaNovos_BA
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
+  novos-processos-jte:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/JTE/criaFilaNovosTodosEstados
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
   
   worker-jte-01:
     extends:
@@ -200,75 +200,75 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  # worker-jte-04:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
+  worker-jte-04:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-  # worker-jte-05:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
+  worker-jte-05:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-  # worker-jte-06:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
+  worker-jte-06:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-  # worker-jte-07:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
+  worker-jte-07:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-  # worker-jte-08:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
+  worker-jte-08:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # worker-jte-09:
   #   extends:

@@ -102,7 +102,10 @@ const fila = new CriaFilaJTE();
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };
             let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
-            if (contaOrigem == 160) { contaOrigem = 0; await sleep(pausaNaConsulta) } else { contaOrigem++ };
+            if (contaOrigem == 160) { 
+                contaOrigem = 0; 
+                if (relogio.min == 59) { break } 
+            } else { contaOrigem++ };
         };
         await sleep(1000)
     };

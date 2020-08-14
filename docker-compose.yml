@@ -146,6 +146,44 @@ services:
   #       max-size: "5m"
   #       max-file: "2"
       
+  
+  
+  worker-tjba-portal:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJBAPortal/extracaoNovos.js
+
+  worker-tjsp-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSP/extracao.js
+
+  worker-tjsp-processo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSP/extracaoProcesso.js
+
+  worker-tjsp-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSP/extracaoPeticao.js
+
+  worker-tjsc-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSC/extracaoNovos.js
+
+  worker-tjsc-processo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/TJSC/extracaoProcesso.js
+
   novos-processos-jte:
     extends:
       file: common-services.yml
@@ -157,7 +195,7 @@ services:
       options:
         max-size: "5m"
         max-file: "2"
-  
+
   worker-jte-01:
     extends:
       file: common-services.yml
@@ -267,33 +305,5 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "5"
-
-  # worker-jte-09:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
-
-  # worker-jte-10:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start workers/JTE/extracao_JTE.js --watch --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
+        max-size: "5m"
+        max-file: "2"

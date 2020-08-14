@@ -11,8 +11,8 @@ const {
 const { ExtratorBase } = require('./extratores');
 const { TJSCParser } = require('../parsers/TJSCParser');
 
-const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json').INSTANCIAS_URL;
-
+const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json')
+  .INSTANCIAS_URL;
 
 class ProcessoTJSC extends ExtratorBase {
   constructor(url, isDebug) {
@@ -32,15 +32,16 @@ class ProcessoTJSC extends ExtratorBase {
    *
    * @param {String} numeroDoProcesso o numero do processo
    * @param {String} numeroDaOab indica que a extração teve inicio com uma oab
+   * @param {Number} instancia instancia da pesquisa do processo
    * @returns {Promise<{sucesso: boolean, logs: [], numeroDoProcesso: string}|{sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: ("undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint")}|{resultado: (void|*|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos: *}|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos}), sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: string}>}
    */
-  async extrair(numeroDoProcesso, numeroDaOab = '', instancia=1) {
+  async extrair(numeroDoProcesso, numeroDaOab = '', instancia = 1) {
     const nomeRobo = 'ProcessoTJSC';
     this.numeroDaOab = numeroDaOab;
     this.numeroDoProcesso = numeroDoProcesso;
     this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
-    this.instancia = instancia;
-    this.setInstanciaUrl(instancia);
+    this.instancia = Number(instancia);
+    this.setInstanciaUrl(this.instancia);
 
     this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
       nomeRobo: 'processo.TJSC',
@@ -72,18 +73,20 @@ class ProcessoTJSC extends ExtratorBase {
     try {
       this.logger.info('Fazendo primeira conexão.');
 
-      console.log(this.instancia)
-      if (this.instancia === 1){
-        url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=83&processo.numero=${this.detalhes.numeroProcessoMascara}`
-      }  else {
-        url = `${this.url}/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(0, 15)}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${this.detalhes.numeroProcessoMascara}&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`
-      }
+      url = `${
+        this.url
+      }/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(
+        0,
+        15
+      )}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${
+        this.detalhes.numeroProcessoMascara
+      }&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`;
 
       console.log('PRE URL', url);
 
       objResponse = await this.robo.acessar({
         url: url,
-        usaProxy: false,
+        usaProxy: true,
       });
       this.logger.info('Conexão ao website concluido.');
       cookies = objResponse.cookies;
@@ -104,11 +107,19 @@ class ProcessoTJSC extends ExtratorBase {
 
         this.logger.info('Preparando para acessar site do processo.');
 
-        if (this.instancia === 1){
+        if (this.instancia === 1) {
           url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=${this.detalhes.origem}&processo.numero=${this.detalhes.numeroProcessoMascara}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-        }
-        else {
-          url = `${this.url}/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(0, 15)}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${this.detalhes.numeroProcessoMascara}&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`
+        } else {
+          url = `${
+            this.url
+          }/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(
+            0,
+            15
+          )}&foroNumeroUnificado=${
+            this.detalhes.origem
+          }&dePesquisaNuUnificado=${
+            this.detalhes.numeroProcessoMascara
+          }&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
         }
 
         console.log(url);
@@ -120,7 +131,7 @@ class ProcessoTJSC extends ExtratorBase {
           method: 'GET',
           encoding: 'latin1',
           headers: headers,
-          usaProxy: false,
+          usaProxy: true,
         });
         const $ = cheerio.load(objResponse.responseBody);
         // verifica se há uma tabela de movimentação dentro da pagina.
@@ -136,7 +147,7 @@ class ProcessoTJSC extends ExtratorBase {
             `Pagina capturada com sucesso. [Tentativas: ${tentativas + 1}]`
           );
           this.logger.info('Iniciando processo de extração.');
-          extracao = await this.parser.parse(objResponse.responseBody);
+          extracao = await this.parser.parse(objResponse.responseBody, this.instancia);
           this.logger.info('Processo de extração concluído.');
           this.logger.info('Iniciando salvamento de Andamento');
           await Andamento.salvarAndamentos(extracao.andamentos);
@@ -180,7 +191,7 @@ class ProcessoTJSC extends ExtratorBase {
       url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
       encoding: 'latin1',
-      usaProxy: false,
+      usaProxy: true,
       headers: {
         Cookie: cookies,
       },

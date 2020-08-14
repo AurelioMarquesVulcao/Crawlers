@@ -52,13 +52,16 @@ const teste = (numeroProcesso, instancia) => {
 };
 
 describe('TJSC - Teste de Parser', function () {
-  describe('Processo: 03236535520148240023', function () {
+  describe('Processo: 03236535520148240023 / instancia: 1', function () {
     teste('03236535520148240023', 1);
   });
-  describe('Processo: 00040096520198240011', function () {
+  describe('Processo: 00040096520198240011 / instancia: 1', function () {
     teste('00040096520198240011', 1);
   });
-  describe('Processo: 00468204820128240023', function () {
+  describe('Processo: 00468204820128240023 / instancia: 2', function () {
     teste('00468204820128240023', 2);
+  });
+  describe('03006837620168240060 / instancia: 3', function() {
+    teste('03006837620168240060', 3);
   })
 });

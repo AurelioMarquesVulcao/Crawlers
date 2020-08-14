@@ -12,6 +12,7 @@ const cron = require('node-cron');
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
+  SC: enums.nomesRobos.TJSC,
   JTE: enums.nomesRobos.JTE
 };
 
@@ -77,6 +78,7 @@ class Enfileirador {
    */
   static async executar() {
     try {
+      let cadastros = [];
       const dataCorte = new moment().subtract(7, 'days');
       const busca = {
         $or: [
@@ -88,10 +90,14 @@ class Enfileirador {
       const lista = await ConsultasCadastradas.find(busca);
 
       for (let i = 0, si = lista.length; i < si; i++) {
-        await Enfileirador.cadastrarConsultaPendente(lista[i]);
+        cadastros.push(Enfileirador.cadastrarConsultaPendente(lista[i]));
       }
 
-      mongoose.connection.close();
+      Promise.all(cadastros).then(res => {
+        console.log('consultas cadastradas');
+        mongoose.connection.close();
+      });
+
     } catch (e) {
       console.log(e);
     }

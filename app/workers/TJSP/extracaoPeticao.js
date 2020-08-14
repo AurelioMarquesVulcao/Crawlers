@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
+const sleep = require('await-sleep');
+
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
-const sleep = require('await-sleep');
 
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
@@ -21,15 +22,15 @@ const logarExecucao = async (execucao) => {
     console.log(e);
   });
 
-  const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}.extracao.novos`;
+  const nomeFila = `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}.extracao`;
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     console.table(message);
-    let logger = new Logger('info', 'logs/OabTJSP/OabTJSPInfo.log', {
-      nomeRobo: `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSP}`,
-      NumeroOab: message.NumeroOab,
+    let logger = new Logger('info', 'logs/PeticaoTJSP/PeticaoTJSPInfo.log', {
+      nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}`,
+      NumeroDoProcesso: message.NumeroProcesso,
     });
     try {
       logger.info('Mensagem recebida');
@@ -37,8 +38,7 @@ const logarExecucao = async (execucao) => {
 
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(
-        message.NumeroOab,
-        message.ConsultaCadastradaId,
+        message.NumeroProcesso,
         message.Instancia
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
@@ -52,11 +52,14 @@ const logarExecucao = async (execucao) => {
 
       logger.info('Enviando resposta ao BigData');
       await Helper.enviarFeedback(
-        extracao.prepararEnvio()
+        extracao.prepararEnvio(),
+        {
+          NumeroDoProcesso: resultadoExtracao.numeroProcesso,
+        }
       ).catch((err) => {
         console.log(err);
         throw new Error(
-          `OabTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+          `PeticaoTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
         );
       });
       logger.info('Resposta enviada ao BigData');
@@ -67,8 +70,9 @@ const logarExecucao = async (execucao) => {
         DataTermino: new Date(),
         status: 'OK',
         logs: logger.logs,
-        NomeRobo: enums.nomesRobos.TJSP,
+        NomeRobo: 'PeticaoTJSP',
       });
+
 
     } catch (e) {
       logger.info('Encontrado erro durante a execução');
@@ -84,11 +88,13 @@ const logarExecucao = async (execucao) => {
         logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSP,
       });
+
+
     } finally {
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
-      console.log('\n\n\n\n');
+      console.log('\n\n\n\n')
       await sleep(2000);
     }
   });

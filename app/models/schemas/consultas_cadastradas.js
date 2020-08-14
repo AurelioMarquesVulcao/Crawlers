@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 
+const DetalhesSchema = new mongoose.Schema({
+  Orgao: Number,
+  Tribunal: Number,
+}, { _id:false, versionKey: false });
+
 const ConsultaCadastroSchema = new mongoose.Schema({
   NumeroOab: {
     type: String,
@@ -40,6 +45,11 @@ const ConsultaCadastroSchema = new mongoose.Schema({
   Instancia: {
     type: String,
     default: "1"
+  },
+  Detalhes: {
+    type: DetalhesSchema,
+    required: false,
+    default: null
   }
 });
 

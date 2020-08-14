@@ -59,6 +59,7 @@ module.exports.LogExecucao = class LogExecucao {
             status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`
           }
         ],
+        Instancia: mensagem.Instancia,
         Mensagem: [mensagem]
       };
       const execucaoConsulta = new ExecucaoConsulta(execucao);

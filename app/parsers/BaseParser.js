@@ -29,6 +29,20 @@ module.exports.BaseParser = class BaseParser {
     this.jsonAssuntos = [];
     this.jsonAndamentos = [];
   }
+
+  filtrarUnicosLista(lista) {
+    let listaString = [];
+    lista = lista.map(element => {
+      let envString = JSON.stringify(element);
+      if (listaString.indexOf(envString) === -1){
+        listaString.push(envString);
+        return element;
+      }
+      listaString.push(envString);
+      return false;
+    })
+    return lista.filter(x => Boolean(x));
+  }
 };
 
 const tradutor = {
@@ -47,6 +61,8 @@ const tradutor = {
   "Apdo": "Apelado",
   "Apte": "Apelante",
   "Autor": "Autor",
+  "Credor": "Credor",
+  "Devedor": "Devedor",
   "Embargdo": "Embargado",
   "Embargte": "Embargante",
   "Exectdo": "Executado",

@@ -1,4 +1,3 @@
-const cheerio = require('cheerio');
 const moment = require('moment');
 
 const { BaseParser } = require('./BaseParser');
@@ -8,7 +7,11 @@ const { Andamento } = require('../models/schemas/andamento');
 const { COMARCAS } = require('../assets/tjba/comarcas');
 // parser => processo
 
-
+const possiveisStatus = [
+  "Arquivamento com baixa",
+  "Arquivamento",
+  "Baixa Definitiva",
+];
 
 class TJBAPortalParser extends BaseParser {
   /**
@@ -53,7 +56,7 @@ class TJBAPortalParser extends BaseParser {
         nome = removerAcentos(nome);
         let tipo = traduzir(element.tipo);
 
-        if (tipo == "Advogado") {
+        if (tipo === "Advogado") {
           nome = nome.replace(/\s\W\s.*/, '');
           nome = `(${element.documento}) ${nome}`;
         } else {
@@ -108,7 +111,7 @@ class TJBAPortalParser extends BaseParser {
     let oabs = [];
 
     envolvidos.map((element) => {
-      if (element.tipo == 'Advogado') {
+      if (element.tipo === 'Advogado') {
         let oab = /\d+\w{2}/.exec(element.nome);
         if (oab) {
           oabs.push(oab[0]);
@@ -119,12 +122,51 @@ class TJBAPortalParser extends BaseParser {
     return oabs;
   }
 
-  extrairStatus(content) {
-    return 'Não informado.';
+  /**
+   * @param {[Andamento]}andamentos
+   * @returns {string}
+   */
+  extrairStatus(andamentos) {
+
+    const tam = andamentos.length;
+    for (let i = 0; i < tam; i++){
+
+      let statusIndex = possiveisStatus.indexOf(andamentos[i].descricao);
+      if (statusIndex !== -1) {
+        return possiveisStatus[statusIndex];
+      }
+    }
+
+    return "Aberto";
+  }
+
+  /**
+   * @param {String} status
+   * @returns {boolean}
+   */
+  extrairBaixa(status) {
+    return possiveisStatus.indexOf(status) !== -1;
   }
 
   extrairDetalhes(content) {
     return Processo.identificarDetalhes(content.numero);
+  }
+
+  /**
+   * @param {[Andamento]} andamentos
+   * @returns {null|String}
+   */
+  extrairDataDistribuicao(andamentos) {
+    const tam = andamentos.length;
+
+    // percorre a fila de forma inversa, assim pega o primeiro andamento em ordem cronologica :)
+    for (let i = tam - 1; i >= 0; i--) {
+      if (/Distribuicao/.test(andamentos[i].descricao)) {
+        return andamentos[i].data;
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -138,19 +180,22 @@ class TJBAPortalParser extends BaseParser {
     const detalhes = this.extrairDetalhes(content);
     const envolvidos = this.extrairEnvolvidos(content);
     const oabs = this.extrairOabs(envolvidos);
-    const status = this.extrairStatus(content);
     const andamentos = this.extrairAndamentos(
       content,
       dataAtual,
       detalhes.numeroProcesso
     );
-
+    const status = this.extrairStatus(andamentos);
+    capa.dataDistribuicao = this.extrairDataDistribuicao(andamentos);
+    const isBaixa = this.extrairBaixa(status);
     const processo = new Processo({
       capa: capa,
       detalhes: detalhes,
       envolvidos: envolvidos,
       oabs: oabs,
       qtdAndamentos: andamentos.length,
+      isBaixa: isBaixa,
+      status: status,
       origemExtracao: 'OabTJBAPortal',
     });
 

@@ -7,6 +7,8 @@ const { ProcessoTJRS } = require('./ProcessoTJRS');
 const { ProcessoTJSP } = require("./ProcessoTJSP");
 const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { ProcJTE } = require('./ProcJTE');
+const { PeticaoTJSP } = require('./PeticaoTJSP');
+
 
 class ExtratorFactory {
   static getExtrator(fila, isDebug) {
@@ -21,7 +23,7 @@ class ExtratorFactory {
     }
 
     if (/oab.TJSP/.test(fila)) {
-      extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg/open.do', isDebug);
+      extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg', isDebug);
     }
 
     if (/oab.TJRS/.test(fila)) {      
@@ -38,6 +40,10 @@ class ExtratorFactory {
 
     if (/processo.TJSP/.test(fila)) {
       extrator = new ProcessoTJSP(isDebug);
+    }
+
+    if (/peticao.TJSP/.test(fila)) { // usa puppeteer
+      extrator = new PeticaoTJSP({headless: true});
     }
 
     if (/oab.TJSC/.test(fila)) {

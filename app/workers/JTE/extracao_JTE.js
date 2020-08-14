@@ -52,11 +52,11 @@ async function worker() {
     // await puppet.start()
     await puppet.iniciar()
 
-    //await sleep(10000)
+    await sleep(3000)
     await puppet.acessar("https://jte.csjt.jus.br/")
 
     // await puppet.loga()
-    // await sleep(1000)
+    await sleep(3000)
 
     // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;

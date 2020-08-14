@@ -157,12 +157,32 @@ class JTEParser extends BaseParser {
     let dados = this.detalhes(numeroProcesso).tribunal
 
 
-    if (dados == 2 || dados == 15) resultado = 'SP'
-    if (dados == 1) resultado = 'RJ'
+    if (dados == 2 || dados == 15) resultado = 'SP';
+    if (dados == 1) resultado = 'RJ';
     // if (dados == 15) resultado = 'SP'
-    if (dados == 3) resultado = 'MG'
-    if (dados == 21) resultado = 'RN'
-    if (dados == 5) resultado = 'BA'
+    if (dados == 3) resultado = 'MG';
+    // if (dados == 21) resultado = 'RN';
+    if (dados == 5) resultado = 'BA';
+
+    if (dados == 4) resultado = 'RS';
+    if (dados == 6) resultado = 'PE';
+    if (dados == 7) resultado = 'CE';
+    if (dados == 8) resultado = 'PA';
+    if (dados == 9) resultado = 'PR';
+    if (dados == 10) resultado = 'TO';
+    if (dados == 11) resultado = 'AM';
+    if (dados == 12) resultado = 'SC';
+    if (dados == 13) resultado = 'PB';
+    if (dados == 14) resultado = 'AC';
+    if (dados == 16) resultado = 'MA';
+    if (dados == 17) resultado = 'ES';
+    if (dados == 18) resultado = 'GO';
+    if (dados == 19) resultado = 'AL';
+    if (dados == 20) resultado = 'SE';
+    if (dados == 21) resultado = 'RN';
+    if (dados == 22) resultado = 'PI';
+    if (dados == 23) resultado = 'MT';
+    if (dados == 24) resultado = 'MS';
     return resultado
   }
 

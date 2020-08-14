@@ -17,11 +17,12 @@ class RoboPuppeteer3 {
       headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
-      // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      args: ['--ignore-certificate-errors']
+      //args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -34,7 +35,7 @@ class RoboPuppeteer3 {
     try {
       await this.page.goto(url, {
         waitUntil: "load",
-        timeout: 20000,
+        timeout: 30000,
         // waitUntil: 'networkidle2'
       });
       // isso me da o url completo
@@ -57,7 +58,7 @@ class RoboPuppeteer3 {
     // const pages = await this.browser.pages();
     // await sleep(timerSleep2)
     // console.log("------------------------------------------" + pages.length)
-    
+
     // const popup = pages[pages.length - 1];
     // console.log(popup)
     // await sleep(timerSleep2)
@@ -458,13 +459,19 @@ class RoboPuppeteer3 {
 function escolheEstado(numero) {
   let resultado;
   numero = numero.slice(numero.length - 6, numero.length - 4)
-  if (numero == 01) resultado = 2     // Rio de Janeiro
-  if (numero == 02) resultado = 03    // São Paulo
-  if (numero == 21) resultado = 22    // Rio Grande do Norte
-  if (numero == 15) resultado = 16    // São Paulo
-  if (numero == 03) resultado = 4    // Minas Gerais
-  if (numero == 05) resultado = 6    // Bahia
-  return resultado
+  // if (numero == 01) resultado = 2     // Rio de Janeiro
+  // if (numero == 02) resultado = 03    // São Paulo
+  // if (numero == 03) resultado = 4    // Minas Gerais
+  // if (numero == 04) resultado = 5    // Bahia
+  // if (numero == 05) resultado = 6    //
+  // if (numero == 06) resultado = 7    
+  // if (numero == 09) resultado = 10
+
+  // if (numero == 15) resultado = 16    // São Paulo
+  // if (numero == 21) resultado = 22    // Rio Grande do Norte
+
+  // substitui o código acima
+  return parseInt(numero) + 1;
 }
 function processaNumero(numero) {
   let numeroProcesso = numero.trim().slice(0, 7);

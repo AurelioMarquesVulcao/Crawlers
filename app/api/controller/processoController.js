@@ -213,11 +213,11 @@ class ProcessoController {
   static async contarDocumentos(req, res) {
 
     let response = {};
-
+    
     try {
-      const res = await Processo.countDocuments({});
+      const results = await Processo.countDocuments({});
       response.status = 200;
-      response.data = res.data;
+      response.data = results;
       response.error = null;
     } catch (e) {
       response.status = 500;
@@ -325,8 +325,8 @@ class ProcessoController {
         }
       }
 
-      const skip = filtros && filtros.pagina ? filtros.pagina : 0;
-      const limit = filtros && filtros.limite ? filtros.limite : 1000;
+      const skip = filtros && filtros.pagina ? parseInt(filtros.pagina) : 0;
+      const limit = filtros && filtros.limite ? parseInt(filtros.limite) : 1000;
 
       const count = await Processo.countDocuments(query);
       const resProcessos = await Processo.find(query).skip(skip).limit(limit);

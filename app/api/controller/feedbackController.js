@@ -1,4 +1,5 @@
 const { FeedbackIntegracaoProadv } = require('../../models/schemas/feedbackIntegracaoProadv');
+const { LogCaptcha } = require("../../models/schemas/logCaptcha");
 
 module.exports.FeedbackController = class FeedbackController {
 
@@ -37,7 +38,7 @@ module.exports.FeedbackController = class FeedbackController {
       log.NumeroOab = req.body.NumeroOab;
       log.Data = req.body.Data;
       log.CaptchaBody = req.body.CaptchaBody;
-      
+
       await new LogCaptcha(log)
         .save()
         .then(() => {

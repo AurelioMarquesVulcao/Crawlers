@@ -2,6 +2,10 @@ const router = require("express").Router();
 const feedback = require("./feedback");
 const { ProcessoController } = require("../controller/processoController");
 
+router.get('/', (req, res) => {
+    res.send('Não há rota padrao para /api');
+});
+
 // router.get('/', ProcessoController.contarDocumentos);
 router.get('/processo/:numeroProcesso', ProcessoController.obterProcesso);
 router.get('/processo/:numeroProcesso/andamentos', ProcessoController.obterAndamentos);

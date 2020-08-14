@@ -213,11 +213,11 @@ class ProcessoController {
   static async contarDocumentos(req, res) {
 
     let response = {};
-
+    
     try {
-      const res = await Processo.countDocuments({});
+      const results = await Processo.countDocuments({});
       response.status = 200;
-      response.data = res.data;
+      response.data = results;
       response.error = null;
     } catch (e) {
       response.status = 500;

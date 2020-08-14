@@ -3,7 +3,7 @@ const feedback = require("./feedback");
 const { ProcessoController } = require("../controller/processoController");
 
 router.get('/', (req, res) => {
-    res.send('Não há rota padrao para /api');
+    res.send('Não há rota padrao para /api/bigdata');
 });
 
 // router.get('/', ProcessoController.contarDocumentos);

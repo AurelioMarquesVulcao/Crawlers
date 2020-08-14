@@ -13,7 +13,7 @@ const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseE
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
@@ -56,6 +56,8 @@ async function worker() {
     //await sleep(10000)
     await puppet.acessar("https://jte.csjt.jus.br/")
     await puppet.preencheTribunal('10014385020135150473')
+    await sleep(2000)
+    await puppet.loga()
     await sleep(1000)
 
     // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
@@ -119,6 +121,14 @@ async function worker() {
                     data: { dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(), mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth() },
                 })
             }
+            let link = await puppet.pegaInicial()
+            await console.log(link.length);
+            for (let w = 0; w < link.length; w++) {
+                console.log("entrou no laço");
+                await new CriaFilaJTE().salvaDocumentoLink(link[w])
+                await console.log("O link " + w + " Foi salvo");
+            }
+
 
             logger.info('Processos extraidos com sucesso');
             if (!!dadosProcesso) {
@@ -179,7 +189,7 @@ async function worker() {
             // })
         } catch (e) {
             catchError++
-            //console.log(e);
+            console.log(e);
             // envia a mensagem para a fila de reprocessamento
             new GerenciadorFila().enviar(reConsumo, message);
             logger.info('Encontrado erro durante a execução');
@@ -191,7 +201,7 @@ async function worker() {
             logger.info(`Error: ${e.message}`);
             logger.info('Reconhecendo mensagem ao RabbitMQ');
             logger.info('Mensagem reconhecida');
-            logger.info('Finalizando proceso');
+            logger.info('Finalizando processo');
             console.log(message.LogConsultaId);
             // await logarExecucao({
             //   LogConsultaId: message.LogConsultaId,

@@ -3,52 +3,49 @@ const cheerio = require('cheerio');
 const re = require('xregexp');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
+const comarcas = require('../../assets/jte/comarcas');
 
 const fila = new CriaFilaJTE();
+const comarca1 = comarcas.comarcas;
 
+//console.log(comarca1[0]);
+//const origens = COMARCA1S
 (async () => {
+    let arrayTemp = [];
+    let contador = 1;
+    let codigo;
+    for (i in comarca1) { if (comarca1[i].length > 0) { arrayTemp.push(comarca1[i]) }; };
+    console.log(arrayTemp.length+"----------");
+    for (let w = 0; w < 1;) {
+        await sleep(1000)
+        let relogio = fila.relogio();
+
+        console.log(relogio);
+        if (relogio.min == 1 && relogio.seg == 00 || contador == 1) {
+            if (contador < 10) {
+                contador ++
+                codigo = "0" + contador;
+                //console.log(codigo);
+                contador --
+                
+            } else {
+                contador ++
+                codigo = contador+1;
+                contador --
+            }
+
+
+            criador(arrayTemp[contador], contador+1, codigo, arrayTemp[contador].length)
+
+            contador++
+            console.log(contador);
+        }
+        if(contador ==14){contador ==0}
+    }
+})()
+
+async function criador(origens, tribunal, codigo, max) {
     let second = 0;
-    let origens = [
-        '0000', '0001', '0002', '0003', '0004', '0005',
-        '0006', '0007', '0008', '0009', '0010',
-        '0011', '0012', '0013', '0014', '0015',
-        '0016', '0017', '0018', '0019', '0020',
-        '0021', '0022', '0023', '0024', '0025',
-        '0026', '0027', '0028', '0029', '0030',
-        '0031', '0032', '0033', '0034', '0035',
-        '0036', '0037', '0038', '0039', '0040',
-        '0041', '0042', '0043', '0044', '0045',
-        '0046', '0047', '0048', '0049',
-        '0050', '0051', '0052', '0053', '0054',
-        '0055', '0056', '0057', '0058', '0059',
-        '0060', '0061', '0062', '0063', '0064',
-        '0065', '0066', '0067', '0068', '0069',
-        '0070', '0071', '0072', '0073', '0074',
-        '0075', '0076', '0077', '0078', '0079',
-        '0080', '0081', '0082', '0083', '0084',
-        '0085', '0086', '0087', '0088', '0089',
-        '0090', '0201', '0202', '0203', '0204',
-        '0205', '0211', '0221', '0231', '0232',
-        '0241', '0242', '0251', '0252', '0254', '0255', '0261',
-        '0262', '0263', '0264', '0271', '0281', '0291', '0292',
-        '0301', '0302', '0303', '0311', '0312', '0313', '0314',
-        '0315', '0316', '0317', '0318', '0319', '0320', '0321',
-        '0322', '0323', '0331', '0332', '0341', '0342', '0351',
-        '0361', '0362', '0363', '0371', '0372', '0373', '0374',
-        '0381', '0382', '0383', '0384', '0385', '0386', '0391',
-        '0401', '0402', '0411', '0421', '0422', '0431', '0432',
-        '0433', '0434', '0435', '0441', '0442', '0443', '0444',
-        '0445', '0446', '0447', '0461', '0462', '0463', '0464',
-        '0465', '0466', '0467', '0468', '0471', '0472', '0473',
-        '0481', '0482', '0491', '0492', '0501', '0502', '0511',
-        '0521', '0601', '0602', '0603', '0604', '0605', '0606',
-        '0607', '0608', '0609', '0610', '0611', '0612', '0613',
-        '0614', '0701',
-        '0702', '0703', '0704', '0705', '0706',
-        '0707', '0708', '0709', '0710', '0711',
-        '0712', '0713', '0714', '0715', '0716',
-        '0717', '0718', '0719', '0720'
-    ]
     let contaOrigem = 60;
     for (let w = 0; w < 1;) {
         second++
@@ -58,7 +55,7 @@ const fila = new CriaFilaJTE();
             let relogio = fila.relogio();
             try {
                 // string de busca no banco de dados
-                let parametroBusca = { "tribunal": 2, "origem": origens[contaOrigem] };
+                let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
                 // console.log(origens.length);
                 let buscar = await fila.abreUltimo(parametroBusca);
                 console.log(buscar.length);
@@ -72,26 +69,26 @@ const fila = new CriaFilaJTE();
                 // console.log(sequencial.data.mes < relogio.mes);
                 if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
-                        await fila.procura10(numeroSequencial, comarca, 4, '02')
+                        await fila.procura10(numeroSequencial, comarca, 4, codigo)
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 1, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, codigo)
                     }
                     await sleep(500)
                 } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
-                        await fila.procura10(numeroSequencial, comarca, 3, '02')
+                        await fila.procura10(numeroSequencial, comarca, 3, codigo)
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 1, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, codigo)
                     }
                     await sleep(500)
                 } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
                     if (sequencial.data.mes < relogio.mes - 1) {
-                        await fila.procura10(numeroSequencial, comarca, 3, '02')
+                        await fila.procura10(numeroSequencial, comarca, 3, codigo)
                         console.log("----------------------- Estou dando um salto no Tempo--------------------------");
                     } else {
-                        await fila.procura(numeroSequencial, comarca, 1, '02')
+                        await fila.procura(numeroSequencial, comarca, 1, codigo)
                     }
                     await sleep(500)
                 }
@@ -102,15 +99,15 @@ const fila = new CriaFilaJTE();
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };
             let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
-            if (contaOrigem == 160) { 
-                contaOrigem = 0; 
-                if (relogio.min == 59) { break } 
+            if (contaOrigem == 160) {
+                contaOrigem = 0;
+                if (relogio.min == 59) { break }
             } else { contaOrigem++ };
         };
         await sleep(1000)
     };
     await sleep(2000)
-})();
+};
 
 
 function maiorSequencial(obj) {

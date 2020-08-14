@@ -35,6 +35,17 @@ var ultimoProcesso = mongoose.model('ultimosProcessos', ultimoProcesso1, 'ultimo
 var ultimoProcessodb1 = mongoose.model('ultimos-processos', ultimoProcesso1, 'ultimos-processos');
 var ultimoProcessodb2 = mongoose.model('ultimosprocessos', ultimoProcesso1, 'ultimosprocessos');
 
+
+var linkDocumento1 = new mongoose.Schema({
+    link: String,
+    movimentacao: String,
+    data: String,
+    numeroProcesso: String,
+    tipo: String,
+})
+
+var linkDocumento = mongoose.model('salvaDocumentoLink', linkDocumento1, 'salvaDocumentoLink');
+
 class CriaFilaJTE {
     enviarMensagem(nome, message) {
         new GerenciadorFila().enviar(nome, message);
@@ -58,13 +69,32 @@ class CriaFilaJTE {
             useUnifiedTopology: true
         });
         let veirifica = await ultimoProcesso.find({ "numeroProcesso": ultimo.numeroProcesso })
-       
+
 
         if (!veirifica[0]) {
             return await new ultimoProcesso(ultimo).save()
         }
 
     }
+
+    async salvaDocumentoLink(link) {
+        //let devDbConection = process.env.MONGO_DEV_CONECTION
+        let devDbConection = process.env.MONGO_CONNECTION_STRING
+        mongoose.connect(devDbConection, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+
+        let verifica = await linkDocumento.find({ "numeroProcesso": link.numeroProcesso, "movimentacao": link.link })
+        console.log(!verifica[0]);
+        if (!verifica[0]) {
+            return await new linkDocumento(link).save()
+        }
+
+
+
+    }
+
     async abreUltimo(parametro) {
         let devDbConection = process.env.MONGO_CONNECTION_STRING
         mongoose.connect(devDbConection, {
@@ -73,7 +103,7 @@ class CriaFilaJTE {
         });
         let busca = await ultimoProcesso.find(parametro)
         let obj = busca;
-        
+
         return obj
     }
 
@@ -92,7 +122,7 @@ class CriaFilaJTE {
                 resultado.push([varaTrabalho, sequencial])
             }
         }
-        
+
         return resultado.sort()
     }
     async peganumero() {
@@ -115,7 +145,7 @@ class CriaFilaJTE {
             sequencial = parseInt(obj.seq)
             let a = sequencial + 1 + i
             let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
-            
+
             await this.enviaFila([{
                 NumeroProcesso: processo
             }])
@@ -129,7 +159,7 @@ class CriaFilaJTE {
             sequencial = parseInt(obj.seq)
             let a = sequencial + 5 + i
             let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
-            
+
             await this.enviaFila([{
                 NumeroProcesso: processo
             }])
@@ -157,13 +187,13 @@ class CriaFilaJTE {
         const sleep1 = 2;
         let filtro = numeroProcesso;
         let conta1000 = 0;
-        
+
         for (let i = 0; i < filtro.length; i++) {
             let tribunal = 0
             tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
-            if (tribunal == 15) {
+            if (tribunal != 150000) {
                 await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-15`;
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
@@ -174,58 +204,58 @@ class CriaFilaJTE {
                     conta1000 = 0
                 }
             }
-            if (tribunal == 2) {
-                await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-SP-2`;
-                let message = criaPost(filtro[i].NumeroProcesso)
+            // if (tribunal == 2) {
+            //     await sleep(sleep1)
+            //     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+            //     let message = criaPost(filtro[i].NumeroProcesso)
 
-                await this.enviarMensagem(nomeFila, message)
-                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
-                conta1000++
-                if (conta1000 == 2000) {
-                    await sleep(sleep4)
-                    conta1000 = 0
-                }
-            }
-            if (tribunal == 3) {
-                await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-MG`;
-                let message = criaPost(filtro[i].NumeroProcesso)
+            //     await this.enviarMensagem(nomeFila, message)
+            //     //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+            //     conta1000++
+            //     if (conta1000 == 2000) {
+            //         await sleep(sleep4)
+            //         conta1000 = 0
+            //     }
+            // }
+            // if (tribunal == 3) {
+            //     await sleep(sleep1)
+            //     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-MG`;
+            //     let message = criaPost(filtro[i].NumeroProcesso)
 
-                await this.enviarMensagem(nomeFila, message)
-                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
-                conta1000++
-                if (conta1000 == 2000) {
-                    await sleep(sleep4)
-                    conta1000 = 0
-                }
-            }
-            if (tribunal == 1) {
-                await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-RJ`;
-                let message = criaPost(filtro[i].NumeroProcesso)
+            //     await this.enviarMensagem(nomeFila, message)
+            //     //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+            //     conta1000++
+            //     if (conta1000 == 2000) {
+            //         await sleep(sleep4)
+            //         conta1000 = 0
+            //     }
+            // }
+            // if (tribunal == 1) {
+            //     await sleep(sleep1)
+            //     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-RJ`;
+            //     let message = criaPost(filtro[i].NumeroProcesso)
 
-                await this.enviarMensagem(nomeFila, message)
-                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
-                conta1000++
-                if (conta1000 == 2000) {
-                    await sleep(sleep4)
-                    conta1000 = 0
-                }
-            }
-            if (tribunal == 5) {
-                await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
-                let message = criaPost(filtro[i].NumeroProcesso)
+            //     await this.enviarMensagem(nomeFila, message)
+            //     //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+            //     conta1000++
+            //     if (conta1000 == 2000) {
+            //         await sleep(sleep4)
+            //         conta1000 = 0
+            //     }
+            // }
+            // if (tribunal == 5) {
+            //     await sleep(sleep1)
+            //     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
+            //     let message = criaPost(filtro[i].NumeroProcesso)
 
-                await this.enviarMensagem(nomeFila, message)
-                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
-                conta1000++
-                if (conta1000 == 2000) {
-                    await sleep(sleep4)
-                    conta1000 = 0
-                }
-            }
+            //     await this.enviarMensagem(nomeFila, message)
+            //     //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+            //     conta1000++
+            //     if (conta1000 == 2000) {
+            //         await sleep(sleep4)
+            //         conta1000 = 0
+            //     }
+            // }
 
 
 
@@ -270,7 +300,8 @@ function criaPost(numero) {
         "DataEnfileiramento" : "${new Date}",
         "NumeroProcesso" : "${numero}",
         "NumeroOab" : "null",        
-        "SeccionalOab" : "SP"
+        "SeccionalOab" : "SP",
+        "NovosProcessos" : true
     }`
     return post
 }

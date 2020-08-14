@@ -327,9 +327,10 @@ class ProcessoController {
 
       const skip = filtros && filtros.pagina ? parseInt(filtros.pagina) : 0;
       const limit = filtros && filtros.limite ? parseInt(filtros.limite) : 1000;
+      const sort = filtros && filtros.ord ? parseInt(filtros.ord) : 1;
 
       const count = await Processo.countDocuments(query);
-      const resProcessos = await Processo.find(query).skip(skip).limit(limit);
+      const resProcessos = await Processo.find(query).skip(skip).limit(limit).sort({ _id: sort });
 
       const tradutor = new Tradutor();
       const listaProcessos = [];

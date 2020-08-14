@@ -325,8 +325,8 @@ class ProcessoController {
         }
       }
 
-      const skip = filtros && filtros.pagina ? filtros.pagina : 0;
-      const limit = filtros && filtros.limite ? filtros.limite : 1000;
+      const skip = filtros && filtros.pagina ? parseInt(filtros.pagina) : 0;
+      const limit = filtros && filtros.limite ? parseInt(filtros.limite) : 1000;
 
       const count = await Processo.countDocuments(query);
       const resProcessos = await Processo.find(query).skip(skip).limit(limit);

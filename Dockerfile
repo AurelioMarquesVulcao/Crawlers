@@ -12,5 +12,6 @@ RUN  apt-get update \
      && chmod +x /usr/sbin/wait-for-it.sh
 
 
-RUN npm install && npm install -g pm2
+RUN npm install && npm install -g pm2 && npm install -g nodemon
 CMD ["node", "server"]
+# CMD ["pm2-docker", "ecosystem.config.js"]

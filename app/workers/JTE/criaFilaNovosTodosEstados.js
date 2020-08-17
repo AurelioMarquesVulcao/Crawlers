@@ -10,38 +10,42 @@ const fila = new CriaFilaJTE();
 const comarca1 = comarcas.comarcas;
 
 
-//console.log(comarca1[0]);
-//const origens = COMARCA1S
+// con
 (async () => {
     let arrayTemp = [];
-    let contador = 0;
+    let contador = 3;
     let codigo;
     for (i in comarca1) { if (comarca1[i].length > 0) { arrayTemp.push(comarca1[i]) }; };
-    console.log(arrayTemp.length+"----------");
+    let laco = arrayTemp.length - 1;
+    // console.log(arrayTemp.length + "----------");
+    console.log("quantidade de estados " + laco);
     for (let w = 0; w < 1;) {
         await sleep(1000)
         let relogio = fila.relogio();
         console.log(relogio);
-        if (relogio.min == 1 && relogio.seg == 00 || contador == 0) {
+        if (relogio.min == 1 && relogio.seg == 00 || contador == 3) {
             if (contador < 10) {
-                contador ++
+                contador++
                 codigo = "0" + contador;
                 //console.log(codigo);
-                contador --
+                contador--
             } else {
-                contador ++
-                codigo = contador+1;
-                contador --
+                contador++
+                codigo = contador + 1;
+                contador--
             }
-            await criador(arrayTemp[contador], contador+1, codigo, arrayTemp[contador].length)
+            await criador(arrayTemp[contador], contador + 1, codigo, arrayTemp[contador].length)
             contador++
             console.log(contador);
         }
-        if(contador ==14){contador ==0}
+
+        if (contador == laco) { contador == 0 }
     }
 })()
 
-
+// Criador de fila:
+// Busca no banco de dados qual o ultimo processesso do estado/comarca,
+// Após isso tenta pegar o proximo processo em ordem númerica.
 async function criador(origens, tribunal, codigo, max) {
     let second = 0;
     let contaOrigem = 0;
@@ -51,8 +55,11 @@ async function criador(origens, tribunal, codigo, max) {
         // if (timer.min == 20 && timer.seg == 01 || timer.min == 47) {
         if ("a") {
             let relogio = fila.relogio();
-            if (relogio.min == 45) { break }
-            await sleep(700)
+            // Informa o momento em que essa aplicação para.
+            if (relogio.min == 50) { break }
+            // esse tempo da o ritmo de busca de processos, 
+            //3000 - nos da a velocidade de 20 processos por minuto
+            await sleep(3000)
             try {
                 // string de busca no banco de dados
                 let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
@@ -101,7 +108,7 @@ async function criador(origens, tribunal, codigo, max) {
             let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
             if (contaOrigem == max) {
                 contaOrigem = 0;
-                
+
             } else { contaOrigem++ };
         };
     };

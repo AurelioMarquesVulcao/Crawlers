@@ -14,7 +14,7 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
@@ -487,64 +487,27 @@ function processaNumero(numero) {
 //   await sleep(1000)
 //   await puppet.pegaInicial()
 // })()
-// (async () => {
-//   let puppet = new RoboPuppeteer3()
+(async () => {
+  let puppet = new RoboPuppeteer3()
 
-//   await puppet.iniciar()
+  await puppet.iniciar()
 
-//   await sleep(1000)
-//   await puppet.acessar("https://jte.csjt.jus.br/")
-//   await sleep(1000)
-//   await puppet.preencheTribunal('00105492920205150001')
-//   await sleep(2000)
-//   await puppet.loga()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109906220205150001", 0)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109936220205150001", 1)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00079274720205150000", 2)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   // await puppet.preencheProcesso("00109936220205150001", 3)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109364720205150069", 4)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109886220205150001", 5)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109886220205150001", 6)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109886220205150001", 7)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109876220205150001", 8)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109846220205150001", 9)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109916220205150001", 10)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
+  await sleep(1000)
+  await puppet.acessar("https://jte.csjt.jus.br/")
+  await sleep(1000)
+  await puppet.preencheTribunal('00105492920205150001')
+  await sleep(2000)
+  await puppet.loga()
+  await sleep(3000)
+  
+  await puppet.preencheProcesso("00109906220205150001", 0)
+  await sleep(1000)
+  await puppet.pegaInicial()
+  await sleep(1000)
+  await puppet.preencheProcesso("00109936220205150001", 1)
+  await sleep(1000)
 
-// })()
+})//()
 // 0011051-65.2020.5.15.0001  
 // 00109474720205150042   -- verificar esse numero
 // 00109364720205150069

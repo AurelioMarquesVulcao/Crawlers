@@ -195,7 +195,7 @@ class CriaFilaJTE {
             // estou usando uma fila unica o código abaixo esta obsoleto.
             if (tribunal != 150000) {
                 await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-iniciais`;
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)

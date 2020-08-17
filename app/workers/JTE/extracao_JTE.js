@@ -18,13 +18,10 @@ const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
 
-
-
 /**
  * Logger para console e arquivo
  */
 let logger;
-
 
 const logarExecucao = async (execucao) => {
     await LogExecucao.salvar(execucao);

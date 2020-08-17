@@ -167,13 +167,13 @@ class JTEParser extends BaseParser {
     if (dados == 4) resultado = 'RS';
     if (dados == 6) resultado = 'PE';
     if (dados == 7) resultado = 'CE';
-    if (dados == 8) resultado = 'PA';
+    if (dados == 8) resultado = '';
     if (dados == 9) resultado = 'PR';
-    if (dados == 10) resultado = 'TO';
-    if (dados == 11) resultado = 'AM';
+    if (dados == 10) resultado = '';
+    if (dados == 11) resultado = '';
     if (dados == 12) resultado = 'SC';
     if (dados == 13) resultado = 'PB';
-    if (dados == 14) resultado = 'AC';
+    if (dados == 14) resultado = '';
     if (dados == 16) resultado = 'MA';
     if (dados == 17) resultado = 'ES';
     if (dados == 18) resultado = 'GO';

@@ -89,8 +89,13 @@ async function worker() {
                 await puppet.mudaTribunal(estadoDaFila); await sleep(1000);
                 contador = 0;
             };
+            // desliga o worker para parar de baixar as iniciais
+            if (!message.NovosProcessos && logadoParaIniciais == true) { 
+                logadoParaIniciais == false
+                process.exit()
+            }
             // reinicia o worker para baixarmos os processos iniciais.
-            if (message.NovosProcessos == true && contador != 0) {
+            if (message.NovosProcessos == true && contador != 0 && logadoParaIniciais == false) {
                 console.log("vou deslogar a aplicação ----01");
                 process.exit()
             }
@@ -116,7 +121,7 @@ async function worker() {
                 if (message.NovosProcessos == true && logadoParaIniciais == false) {
                     await puppet.loga()
                     logadoParaIniciais = true
-                } else { logadoParaIniciais = false }
+                }
 
 
                 let dadosProcesso;

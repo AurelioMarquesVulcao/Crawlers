@@ -101,7 +101,7 @@ async function criador(origens, tribunal, codigo, max) {
                 }
                 console.log(sequencial);
             } catch (e) {
-                // console.log(e);
+                console.log(e);
                 console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };

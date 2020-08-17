@@ -182,6 +182,7 @@ class CriaFilaJTE {
         return { dia, mes, hora, min, seg }
     }
 
+    // direciona as mensagens para suas devidas filas
     async enviaFila(numeroProcesso) {
         const sleep4 = 5;
         const sleep1 = 2;
@@ -191,9 +192,10 @@ class CriaFilaJTE {
         for (let i = 0; i < filtro.length; i++) {
             let tribunal = 0
             tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
+            // estou usando uma fila unica o código abaixo esta obsoleto.
             if (tribunal != 150000) {
                 await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-iniciais`;
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)

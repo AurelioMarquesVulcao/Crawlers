@@ -13,7 +13,7 @@ const { BaseException, RequestException, ExtracaoException, AntiCaptchaResponseE
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
@@ -31,6 +31,7 @@ var estadoAnterior;
 var estadoDaFila;
 var contador = 0;
 let data = 1;
+var logadoParaIniciais = false;
 const fila = new CriaFilaJTE();
 if (data == 1) { worker() }
 
@@ -45,24 +46,18 @@ async function worker() {
     });
     const puppet = new RoboPuppeteer3()
     var catchError = 0;
-    
 
-    // await puppet.start()
     await puppet.iniciar()
 
     await sleep(3000)
     await puppet.acessar("https://jte.csjt.jus.br/")
-
-    // await puppet.loga()
     await sleep(3000)
 
-    // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-iniciais`;
     const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
 
     // tudo que está abaixo é acionado para cada processo na fila.
     contador = 0;
-
     await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
         let dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
@@ -77,33 +72,36 @@ async function worker() {
         }
         );
 
-
         try {
             logger.info('Mensagem recebida');
             const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
             logger.info('Iniciando processo de extração');
             //-------------------------------------------------- inicio do extrator--------------------------------------------
-            if (contador == 0) {
-                estadoAnterior = puppet.processaNumero(numeroProcesso).estado
-            };
+            // grava o estado da primeira mensagem recebida.
+            if (contador == 0) { estadoAnterior = puppet.processaNumero(numeroProcesso).estado };
             console.log("O estado atual é o numero: " + estadoAnterior);
-
-            // verifica qual é o estado de origem do pedido de raspagem.
+            // verifica qual é o estado do pedido de raspagem atual.
             estadoDaFila = puppet.processaNumero(numeroProcesso).estado
-
+            // se o estado atual for difente do primeiro estado raspado pelo worker
+            // reinicia o worker.
             if (estadoDaFila != estadoAnterior) {
                 await puppet.mudaTribunal(estadoDaFila); await sleep(1000);
                 contador = 0;
             };
-
+            // reinicia o worker para baixarmos os processos iniciais.
+            if (message.NovosProcessos == true && contador != 0) {
+                console.log("vou deslogar a aplicação ----01");
+                process.exit()
+            }
             estadoAnterior = estadoDaFila
             console.log("O estado atual é o numero: " + estadoAnterior);
-            await teste(message)
+            // caso o estado atual seja igual ao primeiro estado, inicia a raspagem.
+            await ExtratorFunc(message)
 
 
-            async function teste(message) {
-
+            async function ExtratorFunc(message) {
+                console.log("ligou");
                 var resultadoExtracao = {};
                 let numeroProcesso = message.NumeroProcesso;
 
@@ -111,6 +109,14 @@ async function worker() {
                 // loga no tribunal de arranque se for a primeira chamada da fila
                 if (contador == 0) { await puppet.preencheTribunal(numeroProcesso); await sleep(1000) }
 
+                // loga para pegar iniciais
+                // if (message.inicial == true  && contador == 0) {
+                // condicional provisório para testes                    
+                console.log(logadoParaIniciais);
+                if (message.NovosProcessos == true && logadoParaIniciais == false) {
+                    await puppet.loga()
+                    logadoParaIniciais = true
+                } else { logadoParaIniciais = false }
 
 
                 let dadosProcesso;
@@ -131,29 +137,37 @@ async function worker() {
                 dadosProcesso = parser.parse($, $2, contador)
                 if (!!objResponse) contador++
                 // var processo = dadosProcesso.processo
-                await dadosProcesso.processo.salvar()
-                //console.log(dadosProcesso.andamentos[0]);
-                await Andamento.salvarAndamentos(dadosProcesso.andamentos)
-                processo = await dadosProcesso.processo.salvar()
-                // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
-                // após que todas as comarcas estiverem no mes corrente aplicar o código acima
-                if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
-                    //console.log('ok');
-                    await new CriaFilaJTE().salvaUltimo({
-                        numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
-                        dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
-                        origem: dadosProcesso.processo.detalhes.origem,
-                        tribunal: dadosProcesso.processo.detalhes.tribunal,
-                        data: { dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(), mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth() },
-                    })
-                }
-                // let link = await puppet.pegaInicial()
-                // await console.log(link.length);
-                // for (let w = 0; w < link.length; w++) {
-                //     console.log("entrou no laço");
-                //     await new CriaFilaJTE().salvaDocumentoLink(link[w])
-                //     await console.log("O link " + w + " Foi salvo");
+                // await dadosProcesso.processo.salvar()
+                // //console.log(dadosProcesso.andamentos[0]);
+                // await Andamento.salvarAndamentos(dadosProcesso.andamentos)
+                // processo = await dadosProcesso.processo.salvar()
+                // // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
+                // // após que todas as comarcas estiverem no mes corrente aplicar o código acima
+                // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
+                //     //console.log('ok');
+                //     await new CriaFilaJTE().salvaUltimo({
+                //         numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
+                //         dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
+                //         origem: dadosProcesso.processo.detalhes.origem,
+                //         tribunal: dadosProcesso.processo.detalhes.tribunal,
+                //         data: { dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(), mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth() },
+                //     })
                 // }
+
+                // if (message.inicial == true) {
+                // condicional provisório para testes                    
+                if (message.NovosProcessos == true) {
+
+                    console.log("---------- Vou baixar link das iniciais-------");
+                    let link = await puppet.pegaInicial()
+                    await console.log(link.length);
+                    for (let w = 0; w < link.length; w++) {
+                        console.log("entrou no laço");
+                        await new CriaFilaJTE().salvaDocumentoLink(link[w])
+                        await console.log("O link " + w + " Foi salvo");
+                    }
+                };
+
 
 
                 logger.info('Processos extraidos com sucesso');

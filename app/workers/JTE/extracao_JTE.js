@@ -19,6 +19,7 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
 
 
+
 /**
  * Logger para console e arquivo
  */
@@ -33,21 +34,21 @@ var estadoAnterior;
 var estadoDaFila;
 var contador = 0;
 let data = 1;
+const fila = new CriaFilaJTE();
 if (data == 1) { worker() }
+
 
 async function worker() {
     mongoose.connect(enums.mongo.connString, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });
-
     mongoose.connection.on("error", (e) => {
         console.log(e);
     });
     const puppet = new RoboPuppeteer3()
-
     var catchError = 0;
-
+    
 
     // await puppet.start()
     await puppet.iniciar()
@@ -65,7 +66,6 @@ async function worker() {
     // tudo que está abaixo é acionado para cada processo na fila.
     contador = 0;
 
-
     await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
         let dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
@@ -79,7 +79,7 @@ async function worker() {
             NumeroDoProcesso: message.NumeroProcesso,
         }
         );
-        
+
 
         try {
             logger.info('Mensagem recebida');
@@ -103,10 +103,6 @@ async function worker() {
             estadoAnterior = estadoDaFila
             console.log("O estado atual é o numero: " + estadoAnterior);
             await teste(message)
-
-
-
-
 
 
             async function teste(message) {
@@ -231,7 +227,7 @@ async function worker() {
             console.log("-------------- estamos com : " + catchError + " erros");
             if (catchError > 2) { process.exit() }
             // envia a mensagem para a fila de reprocessamento
-            
+
             console.log("----------------- É busca de novo processo novo processo " + novosProcesso);
             if (!novosProcesso) { new GerenciadorFila().enviar(reConsumo, message) }
 

@@ -5,38 +5,35 @@ const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const comarcas = require('../../assets/jte/comarcas');
 
+
 const fila = new CriaFilaJTE();
 const comarca1 = comarcas.comarcas;
+
 
 //console.log(comarca1[0]);
 //const origens = COMARCA1S
 (async () => {
     let arrayTemp = [];
-    let contador = 1;
+    let contador = 0;
     let codigo;
     for (i in comarca1) { if (comarca1[i].length > 0) { arrayTemp.push(comarca1[i]) }; };
     console.log(arrayTemp.length+"----------");
     for (let w = 0; w < 1;) {
         await sleep(1000)
         let relogio = fila.relogio();
-
         console.log(relogio);
-        if (relogio.min == 1 && relogio.seg == 00 || contador == 1) {
+        if (relogio.min == 1 && relogio.seg == 00 || contador == 0) {
             if (contador < 10) {
                 contador ++
                 codigo = "0" + contador;
                 //console.log(codigo);
                 contador --
-                
             } else {
                 contador ++
                 codigo = contador+1;
                 contador --
             }
-
-
-            criador(arrayTemp[contador], contador+1, codigo, arrayTemp[contador].length)
-
+            await criador(arrayTemp[contador], contador+1, codigo, arrayTemp[contador].length)
             contador++
             console.log(contador);
         }
@@ -44,15 +41,18 @@ const comarca1 = comarcas.comarcas;
     }
 })()
 
+
 async function criador(origens, tribunal, codigo, max) {
     let second = 0;
-    let contaOrigem = 60;
+    let contaOrigem = 0;
     for (let w = 0; w < 1;) {
         second++
         let timer = fila.relogio();
         // if (timer.min == 20 && timer.seg == 01 || timer.min == 47) {
         if ("a") {
             let relogio = fila.relogio();
+            if (relogio.min == 45) { break }
+            await sleep(700)
             try {
                 // string de busca no banco de dados
                 let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
@@ -94,20 +94,20 @@ async function criador(origens, tribunal, codigo, max) {
                 }
                 console.log(sequencial);
             } catch (e) {
-                console.log(e);
+                // console.log(e);
                 console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
             }
             //if (contaOrigem == 219) { break } else { contaOrigem++ };
             let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
-            if (contaOrigem == 160) {
+            if (contaOrigem == max) {
                 contaOrigem = 0;
-                if (relogio.min == 59) { break }
+                
             } else { contaOrigem++ };
         };
-        await sleep(1000)
     };
     await sleep(2000)
 };
+
 
 
 function maiorSequencial(obj) {

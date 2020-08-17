@@ -225,7 +225,7 @@ async function worker() {
             catchError++
             console.log(e);
             console.log("-------------- estamos com : " + catchError + " erros");
-            if (catchError > 2) { process.exit() }
+            if (catchError > 7) { process.exit() }
             // envia a mensagem para a fila de reprocessamento
 
             console.log("----------------- É busca de novo processo novo processo " + novosProcesso);

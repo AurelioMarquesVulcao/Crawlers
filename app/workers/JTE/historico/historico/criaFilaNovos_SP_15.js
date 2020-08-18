@@ -41,7 +41,7 @@ const fila = new CriaFilaJTE();
         '0154', '0156', '0157', '0159', '0161', '0162',
         '0898'
     ]
-    let contaOrigem = 0;
+    let contaOrigem = 100;
     for (let w = 0; w < 1;) {
         second++
         let timer = fila.relogio();

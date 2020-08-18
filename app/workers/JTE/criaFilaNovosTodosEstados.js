@@ -59,7 +59,7 @@ async function criador(origens, tribunal, codigo, max) {
             if (relogio.min == 50) { break }
             // esse tempo da o ritmo de busca de processos, 
             //3000 - nos da a velocidade de 20 processos por minuto
-            await sleep(1000)
+            await sleep(4000)
             try {
                 // string de busca no banco de dados
                 let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };

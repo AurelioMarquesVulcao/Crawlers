@@ -207,9 +207,11 @@ class JTEParser extends BaseParser {
         if (andamentos[i].descricao.indexOf("Audiencia inicial designada") > -1) dados = andamentos[i].descricao
         data = andamentos[i].data
       }
+      //console.log(dados);
       if (!!dados) {
         let vara = dados.split('-')[1].split('de')[0].trim();
-        let comarca = dados.split('-')[1].split(/ de /gmi)[1].replace(')', '').trim();
+        //console.log(dados.split(/ DE /gmi)[1].replace(')', '').trim());
+        let comarca = dados.split(/ DE /gmi)[1].replace(')', '').trim();
         let primeiraDistribuicao = data
         return {
           vara: vara,

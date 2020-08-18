@@ -209,7 +209,7 @@ class JTEParser extends BaseParser {
       }
       if (!!dados) {
         let vara = dados.split('-')[1].split('de')[0].trim();
-        let comarca = dados.split('-')[1].split('de')[1].replace(')', '').trim();
+        let comarca = dados.split('-')[1].split(/ de /gmi)[1].replace(')', '').trim();
         let primeiraDistribuicao = data
         return {
           vara: vara,

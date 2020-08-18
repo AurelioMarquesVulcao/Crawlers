@@ -208,26 +208,37 @@ class JTEParser extends BaseParser {
         data = andamentos[i].data
       }
       //console.log(dados);
-      if (!!dados) {
-        let vara = dados.split('-')[1].split('de')[0].trim();
-        //console.log(dados.split(/ DE /gmi)[1].replace(')', '').trim());
-        let comarca = dados.split(/ DE /gmi)[1].replace(')', '').trim();
-        let primeiraDistribuicao = data
-        return {
-          vara: vara,
-          comarca: comarca,
-          primeiraDistribuicao: primeiraDistribuicao,
-          fase: fase,
+      try{
+        if (!!dados) {
+          let vara = dados.split('-')[1].split('de')[0].trim();
+          //console.log(dados.split(/ DE /gmi)[1].replace(')', '').trim());
+          let comarca = dados.split(/ DE /gmi)[1].replace(')', '').trim();
+          let primeiraDistribuicao = data
+          return {
+            vara: vara,
+            comarca: comarca,
+            primeiraDistribuicao: primeiraDistribuicao,
+            fase: fase,
+          }
+        } else {
+          let primeiraDistribuicao = data
+          return {
+            vara: "",
+            comarca: "",
+            primeiraDistribuicao: primeiraDistribuicao,
+            fase: fase,
+          }
         }
-      } else {
+      } catch (e){
         let primeiraDistribuicao = data
-        return {
-          vara: "Não foi possivel obter",
-          comarca: "Não foi possivel obter",
-          primeiraDistribuicao: primeiraDistribuicao,
-          fase: fase,
-        }
+          return {
+            vara: "",
+            comarca: "",
+            primeiraDistribuicao: primeiraDistribuicao,
+            fase: fase,
+          }
       }
+      
     }
   }
 

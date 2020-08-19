@@ -49,19 +49,9 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundo!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 120) {
-        console.log(
-          '----------------- Fechando o processo por inatividade -------------------'
-        );
-        process.exit();
-      }
+      if (heartBeat > 120) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
-      if (heartBeat > 360) {
-        console.log(
-          '----------------- Fechando o processo por inatividade -------------------'
-        );
-        process.exit();
-      }
+      if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
   }, 1000);
 
@@ -97,7 +87,7 @@ async function worker() {
 
     console.log(
       '----------------- É busca de novo processo novo processo ' +
-        novosProcesso
+      novosProcesso
     );
 
     let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
@@ -238,10 +228,10 @@ async function worker() {
         if (!!dadosProcesso)
           await console.log(
             '\033[0;32m' +
-              'Resultado da extração ' +
-              '\033[0;34m' +
-              !!resultadoExtracao +
-              '\033[0m'
+            'Resultado da extração ' +
+            '\033[0;34m' +
+            !!resultadoExtracao +
+            '\033[0m'
           );
 
         logger.logs = [...logger.logs, ...resultadoExtracao.logs];
@@ -300,7 +290,7 @@ async function worker() {
 
       console.log(
         '----------------- É busca de novo processo novo processo ' +
-          novosProcesso
+        novosProcesso
       );
       if (!novosProcesso) {
         new GerenciadorFila().enviar(reConsumo, message);

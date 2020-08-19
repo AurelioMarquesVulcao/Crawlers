@@ -8,12 +8,12 @@ const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 const { Andamento } = require('../../models/schemas/andamento');
-const {
-  BaseException,
-  RequestException,
-  ExtracaoException,
-  AntiCaptchaResponseException,
-} = require('../../models/exception/exception');
+// const {
+//   BaseException,
+//   RequestException,
+//   ExtracaoException,
+//   AntiCaptchaResponseException,
+// } = require('../../models/exception/exception');
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
@@ -61,19 +61,9 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundo!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 120) {
-        console.log(
-          '----------------- Fechando o processo por inatividade -------------------'
-        );
-        process.exit();
-      }
+      if (heartBeat > 45) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
-      if (heartBeat > 360) {
-        console.log(
-          '----------------- Fechando o processo por inatividade -------------------'
-        );
-        process.exit();
-      }
+      if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
   }, 1000);
 
@@ -103,7 +93,7 @@ async function worker() {
 
     console.log(
       '----------------- É busca de novo processo novo processo ' +
-        novosProcesso
+      novosProcesso
     );
     let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
@@ -203,10 +193,10 @@ async function worker() {
         if (!!dadosProcesso)
           await console.log(
             '\033[0;32m' +
-              'Resultado da extração ' +
-              '\033[0;34m' +
-              !!resultadoExtracao +
-              '\033[0m'
+            'Resultado da extração ' +
+            '\033[0;34m' +
+            !!resultadoExtracao +
+            '\033[0m'
           );
 
         logger.logs = [...logger.logs, ...resultadoExtracao.logs];
@@ -247,7 +237,7 @@ async function worker() {
       //   logs: logger.logs,
       //   NomeRobo: enums.nomesRobos.JTE
       // });
-
+      console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
       ch.ack(msg);
       // await new CriaFilaJTE().salvaUltimo({
       //     NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
@@ -267,7 +257,7 @@ async function worker() {
 
       console.log(
         '----------------- É busca de novo processo novo processo ' +
-          novosProcesso
+        novosProcesso
       );
       if (!novosProcesso) {
         new GerenciadorFila().enviar(reConsumo, message);
@@ -284,7 +274,7 @@ async function worker() {
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
-      console.log(message.LogConsultaId);
+      //console.log(message.LogConsultaId);
       // await logarExecucao({
       //   LogConsultaId: message.LogConsultaId,
       //   Mensagem: message,

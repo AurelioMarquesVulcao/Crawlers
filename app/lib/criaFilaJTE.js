@@ -343,3 +343,4 @@ function mascaraNumero(numeroProcesso) {
     return resultado
 }
 module.exports.CriaFilaJTE = CriaFilaJTE;
+module.exports.linkDocumento1 = linkDocumento1;

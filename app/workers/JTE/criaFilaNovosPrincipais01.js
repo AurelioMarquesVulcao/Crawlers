@@ -15,6 +15,7 @@ const comarca1 = comarcas.comarcas;
     let arrayTemp = [];
     let contador = 1;
     let codigo;
+    let escolha = [ rj.sp]
     for (i in comarca1) { if (comarca1[i].length > 0) { arrayTemp.push(comarca1[i]) }; };
     let laco = arrayTemp.length - 1;
     // console.log(arrayTemp.length + "----------");

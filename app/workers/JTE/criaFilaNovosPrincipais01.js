@@ -4,6 +4,10 @@ const re = require('xregexp');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const comarcas = require('../../assets/jte/comarcas');
+const OBJ = require('../../assets/jte/comarcascopy.json');
+
+// vem o obj json que estou querendo usar
+console.log(OBJ);
 
 
 const fila = new CriaFilaJTE();
@@ -15,7 +19,7 @@ const comarca1 = comarcas.comarcas;
     let arrayTemp = [];
     let contador = 1;
     let codigo;
-    let escolha = [ rj.sp]
+    
     for (i in comarca1) { if (comarca1[i].length > 0) { arrayTemp.push(comarca1[i]) }; };
     let laco = arrayTemp.length - 1;
     // console.log(arrayTemp.length + "----------");
@@ -42,7 +46,7 @@ const comarca1 = comarcas.comarcas;
 
         if (contador == laco) { contador == 0 }
     }
-})()
+})//()
 
 // Criador de fila:
 // Busca no banco de dados qual o ultimo processesso do estado/comarca,

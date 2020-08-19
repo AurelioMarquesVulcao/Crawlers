@@ -6,7 +6,7 @@ const { JTEParser } = require('../parsers/JTEParser');
 
 const ajustes = new JTEParser();
 
-var timerSleep = 100
+var timerSleep = 200
 
 class RoboPuppeteer3 {
 
@@ -35,7 +35,7 @@ class RoboPuppeteer3 {
     try {
       await this.page.goto(url, {
         waitUntil: "load",
-        timeout: 30000,
+        timeout: 20000,
         // waitUntil: 'networkidle2'
       });
       // isso me da o url completo
@@ -97,17 +97,13 @@ class RoboPuppeteer3 {
 
 
   async preencheProcesso(numero, contador) {
-
     let entrada = processaNumero(numero)
     //await console.log("leu a entrada: " + entrada.numeroprocesso);
     await console.log("O contador de processo esta em: " + contador);
 
-
     //await this.page.click('#consultaProcessual')
     await sleep(timerSleep)
-    // console.log('wait 600');
 
-    // console.log(!! await this.page.waitFor('#campoNumeroProcesso'));
 
     await this.page.waitFor('#campoNumeroProcesso')
     await sleep(timerSleep)
@@ -126,8 +122,10 @@ class RoboPuppeteer3 {
     await this.page.type('#campoVara', `${entrada.vara}`)
     await sleep(timerSleep)
     await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
-    await sleep(1000)
+    await sleep(timerSleep)
     await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
+    await sleep(timerSleep)
+    // await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
     console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
 
     //await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
@@ -139,7 +137,9 @@ class RoboPuppeteer3 {
   async pegaHtml(contador, numero) {
     //const contador = 0
     await sleep(timerSleep)
+
     await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
+    await sleep(timerSleep)
     await sleep(timerSleep)
     await this.page.waitFor(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div`)
     // pega assunto

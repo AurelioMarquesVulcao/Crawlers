@@ -13,7 +13,7 @@ const comarca1 = comarcas.comarcas;
 // con
 (async () => {
     let arrayTemp = [];
-    let contador = 13;
+    let contador = 1;
     let codigo;
     for (i in comarca1) { if (comarca1[i].length > 0) { arrayTemp.push(comarca1[i]) }; };
     let laco = arrayTemp.length - 1;
@@ -23,7 +23,7 @@ const comarca1 = comarcas.comarcas;
         await sleep(1000)
         let relogio = fila.relogio();
         console.log(relogio);
-        if (relogio.min == 1 && relogio.seg == 00 || contador == 13) {
+        if (relogio.min == 1 && relogio.seg == 00 || contador == 1) {
             if (contador < 10) {
                 contador++
                 codigo = "0" + contador;

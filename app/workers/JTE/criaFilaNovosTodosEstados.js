@@ -13,7 +13,7 @@ const comarca1 = comarcas.comarcas;
 // con
 (async () => {
     let arrayTemp = [];
-    let contador = 0;
+    let contador = 8;
     let codigo;
     for (i in comarca1) { if (comarca1[i].length > 0) { arrayTemp.push(comarca1[i]) }; };
     let laco = arrayTemp.length - 1;
@@ -23,7 +23,7 @@ const comarca1 = comarcas.comarcas;
         await sleep(1000)
         let relogio = fila.relogio();
         console.log(relogio);
-        if (relogio.min == 1 && relogio.seg == 00 || contador == 0) {
+        if (relogio.min == 1 && relogio.seg == 00 || contador == 8) {
             if (contador < 10) {
                 contador++
                 codigo = "0" + contador;
@@ -39,7 +39,7 @@ const comarca1 = comarcas.comarcas;
             console.log(contador);
         }
 
-        if (contador == laco) { contador == 0 }
+        if (contador == laco) { contador = 0 }
     }
 })()
 
@@ -47,6 +47,7 @@ const comarca1 = comarcas.comarcas;
 // Busca no banco de dados qual o ultimo processesso do estado/comarca,
 // Após isso tenta pegar o proximo processo em ordem númerica.
 async function criador(origens, tribunal, codigo, max) {
+    console.log(origens,tribunal,codigo,max, origens.length);
     let second = 0;
     let contaOrigem = 0;
     for (let w = 0; w < 1;) {
@@ -59,7 +60,7 @@ async function criador(origens, tribunal, codigo, max) {
             if (relogio.min == 50) { break }
             // esse tempo da o ritmo de busca de processos, 
             //3000 - nos da a velocidade de 20 processos por minuto
-            await sleep(2000)
+            await sleep(4000)
             try {
                 // string de busca no banco de dados
                 let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };

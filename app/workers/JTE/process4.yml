@@ -1,8 +1,8 @@
 apps:
   - script   : ./app/workers/JTE/extracao_JTE_Princ.js
-    name     : 'worker-001'
+    name     : 'worker-004'
   - script   : ./app/workers/JTE/extracao_JTE_Princ.js
-    name     : 'worker-002'
+    name     : 'worker-005'
   - script   : ./app/workers/JTE/extracao_JTE_Princ.js
-    name     : 'worker-003'
+    name     : 'worker-006'
     

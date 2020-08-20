@@ -200,7 +200,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaNovosTodosEstados.js --watch --no-daemon
+    command: pm2 start workers/JTE/cdoriaFilaNovosTodosEstados.js --watch --no-daemon
     restart: always
     logging:
       driver: "json-file"

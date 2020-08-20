@@ -20,7 +20,7 @@ const Fila = new CriaFilaJTE();
   let contador = 0;
   let start = 0;
   let estados = [
-    Estados.sp15, //Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
+    Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
   ];
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
@@ -28,7 +28,7 @@ const Fila = new CriaFilaJTE();
     console.log(estados[contador].estado);
 
     await sleep(1000);
-    if (relogio.min == 1 && relogio.seg == 00 || start == 0) {
+    if (relogio.min == 9 && relogio.seg == 00 || start == 0) {
       // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
       start = 1
       origens = estados[contador].comarcas;
@@ -59,7 +59,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
     if ("a") {
       let relogio = Fila.relogio();
       // Informa o momento em que essa aplicação para.
-      if (relogio.min == 50) { break }
+      if (relogio.min == 59) { break }
       // esse tempo da o ritmo de busca de processos, 
       await sleep(tempo)
       try {

@@ -7,7 +7,7 @@ const comarcas = require('../../assets/jte/comarcas');
 const Estados = require('../../assets/jte/comarcascopy.json');
 
 
-const fila = new CriaFilaJTE();
+const Fila = new CriaFilaJTE();
 
 
 (async () => {
@@ -16,16 +16,17 @@ const fila = new CriaFilaJTE();
   let codigo;   // numero do tribunal do tipo String.
   let max;      // quantidade de comarca do tribunal
   let timer;    // tempo entre o envio de cada teste, isso marca o ritmo de envio de processos
+  let fila = ""; // string de escolha de fila
   let contador = 0;
   let start = 0;
   let estados = [
-      Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa, 
-      Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
-      Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
-      Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
-    ];
+    Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
+    Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
+    Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
+    Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
+  ];
   for (let w = 0; w < 1;) {
-    let relogio = fila.relogio();
+    let relogio = Fila.relogio();
 
     console.log(estados[contador].estado);
 
@@ -38,7 +39,7 @@ const fila = new CriaFilaJTE();
       codigo = estados[contador].codigo;
       max = estados[contador].comarcas.length;
       timer = estados[contador].tempo;
-      await criador(origens, tribunal, codigo, max, timer)
+      await criador(origens, tribunal, codigo, max, timer, fila)
 
       contador++
     }
@@ -51,7 +52,7 @@ const fila = new CriaFilaJTE();
 // Criador de fila:
 // Busca no banco de dados qual o ultimo processesso do estado/comarca,
 // Após isso tenta pegar o proximo processo em ordem númerica.
-async function criador(origens, tribunal, codigo, max, tempo) {
+async function criador(origens, tribunal, codigo, max, tempo, fila) {
   let second = 0;
   let contaOrigem = 0;
   for (let w = 0; w < 1;) {
@@ -59,7 +60,7 @@ async function criador(origens, tribunal, codigo, max, tempo) {
     //let timer = fila.relogio();
     // if (timer.min == 20 && timer.seg == 01 || timer.min == 47) {
     if ("a") {
-      let relogio = fila.relogio();
+      let relogio = Fila.relogio();
       // Informa o momento em que essa aplicação para.
       if (relogio.min == 50) { break }
       // esse tempo da o ritmo de busca de processos, 
@@ -68,7 +69,7 @@ async function criador(origens, tribunal, codigo, max, tempo) {
         // string de busca no banco de dados
         let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
         // console.log(origens.length);
-        let buscar = await fila.abreUltimo(parametroBusca);
+        let buscar = await Fila.abreUltimo(parametroBusca);
         console.log(buscar.length);
         let sequencial = maiorSequencial(buscar)
         let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
@@ -80,26 +81,26 @@ async function criador(origens, tribunal, codigo, max, tempo) {
         // console.log(sequencial.data.mes < relogio.mes);
         if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
           if (sequencial.data.mes < relogio.mes - 1) {
-            await fila.procura10(numeroSequencial, comarca, 4, codigo)
+            await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
             console.log("----------------------- Estou dando um salto no Tempo--------------------------");
           } else {
-            await fila.procura(numeroSequencial, comarca, 1, codigo)
+            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
           }
           await sleep(500)
         } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
           if (sequencial.data.mes < relogio.mes - 1) {
-            await fila.procura10(numeroSequencial, comarca, 3, codigo)
+            await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
             console.log("----------------------- Estou dando um salto no Tempo--------------------------");
           } else {
-            await fila.procura(numeroSequencial, comarca, 1, codigo)
+            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila,)
           }
           await sleep(500)
         } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
           if (sequencial.data.mes < relogio.mes - 1) {
-            await fila.procura10(numeroSequencial, comarca, 3, codigo)
+            await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
             console.log("----------------------- Estou dando um salto no Tempo--------------------------");
           } else {
-            await fila.procura(numeroSequencial, comarca, 1, codigo)
+            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
           }
           await sleep(500)
         }

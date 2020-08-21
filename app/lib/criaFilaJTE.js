@@ -86,7 +86,7 @@ class CriaFilaJTE {
         });
 
         let verifica = await linkDocumento.find({ "numeroProcesso": link.numeroProcesso, "movimentacao": link.link })
-        console.log(!verifica[0]);
+        // console.log(!verifica[0]);
         if (!verifica[0]) {
             return await new linkDocumento(link).save()
         }
@@ -138,21 +138,27 @@ class CriaFilaJTE {
             }
         }
     }
-    async procura(sequencial, origem, tentativas, tribunal,fila) {
-        let obj = corrigeSequencial(sequencial)
-        origem = corrigeOrigem(origem)
-        for (let i = 0; i < tentativas; i++) {
-            sequencial = parseInt(obj.seq)
-            let a = sequencial + 1 + i
-            let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+    async procura(sequencial, origem, tentativas, tribunal, fila) {
+        try {
+            let obj = corrigeSequencial(sequencial)
+            origem = corrigeOrigem(origem)
+            for (let i = 0; i < tentativas; i++) {
+                sequencial = parseInt(obj.seq)
+                let a = sequencial + 1 + i
+                let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
 
-            await this.enviaFila([{
-                NumeroProcesso: processo
-            }], fila)
-            //await this.enviaFila(`00109964720205150001`)
+                await this.enviaFila([{
+                    NumeroProcesso: processo
+                }], fila)
+                console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
+                //await this.enviaFila(`00109964720205150001`)
+            }
+        } catch (e) {
+            console.log(`O Processo numero: ${processo} FALHOU !!!`);
         }
+
     }
-    async procura10(sequencial, origem, tentativas, tribunal,fila) {
+    async procura10(sequencial, origem, tentativas, tribunal, fila) {
         let obj = corrigeSequencial(sequencial)
         origem = corrigeOrigem(origem)
         for (let i = 0; i < tentativas; i++) {
@@ -183,7 +189,7 @@ class CriaFilaJTE {
     }
 
     // direciona as mensagens para suas devidas filas
-    async enviaFila(numeroProcesso,fila) {
+    async enviaFila(numeroProcesso, fila) {
         const sleep4 = 5;
         const sleep1 = 2;
         let filtro = numeroProcesso;
@@ -199,7 +205,7 @@ class CriaFilaJTE {
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
-                //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+
                 conta1000++
                 if (conta1000 == 2000) {
                     await sleep(sleep4)
@@ -212,7 +218,7 @@ class CriaFilaJTE {
             //     let message = criaPost(filtro[i].NumeroProcesso)
 
             //     await this.enviarMensagem(nomeFila, message)
-            //     //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+            //     
             //     conta1000++
             //     if (conta1000 == 2000) {
             //         await sleep(sleep4)
@@ -225,7 +231,7 @@ class CriaFilaJTE {
             //     let message = criaPost(filtro[i].NumeroProcesso)
 
             //     await this.enviarMensagem(nomeFila, message)
-            //     //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+            //     
             //     conta1000++
             //     if (conta1000 == 2000) {
             //         await sleep(sleep4)
@@ -238,7 +244,7 @@ class CriaFilaJTE {
             //     let message = criaPost(filtro[i].NumeroProcesso)
 
             //     await this.enviarMensagem(nomeFila, message)
-            //     //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+            //     
             //     conta1000++
             //     if (conta1000 == 2000) {
             //         await sleep(sleep4)
@@ -251,7 +257,7 @@ class CriaFilaJTE {
             //     let message = criaPost(filtro[i].NumeroProcesso)
 
             //     await this.enviarMensagem(nomeFila, message)
-            //     //await console.log('processo : ' + filtro[i].NumeroProcesso + ' adicionado');
+            //     
             //     conta1000++
             //     if (conta1000 == 2000) {
             //         await sleep(sleep4)

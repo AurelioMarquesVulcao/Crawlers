@@ -22,7 +22,7 @@ const Fila = new CriaFilaJTE();
   let estados = [
     Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
     Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
-    
+
     Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15,
 
     Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
@@ -31,9 +31,7 @@ const Fila = new CriaFilaJTE();
   ];
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
-
-    console.log(estados[contador].estado);
-
+    // console.log(estados[contador].estado);
     await sleep(1000);
     if (relogio.min == 30 && relogio.seg == 00 || start == 0) {
       // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
@@ -44,10 +42,8 @@ const Fila = new CriaFilaJTE();
       max = estados[contador].comarcas.length;
       timer = estados[contador].tempo;
       await criador(origens, tribunal, codigo, max, timer, fila)
-
       contador++
     }
-
     console.log(relogio);
     if (contador == estados.length) { contador = 0 }
   }
@@ -72,17 +68,20 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       try {
         // string de busca no banco de dados
         let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
-        // console.log(origens.length);
         let buscar = await Fila.abreUltimo(parametroBusca);
-        console.log(buscar.length);
         let sequencial = maiorSequencial(buscar)
         let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
-        console.log(numeroSequencial);
         let comarca = sequencial.numeroProcesso.slice(16, 20);
         // Pegará os processos
+        // console.log("Ultimo processo do banco.");
         console.log("Estamos na comarca: " + origens[contaOrigem]);
-        // console.log(sequencial.data.dia == relogio.dia);
-        // console.log(sequencial.data.mes < relogio.mes);
+        // console.log({
+        //   "data": sequencial.data,
+        //   // "origem": sequencial.origem,
+        //   "tribunal": sequencial.tribunal,
+        //   numeroSequencial
+        // });
+
         if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
           if (sequencial.data.mes < relogio.mes - 1) {
             await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
@@ -108,9 +107,9 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           }
           await sleep(500)
         }
-        console.log(sequencial);
+
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
       }
       //if (contaOrigem == 219) { break } else { contaOrigem++ };
@@ -130,7 +129,7 @@ function maiorSequencial(obj) {
   let resultado = obj[0]
   let teste = parseInt(obj[0].numeroProcesso.slice(0, 7));
   //console.log(teste);
-  console.log(obj[0].numeroProcesso);
+  //console.log(obj[0].numeroProcesso);
   for (let i = 0; i < obj.length; i++) {
     let sequencial = parseInt(obj[i].numeroProcesso.slice(0, 7));
     //console.log(sequencial);

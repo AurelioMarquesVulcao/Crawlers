@@ -22,6 +22,9 @@ const Fila = new CriaFilaJTE();
   let estados = [
     Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
     Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
+    
+    Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15,
+
     Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
     Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
     Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15

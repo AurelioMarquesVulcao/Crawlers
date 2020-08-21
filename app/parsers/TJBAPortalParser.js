@@ -8,9 +8,9 @@ const { COMARCAS } = require('../assets/tjba/comarcas');
 // parser => processo
 
 const possiveisStatus = [
-  "Arquivamento com baixa",
-  "Arquivamento",
-  "Baixa Definitiva",
+  'Arquivamento com baixa',
+  'Arquivamento',
+  'Baixa Definitiva',
 ];
 
 class TJBAPortalParser extends BaseParser {
@@ -31,7 +31,7 @@ class TJBAPortalParser extends BaseParser {
     return capa;
   }
 
-  extrairComarca (content) {
+  extrairComarca(content) {
     let distribuicao = removerAcentos(content.distribuicao);
     for (let c of COMARCAS) {
       if (c.test(distribuicao.toLowerCase())) {
@@ -56,7 +56,7 @@ class TJBAPortalParser extends BaseParser {
         nome = removerAcentos(nome);
         let tipo = traduzir(element.tipo);
 
-        if (tipo === "Advogado") {
+        if (tipo === 'Advogado') {
           nome = nome.replace(/\s\W\s.*/, '');
           nome = `(${element.documento}) ${nome}`;
         } else {
@@ -66,7 +66,7 @@ class TJBAPortalParser extends BaseParser {
         }
         envolvidos.push({
           nome: nome,
-          tipo: tipo
+          tipo: tipo,
         });
       }
     });
@@ -86,25 +86,32 @@ class TJBAPortalParser extends BaseParser {
     };
   }
 
-
   extrairAndamentos(content, dataAtual, numeroProcesso) {
-    let movimentos = [];
+    let andamentos = [];
+    let andamentosHash = [];
 
     content.movimentacoes.map((element, index) => {
       let data = moment(element.dataMovimentacao, 'DD/MM/YYYY').format(
         'YYYY-MM-DD'
       );
 
-      movimentos.push(
-        new Andamento({
-          numeroProcesso: element.numeroProcesso,
-          data: data,
-          dataInclusao: dataAtual,
-          descricao: removerAcentos(element.descricao),
-        })
-      );
+      let andamento = {
+        numeroProcesso: element.numeroProcesso,
+        data: data,
+        dataInclusao: dataAtual,
+        descricao: removerAcentos(element.descricao),
+      };
+
+      let hash = Andamento.criarHash(andamento);
+
+      if (andamentosHash.indexOf(hash) !== -1) {
+        let count = andamentosHash.filter((element) => element === hash).length;
+        andamento.descricao = `${andamento.descricao} [${count + 1}]`;
+      }
+      andamentos.push(new Andamento(andamento));
+      andamentosHash.push(hash);
     });
-    return movimentos;
+    return andamentos;
   }
 
   extrairOabs(envolvidos) {
@@ -127,17 +134,15 @@ class TJBAPortalParser extends BaseParser {
    * @returns {string}
    */
   extrairStatus(andamentos) {
-
     const tam = andamentos.length;
-    for (let i = 0; i < tam; i++){
-
+    for (let i = 0; i < tam; i++) {
       let statusIndex = possiveisStatus.indexOf(andamentos[i].descricao);
       if (statusIndex !== -1) {
         return possiveisStatus[statusIndex];
       }
     }
 
-    return "Aberto";
+    return 'Aberto';
   }
 
   /**

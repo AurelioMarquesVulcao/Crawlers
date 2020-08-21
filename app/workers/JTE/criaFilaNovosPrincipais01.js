@@ -16,17 +16,10 @@ const Fila = new CriaFilaJTE();
   let codigo;   // numero do tribunal do tipo String.
   let max;      // quantidade de comarca do tribunal
   let timer;    // tempo entre o envio de cada teste, isso marca o ritmo de envio de processos
-  let fila = "";  // string de escolha de fila
+  let fila = ".P";  // string de escolha de fila
   let contador = 0;
   let start = 0;
   let estados = [
-    Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
-    Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
-    
-    Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15,
-
-    Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
-    Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
     Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
   ];
   for (let w = 0; w < 1;) {
@@ -35,7 +28,7 @@ const Fila = new CriaFilaJTE();
     console.log(estados[contador].estado);
 
     await sleep(1000);
-    if (relogio.min == 30 && relogio.seg == 00 || start == 0) {
+    if (relogio.min == 9 && relogio.seg == 00 || start == 0) {
       // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
       start = 1
       origens = estados[contador].comarcas;
@@ -66,7 +59,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
     if ("a") {
       let relogio = Fila.relogio();
       // Informa o momento em que essa aplicação para.
-      if (relogio.min == 20) { break }
+      if (relogio.min == 59) { break }
       // esse tempo da o ritmo de busca de processos, 
       await sleep(tempo)
       try {

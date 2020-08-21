@@ -5,19 +5,12 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
-const { Helper, Logger } = require('../../lib/util');
+const { Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 const { Andamento } = require('../../models/schemas/andamento');
-// const {
-//   BaseException,
-//   RequestException,
-//   ExtracaoException,
-//   AntiCaptchaResponseException,
-// } = require('../../models/exception/exception');
-const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
@@ -36,10 +29,6 @@ var contador = 0;
 var heartBeat = 0;
 let data = 1;
 var logadoParaIniciais = false;
-var testeErros1 = [];
-var testeErros2 = [];
-var resultado = [];
-var contadorErros = 0;
 const fila = new CriaFilaJTE();
 if (data == 1) {
   worker();
@@ -54,47 +43,53 @@ async function worker() {
     console.log(e);
   });
   const puppet = new RoboPuppeteer3();
-  var catchError = 0;
 
-  // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
+  // função que reinicia a aplicação caso ocorram erros
   setInterval(function () {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundo!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 45) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 120) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
       if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
   }, 1000);
 
-  // await puppet.start()
-  await puppet.iniciar();
+  var catchError = 0;
 
+  await puppet.iniciar();
   await sleep(3000);
   await puppet.acessar('https://jte.csjt.jus.br/');
-
-  // await puppet.loga()
   await sleep(3000);
 
-  // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
   const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
 
   // tudo que está abaixo é acionado para cada processo na fila.
   contador = 0;
-
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
-    contadorErros++;
     heartBeat = 0;
     let dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     let novosProcesso = message.NovosProcessos;
     let numeroProcesso = message.NumeroProcesso;
+    console.log(fila.relogio());
+    let ww = 1;
+
+    setInterval(function () {
+      heartBeat++;
+      console.log(`setInterval: Ja passou ${heartBeat} segundo!`);
+    }, 1000);
+    // while (!!ww){
+    //     console.log("passou aqui");
+    //     await sleep(1000)
+    // }
 
     console.log(
       '----------------- É busca de novo processo novo processo ' +
       novosProcesso
     );
+
     let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
       NumeroDoProcesso: message.NumeroProcesso,
@@ -106,25 +101,44 @@ async function worker() {
 
       logger.info('Iniciando processo de extração');
       //-------------------------------------------------- inicio do extrator--------------------------------------------
+      // grava o estado da primeira mensagem recebida.
       if (contador == 0) {
         estadoAnterior = puppet.processaNumero(numeroProcesso).estado;
       }
       console.log('O estado atual é o numero: ' + estadoAnterior);
-
-      // verifica qual é o estado de origem do pedido de raspagem.
+      // verifica qual é o estado do pedido de raspagem atual.
       estadoDaFila = puppet.processaNumero(numeroProcesso).estado;
-
+      // se o estado atual for difente do primeiro estado raspado pelo worker
+      // reinicia o worker.
       if (estadoDaFila != estadoAnterior) {
         await puppet.mudaTribunal(estadoDaFila);
         await sleep(1000);
         contador = 0;
       }
+      // desliga o worker para parar de baixar as iniciais
+      // if (message.inicial == true && logadoParaIniciais == true) {
+      if (!message.NovosProcessos && logadoParaIniciais == true) {
+        logadoParaIniciais == false;
+        process.exit();
+      }
+      // reinicia o worker para baixarmos os processos iniciais.
+      // if (message.inicial == true && contador != 0 && logadoParaIniciais == false) {
+      if (
+        message.NovosProcessos == true &&
+        contador != 0 &&
+        logadoParaIniciais == false
+      ) {
+        console.log('vou deslogar a aplicação ----01');
+        process.exit();
+      }
 
       estadoAnterior = estadoDaFila;
       console.log('O estado atual é o numero: ' + estadoAnterior);
-      await teste(message);
+      // caso o estado atual seja igual ao primeiro estado, inicia a raspagem.
+      await ExtratorFunc(message);
 
-      async function teste(message) {
+      async function ExtratorFunc(message) {
+        console.log('ligou');
         var resultadoExtracao = {};
         let numeroProcesso = message.NumeroProcesso;
 
@@ -132,6 +146,15 @@ async function worker() {
         if (contador == 0) {
           await puppet.preencheTribunal(numeroProcesso);
           await sleep(1000);
+        }
+
+        // loga para pegar iniciais
+        // if (message.inicial == true  && logadoParaIniciais == false) {
+        // condicional provisório para testes
+        console.log(logadoParaIniciais);
+        if (message.NovosProcessos == true && logadoParaIniciais == false) {
+          await puppet.loga();
+          logadoParaIniciais = true;
         }
 
         let dadosProcesso;
@@ -150,35 +173,47 @@ async function worker() {
         let $2 = cheerio.load(objResponse.andamentos);
         dadosProcesso = parser.parse($, $2, contador);
         if (!!objResponse) contador++;
-        // var processo = dadosProcesso.processo
-        await dadosProcesso.processo.salvar();
-        //console.log(dadosProcesso.andamentos[0]);
-        await Andamento.salvarAndamentos(dadosProcesso.andamentos);
-        processo = await dadosProcesso.processo.salvar();
-        // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
-        // após que todas as comarcas estiverem no mes corrente aplicar o código acima
-        if (
-          new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao
-        ) {
-          //console.log('ok');
-          await new CriaFilaJTE().salvaUltimo({
-            numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
-            dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
-            origem: dadosProcesso.processo.detalhes.origem,
-            tribunal: dadosProcesso.processo.detalhes.tribunal,
-            data: {
-              dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(),
-              mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth(),
-            },
-          });
+
+        // if (message.inicial == true) {
+        // condicional provisório para testes1
+        // if (message.inicial != true) {
+        if (message.NovosProcessos != true) {
+          var processo = dadosProcesso.processo;
+          await dadosProcesso.processo.salvar();
+          //console.log(dadosProcesso.andamentos[0]);
+          await Andamento.salvarAndamentos(dadosProcesso.andamentos);
+          processo = await dadosProcesso.processo.salvar();
+          // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
+          // após que todas as comarcas estiverem no mes corrente aplicar o código acima
+          if (
+            new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao
+          ) {
+            //console.log('ok');
+            await new CriaFilaJTE().salvaUltimo({
+              numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
+              dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
+              origem: dadosProcesso.processo.detalhes.origem,
+              tribunal: dadosProcesso.processo.detalhes.tribunal,
+              data: {
+                dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(),
+                mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth(),
+              },
+            });
+          }
         }
-        // let link = await puppet.pegaInicial()
-        // await console.log(link.length);
-        // for (let w = 0; w < link.length; w++) {
-        //     console.log("entrou no laço");
-        //     await new CriaFilaJTE().salvaDocumentoLink(link[w])
-        //     await console.log("O link " + w + " Foi salvo");
-        // }
+
+        // if (message.inicial == true) {
+        // condicional provisório para testes
+        if (message.NovosProcessos == true) {
+          console.log('---------- Vou baixar link das iniciais-------');
+          let link = await puppet.pegaInicial();
+          await console.log(link.length);
+          for (let w = 0; w < link.length; w++) {
+            console.log('entrou no laço');
+            await new CriaFilaJTE().salvaDocumentoLink(link[w]);
+            await console.log('O link ' + w + ' Foi salvo');
+          }
+        }
 
         logger.info('Processos extraidos com sucesso');
         if (!!dadosProcesso) {
@@ -237,7 +272,7 @@ async function worker() {
       //   logs: logger.logs,
       //   NomeRobo: enums.nomesRobos.JTE
       // });
-      console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
+
       ch.ack(msg);
       // await new CriaFilaJTE().salvaUltimo({
       //     NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
@@ -246,11 +281,9 @@ async function worker() {
       console.log('-------------- estamos com : ' + catchError + ' erros');
     } catch (e) {
       catchError++;
-      // vai avaliar se o contador está sequencial
-      errosSequencia(catchError, contadorErros);
       console.log(e);
       console.log('-------------- estamos com : ' + catchError + ' erros');
-      if (catchError > 4) {
+      if (catchError > 7) {
         process.exit();
       }
       // envia a mensagem para a fila de reprocessamento
@@ -274,7 +307,7 @@ async function worker() {
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando processo');
-      //console.log(message.LogConsultaId);
+      console.log(message.LogConsultaId);
       // await logarExecucao({
       //   LogConsultaId: message.LogConsultaId,
       //   Mensagem: message,
@@ -289,34 +322,4 @@ async function worker() {
       ch.ack(msg);
     }
   });
-}
-
-function errosSequencia(catchError, contadorErros) {
-  //let testeErros1 = [];
-  console.log(testeErros1);
-  //let testeErros2 = [];
-  console.log(testeErros2);
-  //let resultado = [];
-  console.log(resultado);
-  testeErros1.push(catchError);
-  testeErros2.push(contadorErros);
-  if (testeErros1.length > 3) {
-    let sequencia1 = [
-      testeErros1.length,
-      testeErros1.length - 1,
-      testeErros1.length - 2,
-    ];
-    let sequencia2 = [
-      testeErros2.length,
-      testeErros2.length - 1,
-      testeErros2.length - 2,
-    ];
-    for (mm in sequencia1) {
-      resultado.push(sequencia1[mm] - sequencia2[mm]);
-    }
-    let sequencia = resultado[2] - resultado[1];
-    if (sequencia == 1) {
-      process.exit();
-    }
-  }
 }

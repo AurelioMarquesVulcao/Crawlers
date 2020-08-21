@@ -138,7 +138,7 @@ class CriaFilaJTE {
             }
         }
     }
-    async procura(sequencial, origem, tentativas, tribunal) {
+    async procura(sequencial, origem, tentativas, tribunal,fila) {
         let obj = corrigeSequencial(sequencial)
         origem = corrigeOrigem(origem)
         for (let i = 0; i < tentativas; i++) {
@@ -148,11 +148,11 @@ class CriaFilaJTE {
 
             await this.enviaFila([{
                 NumeroProcesso: processo
-            }])
+            }], fila)
             //await this.enviaFila(`00109964720205150001`)
         }
     }
-    async procura10(sequencial, origem, tentativas, tribunal) {
+    async procura10(sequencial, origem, tentativas, tribunal,fila) {
         let obj = corrigeSequencial(sequencial)
         origem = corrigeOrigem(origem)
         for (let i = 0; i < tentativas; i++) {
@@ -162,7 +162,7 @@ class CriaFilaJTE {
 
             await this.enviaFila([{
                 NumeroProcesso: processo
-            }])
+            }], fila)
         }
     }
     relogio() {
@@ -183,7 +183,7 @@ class CriaFilaJTE {
     }
 
     // direciona as mensagens para suas devidas filas
-    async enviaFila(numeroProcesso) {
+    async enviaFila(numeroProcesso,fila) {
         const sleep4 = 5;
         const sleep1 = 2;
         let filtro = numeroProcesso;
@@ -195,7 +195,7 @@ class CriaFilaJTE {
             // estou usando uma fila unica o código abaixo esta obsoleto.
             if (tribunal != 150000) {
                 await sleep(sleep1)
-                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+                const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos${fila}`;
                 let message = criaPost(filtro[i].NumeroProcesso)
 
                 await this.enviarMensagem(nomeFila, message)
@@ -343,3 +343,4 @@ function mascaraNumero(numeroProcesso) {
     return resultado
 }
 module.exports.CriaFilaJTE = CriaFilaJTE;
+module.exports.linkDocumento1 = linkDocumento1;

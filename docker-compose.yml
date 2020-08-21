@@ -220,17 +220,17 @@ services:
         max-size: "5m"
         max-file: "2"
 
-  novos-processos-jte-all:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: pm2 start workers/JTE/criaFilaNovosTodosEstados.js --no-daemon
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "2"
+  # novos-processos-jte-all:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: pm2 start workers/JTE/criaFilaNovosTodosEstados.js --no-daemon
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
 
   worker-jte-01:
     extends:

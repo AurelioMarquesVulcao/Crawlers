@@ -10,6 +10,7 @@ const {
 const { ExtratorBase } = require('./extratores');
 const { TJBAPortalParser } = require('../parsers/TJBAPortalParser');
 const enums = require('../configs/enums').enums;
+const sleep = require('await-sleep');
 
 /**
  * Logger para console e arquivo
@@ -24,6 +25,7 @@ class OabTJBAPortal extends ExtratorBase {
   }
 
   async extrair(numeroOab) {
+    let listaProcessos = [];
     try {
       this.numeroOab = numeroOab;
       this.logger = new Logger(
@@ -58,25 +60,51 @@ class OabTJBAPortal extends ExtratorBase {
       this.logger.info('Codigo de busca recuperado');
       let cookies = objResponse.cookies;
       this.logger.info('Fazendo request de captura de processos');
-      objResponse = await this.robo.acessar({
-        url: `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
-        method: 'GET',
-        encoding: 'latin1',
-        usaProxy: true, //proxy
-        usaJson: false,
-        headers: { cookies: cookies },
-      });
+      let paginaMax = 1;
+      let paginaAtual = 0;
+      let falhas = 0;
+      do {
+        if (falhas == 0) {
+          paginaAtual++;
+        }
+        objResponse = await this.robo.acessar({
+          url: `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/${paginaAtual}/semCaptcha`,
+          method: 'GET',
+          encoding: 'latin1',
+          usaProxy: true, //proxy
+          usaJson: false,
+          headers: { cookies: cookies },
+        });
+        if (objResponse.responseBody.lstProcessos) {
+          listaProcessos = [...listaProcessos, ...objResponse.responseBody.lstProcessos];
+          if (objResponse.responseBody.numPaginaTotal > paginaMax)
+            paginaMax = objResponse.responseBody.numPaginaTotal;
+          this.logger.info(`Recolhido processos. [Pagina ${paginaAtual} de ${paginaMax}]`);
+          falhas = 0;
+        } else {
+          this.logger.info('Nova tentativa de acessar a pagina atual');
+          falhas++;
+        }
+
+        await sleep(200);
+        if (falhas > 3) {
+          this.logger.info('Tentativas de acesso excederam limite');
+          this.logger.info('Salvando processos já capturados');
+          break;
+        }
+      } while(paginaAtual < paginaMax)
+
       this.logger.info('Request de captura de processos concluido.');
-      let listaProcessos = objResponse.responseBody.lstProcessos;
       this.logger.info('Iniciando processamento da lista de processos');
-      if (listaProcessos == null) {
+      if (listaProcessos.length === 0) {
         throw new ExtracaoException('Lista de processos vazia', 'Não foi possivel recuperar a lista de processos (l.72)');
       }
+      this.logger.info(`${listaProcessos.length} processo(s) encontrado(s).`);
       resultados = listaProcessos.map(async (element) => {
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;
         let andamentos = extracao.andamentos;
-        Andamento.salvarAndamentos(andamentos);
+        await Andamento.salvarAndamentos(andamentos);
         let resultado = await processo.salvar();
         this.logger.info(
           `Processo: ${

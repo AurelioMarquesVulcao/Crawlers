@@ -16,7 +16,7 @@ const Fila = new CriaFilaJTE();
   let codigo;   // numero do tribunal do tipo String.
   let max;      // quantidade de comarca do tribunal
   let timer;    // tempo entre o envio de cada teste, isso marca o ritmo de envio de processos
-  let fila = ""; // string de escolha de fila
+  let fila = ".S"; // string de escolha de fila
   let contador = 0;
   let start = 0;
   let estados = [

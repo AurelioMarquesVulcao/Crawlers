@@ -134,3 +134,7 @@ mongodb/*
 
 # arquivos de pdf de processos
 *.pdf
+
+# comarcas JTE
+
+comarcascopy.json

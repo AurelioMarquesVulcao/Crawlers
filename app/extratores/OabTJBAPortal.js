@@ -10,6 +10,7 @@ const {
 const { ExtratorBase } = require('./extratores');
 const { TJBAPortalParser } = require('../parsers/TJBAPortalParser');
 const enums = require('../configs/enums').enums;
+const sleep = require('await-sleep');
 
 /**
  * Logger para console e arquivo
@@ -24,9 +25,10 @@ class OabTJBAPortal extends ExtratorBase {
   }
 
   async extrair(numeroOab) {
+    let listaProcessos = [];
     try {
       this.numeroOab = numeroOab;
-      logger = new Logger(
+      this.logger = new Logger(
         'info',
         'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
         {
@@ -34,13 +36,14 @@ class OabTJBAPortal extends ExtratorBase {
           NumeroOab:numeroOab,
         }
       );
+      this.resposta = {sucesso: true, detalhes: ''};
       let resultados = [];
-      logger.info('Fazendo primeira conexão ao website');
+      this.logger.info('Fazendo primeira conexão ao website');
       let objResponse = await this.robo.acessar({
         url: `${this.url}`,
         method: 'POST',
         encoding: 'latin1',
-        usaProxy: false,
+        usaProxy: true,
         usaJson: false,
         params: {
           tipo: 'NUMOAB',
@@ -49,35 +52,61 @@ class OabTJBAPortal extends ExtratorBase {
           'g-recaptcha-response': '',
         },
       });
-      logger.info('Conexão ao website concluida.');
-      logger.info('Recuperando codigo de busca');
+      this.logger.info('Conexão ao website concluida.');
+      this.logger.info('Recuperando codigo de busca');
       let $ = cheerio.load(objResponse.responseBody);
       let codigoBusca = $.html().match(/var busca\s*=\s*'(.*)';/)[1];
       codigoBusca = codigoBusca.trim();
-      logger.info('Codigo de busca recuperado');
+      this.logger.info('Codigo de busca recuperado');
       let cookies = objResponse.cookies;
-      logger.info('Fazendo request de captura de processos');
-      objResponse = await this.robo.acessar({
-        url: `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/1/semCaptcha`,
-        method: 'GET',
-        encoding: 'latin1',
-        usaProxy: false, //proxy
-        usaJson: false,
-        headers: { cookies: cookies },
-      });
-      logger.info('Request de captura de processos concluido.');
-      let listaProcessos = objResponse.responseBody.lstProcessos;
-      logger.info('Iniciando processamento da lista de processos');
-      if (listaProcessos == null) {
+      this.logger.info('Fazendo request de captura de processos');
+      let paginaMax = 1;
+      let paginaAtual = 0;
+      let falhas = 0;
+      do {
+        if (falhas == 0) {
+          paginaAtual++;
+        }
+        objResponse = await this.robo.acessar({
+          url: `https://www.tjba.jus.br/consulta-processual/api/v1/carregar/oab/${codigoBusca}/${paginaAtual}/semCaptcha`,
+          method: 'GET',
+          encoding: 'latin1',
+          usaProxy: true, //proxy
+          usaJson: false,
+          headers: { cookies: cookies },
+        });
+        if (objResponse.responseBody.lstProcessos) {
+          listaProcessos = [...listaProcessos, ...objResponse.responseBody.lstProcessos];
+          if (objResponse.responseBody.numPaginaTotal > paginaMax)
+            paginaMax = objResponse.responseBody.numPaginaTotal;
+          this.logger.info(`Recolhido processos. [Pagina ${paginaAtual} de ${paginaMax}]`);
+          falhas = 0;
+        } else {
+          this.logger.info('Nova tentativa de acessar a pagina atual');
+          falhas++;
+        }
+
+        await sleep(200);
+        if (falhas > 3) {
+          this.logger.info('Tentativas de acesso excederam limite');
+          this.logger.info('Salvando processos já capturados');
+          break;
+        }
+      } while(paginaAtual < paginaMax)
+
+      this.logger.info('Request de captura de processos concluido.');
+      this.logger.info('Iniciando processamento da lista de processos');
+      if (listaProcessos.length === 0) {
         throw new ExtracaoException('Lista de processos vazia', 'Não foi possivel recuperar a lista de processos (l.72)');
       }
+      this.logger.info(`${listaProcessos.length} processo(s) encontrado(s).`);
       resultados = listaProcessos.map(async (element) => {
         let extracao = new TJBAPortalParser().parse(element);
         let processo = extracao.processo;
         let andamentos = extracao.andamentos;
-        Andamento.salvarAndamentos(andamentos);
+        await Andamento.salvarAndamentos(andamentos);
         let resultado = await processo.salvar();
-        logger.info(
+        this.logger.info(
           `Processo: ${
             processo.toObject().detalhes.numeroProcesso
           } salvo | Quantidade de andamentos: ${andamentos.length}`
@@ -85,43 +114,36 @@ class OabTJBAPortal extends ExtratorBase {
         return resultado;
       });
 
-      return Promise.all(resultados).then((args) => {
-        logger.info('Processos extraidos com sucesso');
-        return {
-          resultado: args,
-          sucesso: true,
-          detalhes: '',
-          logs: logger.logs
-        };
+      this.resposta.resultado = await Promise.all(resultados).then((args) => {
+        this.logger.info('Processos extraidos com sucesso');
+        return args;
       });
+      this.resposta.logs = this.logger.logs;
     } catch (e) {
-      let logger = new Logger(
-        'info',
-        'logs/OabTJBAPortal/OabTJBAPortalInfo.log',
-        {
-          nomeRobo: enums.nomesRobos.TJBAPortal,
-          NumeroOab: numeroOab,
-        }
-      );
-      logger.log('error', e);
+      this.logger.log('error', e);
+      this.resposta.sucesso = false;
       if (e instanceof RequestException) {
-        throw new RequestException(e.code, e.status, e.message);
+        this.resposta.detalhes = `RequestExceptoion: ${e}`;
       } else if (e instanceof BaseException) {
-        throw new BaseException(e.code, e.message);
+        this.resposta.detalhes = `BaseException: ${e}`;
       } else if (e instanceof ExtracaoException) {
         if (/ERRO_CAPTCHA/.test(e.code)) {
           //refaz tentativas de captcha (deixar aqui mas portal tjba n usa captcha por enquanto)
-          throw new ExtracaoException(e.code, null, e.message);
+          this.resposta.detalhes = `ExtracaoException: ${e}`;
         } else {
-          throw new BaseException(e.code, e.message);
+          this.resposta.detalhes = `BaseException: ${e}`;
         }
       } else {
         if (/ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ENOPROTOOPT/.test(e.code)) {
-          throw new RequestException(e.code, e.status, e.message);
+          this.resposta.detalhes = `RequestExceptoion: ${e}`;
         } else {
-          throw e;
+          this.resposta.detalhes = `Exception: ${e}`;;
         }
       }
+    } finally {
+      this.resposta.logs = this.logger.logs;
+      // console.table(this.resposta);
+      return this.resposta;
     }
   }
 }

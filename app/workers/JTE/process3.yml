@@ -1,8 +1,8 @@
 apps:
-  - script   : ./app/workers/JTE/extracao_JTE_P.js
+  - script   : ./app/workers/JTE/extracao_JTE_S.js
     name     : 'worker-001'
-  - script   : ./app/workers/JTE/extracao_JTE_P.js
+  - script   : ./app/workers/JTE/extracao_JTE_S.js
     name     : 'worker-002'
-  - script   : ./app/workers/JTE/extracao_JTE_P.js
+  - script   : ./app/workers/JTE/extracao_JTE_S.js
     name     : 'worker-003'
     

@@ -46,16 +46,6 @@ if (data == 1) {
 }
 
 async function worker() {
-  mongoose.connect(enums.mongo.connString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.connection.on('error', (e) => {
-    console.log(e);
-  });
-  const puppet = new RoboPuppeteer3();
-  var catchError = 0;
-
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
   setInterval(function () {
     heartBeat++;
@@ -66,6 +56,18 @@ async function worker() {
       if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
   }, 1000);
+
+  mongoose.connect(enums.mongo.connString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  mongoose.connection.on('error', (e) => {
+    console.log(e);
+  });
+  const puppet = new RoboPuppeteer3();
+  var catchError = 0;
+
+  
 
   // await puppet.start()
   await puppet.iniciar();
@@ -251,6 +253,7 @@ async function worker() {
       console.log(e);
       console.log('-------------- estamos com : ' + catchError + ' erros');
       if (catchError > 4) {
+        await mongoose.connection.close()
         process.exit();
       }
       // envia a mensagem para a fila de reprocessamento

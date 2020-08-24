@@ -327,11 +327,6 @@ class ProcessoController {
       const limit = filtros && filtros.limite ? parseInt(filtros.limite) : 1000;
       const sort = filtros && filtros.ord ? parseInt(filtros.ord) : 1;
 
-      console.log(JSON.stringify(query));
-      console.log('filtros: ', filtros);
-      console.log('skip: ',skip);
-      console.log('limit: ', limit);
-
       const count = await Processo.countDocuments(query);
       const resProcessos = await Processo.find(query).skip(skip).limit(limit).sort({ _id: sort });
       
@@ -341,8 +336,6 @@ class ProcessoController {
       for (let i = 0, si = resProcessos.length; i < si; i++) {
         listaProcessos.push(tradutor.traduzirProcesso(resProcessos[i]));        
       }
-
-      console.log('total retornado: ',listaProcessos.length);
 
       response.status = 200;
       response.data = { totalRegistros: count, pagina: skip, limite: limit, resultados: listaProcessos };

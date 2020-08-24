@@ -253,6 +253,7 @@ async function worker() {
       console.log(e);
       console.log('-------------- estamos com : ' + catchError + ' erros');
       if (catchError > 4) {
+        await mongoose.connection.close()
         process.exit();
       }
       // envia a mensagem para a fila de reprocessamento

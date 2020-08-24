@@ -52,22 +52,24 @@ class CriaFilaJTE {
 	}
 
 	async buscaDb(quantidade, salto) {
-		let devDbConection = process.env.MONGO_CONNECTION_STRING
-		mongoose.connect(devDbConection, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true
-		});
+		// let devDbConection = process.env.MONGO_CONNECTION_STRING
+
+		// mongoose.connect(devDbConection, {
+		// 	useNewUrlParser: true,
+		// 	useUnifiedTopology: true
+		// });
+
 		return await consultaCadastradas.find({ "Detalhes.Tribunal": 5 }).limit(quantidade).skip(salto)
 		// return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
 	}
 
 	async salvaUltimo(ultimo) {
 		//let devDbConection = process.env.MONGO_DEV_CONECTION
-		let devDbConection = process.env.MONGO_CONNECTION_STRING
-		mongoose.connect(devDbConection, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true
-		});
+		// let devDbConection = process.env.MONGO_CONNECTION_STRING
+		// mongoose.connect(devDbConection, {
+		// 	useNewUrlParser: true,
+		// 	useUnifiedTopology: true
+		// });
 		let veirifica = await ultimoProcesso.find({ "numeroProcesso": ultimo.numeroProcesso })
 
 
@@ -79,11 +81,11 @@ class CriaFilaJTE {
 
 	async salvaDocumentoLink(link) {
 		//let devDbConection = process.env.MONGO_DEV_CONECTION
-		let devDbConection = process.env.MONGO_CONNECTION_STRING
-		mongoose.connect(devDbConection, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true
-		});
+		// let devDbConection = process.env.MONGO_CONNECTION_STRING
+		// mongoose.connect(devDbConection, {
+		// 	useNewUrlParser: true,
+		// 	useUnifiedTopology: true
+		// });
 
 		let verifica = await linkDocumento.find({ "numeroProcesso": link.numeroProcesso, "movimentacao": link.link })
 		// console.log(!verifica[0]);
@@ -96,12 +98,27 @@ class CriaFilaJTE {
 	}
 
 	async abreUltimo(parametro) {
-		let devDbConection = process.env.MONGO_CONNECTION_STRING
-		mongoose.connect(devDbConection, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true
-		});
+		// let devDbConection = process.env.MONGO_CONNECTION_STRING
+
+		// mongoose.connect(devDbConection, {
+		// 	useNewUrlParser: true,
+		// 	useUnifiedTopology: true
+		// });
+
+		// mongoose.connect(enums.mongo.connString, {
+		// 	useNewUrlParser: true,
+		// 	useUnifiedTopology: true,
+		//   });
+		//   mongoose.connection.on('error', (e) => {
+		// 	console.log(e);
+		//   });
+
 		let busca = await ultimoProcesso.find(parametro)
+		// console.log("abreUltimo", parametro);
+		// console.log(process.env.MONGO_CONNECTION_STRING);
+		// console.log(enums.mongo.connString);
+		// console.log(busca);
+		// process.exit()
 		let obj = busca;
 
 		return obj
@@ -113,6 +130,10 @@ class CriaFilaJTE {
 		let recebeNumeros = [];
 		let resultado = [];
 		let dados = await this.buscaDb(60000, 0);
+		// console.log(dados);
+		// console.log(process.env.MONGO_CONNECTION_STRING);
+		// process.exit()
+
 		for (let i = 0; i < dados.length; i++) {
 			let numero = dados[i].NumeroProcesso
 			let sequencial = numero.slice(0, 7)
@@ -128,6 +149,7 @@ class CriaFilaJTE {
 	async peganumero() {
 		let dados = await this.buscaDb(60000, 0)
 
+
 		for (let i = 0; i < dados.length; i++) {
 			let numero = dados[i].NumeroProcesso
 
@@ -140,6 +162,9 @@ class CriaFilaJTE {
 	}
 	async procura(sequencial, origem, tentativas, tribunal, fila) {
 		try {
+			// console.log("procura");
+			// console.log(process.env.MONGO_CONNECTION_STRING);
+			// process.exit()
 			let obj = corrigeSequencial(sequencial)
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {
@@ -161,6 +186,9 @@ class CriaFilaJTE {
 	}
 	async procura10(sequencial, origem, tentativas, tribunal, fila) {
 		try {
+			// console.log("procura10");
+			// console.log(process.env.MONGO_CONNECTION_STRING);
+			// process.exit()
 			let obj = corrigeSequencial(sequencial)
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {

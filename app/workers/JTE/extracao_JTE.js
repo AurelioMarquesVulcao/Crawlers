@@ -82,7 +82,7 @@ async function worker() {
 
   // tudo que está abaixo é acionado para cada processo na fila.
   contador = 0;
-
+  
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     contadorErros++;
     heartBeat = 0;
@@ -251,6 +251,7 @@ async function worker() {
       console.log(e);
       console.log('-------------- estamos com : ' + catchError + ' erros');
       if (catchError > 4) {
+        await mongoose.connection.close()
         process.exit();
       }
       // envia a mensagem para a fila de reprocessamento

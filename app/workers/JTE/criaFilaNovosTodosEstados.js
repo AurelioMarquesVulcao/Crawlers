@@ -29,6 +29,12 @@ const Fila = new CriaFilaJTE();
     Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
     Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
   ];
+  let devDbConection = process.env.MONGO_CONNECTION_STRING;
+
+  mongoose.connect(devDbConection, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
     // console.log(estados[contador].estado);

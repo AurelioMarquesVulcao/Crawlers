@@ -25,6 +25,13 @@ const Fila = new CriaFilaJTE();
     Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
     Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
   ];
+  let devDbConection = process.env.MONGO_CONNECTION_STRING;
+
+  mongoose.connect(devDbConection, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
 
@@ -62,23 +69,26 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
     if ("a") {
       let relogio = Fila.relogio();
       // Informa o momento em que essa aplicação para.
-      if (relogio.min == 50) { break }
+      if (relogio.min == 20) { break }
       // esse tempo da o ritmo de busca de processos, 
       await sleep(tempo)
       try {
         // string de busca no banco de dados
         let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
-        // console.log(origens.length);
         let buscar = await Fila.abreUltimo(parametroBusca);
-        console.log(buscar.length);
         let sequencial = maiorSequencial(buscar)
         let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
-        console.log(numeroSequencial);
         let comarca = sequencial.numeroProcesso.slice(16, 20);
         // Pegará os processos
+        // console.log("Ultimo processo do banco.");
         console.log("Estamos na comarca: " + origens[contaOrigem]);
-        // console.log(sequencial.data.dia == relogio.dia);
-        // console.log(sequencial.data.mes < relogio.mes);
+        // console.log({
+        //   "data": sequencial.data,
+        //   // "origem": sequencial.origem,
+        //   "tribunal": sequencial.tribunal,
+        //   numeroSequencial
+        // });
+
         if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
           if (sequencial.data.mes < relogio.mes - 1) {
             await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
@@ -104,9 +114,9 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           }
           await sleep(500)
         }
-        console.log(sequencial);
+
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
       }
       //if (contaOrigem == 219) { break } else { contaOrigem++ };
@@ -126,7 +136,7 @@ function maiorSequencial(obj) {
   let resultado = obj[0]
   let teste = parseInt(obj[0].numeroProcesso.slice(0, 7));
   //console.log(teste);
-  console.log(obj[0].numeroProcesso);
+  //console.log(obj[0].numeroProcesso);
   for (let i = 0; i < obj.length; i++) {
     let sequencial = parseInt(obj[i].numeroProcesso.slice(0, 7));
     //console.log(sequencial);

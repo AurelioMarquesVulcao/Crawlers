@@ -22,8 +22,8 @@ const Fila = new CriaFilaJTE();
   let estados = [
     Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
   ];
+  embaralha(estados)
   let devDbConection = process.env.MONGO_CONNECTION_STRING;
-
   mongoose.connect(devDbConection, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -128,8 +128,6 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
   await sleep(2000)
 };
 
-
-
 function maiorSequencial(obj) {
   let resultado = obj[0]
   let teste = parseInt(obj[0].numeroProcesso.slice(0, 7));
@@ -144,4 +142,19 @@ function maiorSequencial(obj) {
     }
   };
   return resultado
+}
+
+function embaralha(lista) {
+
+  for (let indice = lista.length; indice; indice--) {
+
+      const indiceAleatorio = Math.floor(Math.random() * indice);
+      
+      // guarda de um índice aleatório da lista
+      const elemento = lista[indice - 1];
+      
+      lista[indice - 1] = lista[indiceAleatorio];
+      
+      lista[indiceAleatorio] = elemento;
+  }
 }

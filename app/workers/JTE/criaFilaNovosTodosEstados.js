@@ -29,8 +29,8 @@ const Fila = new CriaFilaJTE();
     Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
     Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
   ];
+  embaralha(estados)
   let devDbConection = process.env.MONGO_CONNECTION_STRING;
-
   mongoose.connect(devDbConection, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -145,4 +145,19 @@ function maiorSequencial(obj) {
     }
   };
   return resultado
+}
+
+function embaralha(lista) {
+
+  for (let indice = lista.length; indice; indice--) {
+
+      const indiceAleatorio = Math.floor(Math.random() * indice);
+      
+      // guarda de um índice aleatório da lista
+      const elemento = lista[indice - 1];
+      
+      lista[indice - 1] = lista[indiceAleatorio];
+      
+      lista[indiceAleatorio] = elemento;
+  }
 }

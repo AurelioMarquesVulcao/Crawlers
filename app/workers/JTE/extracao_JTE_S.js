@@ -322,3 +322,4 @@ function errosSequencia(catchError, contadorErros) {
     }
   }
 }
+

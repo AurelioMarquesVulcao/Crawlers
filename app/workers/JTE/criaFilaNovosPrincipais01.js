@@ -5,6 +5,7 @@ const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const comarcas = require('../../assets/jte/comarcas');
 const Estados = require('../../assets/jte/comarcascopy.json');
+const { getFilas } = require('./get_fila');
 
 
 const Fila = new CriaFilaJTE();
@@ -19,6 +20,7 @@ const Fila = new CriaFilaJTE();
   let fila = ".P";  // string de escolha de fila
   let contador = 0;
   let start = 0;
+  let nomeFila = 'processo.JTE.extracao.novos' + fila;
   let estados = [
     Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
   ];
@@ -28,30 +30,31 @@ const Fila = new CriaFilaJTE();
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-  
-  for (let w = 0; w < 1;) {
-    let relogio = Fila.relogio();
-    
-    console.log(estados[contador].estado);
+  console.log(await verificaFila(nomeFila));
 
-    await sleep(1000);
-    if (relogio.min == 9 && relogio.seg == 00 || start == 0) {
-      // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
-      start = 1
-      origens = estados[contador].comarcas;
-      tribunal = parseInt(estados[contador].codigo);
-      codigo = estados[contador].codigo;
-      max = estados[contador].comarcas.length;
-      timer = estados[contador].tempo;
-      await criador(origens, tribunal, codigo, max, timer, fila)
+  // for (let w = 0; w < 1;) {
+  //   let relogio = Fila.relogio();
 
-      contador++
-      
-    }
+  //   console.log(estados[contador].estado);
 
-    console.log(relogio);
-    if (contador == estados.length) { contador = 0 }
-  }
+  //   await sleep(1000);
+  //   if (relogio.min == 9 && relogio.seg == 00 || start == 0) {
+  //     // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
+  //     start = 1
+  //     origens = estados[contador].comarcas;
+  //     tribunal = parseInt(estados[contador].codigo);
+  //     codigo = estados[contador].codigo;
+  //     max = estados[contador].comarcas.length;
+  //     timer = estados[contador].tempo;
+  //     await criador(origens, tribunal, codigo, max, timer, fila)
+
+  //     contador++
+
+  //   }
+
+  //   console.log(relogio);
+  //   if (contador == estados.length) { contador = 0 }
+  // }
 })()
 
 // Criador de fila:
@@ -148,13 +151,30 @@ function embaralha(lista) {
 
   for (let indice = lista.length; indice; indice--) {
 
-      const indiceAleatorio = Math.floor(Math.random() * indice);
-      
-      // guarda de um índice aleatório da lista
-      const elemento = lista[indice - 1];
-      
-      lista[indice - 1] = lista[indiceAleatorio];
-      
-      lista[indiceAleatorio] = elemento;
+    const indiceAleatorio = Math.floor(Math.random() * indice);
+
+    // guarda de um índice aleatório da lista
+    const elemento = lista[indice - 1];
+
+    lista[indice - 1] = lista[indiceAleatorio];
+
+    lista[indiceAleatorio] = elemento;
   }
+}
+
+async function verificaFila(nomeFila) {
+  let filas = await getFilas()
+  //console.log(filas);
+  //nsole.log(nomeFila);
+  if (filas.length > 0) {
+    for (let i =0; i<filas.length;i++) {
+      // console.log(i);
+      // console.log(filas[i].nome);
+      if (filas[i].nome == nomeFila) {
+        //console.log(await getFilas());
+        return true
+      }
+    }
+  }
+  process.exit();
 }

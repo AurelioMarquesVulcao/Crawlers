@@ -89,18 +89,16 @@ class Tradutor {
       let oabs = [];
 
       if (tipo) {
-        const oabMatch = envolvido.nome.match(/\((?<numero>\d+)(?<tipo>\w{0,1})(?<secc>\w{2})\)/);
+        const oabMatch = envolvido.nome.match(/(\((?<numero>\d+)(?<tipo>\w{0,1})-?(?<secc>\w{2})\s?\))/);
         if (oabMatch) {
-          oabs = [
-            {
-              Inscricao: oabMatch[1],
-              TipoInscricao: oabMatch[2],
-              Seccional:  oabMatch[3]
-            }
-          ]
+          oabs = [{
+            Inscricao: oabMatch.groups.numero.replace(/\(|\)/g,'').trim(),
+            TipoInscricao: oabMatch.groups.tipo,
+            Seccional:  oabMatch.groups.secc
+          }];
+          envolvido.nome = envolvido.nome.replace(/(\((?<numero>\d+)(?<tipo>\w{0,1})-?(?<secc>\w{2})\s?\))/ig,'');
         }
       }
-
 
       return {
         Nome: envolvido.nome,
@@ -331,12 +329,12 @@ class ProcessoController {
 
       const count = await Processo.countDocuments(query);
       const resProcessos = await Processo.find(query).skip(skip).limit(limit).sort({ _id: sort });
-
+      
       const tradutor = new Tradutor();
       const listaProcessos = [];
 
       for (let i = 0, si = resProcessos.length; i < si; i++) {
-        listaProcessos.push(tradutor.traduzirProcesso(resProcessos[i]));
+        listaProcessos.push(tradutor.traduzirProcesso(resProcessos[i]));        
       }
 
       response.status = 200;

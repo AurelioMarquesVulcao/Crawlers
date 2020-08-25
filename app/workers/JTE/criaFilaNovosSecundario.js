@@ -45,18 +45,18 @@ var estados = [
     // esse if mantem o enfilerador desligado na hora desejada
     if (!desligado.find(element => element == relogio.hora)) {
 
-      if (relogio.min == 1 && relogio.seg == 00 || start == 0) {
+      if (relogio.min == 30 && relogio.seg == 00 || start == 0 || !statusFila) {
         // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
         start = 1
-        if (!statusFila) {
-          origens = estados[contador].comarcas;
-          tribunal = parseInt(estados[contador].codigo);
-          codigo = estados[contador].codigo;
-          max = estados[contador].comarcas.length;
-          timer = estados[contador].tempo;
-          await criador(origens, tribunal, codigo, max, timer, fila)
-          contador++
-        }
+        // if (!statusFila) {
+        origens = estados[contador].comarcas;
+        tribunal = parseInt(estados[contador].codigo);
+        codigo = estados[contador].codigo;
+        max = estados[contador].comarcas.length;
+        timer = estados[contador].tempo;
+        await criador(origens, tribunal, codigo, max, timer, fila)
+        contador++
+        // }
       }
       console.log(relogio);
       if (contador == estados.length) { contador = 0 }
@@ -78,7 +78,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       try {
         let relogio = Fila.relogio();
         //console.log("funcao criador");
-        if (relogio.min == 55) { break }
+        if (relogio.min == 20) { break }
         // string de busca no banco de dados
         let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
         let buscar = await Fila.abreUltimo(parametroBusca);
@@ -175,7 +175,7 @@ async function testeFila(nomeFila) {
     let relogio = Fila.relogio();
     let statusFila = await verificaFila(nomeFila);
     //console.log("funcao teste fila");
-    if (relogio.min == 55) { break }
+    if (relogio.min == 20) { break }
     if (!statusFila) {
       console.log("A fila ainda não consumiu...");
       await sleep(10000)

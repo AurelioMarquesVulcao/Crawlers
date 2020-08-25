@@ -6,6 +6,7 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const comarcas = require('../../assets/jte/comarcas');
 const Estados = require('../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
+const { Helper, Logger } = require('../../lib/util');
 
 
 

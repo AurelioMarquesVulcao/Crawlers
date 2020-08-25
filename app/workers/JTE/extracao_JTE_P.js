@@ -17,7 +17,7 @@ const { Andamento } = require('../../models/schemas/andamento');
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
@@ -209,9 +209,7 @@ async function worker() {
           resultadoExtracao,
           message.SeccionalProcesso
         );
-        //console.log(extracao);
-        //console.log(resultadoExtracao.resultado.processo.detalhes);
-
+    
         logger.info('Resultado da extracao salva');
 
         logger.info('Enviando resposta ao BigData');

@@ -3,6 +3,8 @@ const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 require("dotenv/config");
 const { JTEParser } = require('../parsers/JTEParser');
+const shell = require('shelljs');
+
 
 const ajustes = new JTEParser();
 
@@ -19,8 +21,8 @@ class RoboPuppeteer3 {
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
       //args: ['--ignore-certificate-errors']
     });
@@ -68,7 +70,8 @@ class RoboPuppeteer3 {
 
     // await sleep(timerSleep2)
     await mongoose.connection.close()
-    this.finalizar()
+    shell.exec('pkill chrome');
+    //this.finalizar()
     process.exit()
   }
 
@@ -457,15 +460,15 @@ class RoboPuppeteer3 {
   }
 
   async finalizar() {
-    const puppeteerPid = this.browser.process().pid;
-    this.logger.info('Finalizando Puppeteer');
-    await this.browser
-      .close()
-      .then(() => {
-        process.kill(puppeteerPid);
-      })
-      .catch(() => {});
-    this.logger.info('Puppeteer finalizado');
+  //   const puppeteerPid = this.browser.process().pid;
+  //   this.logger.info('Finalizando Puppeteer');
+  //   await this.browser
+  //     .close()
+  //     .then(() => {
+  //       process.kill(puppeteerPid);
+  //     })
+  //     .catch(() => {});
+  //   this.logger.info('Puppeteer finalizado');
   }
 }
 

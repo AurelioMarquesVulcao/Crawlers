@@ -37,6 +37,7 @@
     "prettier": "^2.0.5",
     "puppeteer": "^5.0.0",
     "querystring": "^0.2.0",
+    "shelljs": "^0.8.4",
     "winston": "^3.2.1",
     "xregexp": "^4.3.0"
   },

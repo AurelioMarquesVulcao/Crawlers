@@ -20,6 +20,8 @@ const { JTEParser } = require('../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
+const shell = require('shelljs');
+
 
 /**
  * Logger para console e arquivo
@@ -253,6 +255,7 @@ async function worker() {
       console.log('-------------- estamos com : ' + catchError + ' erros');
       if (catchError > 4) {
         await mongoose.connection.close()
+        shell.exec('pkill chrome');
         process.exit();
       }
       // envia a mensagem para a fila de reprocessamento

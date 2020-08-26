@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const cheerio = require('cheerio');
+const shell = require('shelljs');
+const sleep = require('await-sleep');
 
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
@@ -8,17 +10,9 @@ const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 const { Andamento } = require('../../models/schemas/andamento');
-// const {
-//   BaseException,
-//   RequestException,
-//   ExtracaoException,
-//   AntiCaptchaResponseException,
-// } = require('../../models/exception/exception');
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
-
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
-const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 
 /**
@@ -26,21 +20,26 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
  */
 let logger;
 
-const logarExecucao = async (execucao) => {
-  await LogExecucao.salvar(execucao);
-};
-
-var estadoAnterior;
-var estadoDaFila;
-var contador = 0;
-var heartBeat = 0;
-let data = 1;
-var logadoParaIniciais = false;
-var testeErros1 = [];
-var testeErros2 = [];
-var resultado = [];
-var contadorErros = 0;
+const logarExecucao = async (execucao) => { await LogExecucao.salvar(execucao); };
 const fila = new CriaFilaJTE();
+const puppet = new RoboPuppeteer3();
+// Filas a serem usadas
+const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+
+var estadoAnterior;   // Recebe o estado atual que está sendo baixado
+var estadoDaFila;     // Recebe o estado da fila
+var contador = 0;     // Conta quantos processos foram abertos pelo pupperteer, para poder selecionar os botões da pagina
+var heartBeat = 0;    // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
+let data = 1;
+var logadoParaIniciais = false;   // Marca se estamos logados para baixar documentos
+var testeErros1 = []; // Contador de erros
+var testeErros2 = []; // Contador de erros
+var resultado = [];
+var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicação
+var catchError = 0;   // Captura erros;
+
+// posso aplicar condições para rodar o worker
 if (data == 1) {
   worker();
 }
@@ -49,7 +48,7 @@ async function worker() {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
   setInterval(function () {
     heartBeat++;
-    //console.log(`setInterval: Ja passou ${heartBeat} segundo!`);
+    //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
       if (heartBeat > 90) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
@@ -57,6 +56,7 @@ async function worker() {
     }
   }, 1000);
 
+  // liga ao banco de dados
   mongoose.connect(enums.mongo.connString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -64,28 +64,22 @@ async function worker() {
   mongoose.connection.on('error', (e) => {
     console.log(e);
   });
-  const puppet = new RoboPuppeteer3();
-  var catchError = 0;
 
-  // await puppet.start()
+
   await puppet.iniciar();
-
   await sleep(3000);
   await puppet.acessar('https://jte.csjt.jus.br/');
-
-  // await puppet.loga()
   await sleep(3000);
 
-  // const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.JTE}.extracao.novos`;
-  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
-  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+
+  // const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+  // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
 
   // tudo que está abaixo é acionado para cada processo na fila.
   contador = 0;
-  
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     contadorErros++;
-    heartBeat = 0;
+    heartBeat = 0;  // Zero o Contador indicando que a aplicação esta consumindo a fila.
     let dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     let novosProcesso = message.NovosProcessos;
@@ -251,8 +245,9 @@ async function worker() {
       console.log(e);
       console.log('-------------- estamos com : ' + catchError + ' erros');
       if (catchError > 4) {
-        new RoboPuppeteer3().finalizar()
+        //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close()
+        shell.exec('pkill chrome');
         process.exit();
       }
       // envia a mensagem para a fila de reprocessamento

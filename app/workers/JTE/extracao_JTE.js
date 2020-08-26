@@ -251,6 +251,7 @@ async function worker() {
       console.log(e);
       console.log('-------------- estamos com : ' + catchError + ' erros');
       if (catchError > 4) {
+        new RoboPuppeteer3().finalizar()
         await mongoose.connection.close()
         process.exit();
       }

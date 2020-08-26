@@ -70,7 +70,7 @@ class RoboPuppeteer3 {
 
     // await sleep(timerSleep2)
     await mongoose.connection.close()
-    shell.exec('pkill chrome');
+    await shell.exec('pkill chrome');
     //this.finalizar()
     process.exit()
   }

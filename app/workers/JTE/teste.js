@@ -1,2 +1,6 @@
 const shell = require('shelljs');
-shell.exec('pkill chrome');
+
+(async () => {
+    await shell.exec('pkill chrome');
+    shell.exec('ls');
+})()

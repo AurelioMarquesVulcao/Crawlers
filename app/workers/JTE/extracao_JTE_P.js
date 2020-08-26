@@ -254,7 +254,7 @@ async function worker() {
       console.log('-------------- estamos com : ' + catchError + ' erros');
       if (catchError > 4) {
         await mongoose.connection.close()
-        shell.exec('pkill chrome');
+        await shell.exec('pkill chrome');
         process.exit();
       }
       // envia a mensagem para a fila de reprocessamento

@@ -66,6 +66,11 @@ async function worker() {
   });
 
 
+  
+  // parei aqui
+
+
+
   await puppet.iniciar();
   await sleep(3000);
   await puppet.acessar('https://jte.csjt.jus.br/');

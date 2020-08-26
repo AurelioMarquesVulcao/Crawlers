@@ -68,6 +68,7 @@ class RoboPuppeteer3 {
 
     // await sleep(timerSleep2)
     await mongoose.connection.close()
+    this.finalizar()
     process.exit()
   }
 
@@ -453,6 +454,18 @@ class RoboPuppeteer3 {
     await popup.close();
     // https://github.com/puppeteer/puppeteer/issues/1830
     // https://www.codota.com/code/javascript/functions/puppeteer/Browser/close
+  }
+
+  async finalizar() {
+    const puppeteerPid = this.browser.process().pid;
+    this.logger.info('Finalizando Puppeteer');
+    await this.browser
+      .close()
+      .then(() => {
+        process.kill(puppeteerPid);
+      })
+      .catch(() => {});
+    this.logger.info('Puppeteer finalizado');
   }
 }
 

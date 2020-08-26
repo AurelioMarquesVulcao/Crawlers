@@ -5,9 +5,19 @@ const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const comarcas = require('../../assets/jte/comarcas');
 const Estados = require('../../assets/jte/comarcascopy.json');
+const { getFilas } = require('./get_fila');
+const { Helper, Logger } = require('../../lib/util');
+
 
 
 const Fila = new CriaFilaJTE();
+var fila = ".P";  // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos.P';
+var desligado = [];
+// var desligado = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+var estados = [
+  Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
+];
 
 
 (async () => {
@@ -16,41 +26,40 @@ const Fila = new CriaFilaJTE();
   let codigo;   // numero do tribunal do tipo String.
   let max;      // quantidade de comarca do tribunal
   let timer;    // tempo entre o envio de cada teste, isso marca o ritmo de envio de processos
-  let fila = ".P";  // string de escolha de fila
   let contador = 0;
-  let start = 0;
-  let estados = [
-    Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
-  ];
+  let start = 0;  // cria uma condição que permite que a aplicação inicie ao ligar o worker.
+
   embaralha(estados)
+
   let devDbConection = process.env.MONGO_CONNECTION_STRING;
   mongoose.connect(devDbConection, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-  
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
-    
     console.log(estados[contador].estado);
-
+    let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
     await sleep(1000);
-    if (relogio.min == 9 && relogio.seg == 00 || start == 0) {
-      // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
-      start = 1
-      origens = estados[contador].comarcas;
-      tribunal = parseInt(estados[contador].codigo);
-      codigo = estados[contador].codigo;
-      max = estados[contador].comarcas.length;
-      timer = estados[contador].tempo;
-      await criador(origens, tribunal, codigo, max, timer, fila)
+    // esse if mantem o enfilerador desligado na hora desejada
+    if (!desligado.find(element => element == relogio.hora)) {
 
-      contador++
-      
+      if (relogio.min == 30 && relogio.seg == 00 || start == 0 || !statusFila) {
+        // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
+        start = 1
+        // if (!statusFila) {
+        origens = estados[contador].comarcas;
+        tribunal = parseInt(estados[contador].codigo);
+        codigo = estados[contador].codigo;
+        max = estados[contador].comarcas.length;
+        timer = estados[contador].tempo;
+        await criador(origens, tribunal, codigo, max, timer, fila)
+        contador++
+        // }
+      }
+      console.log(relogio);
+      if (contador == estados.length) { contador = 0 }
     }
-
-    console.log(relogio);
-    if (contador == estados.length) { contador = 0 }
   }
 })()
 
@@ -58,19 +67,17 @@ const Fila = new CriaFilaJTE();
 // Busca no banco de dados qual o ultimo processesso do estado/comarca,
 // Após isso tenta pegar o proximo processo em ordem númerica.
 async function criador(origens, tribunal, codigo, max, tempo, fila) {
+
   let second = 0;
   let contaOrigem = 0;
   for (let w = 0; w < 1;) {
     second++
-    //let timer = fila.relogio();
-    // if (timer.min == 20 && timer.seg == 01 || timer.min == 47) {
+
     if ("a") {
-      let relogio = Fila.relogio();
-      // Informa o momento em que essa aplicação para.
-      if (relogio.min == 20) { break }
-      // esse tempo da o ritmo de busca de processos, 
-      await sleep(tempo)
       try {
+        let relogio = Fila.relogio();
+        //console.log("funcao criador");
+        if (relogio.min == 20) { break }
         // string de busca no banco de dados
         let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
         let buscar = await Fila.abreUltimo(parametroBusca);
@@ -78,14 +85,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
         let comarca = sequencial.numeroProcesso.slice(16, 20);
         // Pegará os processos
-        // console.log("Ultimo processo do banco.");
         console.log("Estamos na comarca: " + origens[contaOrigem]);
-        // console.log({
-        //   "data": sequencial.data,
-        //   // "origem": sequencial.origem,
-        //   "tribunal": sequencial.tribunal,
-        //   numeroSequencial
-        // });
 
         if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
           if (sequencial.data.mes < relogio.mes - 1) {
@@ -117,11 +117,10 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         // console.log(e);
         console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
       }
-      //if (contaOrigem == 219) { break } else { contaOrigem++ };
-      let pausaNaConsulta = 3600000 // Tempo de espera entre consultas no momento está 1 hora.
       if (contaOrigem == max) {
         contaOrigem = 0;
-
+        // pausa o envio de processos até que a fila fique limpa.
+        await testeFila(nomeFila);
       } else { contaOrigem++ };
     };
   };
@@ -144,17 +143,41 @@ function maiorSequencial(obj) {
   return resultado
 }
 
+// embaralhador de array, faz com que a ordem de consumo da fila mude 
+// para que não baixe apenas o mesmo estado toda vez que inicie a aplicação.
 function embaralha(lista) {
-
   for (let indice = lista.length; indice; indice--) {
+    const indiceAleatorio = Math.floor(Math.random() * indice);
+    // guarda de um índice aleatório da lista
+    const elemento = lista[indice - 1];
+    lista[indice - 1] = lista[indiceAleatorio];
+    lista[indiceAleatorio] = elemento;
+  }
+}
 
-      const indiceAleatorio = Math.floor(Math.random() * indice);
-      
-      // guarda de um índice aleatório da lista
-      const elemento = lista[indice - 1];
-      
-      lista[indice - 1] = lista[indiceAleatorio];
-      
-      lista[indiceAleatorio] = elemento;
+// me informa true ou undefined para:
+// fila limpa = true, fila com processos = undefined.
+async function verificaFila(nomeFila) {
+  let filas = await getFilas()
+  if (filas.length > 0) {
+    for (let i = 0; i < filas.length; i++) {
+      if (filas[i].nome == nomeFila) {
+        return true
+      }
+    }
+  }
+}
+
+// aguarda a fila ficar limpa para inserir novos processos
+async function testeFila(nomeFila) {
+  for (let w = 0; w < 1;) {
+    let relogio = Fila.relogio();
+    let statusFila = await verificaFila(nomeFila);
+    //console.log("funcao teste fila");
+    if (relogio.min == 20) { break }
+    if (!statusFila) {
+      console.log("A fila ainda não consumiu...");
+      await sleep(10000)
+    } else { break }
   }
 }

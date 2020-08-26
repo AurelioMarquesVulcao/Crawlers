@@ -50,16 +50,16 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      logger.info('Enviando resposta ao BigData');
-      await Helper.enviarFeedback(
-        extracao.prepararEnvio()
-      ).catch((err) => {
-        console.log(err);
-        throw new Error(
-          `OabTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-        );
-      });
-      logger.info('Resposta enviada ao BigData');
+      // logger.info('Enviando resposta ao BigData');
+      // await Helper.enviarFeedback(
+      //   extracao.prepararEnvio()
+      // ).catch((err) => {
+      //   console.log(err);
+      //   throw new Error(
+      //     `OabTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+      //   );
+      // });
+      // logger.info('Resposta enviada ao BigData');
       logger.info('Finalizando processo');
       await logarExecucao({
         Mensagem: message,

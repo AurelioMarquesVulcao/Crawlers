@@ -17,7 +17,7 @@ const { Andamento } = require('../../models/schemas/andamento');
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 

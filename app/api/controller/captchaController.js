@@ -78,6 +78,7 @@ module.exports.CaptchaController = class CaptchaController {
           if (!/data/.test(item))
             query[captilize(item)] = context[item];
           else {
+            //montando range de data
             query[captilize(item)] = {
               $gte : moment(context[item]).format('YYYY-MM-DDT00:00:00.000Z'),
               $lt : moment(context[item]).add(1, 'days').format('YYYY-MM-DDT00:00:00.000Z')

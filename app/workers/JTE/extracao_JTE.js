@@ -35,8 +35,8 @@ let data = 1;
 var logadoParaIniciais = false;   // Marca se estamos logados para baixar documentos
 var testeErros1 = []; // Contador de erros
 var testeErros2 = []; // Contador de erros
-var resultado = [];
 var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicação
+var resultado = [];
 var catchError = 0;   // Captura erros;
 
 // posso aplicar condições para rodar o worker
@@ -66,22 +66,16 @@ async function worker() {
   });
 
 
-  
-  // parei aqui
-
-
-
+  // Ligando o puppeteer.
   await puppet.iniciar();
   await sleep(3000);
   await puppet.acessar('https://jte.csjt.jus.br/');
   await sleep(3000);
 
 
-  // const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
-  // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
 
-  // tudo que está abaixo é acionado para cada processo na fila.
   contador = 0;
+  // tudo que está abaixo é acionado para cada consumer na fila.
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     contadorErros++;
     heartBeat = 0;  // Zero o Contador indicando que a aplicação esta consumindo a fila.
@@ -90,25 +84,24 @@ async function worker() {
     let novosProcesso = message.NovosProcessos;
     let numeroProcesso = message.NumeroProcesso;
 
-    console.log(
-      '----------------- É busca de novo processo novo processo ' +
-      novosProcesso
-    );
     let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
       NumeroDoProcesso: message.NumeroProcesso,
     });
 
-    try {
-      logger.info('Mensagem recebida');
-      const extrator = ExtratorFactory.getExtrator(nomeFila, true);
+    logger.info('Mensagem recebida');
+    logger.info('É busca de novo processo novo processo ' + novosProcesso);
+    // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
-      logger.info('Iniciando processo de extração');
-      //-------------------------------------------------- inicio do extrator--------------------------------------------
+    
+    logger.info('Iniciando processo de extração');
+    //-------------------------------------------------- inicio do extrator--------------------------------------------
+    try {
+      // Quando o worker liga, ele marca qual o primeiro estado da fila
       if (contador == 0) {
         estadoAnterior = puppet.processaNumero(numeroProcesso).estado;
       }
-      console.log('O estado atual é o numero: ' + estadoAnterior);
+      logger.info('O primeiro Estado é o numero: ' + estadoAnterior);
 
       // verifica qual é o estado de origem do pedido de raspagem.
       estadoDaFila = puppet.processaNumero(numeroProcesso).estado;
@@ -118,29 +111,32 @@ async function worker() {
         await sleep(1000);
         contador = 0;
       }
-
       estadoAnterior = estadoDaFila;
-      console.log('O estado atual é o numero: ' + estadoAnterior);
-      await teste(message);
+      logger.info('O Estado do consumer é o numero: ' + estadoAnterior);
+      await extrator(message);
 
-      async function teste(message) {
+      async function extrator(message) {
         var resultadoExtracao = {};
         let numeroProcesso = message.NumeroProcesso;
 
         // loga no tribunal de arranque se for a primeira chamada da fila
         if (contador == 0) {
+          logger.info('Iniciando processo de logar no tribunal');
           await puppet.preencheTribunal(numeroProcesso);
+          logger.info('Loggin no tribunal realizado com sucesso');
           await sleep(1000);
         }
 
+        // caregando as variaveis que receberam os dados do parser
         let dadosProcesso;
         var processo;
         let parser = new JTEParser();
 
-        logger = new Logger('info', 'logs/ProcJTE/ProcJTE.log', {
-          nomeRobo: enums.nomesRobos.JTE,
-          numeroProcesso: numeroProcesso,
-        });
+
+
+
+
+        
         let objResponse = await puppet.preencheProcesso(
           numeroProcesso,
           contador

@@ -38,6 +38,7 @@ var testeErros2 = []; // Contador de erros
 var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicação
 var resultado = [];
 var catchError = 0;   // Captura erros;
+var start = 0;
 
 // posso aplicar condições para rodar o worker
 if (data == 1) {
@@ -93,7 +94,7 @@ async function worker() {
     logger.info('É busca de novo processo novo processo ' + novosProcesso);
     // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
-    
+
     logger.info('Iniciando processo de extração');
     //-------------------------------------------------- inicio do extrator--------------------------------------------
     try {
@@ -120,9 +121,10 @@ async function worker() {
         let numeroProcesso = message.NumeroProcesso;
 
         // loga no tribunal de arranque se for a primeira chamada da fila
-        if (contador == 0) {
+        if (start == 0) {
           logger.info('Iniciando processo de logar no tribunal');
           await puppet.preencheTribunal(numeroProcesso);
+          start = 1
           logger.info('Loggin no tribunal realizado com sucesso');
           await sleep(1000);
         }
@@ -132,30 +134,31 @@ async function worker() {
         var processo;
         let parser = new JTEParser();
 
-
-
-
-
-        
+        // aqui verifico se o processo existe.
+        // caso exista eu obtenho o html da capa e dos andamentos como resposta.
         let objResponse = await puppet.preencheProcesso(
           numeroProcesso,
-          contador
+          contador,
         );
+        logger.info("Execuntando Parser do processo");
         let $ = cheerio.load(objResponse.geral);
         let $2 = cheerio.load(objResponse.andamentos);
         dadosProcesso = parser.parse($, $2, contador);
+        logger.info("Parser executado com sucesso.");
+
         if (!!objResponse) contador++;
-        // var processo = dadosProcesso.processo
+        logger.info("Enviando dados para o banco de dados.")
         await dadosProcesso.processo.salvar();
         //console.log(dadosProcesso.andamentos[0]);
         await Andamento.salvarAndamentos(dadosProcesso.andamentos);
         processo = await dadosProcesso.processo.salvar();
         // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
         // após que todas as comarcas estiverem no mes corrente aplicar o código acima
-        if (
-          new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao
-        ) {
-          //console.log('ok');
+        logger.info("Sucesso ao enviar para o banco de dados.")
+        // Enviando para Collection de controle *ultimosProcessos*
+
+        if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
+          logger.info("Salvando na Collection ultimosProcessos")
           await new CriaFilaJTE().salvaUltimo({
             numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
             dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
@@ -167,15 +170,7 @@ async function worker() {
             },
           });
         }
-        // let link = await puppet.pegaInicial()
-        // await console.log(link.length);
-        // for (let w = 0; w < link.length; w++) {
-        //     console.log("entrou no laço");
-        //     await new CriaFilaJTE().salvaDocumentoLink(link[w])
-        //     await console.log("O link " + w + " Foi salvo");
-        // }
-
-        logger.info('Processos extraidos com sucesso');
+        logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {
           resultadoExtracao = {
             resultado: processo,
@@ -190,9 +185,7 @@ async function worker() {
             '\033[0;32m' +
             'Resultado da extração ' +
             '\033[0;34m' +
-            !!resultadoExtracao +
-            '\033[0m'
-          );
+            !!resultadoExtracao );
 
         logger.logs = [...logger.logs, ...resultadoExtracao.logs];
         logger.info('Processo extraido');
@@ -202,61 +195,32 @@ async function worker() {
           resultadoExtracao,
           message.SeccionalProcesso
         );
-        //console.log(extracao);
-        //console.log(resultadoExtracao.resultado.processo.detalhes);
 
         logger.info('Resultado da extracao salva');
 
-        logger.info('Enviando resposta ao BigData');
+        //logger.info('Enviando resposta ao BigData');
       }
 
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
-      // const resposta = await Helper.enviarFeedback(
-      //     extracao.prepararEnvio()
-      // ).catch((err) => {
-      //     //console.log(err);
-      //     //throw new Error(`JTE - Erro ao enviar resposta ao BigData - Processo: ${message.NumeroProcesso}`)
-      // });
-      // logger.info('Resposta enviada ao BigData');
-      // logger.info('Reconhecendo mensagem ao RabbitMQ');
-
-      // logger.info('Mensagem reconhecida');
-      // logger.info('Finalizando processo');
-
-      // tentar reativar codigo
-      // await logarExecucao({
-      //   Mensagem: message,
-      //   DataInicio: dataInicio,
-      //   DataTermino: new Date(),
-      //   status: 'OK',
-      //   logs: logger.logs,
-      //   NomeRobo: enums.nomesRobos.JTE
-      // });
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
       ch.ack(msg);
-      // await new CriaFilaJTE().salvaUltimo({
-      //     NumeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
-      //     DataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
-      // })
-      console.log('-------------- estamos com : ' + catchError + ' erros');
+      console.log('------- Estamos com : ' + catchError + ' erros ------- ');
+      logger.info('\033[0;34m' + 'Finalizado processo de extração')
+
     } catch (e) {
       catchError++;
-      // vai avaliar se o contador está sequencial
-      errosSequencia(catchError, contadorErros);
-      console.log(e);
-      console.log('-------------- estamos com : ' + catchError + ' erros');
+      // Salva meus erros nos logs
+      // logger.log("info",e);
+      console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
+      // caso o puppeteer fique perdido na sequencias de clicks nós o reiniciamos.
       if (catchError > 4) {
         //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close()
         shell.exec('pkill chrome');
         process.exit();
       }
+      
       // envia a mensagem para a fila de reprocessamento
-
-      console.log(
-        '----------------- É busca de novo processo novo processo ' +
-        novosProcesso
-      );
       if (!novosProcesso) {
         new GerenciadorFila().enviar(reConsumo, message);
       }
@@ -269,33 +233,22 @@ async function worker() {
         logger.info((erro01 = '\033[31m' + 'Extração Falhou'));
       }
       logger.info(`Error: ${e.message}`);
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      logger.info('Mensagem reconhecida');
-      logger.info('Finalizando processo');
-      //console.log(message.LogConsultaId);
-      // await logarExecucao({
-      //   LogConsultaId: message.LogConsultaId,
-      //   Mensagem: message,
-      //   DataInicio: dataInicio,
-      //   DataTermino: new Date(),
-      //   status: e.message,
-      //   error: e.stack.replace(/\n+/, ' ').trim(),
-      //   logs: logger.logs,
-      //   NomeRobo: enums.nomesRobos.JTE
-      // });
-
+      logger.info('Reenviando mensagem ao RabbitMQ');
       ch.ack(msg);
+      logger.info('Mensagem enviada ao reprocessamento');
+      logger.info('\033[31m' + 'Finalizando processo de extração');
+      
     }
   });
 }
 
 function errosSequencia(catchError, contadorErros) {
   //let testeErros1 = [];
-  console.log(testeErros1);
+  //console.log(testeErros1);
   //let testeErros2 = [];
-  console.log(testeErros2);
+  //console.log(testeErros2);
   //let resultado = [];
-  console.log(resultado);
+  //console.log(resultado);
   testeErros1.push(catchError);
   testeErros2.push(contadorErros);
   if (testeErros1.length > 3) {

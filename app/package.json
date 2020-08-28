@@ -26,7 +26,6 @@
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "html-pdf": "^2.2.0",
-    "html2pdf.js": "^0.9.0",
     "http-proxy-agent": "^4.0.1",
     "https-proxy-agent": "^5.0.0",
     "mocha": "^7.1.1",

@@ -80,15 +80,16 @@ class Requisicao {
           }
         })
         .catch((err) => {
-          console.log('Robo erro', err);
-          resolve({
-            code: err.code,
-            status: err.response.status,
-            message: err.response.statusText,
-            responseContent: null,
-            responseBody: err.response.data ? err.response.data : '',
-            headers: err.response.headers
-          });
+          console.log('----- Robo erro', err.code, '-----');
+          let resposta = {};
+          if (err.response) {
+            resposta.status = err.response.status
+            resposta.message = err.response.statusText;
+            resposta.responseBody = err.response.data ? err.response.data : ''
+            resposta.headers = err.response.headers
+          }
+          resposta.code = err.code;
+          resolve(resposta);
         });
     });
 
@@ -96,7 +97,7 @@ class Requisicao {
 
     if (response.code) {
       if (
-        /ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ECONNREFUSED|ENOPROTOOPT/.test(
+        /ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNREFUSED|ENOPROTOOPT/.test(
           response.code
         )
       ) {

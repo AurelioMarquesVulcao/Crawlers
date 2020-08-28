@@ -39,19 +39,34 @@ class OabTJBAPortal extends ExtratorBase {
       this.resposta = {sucesso: true, detalhes: ''};
       let resultados = [];
       this.logger.info('Fazendo primeira conexão ao website');
-      let objResponse = await this.robo.acessar({
-        url: `${this.url}`,
-        method: 'POST',
-        encoding: 'latin1',
-        usaProxy: true,
-        usaJson: false,
-        params: {
-          tipo: 'NUMOAB',
-          funcao: 'funcOAB',
-          processo: numeroOab + 'BA',
-          'g-recaptcha-response': '',
-        },
-      });
+      let tentativa = 0;
+      let objResponse;
+      do {
+        tentativa++;
+        this.logger.info(`Fazendo tentativa ${tentativa} de conexão.`);
+        objResponse = await this.robo.acessar({
+          url: `${this.url}`,
+          method: 'POST',
+          encoding: 'latin1',
+          usaProxy: true,
+          usaJson: false,
+          params: {
+            tipo: 'NUMOAB',
+            funcao: 'funcOAB',
+            processo: numeroOab + 'BA',
+            'g-recaptcha-response': '',
+          },
+        });
+        if (objResponse.status && objResponse.status === 200) {
+          break;
+        }
+        if (tentativa === 3) {
+          this.logger.log('error', 'Tentativa de conexão inicial com o website resultou em erro');
+          this.logger.info('Finalizando robo por erro de conexão com o site');
+          process.exit(0);
+        }
+        await sleep(15000);
+      }while(true);
       this.logger.info('Conexão ao website concluida.');
       this.logger.info('Recuperando codigo de busca');
       let $ = cheerio.load(objResponse.responseBody);

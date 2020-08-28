@@ -166,11 +166,19 @@ class CriaFilaJTE {
 			// console.log(process.env.MONGO_CONNECTION_STRING);
 			// process.exit()
 			let obj = corrigeSequencial(sequencial)
+			let zeros = ""
+			let processo = ""
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {
 				sequencial = parseInt(obj.seq)
 				let a = sequencial + 1 + i
-				let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				if ((obj.zero + a).length > 7) {
+					zeros = obj.zero.substr(1)
+					processo = `${zeros}${a}4720205${tribunal}${origem}`
+				} else {
+					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				}
+
 
 				await this.enviaFila([{
 					NumeroProcesso: processo
@@ -190,11 +198,18 @@ class CriaFilaJTE {
 			// console.log(process.env.MONGO_CONNECTION_STRING);
 			// process.exit()
 			let obj = corrigeSequencial(sequencial)
+			let zeros = ""
+			let processo = ""
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {
 				sequencial = parseInt(obj.seq)
 				let a = sequencial + 5 + i
-				let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				if ((obj.zero + a).length > 7) {
+					zeros = obj.zero.substr(1)
+					processo = `${zeros}${a}4720205${tribunal}${origem}`
+				} else {
+					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				}
 
 				await this.enviaFila([{
 					NumeroProcesso: processo

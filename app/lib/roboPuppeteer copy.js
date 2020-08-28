@@ -113,10 +113,16 @@ class RoboPuppeteer3 {
 
     await this.page.type('#campoVara', `${entrada.vara}`)
     await sleep(timerSleep)
-    await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
-    await sleep(1000)
-    await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
-    console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
+    try {
+      await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
+      await sleep(timerSleep)
+      await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
+      await sleep(timerSleep)
+      // await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
+      // console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
+    } catch (e) {
+      console.log("----- Este é o ultimo processo dessa comarca até o momento. -----");
+    }
 
     //await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
     await sleep(timerSleep)
@@ -127,7 +133,11 @@ class RoboPuppeteer3 {
   async pegaHtml(contador, numero) {
     //const contador = 0
     await sleep(timerSleep)
-    await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
+    try {
+      await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
+    } catch (e) {
+      console.log("----- Este é o ultimo processo dessa comarca até o momento. -----");
+    }
     await sleep(timerSleep)
     await this.page.waitFor(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div`)
     // pega assunto

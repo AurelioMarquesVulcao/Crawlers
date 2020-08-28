@@ -3,6 +3,8 @@ const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 require("dotenv/config");
 const { JTEParser } = require('../parsers/JTEParser');
+const shell = require('shelljs');
+
 
 const ajustes = new JTEParser();
 
@@ -68,7 +70,8 @@ class RoboPuppeteer3 {
 
     // await sleep(timerSleep2)
     await mongoose.connection.close()
-    this.finalizar()
+    await shell.exec('pkill chrome');
+    //this.finalizar()
     process.exit()
   }
 
@@ -76,7 +79,7 @@ class RoboPuppeteer3 {
 
   async preencheTribunal(numero) {
     // await console.log(`foi escolhido o estado numero ${escolheEstado(numero)}`);
-    await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
+    //await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
     // para esperar carregar o elemento onde fica o tribunal
     await sleep(timerSleep)
     await this.page.waitFor('mat-form-field');
@@ -93,7 +96,7 @@ class RoboPuppeteer3 {
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual')
     await sleep(timerSleep)
-    await console.log("Logado ao tribunal desejado");
+    //await console.log("Logado ao tribunal desejado");
 
   }
 
@@ -123,12 +126,18 @@ class RoboPuppeteer3 {
 
     await this.page.type('#campoVara', `${entrada.vara}`)
     await sleep(timerSleep)
-    await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
-    await sleep(timerSleep)
-    await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
-    await sleep(timerSleep)
-    // await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
-    console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
+    try {
+      await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
+      await sleep(timerSleep)
+      await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
+      await sleep(timerSleep)
+      // await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
+      //console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
+    } catch (e) {
+      console.log("----- Este é o ultimo processo dessa comarca até o momento. -----");
+      throw "Erro não mapeado" 
+    }
+
 
     //await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
     await sleep(timerSleep)
@@ -139,8 +148,12 @@ class RoboPuppeteer3 {
   async pegaHtml(contador, numero) {
     //const contador = 0
     await sleep(timerSleep)
-
-    await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
+    try {
+      await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
+    } catch (e) {
+      console.log("----- Este é o ultimo processo dessa comarca até o momento. -----");
+      throw "ultimo processo "
+    }
     await sleep(timerSleep)
     await sleep(timerSleep)
     await this.page.waitFor(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div`)
@@ -294,6 +307,8 @@ class RoboPuppeteer3 {
         await sleep(timerSleep)
         // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
         let link = await this.page.evaluate(async (i, iniciaisArray) => {
+          // sleep para poder dar tempo de fazer o if
+          await new Promise(function (resolve) { setTimeout(resolve, 300); });
           // ser for um documento com link pegue o link
           if (!!document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe")) {
             let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
@@ -457,15 +472,15 @@ class RoboPuppeteer3 {
   }
 
   async finalizar() {
-    const puppeteerPid = this.browser.process().pid;
-    this.logger.info('Finalizando Puppeteer');
-    await this.browser
-      .close()
-      .then(() => {
-        process.kill(puppeteerPid);
-      })
-      .catch(() => {});
-    this.logger.info('Puppeteer finalizado');
+    //   const puppeteerPid = this.browser.process().pid;
+    //   this.logger.info('Finalizando Puppeteer');
+    //   await this.browser
+    //     .close()
+    //     .then(() => {
+    //       process.kill(puppeteerPid);
+    //     })
+    //     .catch(() => {});
+    //   this.logger.info('Puppeteer finalizado');
   }
 }
 

@@ -13,8 +13,8 @@ const { Helper, Logger } = require('../../lib/util');
 const Fila = new CriaFilaJTE();
 var fila = ".P";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.P';
-var desligado = [];
-// var desligado = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+// var desligado = [];
+var desligado = [21,22,23];
 var estados = [
   Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
 ];
@@ -86,9 +86,9 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         let comarca = sequencial.numeroProcesso.slice(16, 20);
         // Pegará os processos
         console.log("Estamos na comarca: " + origens[contaOrigem]);
-
+        
         if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
-          if (sequencial.data.mes < relogio.mes - 1) {
+          if (sequencial.data.mes < relogio.mes - 1) { 
             await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
             console.log("----------------------- Estou dando um salto no Tempo--------------------------");
           } else {

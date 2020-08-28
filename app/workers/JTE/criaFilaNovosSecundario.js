@@ -12,8 +12,8 @@ const { Helper, Logger } = require('../../lib/util');
 const Fila = new CriaFilaJTE();
 var fila = ".S"; // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.S';
-var desligado = [];
-// var desligado = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+// var desligado = [];
+var desligado = [21,22,23];
 var estados = [
   Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
   Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,

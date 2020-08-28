@@ -215,17 +215,17 @@ async function worker() {
 
         //logger.info('Enviando resposta ao BigData');
       }
-
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração')
+      // logger.log("info", numeroProcesso + " ok")
 
     } catch (e) {
       catchError++;
       // Salva meus erros nos logs
-      logger.log("info",e);
+      logger.log("info", numeroProcesso + " " + e);
       console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
       // caso o puppeteer fique perdido na sequencias de clicks nós o reiniciamos.
       if (catchError > 4) {

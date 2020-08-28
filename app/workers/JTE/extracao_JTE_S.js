@@ -225,7 +225,7 @@ async function worker() {
     } catch (e) {
       catchError++;
       // Salva meus erros nos logs
-      // logger.log("info",e);
+      logger.log("info",e);
       console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
       // caso o puppeteer fique perdido na sequencias de clicks nós o reiniciamos.
       if (catchError > 4) {

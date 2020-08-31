@@ -14,7 +14,7 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']

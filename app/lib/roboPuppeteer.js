@@ -152,7 +152,7 @@ class RoboPuppeteer3 {
       await this.page.waitFor('#listaProcessoEncontrado > mat-tab-group > div')
     } catch (e) {
       console.log("----- Este é o ultimo processo dessa comarca até o momento. -----");
-      throw "ultimo processo "
+      throw "ultimo processo"
     }
     await sleep(timerSleep)
     await sleep(timerSleep)

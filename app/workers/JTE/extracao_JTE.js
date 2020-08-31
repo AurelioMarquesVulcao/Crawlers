@@ -14,6 +14,7 @@ const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
+const desligado = require('../../assets/jte/horarioRoboJTE.json');
 
 /**
  * Logger para console e arquivo
@@ -41,9 +42,19 @@ var catchError = 0;   // Captura erros;
 var start = 0;
 
 // posso aplicar condições para rodar o worker
-if (data == 1) {
-  worker();
-}
+(async () => {
+  setInterval(async function () {
+    let relogio = fila.relogio();
+    if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
+      start = 1;
+      await worker();
+    } else {
+      //console.log("aguardando para ligar");
+    }
+  }, 6000);
+
+})()
+
 
 async function worker() {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
@@ -137,10 +148,10 @@ async function worker() {
         let numeroProcesso = message.NumeroProcesso;
 
         // loga no tribunal de arranque se for a primeira chamada da fila
-        if (start == 0) {
+        if (start == 1) {
           logger.info('Iniciando processo de logar no tribunal');
           await puppet.preencheTribunal(numeroProcesso);
-          start = 1
+          start = 2
           logger.info('Loggin no tribunal realizado com sucesso');
           await sleep(1000);
         }
@@ -176,9 +187,9 @@ async function worker() {
         if (!!objResponse) contador++;
 
         if (message.inicial != true) {
-        // condicional provisório para testes1
-        // if (message.inicial != true) {
-        // if (message.NovosProcessos != true) {
+          // condicional provisório para testes1
+          // if (message.inicial != true) {
+          // if (message.NovosProcessos != true) {
           logger.info("Enviando dados para o banco de dados.")
           await dadosProcesso.processo.salvar();
           //console.log(dadosProcesso.andamentos[0]);
@@ -252,10 +263,15 @@ async function worker() {
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
-      logger.info('\033[0;34m' + 'Finalizado processo de extração')
+      logger.info('\033[0;34m' + 'Finalizado processo de extração');
+      desligaAgendado()
 
     } catch (e) {
       catchError++;
+      // console.log(e)
+      if (e == "ultimo processo") {
+        catchError--;
+      }
       // Salva meus erros nos logs
       logger.log("info", numeroProcesso + " " + e);
       console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
@@ -284,9 +300,21 @@ async function worker() {
       ch.ack(msg);
       logger.info('Mensagem enviada ao reprocessamento');
       logger.info('\033[31m' + 'Finalizando processo de extração');
+      desligaAgendado()
 
     }
   });
+}
+
+function desligaAgendado() {
+  let relogio = fila.relogio()
+  if (desligado.worker.find(element => element == relogio.hora)) {
+    //await mongoose.connection.close();
+    shell.exec('pkill chrome');
+    start = 0;
+    console.log("vou desligar");
+    process.exit();
+  }
 }
 
 function errosSequencia(catchError, contadorErros) {

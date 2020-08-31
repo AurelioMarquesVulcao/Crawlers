@@ -33,20 +33,20 @@ class Helper {
 
   static removerEspacosEmBranco(texto) {
     return texto
-      .replace(/\n+|\s+|\t+/g, " ")      
+      .replace(/\n+|\s+|\t+/g, " ")
       .trim();
   }
 
-  static removerEspeciais(texto) {    
-    return texto         
+  static removerEspeciais(texto) {
+    return texto
       .replace(/\n+|\t+/g, ' ')
-      .replace(/\:+/,'')
-      .replace(/\s+/g,'_')
-      .replace(/\(+|\)+/g,'')
+      .replace(/\:+/, '')
+      .replace(/\s+/g, '_')
+      .replace(/\(+|\)+/g, '')
       .trim();
   }
 
-  static removerAcento(texto) {    
+  static removerAcento(texto) {
     return texto
       .toLowerCase()
       .replace(/[ÁÀÂÃÄ]/gi, "a")
@@ -56,7 +56,7 @@ class Helper {
       .replace(/[ÚÙÛÜ]/gi, "u")
       .replace(/[Ç]/gi, "c");
   }
-  
+
   static async resgatarNovoToken() {
     const robo = new Robo();
     return robo.acessar({
@@ -178,7 +178,7 @@ class Helper {
         return -1;
       }
     });
-  }  
+  }
 }
 
 class CnjValidator {
@@ -230,7 +230,7 @@ class CnjValidator {
     }
   }
 
-  static validar(cnj) {    
+  static validar(cnj) {
     let sub = cnj.replace("-", ".").split(".");
     let NNNNNNN = sub[0];
     let DD = sub[1];
@@ -293,6 +293,19 @@ class Logger {
   }
 }
 
+class Cnj {
+  processoSlice(numero) {
+    let comarca = numero.slice(16, 20);
+    let estado = numero.slice(14, 16);
+    let ano = numero.slice(9, 13);
+    let sequencial = numero.slice(0, 7);
+    let dois = numero.slice(7, 9);
+    let tipo = numero.slice(14,16);
+    return { comarca, estado, ano, sequencial, dois, tipo }
+  }
+}
+
 module.exports.Helper = Helper;
 module.exports.CnjValidator = CnjValidator;
 module.exports.Logger = Logger;
+module.exports.Cnj = Cnj;

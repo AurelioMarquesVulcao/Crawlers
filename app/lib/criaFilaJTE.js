@@ -7,12 +7,42 @@ const { GerenciadorFila } = require("../lib/filaHandler");
 const { ExtratorBase } = require('../extratores/extratores');
 const { JTEParser } = require('../parsers/JTEParser');
 const { Processo } = require('../models/schemas/processo');
-const {consultaCadastradas, ultimoProcesso, linkDocumento} = require('../models/schemas/jte')
+const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../models/schemas/jte')
+const { Cnj } = require('../lib/util')
 require("dotenv/config");
 
 
 
 class CriaFilaJTE {
+	async salvaStatusComarca(numero) {
+		let cnj = new Cnj().processoSlice(numero);
+		let verifica = await statusEstadosJTE.find({ "estadoNumero": cnj.estado, "comarca": cnj.comarca });
+
+		let obj = {
+			estado: "",
+			estadoNumero: cnj.estado,
+			comarca: cnj.comarca,
+			status: "novo",
+			atualizacao: [this.relogio.dia, this.relogio.mes],
+			ultimaAtualizacao: new Date(),
+			numeroUltimoProcecesso: `${novoSequencial(numero)}${cnj.dois}${cnj.ano}${cnj.tipo}${cnj.comarca}`,
+
+		}
+		if (!verifica) {
+			await new statusEstadosJTE(obj).save()
+		}
+		function novoSequencial(numero) {
+			let cnj = new Cnj().processoSlice(numero);
+			let sequencial = cnj.sequencial - 1;
+			let zeros = cnj.sequencial.length - sequencial.length;
+			let zero = "";
+			for (let i = 0; i < zeros; i++) {
+				zero += "0"
+			}
+			return zero + sequencial
+		}
+	}
+
 	enviarMensagem(nome, message) {
 		new GerenciadorFila().enviar(nome, message);
 	}

@@ -199,7 +199,7 @@ async function worker() {
           // após que todas as comarcas estiverem no mes corrente aplicar o código acima
           logger.info("Sucesso ao enviar para o banco de dados.")
           // Enviando para Collection de controle *ultimosProcessos*
-
+          fila.salvaStatusComarca(dadosProcesso.processo.detalhes.numeroProcesso);
           if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
             logger.info("Salvando na Collection ultimosProcessos")
             await new CriaFilaJTE().salvaUltimo({

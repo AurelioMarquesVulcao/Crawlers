@@ -46,7 +46,7 @@ module.exports.linkDocumento = linkDocumento;
 
 const comarcaSchema = new mongoose.Schema({
 	estado: String,
-	estadoNumero: Number,
+	estadoNumero: String,
 	comarca: String,
 	status: String,
 	atualizacao: String,

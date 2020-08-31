@@ -2,49 +2,15 @@ const mongoose = require("mongoose");
 const re = require('xregexp');
 const sleep = require('await-sleep');
 const { enums } = require("../configs/enums");
-const { GerenciadorFila } = require("../lib/filaHandler");
 
+const { GerenciadorFila } = require("../lib/filaHandler");
 const { ExtratorBase } = require('../extratores/extratores');
 const { JTEParser } = require('../parsers/JTEParser');
 const { Processo } = require('../models/schemas/processo');
+const {consultaCadastradas, ultimoProcesso, linkDocumento} = require('../models/schemas/jte')
 require("dotenv/config");
 
 
-
-var consultaCadastradas = mongoose.model('consultasCadastradas', {
-	NumeroProcesso: String,
-	DataCadastro: Date,
-	AtivoParaAtualizacao: Boolean,
-	DataUltimaConsultaTribunal: Date,
-	Instancia: String,
-	TipoConsulta: String,
-	Detalhes: {
-		Orgao: Number,
-		Tribunal: Number
-	}
-}, 'consultasCadastradas');
-
-var ultimoProcesso1 = new mongoose.Schema({
-	numeroProcesso: String,
-	dataCadastro: String,
-	origem: Number,
-	tribunal: Number,
-	data: { dia: Number, mes: Number },
-})
-var ultimoProcesso = mongoose.model('ultimosProcessos', ultimoProcesso1, 'ultimosProcessos');
-var ultimoProcessodb1 = mongoose.model('ultimos-processos', ultimoProcesso1, 'ultimos-processos');
-var ultimoProcessodb2 = mongoose.model('ultimosprocessos', ultimoProcesso1, 'ultimosprocessos');
-
-
-var linkDocumento1 = new mongoose.Schema({
-	link: String,
-	movimentacao: String,
-	data: String,
-	numeroProcesso: String,
-	tipo: String,
-})
-
-var linkDocumento = mongoose.model('salvaDocumentoLink', linkDocumento1, 'salvaDocumentoLink');
 
 class CriaFilaJTE {
 	enviarMensagem(nome, message) {
@@ -398,4 +364,6 @@ function mascaraNumero(numeroProcesso) {
 	return resultado
 }
 module.exports.CriaFilaJTE = CriaFilaJTE;
-module.exports.linkDocumento1 = linkDocumento1;
+
+// revisar linha 369.
+module.exports.linkDocumento1 = linkDocumento;

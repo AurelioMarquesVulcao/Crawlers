@@ -7,13 +7,14 @@ const comarcas = require('../../assets/jte/comarcas');
 const Estados = require('../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
 const { Helper, Logger } = require('../../lib/util');
+const desligar = require('../../assets/jte/horarioRoboJTE.json');
 
 
 const Fila = new CriaFilaJTE();
 var fila = "";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos';
 // var desligado = [];
-var desligado = [21,22,23];
+var desligado = desligar.worker
 var estados = [
   Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
   Estados.pi, Estados.mt, // Estados.rn, Estados.ms,

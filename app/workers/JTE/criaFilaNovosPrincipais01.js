@@ -7,6 +7,7 @@ const comarcas = require('../../assets/jte/comarcas');
 const Estados = require('../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
 const { Helper, Logger } = require('../../lib/util');
+const desligar = require('../../assets/jte/horarioRoboJTE.json');
 
 
 
@@ -14,7 +15,7 @@ const Fila = new CriaFilaJTE();
 var fila = ".P";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.P';
 // var desligado = [];
-var desligado = [21,22,23];
+var desligado = desligar.worker
 var estados = [
   Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
 ];
@@ -110,7 +111,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           } else {
             await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
           }
-          await sleep(500)
+          await sleep(2500)
         }
 
       } catch (e) {
@@ -159,6 +160,7 @@ function embaralha(lista) {
 // fila limpa = true, fila com processos = undefined.
 async function verificaFila(nomeFila) {
   let filas = await getFilas()
+  console.log(filas);
   if (filas.length > 0) {
     for (let i = 0; i < filas.length; i++) {
       if (filas[i].nome == nomeFila) {

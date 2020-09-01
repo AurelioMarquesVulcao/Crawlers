@@ -15,24 +15,44 @@ const util = new Cnj();
 
 
 class CriaFilaJTE {
-	async salvaStatusComarca(numero) {
+	async salvaStatusComarca(numero, data, raspagem, buscaProcesso) {
 		let cnj = util.processoSlice(numero);
-		let verifica = await statusEstadosJTE.find({ "estadoNumero": cnj.estado, "comarca": cnj.comarca });
-		console.log(verifica);
-		let obj = {
-			estado: "",
-			estadoNumero: cnj.estado,
-			comarca: cnj.comarca,
-			status: "novo",
-			atualizacao: [this.relogio().dia, this.relogio().mes],
-			ultimaAtualizacao: new Date(),
-			numeroUltimoProcecesso: `${novoSequencial(numero)}${cnj.dois}`,
+		let busca = buscaProcesso;
+		//console.log(busca);
+		let verifica = await statusEstadosJTE.find(busca);
+		//console.log(verifica);
+		//console.log(verifica.length);
+		let estado = "";
+		let estadoNumero = cnj.estado;
+		let comarca = cnj.comarca;
+		let status = "Novo";
+		let dataBusca = { dia: this.relogio().dia, mes: this.relogio().mes }
+		let dataCriaçãoJTE = data;
+		let numeroUltimoProcecesso = numero;
 
+		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
+
+		//await new statusEstadosJTE(obj).save()
+		if (verifica.length == 0) {
+			//console.log(" salvar");
+			//console.log(obj);
+			await new statusEstadosJTE(obj).save()
+			//console.log(await statusEstadosJTE.find(busca));
+		} else if (raspagem == true) {
+			status = "Ultimo Processo";
+			let obj2 = { status, dataBusca };
+			//busca = buscaProcesso = { "estadoNumero": novoSequencial(cnj.estado), "comarca": cnj.comarca };
+			console.log("--------update-------------");
+			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
+			//console.log(await statusEstadosJTE.find(busca));
+		} else {
+			status = "Atualizado";
+			let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
+			console.log("--------update-------------");
+			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
+			//console.log(await statusEstadosJTE.find(busca));
 		}
-		await new statusEstadosJTE(obj).save()
-		// if (!verifica) {
-		// 	await new statusEstadosJTE(obj).save()
-		// }
+
 		function novoSequencial(numero) {
 			let resultado;
 			let cnj = util.processoSlice(numero);

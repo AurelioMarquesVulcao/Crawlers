@@ -1,37 +1,38 @@
+const mongoose = require('mongoose');
 const shell = require('shelljs');
+
 const { Cnj } = require('../../lib/util');
+const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
+const { enums } = require('../../configs/enums');
 
+const fila = new CriaFilaJTE();
+const ajuste = new Cnj();
 
+// liga ao banco de dados
+mongoose.connect(enums.mongo.connString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
+mongoose.connection.on('error', (e) => {
+    console.log(e);
+});
 
 // (async () => {
 //     await shell.exec('pkill chrome');
 //     shell.exec('ls');
 // })()
 
-let ajuste = new Cnj()
-
-console.log(ajuste.processoSlice("10010164720205020203"));
-
-// let zeros = 5;
-// for (let i = 0; i < zeros; i++) {
-// //    console.log(i);
-// }
-
-// zeros = 2;
-// let novoSequencial = ""
-// let zero = ""
-// for (let i = 0; i < zeros; i++) {
-//     zero += "0"
-// }
-// console.log(zero);
 
 (async () => {
-    var sequencial = "0001033"
-    let zero = ajuste.corrigeSequencial(sequencial).zero
-    zero = zero.substr(1)
+    //var sequencial = "0001033"
+    //let zero = ajuste.corrigeSequencial(sequencial).zero
+    //zero = zero.substr(1)
     //console.log(zero);
-    console.log(novoSequencial(sequencial));
+    //console.log(novoSequencial(sequencial));
 
+    await fila.salvaStatusComarca("00104979620205100021", "2020-08-07T03:00:00.000Z", "", {"estadoNumero": "10", "comarca": "0021"});
+    mongoose.connection.close();
+    process.exit()
 })()
 
 function novoSequencial(numero) {

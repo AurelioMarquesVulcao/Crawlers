@@ -49,8 +49,8 @@ const comarcaSchema = new mongoose.Schema({
 	estadoNumero: String,
 	comarca: String,
 	status: String,
-	atualizacao: [],
-	ultimaAtualizacao: Date,
+	dataBusca: {},
+	dataCriaçãoJTE: Date,
 	numeroUltimoProcecesso: String,
 
 })

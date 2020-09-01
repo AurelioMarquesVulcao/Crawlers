@@ -28,7 +28,7 @@ const fila = new CriaFilaJTE();
                 let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
                 console.log(numeroSequencial);
                 let comarca = sequencial.numeroProcesso.slice(16, 20);
-                // isso que vai pegar os processos
+                // pegará os processos
                 console.log("Estamos na comarca: " + contaOrigem);
 
                 if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {
@@ -74,7 +74,7 @@ async function procuraUltimoProcesso(tribunal) {
         let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
         console.log(numeroSequencial);
         let comarca = sequencial.numeroProcesso.slice(16, 20);
-        // isso que vai pegar os processos
+        // pegará os processos
         console.log("Estamos na comarca: " + contaOrigem);
 
         if (sequencial.data.dia < relogio.dia && sequencial.data.mes <= relogio.mes) {

@@ -24,7 +24,7 @@ class JTEParser extends BaseParser {
     let n = this.detalhes(cnj).numeroProcesso.trim();
     let dadosAndamento = this.andamento($2, n);
     // extrai vara/ comarca/ e 1 distribuição
-    let primeiraDistribuicao = this.extraiDadosDosAndametos($, dadosAndamento);
+    let primeiraDistribuicao = this.extraiDadosDosAndametos($, dadosAndamento, contador);
     // console.log(primeiraDistribuicao);
     let dadosProcesso = new Processo({
       capa: this.capa($, cnj, primeiraDistribuicao),
@@ -157,28 +157,48 @@ class JTEParser extends BaseParser {
     let dados = this.detalhes(numeroProcesso).tribunal
 
 
-    if (dados == 2 || dados == 15) resultado = 'SP'
-    if (dados == 1) resultado = 'RJ'
+    if (dados == 2 || dados == 15) resultado = 'SP';
+    if (dados == 1) resultado = 'RJ';
     // if (dados == 15) resultado = 'SP'
-    if (dados == 3) resultado = 'MG'
-    if (dados == 21) resultado = 'RN'
-    if (dados == 5) resultado = 'BA'
+    if (dados == 3) resultado = 'MG';
+    // if (dados == 21) resultado = 'RN';
+    if (dados == 5) resultado = 'BA';
+
+    if (dados == 4) resultado = 'RS';
+    if (dados == 6) resultado = 'PE';
+    if (dados == 7) resultado = 'CE';
+    if (dados == 8) resultado = '';
+    if (dados == 9) resultado = 'PR';
+    if (dados == 10) resultado = '';
+    if (dados == 11) resultado = '';
+    if (dados == 12) resultado = 'SC';
+    if (dados == 13) resultado = 'PB';
+    if (dados == 14) resultado = '';
+    if (dados == 16) resultado = 'MA';
+    if (dados == 17) resultado = 'ES';
+    if (dados == 18) resultado = 'GO';
+    if (dados == 19) resultado = 'AL';
+    if (dados == 20) resultado = 'SE';
+    if (dados == 21) resultado = 'RN';
+    if (dados == 22) resultado = 'PI';
+    if (dados == 23) resultado = 'MT';
+    if (dados == 24) resultado = 'MS';
     return resultado
   }
 
 
-  extraiDadosDosAndametos($, andamentos) {
+  extraiDadosDosAndametos($, andamentos, contador) {
     let dados;
     let data;
     let fase = andamentos[0].descricao
-    if (!!this.extraiVaraCapa($)) {
+    if (!!this.extraiVaraCapa($, contador)) {
       for (let i = 0; i < andamentos.length; i++) {
         data = andamentos[i].data
       }
       let primeiraDistribuicao = data
       return {
-        vara: this.extraiVaraCapa($).vara,
-        comarca: this.extraiVaraCapa($).comarca,
+        vara: this.extraiVaraCapa($, contador).vara,
+        comarca: this.extraiVaraCapa($, contador).comarca,
         primeiraDistribuicao: primeiraDistribuicao,
         fase: fase,
       }
@@ -187,35 +207,50 @@ class JTEParser extends BaseParser {
         if (andamentos[i].descricao.indexOf("Audiencia inicial designada") > -1) dados = andamentos[i].descricao
         data = andamentos[i].data
       }
-      if (!!dados) {
-        let vara = dados.split('-')[1].split('de')[0].trim();
-        let comarca = dados.split('-')[1].split('de')[1].replace(')', '').trim();
-        let primeiraDistribuicao = data
-        return {
-          vara: vara,
-          comarca: comarca,
-          primeiraDistribuicao: primeiraDistribuicao,
-          fase: fase,
+      //console.log(dados);
+      try{
+        if (!!dados) {
+          let vara = dados.split('-')[1].split('de')[0].trim();
+          //console.log(dados.split(/ DE /gmi)[1].replace(')', '').trim());
+          let comarca = dados.split(/ DE /gmi)[1].replace(')', '').trim();
+          let primeiraDistribuicao = data
+          return {
+            vara: vara,
+            comarca: comarca,
+            primeiraDistribuicao: primeiraDistribuicao,
+            fase: fase,
+          }
+        } else {
+          let primeiraDistribuicao = data
+          return {
+            vara: "",
+            comarca: "",
+            primeiraDistribuicao: primeiraDistribuicao,
+            fase: fase,
+          }
         }
-      } else {
+      } catch (e){
         let primeiraDistribuicao = data
-        return {
-          vara: "Não foi possivel obter",
-          comarca: "Não foi possivel obter",
-          primeiraDistribuicao: primeiraDistribuicao,
-          fase: fase,
-        }
+          return {
+            vara: "",
+            comarca: "",
+            primeiraDistribuicao: primeiraDistribuicao,
+            fase: fase,
+          }
       }
+      
     }
   }
 
   // precisa de melhorias
-  extraiVaraCapa($) {
+  extraiVaraCapa($, contador) {
     // let resultado = "não possui vara"
     let resultado;
     let vara;
     let comarca;
-    $('detalhes-aba-geral p').each(async function (element) {
+
+    $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > p`).each(async function (element) {
+      // $('detalhes-aba-geral p').each(async function (element) {
       let datas = $(this).text().split('\n');
       if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
         vara = datas[0].split('-')[1].split('de')[0].trim()
@@ -345,7 +380,7 @@ class JTEParser extends BaseParser {
           idx = array.indexOf(elemento, idx + 1);
         }
         obj = {
-          descricao: this.removeVazios(texto[j])[0]+`[${indices.length}]`,
+          descricao: this.removeVazios(texto[j])[0] + `[${indices.length}]`,
           data: this.ajustaData(this.removeVazios(data[j])[0]),
           numeroProcesso: n,
           observacao: ""
@@ -435,8 +470,6 @@ class JTEParser extends BaseParser {
 
   // ajusta data brasil para Internacional recebe uma data por vez.
   ajustaData(datas) {
-
-
     let dia = datas.slice(0, 2);
     let mes = datas.slice(2, 5);
     let ano = datas.slice(5, 10);

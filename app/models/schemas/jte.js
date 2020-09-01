@@ -49,7 +49,7 @@ const comarcaSchema = new mongoose.Schema({
 	estadoNumero: String,
 	comarca: String,
 	status: String,
-	atualizacao: String,
+	atualizacao: [],
 	ultimaAtualizacao: Date,
 	numeroUltimoProcecesso: String,
 

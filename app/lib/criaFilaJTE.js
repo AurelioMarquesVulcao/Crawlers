@@ -11,35 +11,43 @@ const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } =
 const { Cnj } = require('../lib/util')
 require("dotenv/config");
 
+const util = new Cnj();
 
 
 class CriaFilaJTE {
 	async salvaStatusComarca(numero) {
-		let cnj = new Cnj().processoSlice(numero);
+		let cnj = util.processoSlice(numero);
 		let verifica = await statusEstadosJTE.find({ "estadoNumero": cnj.estado, "comarca": cnj.comarca });
-
+		console.log(verifica);
 		let obj = {
 			estado: "",
 			estadoNumero: cnj.estado,
 			comarca: cnj.comarca,
 			status: "novo",
-			atualizacao: [this.relogio.dia, this.relogio.mes],
+			atualizacao: [this.relogio().dia, this.relogio().mes],
 			ultimaAtualizacao: new Date(),
-			numeroUltimoProcecesso: `${novoSequencial(numero)}${cnj.dois}${cnj.ano}${cnj.tipo}${cnj.comarca}`,
+			numeroUltimoProcecesso: `${novoSequencial(numero)}${cnj.dois}`,
 
 		}
-		if (!verifica) {
-			await new statusEstadosJTE(obj).save()
-		}
+		await new statusEstadosJTE(obj).save()
+		// if (!verifica) {
+		// 	await new statusEstadosJTE(obj).save()
+		// }
 		function novoSequencial(numero) {
-			let cnj = new Cnj().processoSlice(numero);
-			let sequencial = cnj.sequencial - 1;
-			let zeros = cnj.sequencial.length - sequencial.length;
-			let zero = "";
-			for (let i = 0; i < zeros; i++) {
-				zero += "0"
+			let resultado;
+			let cnj = util.processoSlice(numero);
+			let sequencial = cnj.sequencial;
+			let sequencialSlice = util.corrigeSequencial(sequencial);
+			let zero = sequencialSlice.zero;
+			let numeros = sequencialSlice.seq;
+			let numerosAnterior = parseInt(numeros) - 1
+			if ((numerosAnterior.toString().length + zero.length) < 7) {
+				resultado = zero + "0" + numerosAnterior
+			} else {
+				resultado = resultado = zero + numerosAnterior
 			}
-			return zero + sequencial
+
+			return resultado
 		}
 	}
 

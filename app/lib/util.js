@@ -295,13 +295,28 @@ class Logger {
 
 class Cnj {
   processoSlice(numero) {
-    let comarca = numero.slice(16, 20);
-    let estado = numero.slice(14, 16);
-    let ano = numero.slice(9, 13);
     let sequencial = numero.slice(0, 7);
     let dois = numero.slice(7, 9);
-    let tipo = numero.slice(14,16);
-    return { comarca, estado, ano, sequencial, dois, tipo }
+    let ano = numero.slice(9, 13);
+    let tipo = numero.slice(13, 14);
+    let estado = numero.slice(14, 16);
+    let comarca = numero.slice(16, 20);
+
+    return { sequencial, dois, ano, tipo, estado, comarca }
+  }
+  // separa os zeros a serem acrecidos no inicio do numero sequencial
+  corrigeSequencial(sequencial) {
+    let novoSequencial = sequencial
+    let zero = ''
+    for (let i = 0; i < sequencial.length; i++) {
+      if (sequencial[i] == '0') {
+        novoSequencial = novoSequencial.slice(1, novoSequencial.length)
+        zero += "0"
+      } else {
+        break
+      };
+    }; let seq = novoSequencial;
+    return { seq, zero }
   }
 }
 

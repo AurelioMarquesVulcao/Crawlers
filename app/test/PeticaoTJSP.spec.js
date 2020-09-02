@@ -5,8 +5,12 @@ describe('PeticaoTJSP Worker', async () => {
   const teste = new PeticaoTJSP({ debug: false, headless: false }).extrair(
     '1011131-88.2018.8.26.0562',
     1
-  );
-  console.log('Terminado')
+  ).then(teste => {
+    console.log("Terminado");
+    delete teste['logs'];
+    console.log(teste);
+  });
+
 
   // console.log('1 Instancia | Multiplos resultados na pesquisa');
   // const teste = await new PeticaoTJSP({ debug: true, headless: false }).extrair(
@@ -44,6 +48,5 @@ describe('PeticaoTJSP Worker', async () => {
   //   3
   // );
 
-  delete teste['logs'];
-  console.table(teste);
+
 });

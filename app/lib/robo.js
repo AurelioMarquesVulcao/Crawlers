@@ -80,7 +80,7 @@ class Requisicao {
           }
         })
         .catch((err) => {
-          console.log('----- Robo erro', err.code, '-----');
+          console.log('----- Robo erro', err, '-----');
           let resposta = {};
           if (err.response) {
             resposta.status = err.response.status

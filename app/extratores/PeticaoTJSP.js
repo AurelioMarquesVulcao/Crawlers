@@ -228,9 +228,9 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     this.logger.info('Aguardando o carregamento da pagina');
 
     this.debug('Aguardando carregamento da pagina');
-    // Esse sleep é pq pode aleatoriamente ter uma mudança no dom que bloqueia a
-    // tela até que ela esteja completa.
-    await sleep(1500);
+
+    await this.page.waitForSelector('.sc-ifAKCX', { timeout: 15000 });
+
     this.debug('Pagina carregada');
     this.logger.info('Pagina carregada');
     this.logger.info('Digitando numero do processo');
@@ -322,16 +322,16 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     });
 
     // Interceptando request
+
     await this.page.setRequestInterception(true);
-    this.page.on('request', request => {
-      console.log(request);
-      request.continue();
+    this.page.on('request', async request => {
+      if (/getPDFImpressao\.do/.test(request._url)) {
+        this.resposta.urlOrigem = request._url;
+      }
+        request.continue();
     })
-    console.log('botaoClicado')
     await this.page.click('#btnDownloadDocumento');
-
     console.log('botaoClicado')
-
     this.logger.info('Download iniciado');
   }
 

@@ -106,32 +106,51 @@ class Helper {
 
   static async feedbackDocumentos(msg) {
     const robo = new Robo();
-    let resposta = await Token.hasValid();
-    let token;
+    // let resposta = await Token.hasValid();
+    // let token;
+    //
+    // if (resposta.sucesso) {
+    //   token = resposta.token;
+    // } else {
+    //   resposta = await this.resgatarNovoToken();
+    //   if (resposta.responseBody.Sucesso) {
+    //     await new Token({ token: resposta.responseBody.Token }).save();
+    //   } else {
+    //     console.log("Não foi possivel recuperar o Token");
+    //     process.exit(1);
+    //   }
+    // }
 
-    if (resposta.sucesso) {
-      token = resposta.token;
-    } else {
-      resposta = await this.resgatarNovoToken();
-      if (resposta.responseBody.Sucesso) {
-        await new Token({ token: resposta.responseBody.Token }).save();
-      } else {
-        console.log("Não foi possivel recuperar o Token");
-        process.exit(1);
-      }
+    const config = {
+      'method': 'post',
+      url: enums.bigdataUrls.resultadoDocumentos,
+      maxContentLength: Infinity, maxBodyLength: Infinity,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify(msg)
     }
 
-    return await robo.acessar({
-      url: enums.bigdataUrls.resultadoDocumentos,
-      method: "POST",
-      encoding: "",
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      usaProxy: false,
-      usaJson: true,
-      params: msg
-    });
+    Axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    return Promise.resolve(true);
+    //await robo.acessar({
+    //   url: enums.bigdataUrls.resultadoDocumentos,
+    //   method: "POST",
+    //   encoding: "",
+    //   // headers: {
+    //   //   Authorization: `Bearer ${token}`
+    //   // },
+    //   usaProxy: false,
+    //   usaJson: true,
+    //   params: msg
+    // });
   }
 
   static async downloadImage(url, headers) {

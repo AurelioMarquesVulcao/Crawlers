@@ -40,13 +40,11 @@ var testeErros2 = []; // Contador de erros
 var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicação
 var resultado = [];
 var catchError = 0;   // Captura erros;
-var start = 0;
+var start = 0;        // server de marcador para as funções que devem carregar na inicialização
 
 
 
 
-
-// posso aplicar condições para rodar o worker
 (async () => {
   setInterval(async function () {
     let relogio = fila.relogio();

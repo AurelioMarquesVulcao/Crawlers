@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const shell = require('shelljs');
 
-const { Cnj } = require('../../lib/util');
+const { Cnj, Helper} = require('../../lib/util');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const { enums } = require('../../configs/enums');
+const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../models/schemas/jte')
 
 const fila = new CriaFilaJTE();
 const ajuste = new Cnj();
@@ -29,8 +30,16 @@ mongoose.connection.on('error', (e) => {
     //zero = zero.substr(1)
     //console.log(zero);
     //console.log(novoSequencial(sequencial));
+    //await fila.salvaStatusComarca("00104979620205100021", "2020-08-07T03:00:00.000Z", "", {"estadoNumero": "10", "comarca": "0021"});
 
-    await fila.salvaStatusComarca("00104979620205100021", "2020-08-07T03:00:00.000Z", "", {"estadoNumero": "10", "comarca": "0021"});
+
+    //await statusRaspagem()
+
+
+
+
+
+
     mongoose.connection.close();
     process.exit()
 })()
@@ -51,4 +60,36 @@ function novoSequencial(numero) {
     }
 
     return resultado
+}
+
+async function statusRaspagem() {
+    //let obj = await statusEstadosJTE.find({"status" : "Não possui processos"})
+    let obj = await statusEstadosJTE.find({ "estadoNumero": "02" })
+    let ultimos = 0;
+    let buscando = 0;
+    let naoEncontrado = 0;
+    let total = 0;
+    for (i in obj) {
+        Estado = obj[i].estadoNumero
+        Comarca = obj[i].comarca
+        Status = obj[i].status
+        if (Comarca != "unde") {
+            console.log({ Estado, Comarca, Status });
+            total++
+            if (Status == 'Ultimo Processo') {
+                ultimos++
+            } else if (Status == 'Novo' || Status == 'Atualizado') {
+                buscando++
+            } else if (Status == 'Não possui processos') {
+                naoEncontrado++
+            }
+        }
+    }
+    console.log({
+        Total_Comarcas: total,
+        Total_Ultimos_Processos: ultimos,
+        Total_Buscando_Ultimo: buscando,
+        Total_Nao_Encontrado: naoEncontrado
+    }
+    );
 }

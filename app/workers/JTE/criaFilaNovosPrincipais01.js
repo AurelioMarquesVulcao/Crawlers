@@ -10,14 +10,13 @@ const { Helper, Logger } = require('../../lib/util');
 const desligar = require('../../assets/jte/horarioRoboJTE.json');
 
 
-
 const Fila = new CriaFilaJTE();
 var fila = ".P";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.P';
-// var desligado = [];
-var desligado = desligar.worker
+// var desligado = []; // Descomentar essa linha para rodar 24 horas por dia
+var desligado = desligar.worker; 
 var estados = [
-  Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
+  Estados.pr // Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
 ];
 
 
@@ -116,7 +115,9 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
       } catch (e) {
         // console.log(e);
-        console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
+        console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
+        let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
+        await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
       if (contaOrigem == max) {
         contaOrigem = 0;

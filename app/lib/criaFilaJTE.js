@@ -18,10 +18,7 @@ class CriaFilaJTE {
 	async salvaStatusComarca(numero, data, raspagem, buscaProcesso) {
 		let cnj = util.processoSlice(numero);
 		let busca = buscaProcesso;
-		//console.log(busca);
 		let verifica = await statusEstadosJTE.find(busca);
-		//console.log(verifica);
-		//console.log(verifica.length);
 		let estado = "";
 		let estadoNumero = cnj.estado;
 		let comarca = cnj.comarca;
@@ -32,25 +29,29 @@ class CriaFilaJTE {
 
 		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
 
-		//await new statusEstadosJTE(obj).save()
-		if (verifica.length == 0) {
-			//console.log(" salvar");
-			//console.log(obj);
+		if (cnj.sequencial == "0000000") {
+
+			status = "Não possui processos";
+			let obj2 = { status, estadoNumero, comarca, dataBusca, numeroUltimoProcecesso };
+			if (verifica.length == 0) {
+				
+				await new statusEstadosJTE(obj2).save()
+			} else {
+				await statusEstadosJTE.findOneAndUpdate(busca, obj2)	
+			}
+
+		} else if (verifica.length == 0) {
 			await new statusEstadosJTE(obj).save()
-			//console.log(await statusEstadosJTE.find(busca));
 		} else if (raspagem == true) {
 			status = "Ultimo Processo";
 			let obj2 = { status, dataBusca };
-			//busca = buscaProcesso = { "estadoNumero": novoSequencial(cnj.estado), "comarca": cnj.comarca };
-			console.log("--------update-------------");
+			console.log("-------- update -------------");
 			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
-			//console.log(await statusEstadosJTE.find(busca));
 		} else {
 			status = "Atualizado";
 			let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
-			console.log("--------update-------------");
+			console.log("-------- update -------------");
 			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
-			//console.log(await statusEstadosJTE.find(busca));
 		}
 
 		function novoSequencial(numero) {
@@ -76,27 +77,11 @@ class CriaFilaJTE {
 	}
 
 	async buscaDb(quantidade, salto) {
-		// let devDbConection = process.env.MONGO_CONNECTION_STRING
-
-		// mongoose.connect(devDbConection, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true
-		// });
-
 		return await consultaCadastradas.find({ "Detalhes.Tribunal": 5 }).limit(quantidade).skip(salto)
-		// return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
 	}
 
 	async salvaUltimo(ultimo) {
-		//let devDbConection = process.env.MONGO_DEV_CONECTION
-		// let devDbConection = process.env.MONGO_CONNECTION_STRING
-		// mongoose.connect(devDbConection, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true
-		// });
 		let veirifica = await ultimoProcesso.find({ "numeroProcesso": ultimo.numeroProcesso })
-
-
 		if (!veirifica[0]) {
 			return await new ultimoProcesso(ultimo).save()
 		}
@@ -104,60 +89,22 @@ class CriaFilaJTE {
 	}
 
 	async salvaDocumentoLink(link) {
-		//let devDbConection = process.env.MONGO_DEV_CONECTION
-		// let devDbConection = process.env.MONGO_CONNECTION_STRING
-		// mongoose.connect(devDbConection, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true
-		// });
-
 		let verifica = await linkDocumento.find({ "numeroProcesso": link.numeroProcesso, "movimentacao": link.link })
-		// console.log(!verifica[0]);
 		if (!verifica[0]) {
 			return await new linkDocumento(link).save()
 		}
-
-
-
 	}
 
 	async abreUltimo(parametro) {
-		// let devDbConection = process.env.MONGO_CONNECTION_STRING
-
-		// mongoose.connect(devDbConection, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true
-		// });
-
-		// mongoose.connect(enums.mongo.connString, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true,
-		//   });
-		//   mongoose.connection.on('error', (e) => {
-		// 	console.log(e);
-		//   });
-
 		let busca = await ultimoProcesso.find(parametro)
-		// console.log("abreUltimo", parametro);
-		// console.log(process.env.MONGO_CONNECTION_STRING);
-		// console.log(enums.mongo.connString);
-		// console.log(busca);
-		// process.exit()
 		let obj = busca;
-
 		return obj
 	}
-
-
 
 	async filtraTrunal() {
 		let recebeNumeros = [];
 		let resultado = [];
 		let dados = await this.buscaDb(60000, 0);
-		// console.log(dados);
-		// console.log(process.env.MONGO_CONNECTION_STRING);
-		// process.exit()
-
 		for (let i = 0; i < dados.length; i++) {
 			let numero = dados[i].NumeroProcesso
 			let sequencial = numero.slice(0, 7)
@@ -167,13 +114,10 @@ class CriaFilaJTE {
 				resultado.push([varaTrabalho, sequencial])
 			}
 		}
-
 		return resultado.sort()
 	}
 	async peganumero() {
 		let dados = await this.buscaDb(60000, 0)
-
-
 		for (let i = 0; i < dados.length; i++) {
 			let numero = dados[i].NumeroProcesso
 
@@ -186,9 +130,6 @@ class CriaFilaJTE {
 	}
 	async procura(sequencial, origem, tentativas, tribunal, fila) {
 		try {
-			// console.log("procura");
-			// console.log(process.env.MONGO_CONNECTION_STRING);
-			// process.exit()
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
 			let processo = ""
@@ -203,13 +144,11 @@ class CriaFilaJTE {
 					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
 				}
 
-
 				await this.enviaFila([{
 					NumeroProcesso: processo
 				}], fila)
 				console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
 				console.log(`Estado ${tribunal}`);
-				//await this.enviaFila(`00109964720205150001`)
 			}
 		} catch (e) {
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);
@@ -218,9 +157,6 @@ class CriaFilaJTE {
 	}
 	async procura10(sequencial, origem, tentativas, tribunal, fila) {
 		try {
-			// console.log("procura10");
-			// console.log(process.env.MONGO_CONNECTION_STRING);
-			// process.exit()
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
 			let processo = ""
@@ -285,60 +221,6 @@ class CriaFilaJTE {
 					conta1000 = 0
 				}
 			}
-			// if (tribunal == 2) {
-			//     await sleep(sleep1)
-			//     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
-			//     let message = criaPost(filtro[i].NumeroProcesso)
-
-			//     await this.enviarMensagem(nomeFila, message)
-			//     
-			//     conta1000++
-			//     if (conta1000 == 2000) {
-			//         await sleep(sleep4)
-			//         conta1000 = 0
-			//     }
-			// }
-			// if (tribunal == 3) {
-			//     await sleep(sleep1)
-			//     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-MG`;
-			//     let message = criaPost(filtro[i].NumeroProcesso)
-
-			//     await this.enviarMensagem(nomeFila, message)
-			//     
-			//     conta1000++
-			//     if (conta1000 == 2000) {
-			//         await sleep(sleep4)
-			//         conta1000 = 0
-			//     }
-			// }
-			// if (tribunal == 1) {
-			//     await sleep(sleep1)
-			//     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-RJ`;
-			//     let message = criaPost(filtro[i].NumeroProcesso)
-
-			//     await this.enviarMensagem(nomeFila, message)
-			//     
-			//     conta1000++
-			//     if (conta1000 == 2000) {
-			//         await sleep(sleep4)
-			//         conta1000 = 0
-			//     }
-			// }
-			// if (tribunal == 5) {
-			//     await sleep(sleep1)
-			//     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
-			//     let message = criaPost(filtro[i].NumeroProcesso)
-
-			//     await this.enviarMensagem(nomeFila, message)
-			//     
-			//     conta1000++
-			//     if (conta1000 == 2000) {
-			//         await sleep(sleep4)
-			//         conta1000 = 0
-			//     }
-			// }
-
-
 
 		}
 	}

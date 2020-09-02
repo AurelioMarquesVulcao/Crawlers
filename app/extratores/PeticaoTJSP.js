@@ -24,7 +24,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
 
     this.args = [
       '--no-sandbox',
-      `--proxy-server=http://proxy-proadv.7lan.net:8181`,
+      // `--proxy-server=http://proxy-proadv.7lan.net:8181`,
       `--ignore-certificate-errors`,
     ];
     this.ignore = ['--disable-extensions'];
@@ -135,6 +135,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
         `Finalizado processo de extração de documentos ${this.numeroProcesso}`
       );
     } catch (e) {
+      console.log(e);
       this.logger.log('error', e);
       this.debug(`ERRO OCORRIDO:\n ${e}`);
 
@@ -320,7 +321,17 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       downloadPath: './temp/peticoes/tjsp',
     });
 
+    // Interceptando request
+    await this.page.setRequestInterception(true);
+    this.page.on('request', request => {
+      console.log(request);
+      request.continue();
+    })
+    console.log('botaoClicado')
     await this.page.click('#btnDownloadDocumento');
+
+    console.log('botaoClicado')
+
     this.logger.info('Download iniciado');
   }
 

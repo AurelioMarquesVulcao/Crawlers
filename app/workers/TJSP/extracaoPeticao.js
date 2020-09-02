@@ -37,6 +37,7 @@ const logarExecucao = async (execucao) => {
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
+      let resposta;
 
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(
@@ -58,16 +59,28 @@ const logarExecucao = async (execucao) => {
       logger.info('Arquivo preparado');
 
       logger.info('Enviando resposta ao BigData');
-      await Helper.feedbackDocumentos({
-        ArquivoB64: data,
-        NumeroProcesso: message.NumeroProcesso,
-        Instancia: message.Instancia,
-      }).catch((err) => {
-        console.log(err);
-        throw new Error(
-          `PeticaoTJSP - Erro ao enviar resposta ao BigData - Processo: ${message.Processo}`
-        );
-      });
+
+      if (resultadoExtracao.sucesso) {
+        resposta = {
+          NumeroCNJ: message.NumeroProcesso,
+          // Instancia: message.Instancia,
+          Documentos: [
+            {
+              DocumentoBody: data,
+              UrlOrigem: resultadoExtracao.urlOrigem,
+              NomeOrigem: `${message.NumeroProcesso}.pdf`,
+            },
+          ],
+        };
+        await Helper.feedbackDocumentos(resposta).catch((err) => {
+          console.log(err);
+          throw new Error(
+            `PeticaoTJSP - Erro ao enviar resposta ao BigData - Processo: ${message.Processo}`
+          );
+        });
+      } else {
+        console.log('Envia resposta para o endpoint de erro');
+      }
 
       logger.info('Resposta enviada ao BigData');
       logger.info('Finalizando processo');

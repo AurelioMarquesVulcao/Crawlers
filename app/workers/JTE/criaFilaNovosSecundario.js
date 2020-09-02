@@ -41,7 +41,7 @@ var estados = [
   });
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
-    console.log(estados[contador].estado);
+    //console.log(estados[contador].estado);
     let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
     await sleep(1000);
     // esse if mantem o enfilerador desligado na hora desejada
@@ -89,9 +89,9 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         let comarca = sequencial.numeroProcesso.slice(16, 20);
         // Pegará os processos
         console.log("Estamos na comarca: " + origens[contaOrigem]);
-
+        
         if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
-          if (sequencial.data.mes < relogio.mes - 1) {
+          if (sequencial.data.mes < relogio.mes - 1) { 
             await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
             console.log("----------------------- Estou dando um salto no Tempo--------------------------");
           } else {
@@ -113,12 +113,14 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           } else {
             await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
           }
-          await sleep(500)
+          await sleep(2500)
         }
 
       } catch (e) {
         // console.log(e);
-        console.log("------------- A comarca :" + origens[contaOrigem] + ' falhou na busca--------------------');
+        console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
+        let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
+        await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
       if (contaOrigem == max) {
         contaOrigem = 0;
@@ -162,6 +164,7 @@ function embaralha(lista) {
 // fila limpa = true, fila com processos = undefined.
 async function verificaFila(nomeFila) {
   let filas = await getFilas()
+  // console.log(filas);
   if (filas.length > 0) {
     for (let i = 0; i < filas.length; i++) {
       if (filas[i].nome == nomeFila) {

@@ -16,7 +16,7 @@ var nomeFila = 'processo.JTE.extracao.novos.P';
 // var desligado = []; // Descomentar essa linha para rodar 24 horas por dia
 var desligado = desligar.worker; 
 var estados = [
-  Estados.pr // Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
+  Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
 ];
 
 
@@ -38,7 +38,7 @@ var estados = [
   });
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
-    console.log(estados[contador].estado);
+    // console.log(estados[contador].estado);
     let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
     await sleep(1000);
     // esse if mantem o enfilerador desligado na hora desejada
@@ -161,7 +161,7 @@ function embaralha(lista) {
 // fila limpa = true, fila com processos = undefined.
 async function verificaFila(nomeFila) {
   let filas = await getFilas()
-  console.log(filas);
+  //console.log(filas);
   if (filas.length > 0) {
     for (let i = 0; i < filas.length; i++) {
       if (filas[i].nome == nomeFila) {

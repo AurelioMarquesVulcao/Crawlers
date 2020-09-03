@@ -9,6 +9,7 @@ const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 
 
+
 class JTEParser extends BaseParser {
   /**
    * JTEParser
@@ -208,7 +209,7 @@ class JTEParser extends BaseParser {
         data = andamentos[i].data
       }
       //console.log(dados);
-      try{
+      try {
         if (!!dados) {
           let vara = dados.split('-')[1].split('de')[0].trim();
           //console.log(dados.split(/ DE /gmi)[1].replace(')', '').trim());
@@ -229,16 +230,16 @@ class JTEParser extends BaseParser {
             fase: fase,
           }
         }
-      } catch (e){
+      } catch (e) {
         let primeiraDistribuicao = data
-          return {
-            vara: "",
-            comarca: "",
-            primeiraDistribuicao: primeiraDistribuicao,
-            fase: fase,
-          }
+        return {
+          vara: "",
+          comarca: "",
+          primeiraDistribuicao: primeiraDistribuicao,
+          fase: fase,
+        }
       }
-      
+
     }
   }
 
@@ -248,19 +249,50 @@ class JTEParser extends BaseParser {
     let resultado;
     let vara;
     let comarca;
+    let processo = "";
 
     $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > p`).each(async function (element) {
       // $('detalhes-aba-geral p').each(async function (element) {
       let datas = $(this).text().split('\n');
-      if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
-        vara = datas[0].split('-')[1].split('de')[0].trim()
-        comarca = datas[0].split('-')[1].split('de')[1].trim()
-        resultado = {
-          vara: vara,
-          comarca: comarca,
-        }
-      }
+      console.log(datas);
+      processo = datas[0]
+      // console.log(datas);
+      // if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
+      //   vara = datas[0].split('-')[1].split('de')[0].trim()
+      //   comarca = datas[0].split('-')[1].split('de')[1].trim()
+      //   resultado = {
+      //     vara: vara,
+      //     comarca: comarca,
+      //   }
+      // }
     })
+    console.log(processo);
+    let data = this.regexVaraComarca(processo)
+    console.log(data);
+    vara = removerAcentos(data[2])
+    comarca = removerAcentos(data[3])
+    resultado = { vara, comarca }
+    console.log(resultado);
+    return resultado
+  }
+
+  regexVaraComarca(str) {
+    let regex = /(?:^|\n[\t ]*).*?(\d)º.*?-\s*(.+?D[EO].+?)\s*D[EO]\s*(.+)\s*/gim;
+    let m;
+    let resultado = []
+
+    while ((m = regex.exec(str)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      }
+
+      // The result can be accessed through the `m`-variable.
+      m.forEach((match, groupIndex) => {
+        resultado.push(`${match}`)
+        // console.log(`Found match, group ${groupIndex}: ${match}`);
+      });
+    }
     return resultado
   }
   instancia($) {

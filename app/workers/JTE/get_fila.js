@@ -1,5 +1,4 @@
 const axios = require('axios');
-const Estados = require('../../assets/jte/comarcascopy.json');
 
 var rabbitMQ = 'http://admin:crawler480@172.16.16.3:15676/api/queues';
 

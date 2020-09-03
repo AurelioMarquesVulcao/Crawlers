@@ -14,7 +14,7 @@ const Fila = new CriaFilaJTE();
 var fila = ".P";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.P';
 // var desligado = []; // Descomentar essa linha para rodar 24 horas por dia
-var desligado = desligar.worker; 
+var desligado = desligar.worker;
 var estados = [
   Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
 ];
@@ -32,6 +32,7 @@ var estados = [
   embaralha(estados)
 
   let devDbConection = process.env.MONGO_CONNECTION_STRING;
+
   mongoose.connect(devDbConection, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -86,9 +87,9 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         let comarca = sequencial.numeroProcesso.slice(16, 20);
         // Pegará os processos
         console.log("Estamos na comarca: " + origens[contaOrigem]);
-        
+
         if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
-          if (sequencial.data.mes < relogio.mes - 1) { 
+          if (sequencial.data.mes < relogio.mes - 1) {
             await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
             console.log("----------------------- Estou dando um salto no Tempo--------------------------");
           } else {
@@ -110,7 +111,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           } else {
             await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
           }
-          await sleep(2500)
+          await sleep(500)
         }
 
       } catch (e) {
@@ -120,6 +121,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
       if (contaOrigem == max) {
+        await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.
         await testeFila(nomeFila);
@@ -160,7 +162,8 @@ function embaralha(lista) {
 // me informa true ou undefined para:
 // fila limpa = true, fila com processos = undefined.
 async function verificaFila(nomeFila) {
-  let filas = await getFilas()
+  let filas = await getFilas();
+  console.log(filas);
   //console.log(filas);
   if (filas.length > 0) {
     for (let i = 0; i < filas.length; i++) {
@@ -176,11 +179,35 @@ async function testeFila(nomeFila) {
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
     let statusFila = await verificaFila(nomeFila);
+    //console.log(statusFila + "----------------");
     //console.log("funcao teste fila");
     if (relogio.min == 20) { break }
     if (!statusFila) {
       console.log("A fila ainda não consumiu...");
       await sleep(10000)
     } else { break }
+  }
+}
+
+async function paraServico() {
+  let teste = await aguardaServico();
+  let filas = await getFilas();
+  for (l in filas) {
+    if (filas[l].nome == nomeFila && teste == true) {
+      await mongoose.connection.close()
+      process.exit();
+    }
+  }
+}
+
+async function aguardaServico() {
+  let filas = await getFilas();
+  for (l in filas) {
+    if (filas[l].nome == nomeFila) {
+      await sleep(300000);  // aguardar 5 minutos.
+      return true;
+    } else {
+      return false
+    }
   }
 }

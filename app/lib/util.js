@@ -162,6 +162,17 @@ class Helper {
     });
   }
 
+  static async downloadFiles(url, headers) {
+    return await Axios({
+      url,
+      method: 'GET',
+      responseType: 'arraybuffer',
+      headers: headers,
+    }).then((response) => {
+      return Buffer.from(response.data).toString('base64');
+    });
+  }
+
   static async quebrarCaptcha(captchaString, tipo) {
     return await new Robo().acessar({
       url: enums.bigdataUrls.captchaDecoder,

@@ -234,20 +234,27 @@ async function worker() {
         if (message.NovosProcessos == true) {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
-          await console.log(link.length);
+          let listaArquivo = [];
+          let cnj = link[0].numeroProcesso.replace(/[-.]/g, "");
+          //await console.log(link.length);
 
           for (let w = 0; w < link.length - 1; w++) {
             console.log('entrou no laço');
             await new CriaFilaJTE().salvaDocumentoLink(link[w]);
-            let nome = link[w].numeroProcesso + w + ".pdf";
+            let nome = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
             let linkDocumento = link[w].link;
-            let local = '../../downloads'
+            let local = '/home/aurelio/crawlers-bigdata/downloads'
             let tipo = link[w].tipo;
             if (tipo == 'pdf') {
               await new downloadFiles().download(nome, linkDocumento, local)
+              listaArquivo.push({
+                url: linkDocumento,
+                path: `${local}/${nome}`
+              })
             }
             await console.log('O link ' + w + ' Foi salvo');
           }
+          await new downloadFiles().enviarAWS(cnj, listaArquivo)
         }
 
         logger.info('Processo extraidos com sucesso');

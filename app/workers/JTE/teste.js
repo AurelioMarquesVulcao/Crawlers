@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const shell = require('shelljs');
 
-const { Cnj, Helper} = require('../../lib/util');
+const { Cnj, Helper } = require('../../lib/util');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const { enums } = require('../../configs/enums');
 const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../models/schemas/jte')
+const Estados = require('../../assets/jte/comarcascopy.json');
 
 const fila = new CriaFilaJTE();
 const ajuste = new Cnj();
@@ -36,6 +37,11 @@ mongoose.connection.on('error', (e) => {
     //await statusRaspagem()
 
 
+
+    contarComarcas(Estados)
+
+    varaComarca("Processo no 1º grau - 1ª Vara do Trabalho de Campinas");
+    varaComarca("Processo no 1º grau - 5ª Vara do Trabalho do Rio de Janeiro")
 
 
 
@@ -92,4 +98,40 @@ async function statusRaspagem() {
         Total_Nao_Encontrado: naoEncontrado
     }
     );
+}
+
+// conta as comarcas que pussuo até agora.
+function contarComarcas(Estados) {
+    let comarcas = 0;
+    let estados = [
+        Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
+        Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
+        Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
+        Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
+        Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
+    ];
+    for (let i = 0; i < estados.length; i++) {
+        for (let j = 0; j < estados[i].comarcas.length; j++) {
+            comarcas++
+        }
+    }
+    console.log(comarcas);
+}
+
+function varaComarca(str) {
+    let regex = /(?:^|\n[\t ]*).*?(\d)º.*?-\s*(.+?D[EO].+?)\s*D[EO]\s*(.+)\s*/gim;
+    let m;
+
+    while ((m = regex.exec(str)) !== null) {
+        // This is necessary to avoid infinite loops with zero-width matches
+        if (m.index === regex.lastIndex) {
+            regex.lastIndex++;
+        }
+
+        // The result can be accessed through the `m`-variable.
+        m.forEach((match, groupIndex) => {
+            console.log(`Found match, group ${groupIndex}: ${match}`);
+        });
+    }
+
 }

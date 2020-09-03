@@ -184,7 +184,7 @@ services:
       service: base_node
     command: node workers/TJSC/extracaoProcesso.js
 
-  novos-processos-jte:
+  novos-processos-jte-1:
     extends:
       file: common-services.yml
       service: base_node

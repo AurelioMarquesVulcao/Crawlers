@@ -261,6 +261,7 @@ class JTEParser extends BaseParser {
         }
       }
     })
+    console.log(resultado);
     return resultado
   }
   instancia($) {

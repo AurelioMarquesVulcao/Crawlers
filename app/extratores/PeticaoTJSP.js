@@ -324,14 +324,14 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     // Interceptando request
 
     await this.page.setRequestInterception(true);
-    this.page.on('request', async request => {
+    this.page.on('request', async (request) => {
       if (/getPDFImpressao\.do/.test(request._url)) {
         this.resposta.urlOrigem = request._url;
       }
-        request.continue();
-    })
+      request.continue();
+    });
     await this.page.click('#btnDownloadDocumento');
-    console.log('botaoClicado')
+    console.log('botaoClicado');
     this.logger.info('Download iniciado');
   }
 

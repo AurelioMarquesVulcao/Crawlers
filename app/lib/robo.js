@@ -83,10 +83,10 @@ class Requisicao {
           console.log('----- Robo erro', err, '-----');
           let resposta = {};
           if (err.response) {
-            resposta.status = err.response.status
+            resposta.status = err.response.status;
             resposta.message = err.response.statusText;
-            resposta.responseBody = err.response.data ? err.response.data : ''
-            resposta.headers = err.response.headers
+            resposta.responseBody = err.response.data ? err.response.data : '';
+            resposta.headers = err.response.headers;
           }
           resposta.code = err.code;
           resolve(resposta);
@@ -139,14 +139,15 @@ class Robo {
 
   /**
    * Acessa o site
-   * @param {string} url URL do site
-   * @param {string} method 'GET'ou 'POST'
-   * @param {string} encoding tipo de codificacao
-   * @param {boolean} usaProxy deve usar proxy
-   * @param {boolean} usaJson é do tipo querystring
-   * @param {object} params parametros para o form ou querystring
-   * @param {object} headers headers
-   * @param {boolean} randomUserAgent deve utilizar um user agent aleatorio?
+   * @param {Object} options opções para fazer a request
+   * @param {string} options.url URL do site
+   * @param {string} options.method 'GET'ou 'POST'
+   * @param {string} options.encoding tipo de codificacao
+   * @param {boolean} options.usaProxy deve usar proxy
+   * @param {boolean} options.usaJson é do tipo querystring
+   * @param {Object} options.params parametros para o form ou querystring
+   * @param {Object} options.headers headers
+   * @param {boolean} options.randomUserAgent deve utilizar um user agent aleatorio?
    */
   async acessar({
     url,
@@ -184,7 +185,7 @@ class Robo {
 
     if (usaProxy) {
       options.httpsAgent = new HttpsProxyAgent(
-        "http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181"
+        'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181'
       );
     }
     //   host: 'proxy-proadv.7lan.net',
@@ -192,7 +193,7 @@ class Robo {
     //   auth: 'proadvproxy:C4fMSSjzKR5v9dzg'
     // });
 
-    options.timeout = 60000;    
+    options.timeout = 60000;
     return this.requisicao.enviarRequest(options);
   }
 }

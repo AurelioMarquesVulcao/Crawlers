@@ -7,13 +7,14 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
-const { Helper, Logger } = require('../../lib/util');
+const { Helper, Logger, Cnj } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 const { Andamento } = require('../../models/schemas/andamento');
 const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
+const desligado = require('../../assets/jte/horarioRoboJTE.json');
 
 /**
  * Logger para console e arquivo
@@ -23,6 +24,7 @@ let logger;
 const logarExecucao = async (execucao) => { await LogExecucao.salvar(execucao); };
 const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
+const util = new Cnj();
 // Filas a serem usadas
 const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
 const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
@@ -40,10 +42,25 @@ var resultado = [];
 var catchError = 0;   // Captura erros;
 var start = 0;
 
+
+
+
+
 // posso aplicar condições para rodar o worker
-if (data == 1) {
-  worker();
-}
+(async () => {
+  setInterval(async function () {
+    let relogio = fila.relogio();
+    if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
+      start = 1;
+      await worker();
+    } else {
+      //console.log("aguardando para ligar");
+    }
+  }, 6000);
+
+})()
+
+
 
 async function worker() {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
@@ -108,6 +125,7 @@ async function worker() {
       estadoDaFila = puppet.processaNumero(numeroProcesso).estado;
 
       if (estadoDaFila != estadoAnterior) {
+        await mongoose.connection.close()
         await puppet.mudaTribunal(estadoDaFila);
         await sleep(1000);
         contador = 0;
@@ -137,10 +155,10 @@ async function worker() {
         let numeroProcesso = message.NumeroProcesso;
 
         // loga no tribunal de arranque se for a primeira chamada da fila
-        if (start == 0) {
+        if (start == 1) {
           logger.info('Iniciando processo de logar no tribunal');
           await puppet.preencheTribunal(numeroProcesso);
-          start = 1
+          start = 2
           logger.info('Loggin no tribunal realizado com sucesso');
           await sleep(1000);
         }
@@ -176,9 +194,9 @@ async function worker() {
         if (!!objResponse) contador++;
 
         if (message.inicial != true) {
-        // condicional provisório para testes1
-        // if (message.inicial != true) {
-        // if (message.NovosProcessos != true) {
+          // condicional provisório para testes1
+          // if (message.inicial != true) {
+          // if (message.NovosProcessos != true) {
           logger.info("Enviando dados para o banco de dados.")
           await dadosProcesso.processo.salvar();
           //console.log(dadosProcesso.andamentos[0]);
@@ -187,8 +205,15 @@ async function worker() {
           // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
           // após que todas as comarcas estiverem no mes corrente aplicar o código acima
           logger.info("Sucesso ao enviar para o banco de dados.")
-          // Enviando para Collection de controle *ultimosProcessos*
 
+          // salvando status
+          let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
+          let dataAtualProcesso = dadosProcesso.processo.capa.dataDistribuicao;
+          let cnj = util.processoSlice(numeroAtualProcesso);
+          let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
+          await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso);
+
+          // Enviando para Collection de controle *ultimosProcessos*
           if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
             logger.info("Salvando na Collection ultimosProcessos")
             await new CriaFilaJTE().salvaUltimo({
@@ -201,8 +226,10 @@ async function worker() {
                 mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth(),
               },
             });
-          }
+          } 
         }
+
+
 
         // if (message.inicial == true) {
         // condicional provisório para testes
@@ -252,10 +279,21 @@ async function worker() {
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
-      logger.info('\033[0;34m' + 'Finalizado processo de extração')
+      logger.info('\033[0;34m' + 'Finalizado processo de extração');
+      desligaAgendado()
 
     } catch (e) {
       catchError++;
+      // console.log(e)
+      if (e == "ultimo processo") {
+        catchError--;
+        // salvando status 
+        let numeroAtualProcesso = numeroProcesso;
+        let dataAtualProcesso = "";
+        let cnj = util.processoSlice(numeroProcesso);
+        let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
+        await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, true, buscaProcesso);
+      }
       // Salva meus erros nos logs
       logger.log("info", numeroProcesso + " " + e);
       console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
@@ -284,9 +322,21 @@ async function worker() {
       ch.ack(msg);
       logger.info('Mensagem enviada ao reprocessamento');
       logger.info('\033[31m' + 'Finalizando processo de extração');
+      desligaAgendado()
 
     }
   });
+}
+
+function desligaAgendado() {
+  let relogio = fila.relogio()
+  if (desligado.worker.find(element => element == relogio.hora)) {
+    //await mongoose.connection.close();
+    shell.exec('pkill chrome');
+    start = 0;
+    console.log("vou desligar");
+    process.exit();
+  }
 }
 
 function errosSequencia(catchError, contadorErros) {

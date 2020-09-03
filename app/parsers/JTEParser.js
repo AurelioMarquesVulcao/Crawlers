@@ -266,13 +266,13 @@ class JTEParser extends BaseParser {
       //   }
       // }
     })
-    console.log(processo);
+    // console.log(processo);
     let data = this.regexVaraComarca(processo)
-    console.log(data);
+    // console.log(data);
     vara = removerAcentos(data[2])
     comarca = removerAcentos(data[3])
     resultado = { vara, comarca }
-    console.log(resultado);
+    // console.log(resultado);
     return resultado
   }
 

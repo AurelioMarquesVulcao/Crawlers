@@ -1,12 +1,12 @@
-const Crypto = require("crypto-js");
-const winston = require("winston");
-const moment = require("moment");
+const Crypto = require('crypto-js');
+const winston = require('winston');
+const moment = require('moment');
 const Axios = require('axios');
 
-const { Token } = require("../models/schemas/token");
+const { Token } = require('../models/schemas/token');
 
-const { enums } = require("../configs/enums");
-const { Robo } = require("../lib/robo");
+const { enums } = require('../configs/enums');
+const { Robo } = require('../lib/robo');
 
 class Helper {
   /**
@@ -32,9 +32,7 @@ class Helper {
   }
 
   static removerEspacosEmBranco(texto) {
-    return texto
-      .replace(/\n+|\s+|\t+/g, " ")
-      .trim();
+    return texto.replace(/\n+|\s+|\t+/g, ' ').trim();
   }
 
   static removerEspeciais(texto) {
@@ -49,28 +47,28 @@ class Helper {
   static removerAcento(texto) {
     return texto
       .toLowerCase()
-      .replace(/[ÁÀÂÃÄ]/gi, "a")
-      .replace(/[ÉÈÊË]/gi, "e")
-      .replace(/[ÍÌÎÏ]/gi, "i")
-      .replace(/[ÓÒÔÕÖ]/gi, "o")
-      .replace(/[ÚÙÛÜ]/gi, "u")
-      .replace(/[Ç]/gi, "c");
+      .replace(/[ÁÀÂÃÄ]/gi, 'a')
+      .replace(/[ÉÈÊË]/gi, 'e')
+      .replace(/[ÍÌÎÏ]/gi, 'i')
+      .replace(/[ÓÒÔÕÖ]/gi, 'o')
+      .replace(/[ÚÙÛÜ]/gi, 'u')
+      .replace(/[Ç]/gi, 'c');
   }
 
   static async resgatarNovoToken() {
     const robo = new Robo();
     return robo.acessar({
       url: enums.bigdataUrls.login,
-      method: "POST",
+      method: 'POST',
       headers: {
-        "User-Agent": "client",
-        "Content-Type": "application/json"
+        'User-Agent': 'client',
+        'Content-Type': 'application/json',
       },
       usaJson: true,
       params: {
-        Login: "extratificador_bigdata@impacta.adv.br",
-        Senha: "extratificador2019"
-      }
+        Login: 'extratificador_bigdata@impacta.adv.br',
+        Senha: 'extratificador2019',
+      },
     });
   }
 
@@ -86,22 +84,60 @@ class Helper {
       if (resposta.responseBody.Sucesso) {
         await new Token({ token: resposta.responseBody.Token }).save();
       } else {
-        console.log("Não foi possivel recuperar o Token");
+        console.log('Não foi possivel recuperar o Token');
         process.exit(1);
       }
     }
 
     return await robo.acessar({
       url: enums.bigdataUrls.resultadoConsulta,
-      method: "POST",
-      encoding: "",
+      method: 'POST',
+      encoding: '',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       usaProxy: false,
       usaJson: true,
-      params: msg
+      params: msg,
     });
+  }
+
+  static async feedbackDocumentos(msg) {
+    const robo = new Robo();
+    // let resposta = await Token.hasValid();
+    // let token;
+    //
+    // if (resposta.sucesso) {
+    //   token = resposta.token;
+    // } else {
+    //   resposta = await this.resgatarNovoToken();
+    //   if (resposta.responseBody.Sucesso) {
+    //     await new Token({ token: resposta.responseBody.Token }).save();
+    //   } else {
+    //     console.log("Não foi possivel recuperar o Token");
+    //     process.exit(1);
+    //   }
+    // }
+
+    const config = {
+      method: 'post',
+      url: enums.bigdataUrls.resultadoDocumentos,
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw',
+      },
+      data: JSON.stringify(msg),
+    };
+
+    return Axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
   static async downloadImage(url, headers) {
@@ -109,7 +145,7 @@ class Helper {
       url,
       method: 'GET',
       responseType: 'arraybuffer',
-      headers: headers
+      headers: headers,
     }).then((response) => {
       return Buffer.from(response.data).toString('base64');
     });
@@ -183,11 +219,11 @@ class Helper {
 
 class CnjValidator {
   static calcula_mod97(NNNNNNN, AAAA, JTR, OOOO) {
-    let valor1 = "";
+    let valor1 = '';
     let resto1 = 0;
-    let valor2 = "";
+    let valor2 = '';
     let resto2 = 0;
-    let valor3 = "";
+    let valor3 = '';
     valor1 = this.preencheZeros(NNNNNNN, 7);
     resto1 = parseInt(valor1) % 97;
     valor2 =
@@ -195,16 +231,16 @@ class CnjValidator {
       this.preencheZeros(AAAA, 4) +
       this.preencheZeros(JTR, 3);
     resto2 = parseInt(valor2) % 97;
-    valor3 = this.preencheZeros(resto2, 2) + this.preencheZeros(OOOO, 4) + "00";
+    valor3 = this.preencheZeros(resto2, 2) + this.preencheZeros(OOOO, 4) + '00';
     return this.preencheZeros(98 - (parseInt(valor3) % 97), 2);
   }
 
   static valida_mod97(NNNNNNN, DD, AAAA, JTR, OOOO) {
-    let valor1 = "";
+    let valor1 = '';
     let resto1 = 0;
-    let valor2 = "";
+    let valor2 = '';
     let resto2 = 0;
-    let valor3 = "";
+    let valor3 = '';
     valor1 = this.preencheZeros(NNNNNNN, 7);
     resto1 = parseInt(valor1) % 97;
     valor2 =
@@ -221,17 +257,17 @@ class CnjValidator {
 
   static preencheZeros(numero, quantidade) {
     let temp = `${numero}`;
-    let retorno = "";
+    let retorno = '';
     if (quantidade < temp.length) return temp;
     else {
       for (let i = 0; i < quantidade - temp.length; i++)
-        retorno = "0" + retorno;
+        retorno = '0' + retorno;
       return retorno + temp;
     }
   }
 
   static validar(cnj) {
-    let sub = cnj.replace("-", ".").split(".");
+    let sub = cnj.replace('-', '.').split('.');
     let NNNNNNN = sub[0];
     let DD = sub[1];
     let AAAA = sub[2];
@@ -240,12 +276,12 @@ class CnjValidator {
 
     return this.valida_mod97(NNNNNNN, DD, AAAA, JTR, OOOO);
   }
-};
+}
 
 class Logger {
   constructor(
-    logLevel = "info",
-    nomeArquivo = "",
+    logLevel = 'info',
+    nomeArquivo = '',
     { nomeRobo, NumeroDoProcesso = null, NumeroOab = null } = {}
   ) {
     this.nomeRobo = nomeRobo;
@@ -253,18 +289,18 @@ class Logger {
     this.numeroOab = NumeroOab;
     this.logs = [];
     this.consoleLogger = winston.createLogger({
-      level: "info",
+      level: 'info',
       format: winston.format.simple(),
-      transports: [new winston.transports.Console()]
+      transports: [new winston.transports.Console()],
     });
     this.fileLogger = winston.createLogger({
       level: logLevel,
       format: winston.format.simple(),
       transports: [
         new winston.transports.File({
-          filename: nomeArquivo
-        })
-      ]
+          filename: nomeArquivo,
+        }),
+      ],
     });
   }
 

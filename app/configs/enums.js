@@ -1,9 +1,9 @@
-require("dotenv/config");
+require('dotenv/config');
 
-const env = "dev";
+const env = 'dev';
 
 const bigdataAddress = process.env.BIG_DATA_ADDRESS;
-console.log("BigData Address", bigdataAddress); //TODO remove
+console.log('BigData Address', bigdataAddress); //TODO remove
 
 module.exports.enums = Object.freeze({
   mongo: {
@@ -11,47 +11,48 @@ module.exports.enums = Object.freeze({
     address: `mongodb://${process.env.MONGO_ROOT_USERNAME}:${process.env.MONGO_ROOT_PASSWORD}@${process.env.MONGO_ADDRESS}/${process.env.MONGO_DATABASE}`,
     databse: process.env.MONGO_DATABASE,
     username: process.env.MONGO_ROOT_USERNAME,
-    password: process.env.MONGO_ROOT_PASSWORD
+    password: process.env.MONGO_ROOT_PASSWORD,
   },
   rabbitmq: {
     connString: process.env.RABBITMQ_CONNECTION_STRING,
     address:
-      "amqp://" +
+      'amqp://' +
       process.env.RABBITMQ_USERNAME +
-      ":" +
+      ':' +
       process.env.RABBITMQ_PASSWORD +
-      "@" +
+      '@' +
       process.env.RABBITMQ_ADDRESS,
     username: process.env.RABBITMQ_USERNAME,
-    password: process.env.RABBITMQ_PASSWORD
+    password: process.env.RABBITMQ_PASSWORD,
   },
   nomesRobos: {
-    TJBAPortal: "TJBAPortal",
-    TJSP: "TJSP",
-    TJRS: "TJRS",
-    TJSC: "TJSC",
-    TJMG: "TJMG",
-    JTE: "JTE"    
+    TJBAPortal: 'TJBAPortal',
+    TJSP: 'TJSP',
+    TJRS: 'TJRS',
+    TJSC: 'TJSC',
+    TJMG: 'TJMG',
+    JTE: 'JTE',
   },
   robos: {
     TJRS: {
-      nome: "TJRS",
-      filaExtracao: "TJRS.extracao.novos",
-      filaReprocessamento: "TJRS.extracao.novos"
-    }
+      nome: 'TJRS',
+      filaExtracao: 'TJRS.extracao.novos',
+      filaReprocessamento: 'TJRS.extracao.novos',
+    },
   },
   tipoConsulta: {
-    Oab: "oab",
-    Processo: "processo",
-    Peticao: 'peticao'
+    Oab: 'oab',
+    Processo: 'processo',
+    Peticao: 'peticao',
   },
   bigdataUrls: {
-    resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`,
-    login: `http://${bigdataAddress}/login/`,
+    // resultadoConsulta: `http://${bigdataAddress}/consultaPublica/retornarResultadoConsulta`,
+    // login: `http://${bigdataAddress}/login/`,
     captchaDecoder: 'http://172.16.16.8:5000/api/solve',
+    resultadoDocumentos: `http://${bigdataAddress}/processos/documentos/uploadPeticaoInicial/`,
   },
   proxy: {
-    proxiesUrl: process.env.PROXY_ADDRESS
+    proxiesUrl: process.env.PROXY_ADDRESS,
   },
-  bigdataAddress
+  bigdataAddress,
 });

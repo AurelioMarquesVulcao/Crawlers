@@ -45,8 +45,8 @@ class PeticaoTJSP extends ExtratorPuppeteer {
 
   /**
    * Extrai os arquivos iniciais do processo
-   * @param {String} numeroProcesso numero do processo com mascara
-   * @param {Number} instancia default 1
+   * @param {string} numeroProcesso numero do processo com mascara
+   * @param {number} instancia default 1
    * @returns {Promise<{numeroProcesso: *}>}
    */
   async extrair(numeroProcesso, instancia = 1) {
@@ -89,7 +89,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       await sleep(100);
 
       // Tratamento caso resultado da consulta retorne algo invalido
-      if (await this.page.$('#mensagemRetorno') !== null){
+      if ((await this.page.$('#mensagemRetorno')) !== null) {
         let alert = await this.page.$eval('#mensagemRetorno', (element) => {
           return {
             role: element.getAttribute('role'),
@@ -100,7 +100,6 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           throw new Error(alert.msg.trim());
         }
       }
-
 
       // Tratamento caso resultado da consulta retorne uma lista de processos
       let processos;
@@ -184,7 +183,9 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.page.click('#pbEntrar'),
         ]);
 
-        continuar = await this.page.$$('#mensagemRetorno').then((selector) => Boolean(selector.length));
+        continuar = await this.page
+          .$$('#mensagemRetorno')
+          .then((selector) => Boolean(selector.length));
 
         if (continuar) {
           this.logger.log(
@@ -320,7 +321,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
 
   /**
    * Pega as credenciais de advogado para login
-   * @param estado
+   * @param {string} estado o estado para o qual esta tentando pegar as credenciais.
    * @returns {Promise<*>}
    */
   async getCredenciais(estado) {
@@ -348,7 +349,10 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.logger.info('Download finalizado');
           return resolve(true);
         }
-        const size = fs.statSync(`./temp/peticoes/tjsp/${this.numeroProcesso}.pdf.crdownload`).size / 1000000.0
+        const size =
+          fs.statSync(
+            `./temp/peticoes/tjsp/${this.numeroProcesso}.pdf.crdownload`
+          ).size / 1000000.0;
         this.logger.info(`Download não finalizado | ${size} Mb baixados`);
         await sleep(5000);
       } while (true);

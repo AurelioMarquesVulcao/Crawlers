@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const shell = require('shelljs');
+const sleep = require('await-sleep');
 
 const { Cnj, Helper } = require('../../lib/util');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
@@ -7,6 +8,9 @@ const { enums } = require('../../configs/enums');
 const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../models/schemas/jte')
 const Estados = require('../../assets/jte/comarcascopy.json');
 const { Processo } = require('../../models/schemas/processo');
+const { JTEParser } = require('../../parsers/JTEParser');
+const { removerAcentos } = require('../../parsers/BaseParser');
+const { Logform } = require('winston');
 
 const fila = new CriaFilaJTE();
 const ajuste = new Cnj();
@@ -44,13 +48,10 @@ mongoose.connection.on('error', (e) => {
 
     //console.log(varaComarca("Processo no 1º grau - 1ª Vara do Trabalho de Campinas")); 
     //console.log(varaComarca("Processo no 1º grau - 5ª Vara do Trabalho do Rio de Janeiro"));
-    let dados = ['Processo no 1º grau - 1ª Vara do Trabalho de Niterói']
-
-    // let teste = varaComarca(dados)
-    // console.log(teste[2]);
 
     await corrigeBanco()
 
+    //console.log(Estados[0]);
 
     mongoose.connection.close();
     process.exit()
@@ -145,7 +146,75 @@ function varaComarca(str) {
 }
 
 async function corrigeBanco() {
-    let busca = await Processo.find({ "detalhes.numeroProcesso": "01006283220205010005" });
-    console.log(await busca);
+    let estados = [
+        Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
+        Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
+        Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
+        Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
+        Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
+    ];
+    let resultado;
+    let busca;
+    let vara;
+    let comarca;
+    let limite = 1;
+    let salto = 0;
+    let tribunal;
+    //let busca = await Processo.find({ "detalhes.numeroProcesso": "01006283220205010005" });
+    for (j in estados) {
+        // console.log(estados[j].codigo);
+        // process.exit()
+        tribunal = parseInt(estados[j].codigo)
+        console.log(tribunal);
+        let agregar = await Processo.aggregate([
+            {
+                $match: {
+                    'detalhes.tipo': 'cnj',
+                    'detalhes.orgao': 5,
+                    'detalhes.tribunal': tribunal,
+                    'detalhes.ano': 2020,
+                    //'capa.vara': /Não\sfoi\spossivel\sobter|do Rio$/
+                    'capa.vara': /vara\sdo\strabalho\s/gmi
+                }
+            },
+            {
+                $project: {
+                    "capa.vara": 1,
+                    "capa.comarca": 1
+                }
+            }
+        ]).skip(0).limit(10);
+        console.log(agregar);
+        if (agregar.length > 0) {
+            for (i in agregar) {
+                busca = { "_id": agregar[i]._id };
+                let teste01 = new JTEParser().regexVaraComarca("Processo no 1º grau - " + agregar[i].capa.vara)
+                if (agregar[i].capa.comarca == teste01[3]) {
+                    vara = removerAcentos(teste01[2])
+                    comarca = removerAcentos(teste01[3])
+                    resultado = { 'capa.vara': vara, 'capa.comarca': comarca };
+                } else {
+                    let join = await "Processo no 1º grau - " + agregar[i].capa.vara + " " + agregar[i].capa.comarca
+                    let sliceDados = new JTEParser().regexVaraComarca(join)
+                    vara = removerAcentos(sliceDados[2])
+                    comarca = removerAcentos(sliceDados[3])
+                    resultado = { 'capa.vara': vara, 'capa.comarca': comarca };
+                }
+
+                console.log(resultado);
+                await Processo.findOneAndUpdate(busca, resultado)
+                console.log(await Processo.find(busca));
+                sleep(1000)
+            }
+        }
+
+
+
+    }
+
+
+    //console.log(await agregar);
+    //console.log(join);
+    //console.log(agregar[0].capa);
 
 }

@@ -277,7 +277,7 @@ class JTEParser extends BaseParser {
   }
 
   regexVaraComarca(str) {
-    let regex = /(?:^|\n[\t ]*).*?(\d)º.*?-\s*(.+?D[EO].+?)\s*D[EO]\s*(.+)\s*/gim;
+    let regex = /(?:^|\n[\t ]*).*?(\d)º.*?-\s*(.+?D[EO].+?)\s*D[EOA]\s*(.+)\s*/gim;
     let m;
     let resultado = []
 

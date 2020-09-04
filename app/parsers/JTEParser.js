@@ -254,7 +254,7 @@ class JTEParser extends BaseParser {
     $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > p`).each(async function (element) {
       // $('detalhes-aba-geral p').each(async function (element) {
       let datas = $(this).text().split('\n');
-      console.log(datas);
+      // console.log(datas);
       processo = datas[0]
       // console.log(datas);
       // if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
@@ -272,7 +272,7 @@ class JTEParser extends BaseParser {
     vara = removerAcentos(data[2])
     comarca = removerAcentos(data[3])
     resultado = { vara, comarca }
-    // console.log(resultado);
+    console.log(resultado);
     return resultado
   }
 

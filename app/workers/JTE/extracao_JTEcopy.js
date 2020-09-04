@@ -254,7 +254,8 @@ async function worker() {
             }
             await console.log('O link ' + w + ' Foi salvo');
           }
-          await new downloadFiles().enviarAWS(cnj, listaArquivo)
+          // enviar para AWS
+          // await new downloadFiles().enviarAWS(cnj, listaArquivo)
         }
 
         logger.info('Processo extraidos com sucesso');

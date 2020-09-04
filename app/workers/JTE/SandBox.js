@@ -6,9 +6,11 @@ const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const { enums } = require('../../configs/enums');
 const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../models/schemas/jte')
 const Estados = require('../../assets/jte/comarcascopy.json');
+const { Processo } = require('../../models/schemas/processo');
 
 const fila = new CriaFilaJTE();
 const ajuste = new Cnj();
+const processoConection = new Processo()
 
 // liga ao banco de dados
 mongoose.connect(enums.mongo.connString, {
@@ -38,14 +40,16 @@ mongoose.connection.on('error', (e) => {
 
 
 
-//    contarComarcas(Estados)
+    //    contarComarcas(Estados)
 
     //console.log(varaComarca("Processo no 1º grau - 1ª Vara do Trabalho de Campinas")); 
     //console.log(varaComarca("Processo no 1º grau - 5ª Vara do Trabalho do Rio de Janeiro"));
-    let dados = [ 'Processo no 1º grau - 1ª Vara do Trabalho de Niterói' ]
-    
-    let teste = varaComarca(dados)
-    console.log(teste[2]);
+    let dados = ['Processo no 1º grau - 1ª Vara do Trabalho de Niterói']
+
+    // let teste = varaComarca(dados)
+    // console.log(teste[2]);
+
+    await corrigeBanco()
 
 
     mongoose.connection.close();
@@ -123,7 +127,7 @@ function contarComarcas(Estados) {
 function varaComarca(str) {
     let regex = /(?:^|\n[\t ]*).*?(\d)º.*?-\s*(.+?D[EO].+?)\s*D[EO]\s*(.+)\s*/gim;
     let m;
-    let resultado=[]
+    let resultado = []
 
     while ((m = regex.exec(str)) !== null) {
         // This is necessary to avoid infinite loops with zero-width matches
@@ -138,4 +142,10 @@ function varaComarca(str) {
         });
     }
     return resultado
+}
+
+async function corrigeBanco() {
+    let busca = await Processo.find({ "detalhes.numeroProcesso": "01006283220205010005" });
+    console.log(await busca);
+
 }

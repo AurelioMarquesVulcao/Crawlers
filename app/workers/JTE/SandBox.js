@@ -183,28 +183,30 @@ async function corrigeBanco() {
                     "capa.comarca": 1
                 }
             }
-        ]).skip(0).limit(10);
+        ]).skip(0).limit(1000);
         console.log(agregar);
         if (agregar.length > 0) {
             for (i in agregar) {
                 busca = { "_id": agregar[i]._id };
-                let teste01 = new JTEParser().regexVaraComarca("Processo no 1º grau - " + agregar[i].capa.vara)
+                let teste01 = new JTEParser().regexVaraComarca("Processo no 1º grau - " + agregar[i].capa.vara.replace(")",""))
+                console.log(teste01 + " imprimonedo teste");
                 if (agregar[i].capa.comarca == teste01[3]) {
-                    vara = removerAcentos(teste01[2])
+                    vara = teste01[2]
                     comarca = removerAcentos(teste01[3])
                     resultado = { 'capa.vara': vara, 'capa.comarca': comarca };
                 } else {
                     let join = await "Processo no 1º grau - " + agregar[i].capa.vara + " " + agregar[i].capa.comarca
+                    console.log(join);
                     let sliceDados = new JTEParser().regexVaraComarca(join)
-                    vara = removerAcentos(sliceDados[2])
-                    comarca = removerAcentos(sliceDados[3])
+                    vara = sliceDados[2]
+                    comarca = removerAcentos(sliceDados[3].replace("JI ",""))
                     resultado = { 'capa.vara': vara, 'capa.comarca': comarca };
                 }
 
                 console.log(resultado);
                 await Processo.findOneAndUpdate(busca, resultado)
+                await sleep(500)
                 console.log(await Processo.find(busca));
-                sleep(1000)
             }
         }
 

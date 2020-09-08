@@ -3,6 +3,7 @@
 const Axios = require('axios');
 const Fs = require('fs');
 const Path = require('path');
+const { path } = require('dotenv/lib/env-options');
 
 
 class downloadFiles {
@@ -77,10 +78,20 @@ class downloadFiles {
             console.log('deu erro!\n');
             // Helper.pred(error);
         }
-
-
     }
 
+    async covertePDF(nome, local, html) {
+        let url = false;
+        let path = `${local}/${nome}`
+        //var html = ""
+        var options = { format: 'A4' };
+
+        pdf.create(html, options).toFile(path, function (err, res) {
+            if (err) return console.log(err);
+            console.log(res); // { filename: '/app/businesscard.pdf' }
+        });
+        return {url, path}
+    }
 }
 
 

@@ -183,7 +183,7 @@ async function corrigeBanco() {
                     "capa.comarca": 1
                 }
             }
-        ]).skip(0).limit(1000);
+        ]).skip(0).limit(2000);
         console.log(agregar);
         if (agregar.length > 0) {
             for (i in agregar) {
@@ -206,7 +206,7 @@ async function corrigeBanco() {
                 console.log(resultado);
                 await Processo.findOneAndUpdate(busca, resultado)
                 await sleep(500)
-                console.log(await Processo.find(busca));
+                //console.log(await Processo.find(busca));
             }
         }
 

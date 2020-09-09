@@ -85,7 +85,7 @@ function novoSequencial(numero) {
 
 async function statusRaspagem() {
     //let obj = await statusEstadosJTE.find({"status" : "Não possui processos"})
-    let obj = await statusEstadosJTE.find({ "estadoNumero": "07" })
+    let obj = await statusEstadosJTE.find({ "estadoNumero": "14" })
     let ultimos = 0;
     let buscando = 0;
     let naoEncontrado = 0;
@@ -99,7 +99,7 @@ async function statusRaspagem() {
         data = obj[i].dataBusca
         if (Comarca != "unde") {
             if (Status != 'Ultimo Processo') {
-                // console.log({ Estado, Comarca, data });
+                //console.log({ Estado, Comarca, data });
 
             }
             if (Status == 'Não possui processos') {

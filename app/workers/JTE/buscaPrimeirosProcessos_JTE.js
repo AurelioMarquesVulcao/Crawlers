@@ -10,12 +10,11 @@ console.log('até aqui');
 (async () => {
     var origem = [
 
-        '0110', '0113', '0122',
-        '0127', '0128', '0129',
-        '0130', '0131', '0201',
-        '0202', '0205', '0206',
-        '0207', '0208', '0209',
-        '0210', '0900', '5555'
+        '0005', '0081',
+        '0101', '0151',
+        '0161', '0416',
+        '0426', '0431',
+        '0900'
 
     ];
     console.log('carregou a var');
@@ -31,16 +30,16 @@ console.log('até aqui');
         // await fila.procura("0000025", `${origem[i]}`, 2, "07", "")
         // await fila.procura("0000035", `${origem[i]}`, 2, "07", "")
         // await fila.procura("0000045", `${origem[i]}`, 2, "07", "")
-        await fila.procura("0000055", `${origem[i]}`, 2, "08", "")
-        await fila.procura("0000065", `${origem[i]}`, 2, "08", "")
-        await fila.procura("0000075", `${origem[i]}`, 2, "08", "")
-        await fila.procura("0000085", `${origem[i]}`, 2, "08", "")
-        await fila.procura("0000095", `${origem[i]}`, 2, "08", "")
-        await fila.procura("0000205", `${origem[i]}`, 20, "08", "")
-        await fila.procura("0000315", `${origem[i]}`, 20, "08", "")
-        await fila.procura("0000425", `${origem[i]}`, 20, "08", "")
-        await fila.procura("0000535", `${origem[i]}`, 20, "08", "")
-        await fila.procura("0000645", `${origem[i]}`, 20, "08", "")
+        await fila.procura("0000055", `${origem[i]}`, 3, "14", "")
+        await fila.procura("0000065", `${origem[i]}`, 3, "14", "")
+        await fila.procura("0000075", `${origem[i]}`, 3, "14", "")
+        await fila.procura("0000085", `${origem[i]}`, 3, "14", "")
+        await fila.procura("0000095", `${origem[i]}`, 3, "14", "")
+        await fila.procura("0000205", `${origem[i]}`, 10, "14", "")
+        await fila.procura("0000315", `${origem[i]}`, 10, "14", "")
+        await fila.procura("0000425", `${origem[i]}`, 10, "14", "")
+        await fila.procura("0000535", `${origem[i]}`, 10, "14", "")
+        await fila.procura("0000645", `${origem[i]}`, 10, "14", "")
         // await fila.procura("0000855", `${origem[i]}`, 300, "10", "")
         // await fila.procura("0001170", `${origem[i]}`, 5, "10", "")
         // await fila.procura("0000570", `${origem[i]}`, 2, "22","")

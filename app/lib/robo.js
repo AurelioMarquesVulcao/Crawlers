@@ -44,6 +44,10 @@ class Requisicao {
 
   async enviarRequest(options) {
     const promise = new Promise((resolve) => {
+
+      // Alteração importante de segurança no código
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; 
+      
       let statusCode = 500;
       axios(options)
         .then((res) => {
@@ -155,7 +159,7 @@ class Robo {
     encoding = '',
     usaProxy = false,
     usaJson = false,
-    params = null,
+    params = null, // body!
     headers = {},
     randomUserAgent = false,
   } = {}) {
@@ -194,6 +198,7 @@ class Robo {
     // });
 
     options.timeout = 60000;
+    // console.log(options);
     return this.requisicao.enviarRequest(options);
   }
 }

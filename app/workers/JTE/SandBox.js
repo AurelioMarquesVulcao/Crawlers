@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const shell = require('shelljs');
 const sleep = require('await-sleep');
+const axios = require('axios');
+
 
 const { Cnj, Helper } = require('../../lib/util');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
@@ -40,7 +42,10 @@ mongoose.connection.on('error', (e) => {
     //await fila.salvaStatusComarca("00104979620205100021", "2020-08-07T03:00:00.000Z", "", {"estadoNumero": "10", "comarca": "0021"});
 
 
-    //await statusRaspagem()
+    // await statusRaspagem()
+    // console.log(await axios.get(
+    //     `http://admin:crawler480@172.16.16.3:15676/api/queues`
+    //   ));
 
 
 
@@ -49,9 +54,12 @@ mongoose.connection.on('error', (e) => {
     //console.log(varaComarca("Processo no 1º grau - 1ª Vara do Trabalho de Campinas")); 
     //console.log(varaComarca("Processo no 1º grau - 5ª Vara do Trabalho do Rio de Janeiro"));
 
-    await corrigeBanco()
+    // yasmin23await corrigeBanco()
 
     //console.log(Estados[0]);
+
+    await statusRaspagem()
+
 
     mongoose.connection.close();
     process.exit()
@@ -77,17 +85,27 @@ function novoSequencial(numero) {
 
 async function statusRaspagem() {
     //let obj = await statusEstadosJTE.find({"status" : "Não possui processos"})
-    let obj = await statusEstadosJTE.find({ "estadoNumero": "02" })
+    let obj = await statusEstadosJTE.find({ "estadoNumero": "07" })
     let ultimos = 0;
     let buscando = 0;
     let naoEncontrado = 0;
     let total = 0;
+    let data;
+    let comarcas = [];
     for (i in obj) {
         Estado = obj[i].estadoNumero
         Comarca = obj[i].comarca
         Status = obj[i].status
+        data = obj[i].dataBusca
         if (Comarca != "unde") {
-            console.log({ Estado, Comarca, Status });
+            if (Status != 'Ultimo Processo') {
+                // console.log({ Estado, Comarca, data });
+
+            }
+            if (Status == 'Não possui processos') {
+                console.log({ Estado, Comarca, data });
+                comarcas.push(Comarca);
+            }
             total++
             if (Status == 'Ultimo Processo') {
                 ultimos++
@@ -102,7 +120,8 @@ async function statusRaspagem() {
         Total_Comarcas: total,
         Total_Ultimos_Processos: ultimos,
         Total_Buscando_Ultimo: buscando,
-        Total_Nao_Encontrado: naoEncontrado
+        Total_Nao_Encontrado: naoEncontrado,
+        comarcas
     }
     );
 }
@@ -188,7 +207,7 @@ async function corrigeBanco() {
         if (agregar.length > 0) {
             for (i in agregar) {
                 busca = { "_id": agregar[i]._id };
-                let teste01 = new JTEParser().regexVaraComarca("Processo no 1º grau - " + agregar[i].capa.vara.replace(")",""))
+                let teste01 = new JTEParser().regexVaraComarca("Processo no 1º grau - " + agregar[i].capa.vara.replace(")", ""))
                 console.log(teste01 + " imprimonedo teste");
                 if (agregar[i].capa.comarca == teste01[3]) {
                     vara = teste01[2]
@@ -199,7 +218,7 @@ async function corrigeBanco() {
                     console.log(join);
                     let sliceDados = new JTEParser().regexVaraComarca(join)
                     vara = sliceDados[2]
-                    comarca = removerAcentos(sliceDados[3].replace("JI ",""))
+                    comarca = removerAcentos(sliceDados[3].replace("JI ", ""))
                     resultado = { 'capa.vara': vara, 'capa.comarca': comarca };
                 }
 

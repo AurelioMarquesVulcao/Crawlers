@@ -1,0 +1,31 @@
+Request URL: https://pje.trt1.jus.br/pje-consulta-api/api/processos/2203136?tokenDesafio=110a92c740d522c8d9334f1bbbf826d53ede81d8469df282636a15a2935b124d42a3290d8628ca8a66791a3bf5b2eb0a5f877c64e3113c36f2151288ecf53cb16cdb4dc49ba21e0e8e05c1cdb207fe17bb1c24da965529fc1b56337b3c017a6c&resposta=9999
+Request Method: GET
+Status Code: 200 OK
+Remote Address: 201.33.31.78:443
+Referrer Policy: no-referrer-when-downgrade
+Connection: Keep-Alive
+Content-Length: 6270
+Content-Type: application/json
+Date: Tue, 08 Sep 2020 21:42:29 GMT
+Feature-Policy: camera 'none'; microphone 'none'
+Keep-Alive: timeout=5, max=500
+Referrer-Policy: no-referrer-when-downgrade
+Server: Apache
+Vary: User-Agent
+X-Content-Type-Options: nosniff
+X-FRAME-OPTIONS: SAMEORIGIN
+X-Request-ID: ced0ffc3-5434-46fa-8168-4ff479a4cea9
+Accept: application/json, text/plain, */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7
+Connection: keep-alive
+Content-type: application/json
+Host: pje.trt1.jus.br
+Referer: https://pje.trt1.jus.br/consultaprocessual/detalhe-processo/01001213320205010341
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36
+X-Grau-Instancia: 1
+tokenDesafio: 110a92c740d522c8d9334f1bbbf826d53ede81d8469df282636a15a2935b124d42a3290d8628ca8a66791a3bf5b2eb0a5f877c64e3113c36f2151288ecf53cb16cdb4dc49ba21e0e8e05c1cdb207fe17bb1c24da965529fc1b56337b3c017a6c
+resposta: 9999

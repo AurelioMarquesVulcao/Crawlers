@@ -1,189 +1,135 @@
-class ExtratorAndamentosTrtrj extends ExtratorBase {
-    constructor(url, isDebug) {
-      super(url, isDebug);
-      this.parser = new TrtrjParser();
-      this.qtdTentativas = 1;
-    }
-  
-    /**
-     * Executa a extracao do cnj
-     * @param {string} cnj Numero do processo no padrão CNJ
-     */
-    async extrair(cnj) {    
-  
-      console.log();
-      console.log(`ExtratorAndamentosTrtrj@extrair#${cnj}`);
-      console.log();
-      console.log("Debug? ", this.isDebug ? "Sim" : "Não");
-      console.log();
-  
-      let extracao;
-  
-      try {
-       
-        if (cnj.length < 25)
-          throw new BaseException("CNJ_INVALIDO","Cnj inválido, o cnj enviado possui menos de 25 caracteres!");
-        if (!CnjValidator.validar(cnj))
-          throw new BaseException("CNJ_INVALIDO", "Cnj inválido!");      
-  
-        extracao = await this.capturar({ "X-Grau-Instancia": "1" }, cnj);
-  
-        const extracao2ins = await this.capturar({ "X-Grau-Instancia": "2" } , cnj);
-      
-        if (extracao == null && extracao2ins == null)
-          throw new ExtracaoException("SISTEMA_SAPWEB", null, "Extracao no sistema sapweb!");
-          // throw new ExtracaoException('PROCESSO_NAO_ENCONTRADO', null, 'Processo não encontrado!');
-  
-        if (extracao2ins && extracao2ins.andamentos && extracao2ins.andamentos.length > 0) {
-          if (!extracao)
-            extracao = extracao2ins;
-          else 
-            extracao.andamentos = extracao.andamentos.concat(extracao2ins.andamentos);
-        }
-          
-  
-      } catch (e) {
-  
-        if (e instanceof RequestException) {
-          throw new RequestException(e.code, e.status, e.message);
-        } else if (e instanceof BaseException) {
-          throw new BaseException(e.code, e.message);
-        } else if (e instanceof ExtracaoException) {
-          if (/ERRO_CAPTCHA/.test(e.code)) {
-            if (this.qtdTentativas < 5) {
-              console.log();
-              console.log(`Captcha falhou!`, this.qtdTentativas);
-              this.qtdTentativas += 1;
-              extracao = await this.extrair(cnj);
-            } else {
-              // TODO enviar erro para a api do bruno pra informar que a quebra de captcha falhou
-              throw new ExtracaoException(e.code, null, e.message);
-            }
-          } else if(/PROCESSO_SIGILOSO/.test(e.code)) {
-            throw new ExtracaoException(e.code, null, e.message);
-          } else throw new BaseException(e.code, e.message);
-        } else {
-          if (/ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNREFUSED|ECONNRESET|ENOPROTOOPT|EAI_AGAIN/.test(e.code)) {
-            throw new RequestException(e.code, e.status, e.message);
-          }
-        }
-      }
-  
-      return extracao;
-    }
-  
-    async capturar(header, cnj) {
-  
-      let extracao;
-  
-      const numeroProcesso = cnj.replace(/[-.]/g, "");
-      const url = `${this.url}/api/processos/dadosbasicos/${numeroProcesso}`;
-      const objResponse = await this.robo.acessar(url, "GET", "latin1", true, false, null, header);
-      const bodyRes = JSON.parse(objResponse.responseBody);
-      const info = bodyRes[0];
-   
-      if(!info)
-        return null
-  
-      const objResponseCaptcha = await this.robo.acessar(`${this.url}/api/processos/${info.id}`, "GET", "latin1", true);
-      const desafio = JSON.parse(objResponseCaptcha.responseBody);
-  
-      // // salvando imagem do captcha atual
-      // require("fs")
-      //   .writeFile(`/var/www/html/assets/captcha/captcha_${numeroProcesso}.png`, 
-      //     desafio.imagem, 'base64', 
-      //     function (err) {
-      //       if (err)
-      //         console.log(err);
-      // });
-  
-      const captcha = {
-        refinador: "trt_1",
-        imagem: desafio.imagem
-      };
-  
-      console.log()
-      console.log('aguardando quebra do captcha! Instancia:', header["X-Grau-Instancia"]);
-  
-      const resQuebrarCaptcha = await this.robo.acessar(`${bootstrap.captcha.url}/api/refinar/`, "post", "utf8", false, true, captcha);
-  
-      await sleep(600);
-  
-      const captchaSolved = resQuebrarCaptcha.responseBody;      
-  
-      if (captchaSolved.sucesso) {
-  
-        console.log(`Captcha quebrado com sucesso ${captchaSolved.texto}!`);
-  
-        const texto = captchaSolved.texto.replace(/[^a-z0-9]/g, "");
-  
-        const detalheProcesso = await this.robo.acessar(`https://pje.trt1.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`, "get", "utf8", true, false, null, header);
-  
-        const jsonResposta = JSON.parse(detalheProcesso.responseBody);
-  
-        if (jsonResposta.mensagem)
-          throw new ExtracaoException("ERRO_CAPTCHA", null, "Captcha Falhou");
-  
-        if (jsonResposta.mensagemErro)
-          throw new ExtracaoException("PROCESSO_SIGILOSO", null, "Processo com sigilo de justiça!");
-  
-        let parser = new TrtrjParser();
-        parser.setDados(cnj, header["X-Grau-Instancia"]);
-        extracao = parser.parse(jsonResposta);        
-  
-      }
-      
-      return extracao;
-    }
-  
-    /**
-     * Pre extracao e verificacao de inconsistencias ou lista de processos
-     * @param {string} conteudo Html do site para verificacao
-     */
-    async preParse(conteudo) {
-      const $ = cheerio.load(conteudo);
-      let preParse = {
-        linkLista: "",
-        captcha: false,
-        inconsistencias: [],
-        response: null
-      };
-  
-      if (/Erro\socorreu\:\sProcesso\sinexistente\./.test(conteudo))
-        preParse.inconsistencias.push("Processo inexistente");
-      if (/Erro\socorreu\:\sPar[aâ]metro incorreto\./.test(conteudo))
-        preParse.inconsistencias.push("Parâmetro incorreto");
-      if (/Processo\sinexistente\./.test(conteudo))
-        preParse.inconsistencias.push("Processo inexistente");
-      if (/Nenhum\sregistro\sencontrado\./.test(conteudo))
-        preParse.inconsistencias.push("Nenhum registro encontrado!");
-      if (/Nova\sconsulta/.test(conteudo))
-        preParse.inconsistencias.push("Processo inexistente");
-      if ($("#imgCaptcha").length > 0) preParse.captcha = true;
-  
-      if ($("#content > #form > table > tbody > tr > td > ul").length > 0) {
-        const elemento = $(
-          "#content > #form > table > tbody > tr > td > ul > li"
-        ).first();
-        if (elemento.find("a") && elemento.find("a").attr("href")) {
-          preParse.linkLista = elemento
-            .find("a")
-            .attr("href")
-            .trim();
-        }
-      }
-  
-      if (preParse.linkLista) {
-        const objResponse = await this.robo.acessar(
-          preParse.linkLista,
-          "GET",
-          "utf8"
-        );
-        preParse = await this.preParse(objResponse.responseBody);
-        preParse.response = objResponse.responseBody;
-        return preParse;
-      }
-  
-      return preParse;
-    }
+const { Robo } = require("../lib/robo");
+const { Logger } = require('../lib/util');
+const { enums } = require('../configs/enums');
+
+
+
+
+class ExtratorTrtrj {
+  constructor(url, isDebug) {
+    // super(url, isDebug);
+    this.robo = new Robo();
+    this.url = `http://pje.trt1.jus.br/pje-consulta-api`;
+
   }
+  /**
+   * Executa a extração da capa do cnj desejado.
+   * @param {string} cnj Numero de processo a ser buscado.
+   * @param {string} objResponse Obtem objeto inicial para a captura do processo.
+   * @param {string} objResponseCaptcha Obtem a imagem em base64 do captcha
+   */
+  async extrair(cnj) {
+    /**Logger para console de arquivos */
+    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
+      nomeRobo: enums.nomesRobos.TRTRJ,
+      NumeroDoProcesso: cnj,
+    });
+    logger.info("Extrator de processos TRT_RJ Iniciado");
+    try{
+      const captura = await new ExtratorTrtrj().captura({ "X-Grau-Instancia": "1" }, cnj);
+      const valor = captura.valorDaCausa;
+      const segredoJustica = captura.segredoJustica;
+      const justicaGratuita = captura.justicaGratuita;
+      console.log({valor,segredoJustica,justicaGratuita});
+      return {valor,segredoJustica,justicaGratuita}
+    } catch(e){
+      logger.log('warn',`${e} CNJ: ${cnj}`);
+    }
+    
+
+  }
+
+
+  /** 
+   * Captura o Processo informado usando a API de quebra de captcha da Impacta
+   */
+  async captura(header, cnj) {
+    /**Logger para console de arquivos */
+    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
+      nomeRobo: enums.nomesRobos.TRTRJ,
+      NumeroDoProcesso: cnj,
+    });
+    logger.info("Iniciado captura do processo.");
+
+    const url = `${this.url}/api/processos/dadosbasicos/${cnj}`;
+
+    // Primeira requisição ao TRT-RJ    
+    const objResponse = await this.robo.acessar({
+      url: url,
+      encoding: "latin1",
+      usaProxy: true,
+      headers: header
+    });
+    const bodyRes = objResponse.responseBody;
+    const info = bodyRes[0];
+    // finaliza a captura caso não obtenho os dados iniciais.
+    if (!info) {
+      logger.info("Não foi possível obter os primeiros dados do processo.");
+      return null
+    };
+
+    // obtem a imagem em base64 do captcha
+    const objResponseCaptcha = await this.robo.acessar({
+      url: `${this.url}/api/processos/${info.id}`,
+      method: "GET",
+      encoding: "latin1",
+      usaProxy: true
+    });
+    const desafio = objResponseCaptcha.responseBody
+    const captcha = {
+      refinador: "trt_1",
+      imagem: `${desafio.imagem}`
+    }
+    logger.info("Captcha obtido com sucesso");
+
+    logger.info("Iniciado processo de solução do captcha")
+    // envia captcha para API de resolução
+    const resQuebrarCaptcha = await this.robo.acessar({
+      url: `http://172.16.16.8:8082/api/refinar/`,
+      method: "POST",
+      encoding: "utf8",
+      usaProxy: false,
+      usaJson: true,
+      params: captcha
+    });
+    const captchaSolved = resQuebrarCaptcha.responseBody;
+
+
+    if (captchaSolved.sucesso) {
+      logger.info("Solução do captcha é: " + captchaSolved.texto);
+
+      // removendo caracteres especiais da solução do captcha
+      const texto = captchaSolved.texto.replace(/[^a-z0-9]/g, "");
+      // const texto = captchaSolved.texto.replace(/[a-z0-9]/g, ""); // cria erro para testes
+
+      // obtendo dados do processo.
+      const detalheProcesso = await this.robo.acessar({
+        url: `https://pje.trt1.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`,
+        method: "get",
+        encoding: "utf8",
+        usaProxy: true,
+        headers: header
+      });
+      
+      if(detalheProcesso.responseBody.mensagem) {
+        const error = new Error('Captcha invalido');
+        error.code = "Ocorreu um problema na solução do Captcha";
+        throw error;
+      }
+      if (detalheProcesso.responseBody.mensagemErro){
+        const error = new Error('Processo sigiloso');
+        error.code = "Não é possível obter devido ao processo ser sigiliso";
+        throw error;
+      }
+
+      logger.info("Dados do processo obtidos com sucesso.")
+      return detalheProcesso.responseBody
+    } else {
+      logger.info("Não foi possível resolver o captcha");
+    }
+
+  }
+
+
+}
+module.exports.ExtratorTrtrj = ExtratorTrtrj;

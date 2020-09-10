@@ -228,14 +228,15 @@ async function corrigeBanco() {
                 //console.log(await Processo.find(busca));
             }
         }
-
-
-
     }
+}
 
-
-    //console.log(await agregar);
-    //console.log(join);
-    //console.log(agregar[0].capa);
+async function atulizaProcessos() {
+    let resultado;
+    let busca;
+    for (i in BD_busca) {
+        resultado = { valor, segredoJustica, justicaGratuita }
+        await Processo.findOneAndUpdate(busca, resultado)
+    }
 
 }

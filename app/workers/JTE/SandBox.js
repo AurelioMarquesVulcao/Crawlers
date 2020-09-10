@@ -13,10 +13,12 @@ const { Processo } = require('../../models/schemas/processo');
 const { JTEParser } = require('../../parsers/JTEParser');
 const { removerAcentos } = require('../../parsers/BaseParser');
 const { Logform } = require('winston');
+const { ExtratorTrtrj } = require('../../extratores/processoTRT-RJ');
 
 const fila = new CriaFilaJTE();
 const ajuste = new Cnj();
-const processoConection = new Processo()
+const processoConection = new Processo();
+const rj = new ExtratorTrtrj();
 
 // liga ao banco de dados
 mongoose.connect(enums.mongo.connString, {
@@ -58,7 +60,12 @@ mongoose.connection.on('error', (e) => {
 
     //console.log(Estados[0]);
 
-    await statusRaspagem()
+    //await statusRaspagem()
+
+    // console.log(await atulizaProcessos("01001199020205010041")); // segredo de justiça
+    //console.log(await atulizaProcessos("01002214120205010000")); // 2 instância "especial"
+    //console.log(await atulizaProcessos("01005289420205010452")); // processo travando
+    console.log(await atulizaProcessos("01006283220205010005")); // processo travando
 
 
     mongoose.connection.close();
@@ -231,12 +238,15 @@ async function corrigeBanco() {
     }
 }
 
-async function atulizaProcessos() {
+async function atulizaProcessos(cnj) {
     let resultado;
-    let busca;
-    for (i in BD_busca) {
-        resultado = { valor, segredoJustica, justicaGratuita }
-        await Processo.findOneAndUpdate(busca, resultado)
-    }
+    resultado = await rj.extrair(cnj)
+    return resultado
+    
+    // let busca;
+    // for (i in BD_busca) {
+    //     resultado = { valor, segredoJustica, justicaGratuita }
+    //     await Processo.findOneAndUpdate(busca, resultado)
+    // }
 
 }

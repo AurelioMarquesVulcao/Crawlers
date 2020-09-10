@@ -64,7 +64,17 @@ class Requisicao {
                 responseBody: corpo,
                 cookies: this.validarCookies(res.headers['set-cookie']),
               });
-            } else {
+            } else if((statusCode === 204)){
+              resolve({
+                code: 'HTTP_204',
+                status: statusCode,
+                message: `StatusCode: ${statusCode}.`,
+                responseContent: res,
+                responseBody: undefined,
+                cookies: this.validarCookies(res.headers['set-cookie']),
+              });
+            }
+            else {
               resolve({
                 code: 'HTTP_STATUS_NOT_200',
                 status: statusCode,

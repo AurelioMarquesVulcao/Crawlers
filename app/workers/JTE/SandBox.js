@@ -61,11 +61,16 @@ mongoose.connection.on('error', (e) => {
     //console.log(Estados[0]);
 
     //await statusRaspagem()
+    for (let i = 0; i < 20; i++) {
+        atulizaProcessos(i * 100);
+        await sleep(10000)
+    }
+    await sleep(1800000)
 
     // console.log(await atulizaProcessos("01001199020205010041")); // segredo de justiça
-    //console.log(await atulizaProcessos("01002214120205010000")); // 2 instância "especial"
-    //console.log(await atulizaProcessos("01005289420205010452")); // processo travando
-    console.log(await atulizaProcessos("01006283220205010005")); // processo travando
+    // console.log(await atulizaProcessos("01002214120205010000")); // 2 instância "especial"
+    // console.log(await atulizaProcessos("01005289420205010452")); // processo travando
+    // console.log(await atulizaProcessos("01006283220205010005")); // processo normal
 
 
     mongoose.connection.close();
@@ -209,7 +214,7 @@ async function corrigeBanco() {
                     "capa.comarca": 1
                 }
             }
-        ]).skip(0).limit(2000);
+        ]).skip().limit(2000);
         console.log(agregar);
         if (agregar.length > 0) {
             for (i in agregar) {
@@ -238,11 +243,67 @@ async function corrigeBanco() {
     }
 }
 
-async function atulizaProcessos(cnj) {
+async function atulizaProcessos(pulo) {
+    let busca;
     let resultado;
-    resultado = await rj.extrair(cnj)
-    return resultado
-    
+    let extracao;
+    let agregar = await Processo.aggregate([
+        {
+            $match: {
+                'detalhes.orgao': 5,
+                'detalhes.tribunal': 1,
+                'detalhes.ano': 2020,
+                "origemExtracao": "JTE"
+            }
+        },
+        {
+            $project: {
+                "detalhes.numeroProcesso": 1,
+                "_id": 1
+            }
+        }
+    ]).skip(pulo).limit(100);
+    console.log(await agregar);
+    for (i in agregar) {
+        busca = { "_id": agregar[i]._id }
+        extracao = await rj.extrair(agregar[i].detalhes.numeroProcesso);
+        //console.log(await extracao);
+        console.log(await !!extracao);
+        if (await !!extracao) {
+            if (extracao.segredoJustica == true) {
+
+                resultado = {
+                    "capa.segredoJustica": extracao.segredoJustica,
+                    "capa.valor": "",
+                    "capa.justicaGratuita": "",
+                    "origemExtracao": "JTE.TRT"
+                }
+                console.log(resultado);
+                await Processo.findOneAndUpdate(busca, resultado);
+            }
+            if (extracao.segredoJustica == false) {
+                resultado = {
+                    "capa.segredoJustica": extracao.segredoJustica,
+                    "capa.valor": `${extracao.valorDaCausa}`,
+                    "capa.justicaGratuita": extracao.justicaGratuita,
+                    "origemExtracao": "JTE.TRT"
+                }
+                console.log(resultado);
+                await Processo.findOneAndUpdate(busca, resultado);
+            }
+            // resultado = { "capa.segredoJustica": " ", "origemExtracao": "JTE.TRT", }
+            // await Processo.findOneAndUpdate(busca, resultado);
+            await sleep(100);
+            // console.log(resultado);
+        }
+
+    }
+
+
+    // let resultado;
+    // resultado = await rj.extrair(cnj)
+    // return resultado
+
     // let busca;
     // for (i in BD_busca) {
     //     resultado = { valor, segredoJustica, justicaGratuita }

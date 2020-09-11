@@ -3,6 +3,7 @@ const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 
 
+
 class ExtratorTrtrj {
   constructor(url, isDebug) {
     // super(url, isDebug);
@@ -17,7 +18,7 @@ class ExtratorTrtrj {
    */
   async extrair(cnj) {
     /**Logger para console de arquivos */
-    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
+    var logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
       nomeRobo: enums.nomesRobos.TRTRJ,
       NumeroDoProcesso: cnj,
     });
@@ -36,7 +37,7 @@ class ExtratorTrtrj {
           logger.info("Vou reiniciar a extração");
           capturaProcesso = await this.extrair(cnj);
         } else {
-          const error = new Error('Não conseguimos resolver o capcha 4 vezes');
+          const error = new Error('Não conseguimos resolver o capcha em 4 tentativas');
           error.code = "Ocorreu um problema na solução do Captcha";
           throw error;
         }
@@ -63,7 +64,6 @@ class ExtratorTrtrj {
       NumeroDoProcesso: cnj,
     });
     logger.info("Iniciado captura do processo.");
-
     const url = `${this.url}/api/processos/dadosbasicos/${cnj}`;
     //console.log("dentro da captura", url);
     // Primeira requisição ao TRT-RJ    
@@ -73,18 +73,24 @@ class ExtratorTrtrj {
       usaProxy: true,
       headers: header
     });
-    // console.log(objResponse);
     const bodyRes = objResponse.responseBody;
-    console.log(bodyRes);
-    if (bodyRes === undefined) { return null; }
+    
+    if (bodyRes === undefined) { 
+      logger.info("Não foi possivel obter a resposta inicial");
+      return null; 
+    }
 
     const info = bodyRes[0];
-    // finaliza a captura caso não obtenho os dados iniciais.
-    if (!info) {
-      // logger.info("Não foi possível obter os primeiros dados do processo.");
-      throw new Error("Não foi possível obter os primeiros dados do processo.")
-    };
+    
+    // // finaliza a captura caso não obtenho os dados iniciais.
+    // if (!info) {
+    //   // logger.info("Não foi possível obter os primeiros dados do processo.");
+    //   throw new Error("Não foi possível obter os primeiros dados do processo.")
+    // };
     // process.exit()
+
+
+
     // obtem a imagem em base64 do captcha
     const objResponseCaptcha = await this.robo.acessar({
       url: `${this.url}/api/processos/${info.id}`,
@@ -144,20 +150,26 @@ class ExtratorTrtrj {
     } else {
       logger.info("Não foi possível resolver o captcha");
     }
-
-
   }
+
 
   /**Existe processos que não possuem cadastro em primeira instancia e o servidor
    * do TRT-RJ trava a requisição sendo necessario baixar direto em 2 instância
-   * @param {string} cnj Numero de processo a ser buscado.
    */
   async tryCaptura(cnj) {
+    /**Logger para console de arquivos */
+    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
+      nomeRobo: enums.nomesRobos.TRTRJ,
+      NumeroDoProcesso: cnj,
+    });
     let resultado;
     try {
-      console.log("tentando fluxo 01");
+      logger.info("Entrando no fluxo 01 - tentativa 01");
+
       let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj);
-      console.log("tentando 2");
+      
+      logger.info("Entrando no fluxo 01 - tentativa 02");
+      
       let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj);
 
       if (captura_2ins && captura_2ins.andamentos && captura_2ins.andamentos.length > 0) {
@@ -170,7 +182,7 @@ class ExtratorTrtrj {
       return resultado
 
     } catch (e) {
-      console.log("tentando fluxo 02");
+      logger.info("Entrando no fluxo 02 - tentativa 01");
       //console.log(e);
       if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
         return { segredoJustica: true }
@@ -183,7 +195,10 @@ class ExtratorTrtrj {
   }
 }
 (async () => {
-  let teste = await new ExtratorTrtrj().extrair("01006283220205010005")
+  let many = []
+  let teste = await new ExtratorTrtrj().extrair("01001200420205010000")
+  console.log(typeof teste);
+  console.log(teste);
   console.log({ segredoJustica: teste.segredoJustica, valorDaCausa: teste.valorDaCausa, justicaGratuita: teste.justicaGratuita });
 
   process.exit()

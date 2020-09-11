@@ -3,6 +3,7 @@ const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 
 
+
 class ExtratorTrtrj {
   constructor(url, isDebug) {
     // super(url, isDebug);
@@ -17,19 +18,15 @@ class ExtratorTrtrj {
    */
   async extrair(cnj) {
     /**Logger para console de arquivos */
-    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
+    var logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
       nomeRobo: enums.nomesRobos.TRTRJ,
       NumeroDoProcesso: cnj,
     });
-    let captura;
+    let capturaProcesso;
     logger.info("Extrator de processos TRT_RJ Iniciado");
     try {
-      captura = await this.tryCaptura(cnj);
-      const valor = captura.valorDaCausa;
-      const segredoJustica = captura.segredoJustica;
-      const justicaGratuita = captura.justicaGratuita;
-      console.log({ valor, segredoJustica, justicaGratuita });
-      return { valor, segredoJustica, justicaGratuita }
+      capturaProcesso = await this.tryCaptura(cnj);
+      //console.log(capturaProcesso);
     } catch (e) {
       logger.log('warn', `${e} CNJ: ${cnj}`);
 
@@ -37,10 +34,10 @@ class ExtratorTrtrj {
         if (this.qtdTentativas < 5) {
           logger.info(`Captcha falhou!`, this.qtdTentativas);
           this.qtdTentativas += 1;
-          logger.info("vou reiniciar a extração");
-          captura = await this.extrair(cnj);
+          logger.info("Vou reiniciar a extração");
+          capturaProcesso = await this.extrair(cnj);
         } else {
-          const error = new Error('Não conseguimos resolver o capcha 4 vezes');
+          const error = new Error('Não conseguimos resolver o capcha em 4 tentativas');
           error.code = "Ocorreu um problema na solução do Captcha";
           throw error;
         }
@@ -50,7 +47,7 @@ class ExtratorTrtrj {
         throw error;
       }
     }
-    return captura
+    return capturaProcesso
   }
 
 
@@ -61,15 +58,12 @@ class ExtratorTrtrj {
    * @param {string} objResponseCaptcha Obtem a imagem em base64 do captcha
    */
   async captura(header, cnj) {
-
-
     /**Logger para console de arquivos */
     const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
       nomeRobo: enums.nomesRobos.TRTRJ,
       NumeroDoProcesso: cnj,
     });
     logger.info("Iniciado captura do processo.");
-
     const url = `${this.url}/api/processos/dadosbasicos/${cnj}`;
     //console.log("dentro da captura", url);
     // Primeira requisição ao TRT-RJ    
@@ -79,17 +73,24 @@ class ExtratorTrtrj {
       usaProxy: true,
       headers: header
     });
-
     const bodyRes = objResponse.responseBody;
-    // console.log(bodyRes);
+    
+    if (bodyRes === undefined) { 
+      logger.info("Não foi possivel obter a resposta inicial");
+      return null; 
+    }
 
     const info = bodyRes[0];
-    // finaliza a captura caso não obtenho os dados iniciais.
-    if (!info) {
-      // logger.info("Não foi possível obter os primeiros dados do processo.");
-      throw new Error("Não foi possível obter os primeiros dados do processo.")
-    };
+    
+    // // finaliza a captura caso não obtenho os dados iniciais.
+    // if (!info) {
+    //   // logger.info("Não foi possível obter os primeiros dados do processo.");
+    //   throw new Error("Não foi possível obter os primeiros dados do processo.")
+    // };
     // process.exit()
+
+
+
     // obtem a imagem em base64 do captcha
     const objResponseCaptcha = await this.robo.acessar({
       url: `${this.url}/api/processos/${info.id}`,
@@ -149,20 +150,27 @@ class ExtratorTrtrj {
     } else {
       logger.info("Não foi possível resolver o captcha");
     }
-
-
   }
+
 
   /**Existe processos que não possuem cadastro em primeira instancia e o servidor
    * do TRT-RJ trava a requisição sendo necessario baixar direto em 2 instância
-   * @param {string} cnj Numero de processo a ser buscado.
    */
   async tryCaptura(cnj) {
+    /**Logger para console de arquivos */
+    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
+      nomeRobo: enums.nomesRobos.TRTRJ,
+      NumeroDoProcesso: cnj,
+    });
     let resultado;
     try {
+      logger.info("Entrando no fluxo 01 - tentativa 01");
 
-      const captura = await new ExtratorTrtrj().captura({ "X-Grau-Instancia": "1" }, cnj);
-      const captura_2ins = await new ExtratorTrtrj().captura({ "X-Grau-Instancia": "2" }, cnj);
+      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj);
+      
+      logger.info("Entrando no fluxo 01 - tentativa 02");
+      
+      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj);
 
       if (captura_2ins && captura_2ins.andamentos && captura_2ins.andamentos.length > 0) {
         if (!captura)
@@ -174,19 +182,16 @@ class ExtratorTrtrj {
       return resultado
 
     } catch (e) {
+      logger.info("Entrando no fluxo 02 - tentativa 01");
       //console.log(e);
       if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
-        return undefined
+        return { segredoJustica: true }
       }
       const captura_2ins = await new ExtratorTrtrj().captura({ "X-Grau-Instancia": "2" }, cnj);
       resultado = captura_2ins
+
       return resultado
     }
   }
 }
-// (async () => {
-//   console.log(await new ExtratorTrtrj().extrair("01001199020205010041"));
-
-//   process.exit()
-// })()
 module.exports.ExtratorTrtrj = ExtratorTrtrj;

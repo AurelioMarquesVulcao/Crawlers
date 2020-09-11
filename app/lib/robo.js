@@ -46,14 +46,15 @@ class Requisicao {
     const promise = new Promise((resolve) => {
 
       // Alteração importante de segurança no código
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; 
-      
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
       let statusCode = 500;
       axios(options)
         .then((res) => {
           if (res) {
             statusCode = res.status;
 
+            //if (statusCode >= 200 && statusCode < 300) {
             if (statusCode === 200) {
               const corpo = res.data ? res.data : true;
               resolve({
@@ -64,7 +65,7 @@ class Requisicao {
                 responseBody: corpo,
                 cookies: this.validarCookies(res.headers['set-cookie']),
               });
-            } else if((statusCode === 204)){
+            } else if ((statusCode === 204)) {
               resolve({
                 code: 'HTTP_204',
                 status: statusCode,
@@ -115,15 +116,13 @@ class Requisicao {
           response.code
         )
       ) {
-        const mensagem = `Parando script CODE: ${
-          response.code
-        } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
+        const mensagem = `Parando script CODE: ${response.code
+          } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
         throw new RequestException(response.code, response.status, mensagem);
       } else if (/HTTP_STATUS_NOT_200|HTTP_REPONSE_FAIL/.test(response.code)) {
         if (this.contadorTentativas < 1) {
           console.log(
-            `${response.code} | Tentativa ${this.contadorTentativas} para ${
-              options.url
+            `${response.code} | Tentativa ${this.contadorTentativas} para ${options.url
             } | ${options.proxy ? options.proxy : 'sem proxy'}`
           );
 

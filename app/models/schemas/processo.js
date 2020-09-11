@@ -11,8 +11,8 @@ const capaSchema = new Schema(
     classe: String,
     dataDistribuicao: Date,
     instancia: String,
-    segredojustiça: Boolean,
-    justicaGratuita: Boolean,
+    segredoJustica: Boolean,
+    justicaGratuita: String,
     valor:String
   },
   { _id: false, versionKey: false }

@@ -180,6 +180,11 @@ class Robo {
       url: url,
       headers: headers,
       method: method,
+
+      strictSSL: false,
+      encoding: encoding,
+      followAllRedirects: true,
+      timeout: 100000
     };
 
     if (params) {

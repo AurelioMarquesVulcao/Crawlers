@@ -74,14 +74,14 @@ class ExtratorTrtrj {
       headers: header
     });
     const bodyRes = objResponse.responseBody;
-    
-    if (bodyRes === undefined) { 
+
+    if (bodyRes === undefined) {
       logger.info("Não foi possivel obter a resposta inicial");
-      return null; 
+      return null;
     }
 
     const info = bodyRes[0];
-    
+
     // // finaliza a captura caso não obtenho os dados iniciais.
     // if (!info) {
     //   // logger.info("Não foi possível obter os primeiros dados do processo.");
@@ -167,9 +167,9 @@ class ExtratorTrtrj {
       logger.info("Entrando no fluxo 01 - tentativa 01");
 
       let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj);
-      
+
       logger.info("Entrando no fluxo 01 - tentativa 02");
-      
+
       let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj);
 
       if (captura_2ins && captura_2ins.andamentos && captura_2ins.andamentos.length > 0) {
@@ -195,11 +195,17 @@ class ExtratorTrtrj {
   }
 }
 (async () => {
-  let many = []
-  let teste = await new ExtratorTrtrj().extrair("01001200420205010000")
-  console.log(typeof teste);
-  console.log(teste);
-  console.log({ segredoJustica: teste.segredoJustica, valorDaCausa: teste.valorDaCausa, justicaGratuita: teste.justicaGratuita });
+  let many = ["01004498320205010301", "01004282920205010036", "01002185920205010009", "01005400320205010002", "01005311920205010074", "01005301520205010048"]
+  for (i in many) {
+    let teste = await new ExtratorTrtrj().extrair(many[i])
+    console.log(typeof teste);
+    //console.log(teste);
+    if (teste != null){
+      console.log({ segredoJustica: teste.segredoJustica, valorDaCausa: teste.valorDaCausa, justicaGratuita: teste.justicaGratuita });
+    }
+    
+  }
+
 
   process.exit()
 })()

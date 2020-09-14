@@ -6,6 +6,8 @@ const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 const sleep = require('await-sleep');
+const { ExtratorTrtrj } = require('../../extratores/processoTRT-RJ');
+const { Processo } = require('../../models/schemas/processo');
 // const logarExecucao = async (execucao) => {
 //   await LogExecucao.salvar(execucao);
 // };
@@ -20,11 +22,11 @@ const sleep = require('await-sleep');
         console.log(e);
     });
 
-    const nomeFila = `fila TRT-RJ`;
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos`;
+    //const nomeFila = `fila TRT-RJ`;
+    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos.2`;
     // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
 
-    new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+    new GerenciadorFila(false,5).consumir(nomeFila, async (ch, msg) => {
         const dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
         console.table(message);
@@ -40,8 +42,41 @@ const sleep = require('await-sleep');
 
 
             // extrator
-            const resultadoExtracao = await extrator.extrair(message.NumeroOab);
-            await extrator.extrair(message.NumeroOab);
+            // const resultadoExtracao = await extrator.extrair(message.NumeroOab);
+            // await new ExtratorTrtrj().extrair(message.NumeroProcesso);
+            console.log(message.NumeroProcesso);
+            console.log(message);
+            let extracao = await new ExtratorTrtrj().extrair(message.NumeroProcesso);
+            console.log(message);
+            let busca = { "_id": message._id }
+            if (extracao.segredoJustica == true) {
+
+                resultado = {
+                    "capa.segredoJustica": extracao.segredoJustica,
+                    "capa.valor": "",
+                    "capa.justicaGratuita": "",
+                    "origemExtracao": "JTE.TRT"
+                }
+                console.log(resultado);
+                console.log(busca);
+                await Processo.findOneAndUpdate(busca, resultado);
+                console.log("------------- Salvo com sucesso -------------------");
+            }
+            if (extracao.segredoJustica == false) {
+                resultado = {
+                    "capa.segredoJustica": extracao.segredoJustica,
+                    "capa.valor": `${extracao.valorDaCausa}`,
+                    "capa.justicaGratuita": extracao.justicaGratuita,
+                    "origemExtracao": "JTE.TRT"
+                }
+                console.log(resultado);
+                console.log(busca);
+                await Processo.findOneAndUpdate(busca, resultado);
+                console.log("------------- Salvo com sucesso -------------------");
+            }
+            // resultado = { "capa.segredoJustica": " ", "origemExtracao": "JTE.TRT", }
+            // await Processo.findOneAndUpdate(busca, resultado);
+            await sleep(100);
 
 
 
@@ -72,7 +107,7 @@ const sleep = require('await-sleep');
             logger.info(`Error: ${e.message}`);
 
             // Estou reprocessando automaticamente no fim da fila.
-            if (!!novosProcesso) {
+            if (!!message.NovosProcessos) {
                 new GerenciadorFila().enviar(nomeFila, message);
             }
 

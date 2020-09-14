@@ -387,3 +387,7 @@ class ProcessoTRTRJ {
   }
 }
 module.exports.ProcessoTRTRJ = ProcessoTRTRJ;
+
+// (async ()=>{
+// new ExtratorTrtrj().extrair("01001183420205010000")
+// })()

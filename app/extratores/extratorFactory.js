@@ -8,7 +8,7 @@ const { ProcessoTJSP } = require("./ProcessoTJSP");
 const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { ProcJTE } = require('./ProcJTE');
 const { PeticaoTJSP } = require('./PeticaoTJSP');
-const { ExtratorTrtrj } = require('./processoTRT-RJ')
+const { ExtratorTrtrj } = require('./processoTRT-RJ');
 
 
 class ExtratorFactory {

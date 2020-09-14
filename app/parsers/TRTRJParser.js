@@ -76,9 +76,9 @@ class TRTParser extends BaseParser {
         return resultado
     }
 }
-(async () => {
-    console.log(new TRTParser().parse(Extracao));
-    console.log(new TRTParser().parse(Extracao).processo.capa.assunto);
-    // console.log(Extracao.assuntos[0].descricao);
+// (async () => {
+//     console.log(new TRTParser().parse(Extracao));
+//     console.log(new TRTParser().parse(Extracao).processo.capa.assunto);
+//     // console.log(Extracao.assuntos[0].descricao);
 
-})()
+// })()

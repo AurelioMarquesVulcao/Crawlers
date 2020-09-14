@@ -20,7 +20,7 @@ const ajuste = new Cnj();
 const processoConection = new Processo();
 const rj = new ExtratorTrtrj();
 
-// liga ao banco de dados
+// Conecta ao banco de dados
 mongoose.connect(enums.mongo.connString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -269,7 +269,7 @@ async function atulizaProcessos(pulo) {
     for (i in agregar) {
         busca = { "_id": agregar[i]._id }
         extracao = await rj.extrair(agregar[i].detalhes.numeroProcesso);
-        //console.log(await extracao);
+        console.log(await extracao);
         console.log(await !!extracao);
         if (await !!extracao) {
             if (extracao.segredoJustica == true) {

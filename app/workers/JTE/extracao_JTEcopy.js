@@ -296,10 +296,13 @@ async function worker() {
 
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
+      logger.info('Verificando se o processo é RJ');
+      enfileirarTRT_RJ(numeroProcesso);
+
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
-      desligaAgendado()
+      desligaAgendado();
 
     } catch (e) {
       catchError++;
@@ -355,5 +358,36 @@ function desligaAgendado() {
     start = 0;
     console.log("vou desligar");
     process.exit();
+  }
+}
+
+function enfileirarTRT_RJ(numero) {
+  let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
+  //console.log(regex);
+  if (regex) {
+    let mensagem = criaPost(numero);
+    fila.enviarMensagem("fila TRT-RJ", mensagem);
+    console.log("Processo enfileirado para Download");
+  }
+  function criaPost(numero) {
+    let post = `{
+      "ExecucaoConsultaId" : "${makeid()}",
+      "ConsultaCadastradaId" : "${makeid()}",
+      "DataEnfileiramento" : "${new Date}",
+      "NumeroProcesso" : "${numero}",
+      "NumeroOab" : "null",        
+      "SeccionalOab" : "SP",
+      "NovosProcessos" : true}`
+    return post
+  }
+
+  function makeid() {
+    let text = "5ed9";
+    let possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+    let letra = "abcdefghijklmnopqrstuvwxyz";
+    let numero = "0123456789";
+    for (var i = 0; i < 20; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
   }
 }

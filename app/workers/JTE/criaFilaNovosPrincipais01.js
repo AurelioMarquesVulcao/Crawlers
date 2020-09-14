@@ -118,7 +118,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         // console.log(e);
         console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
         let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
-        await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
+        // await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
       if (contaOrigem == max) {
         await paraServico()
@@ -163,8 +163,8 @@ function embaralha(lista) {
 // fila limpa = true, fila com processos = undefined.
 async function verificaFila(nomeFila) {
   let filas = await getFilas();
-  console.log(filas);
-  //console.log(filas);
+  // console.log(filas);
+  // console.log(filas);
   if (filas.length > 0) {
     for (let i = 0; i < filas.length; i++) {
       if (filas[i].nome == nomeFila) {

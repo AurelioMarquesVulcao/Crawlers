@@ -21,10 +21,10 @@ class RoboPuppeteer3 {
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      args: ['--ignore-certificate-errors']
+      //args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -69,7 +69,7 @@ class RoboPuppeteer3 {
     // // this.page = await this.browser.newPage();
 
     // await sleep(timerSleep2)
-    
+
     await shell.exec('pkill chrome');
     //this.finalizar()
     process.exit()
@@ -135,7 +135,7 @@ class RoboPuppeteer3 {
       //console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
     } catch (e) {
       console.log("----- Este é o ultimo processo dessa comarca até o momento. -----");
-      throw "Erro não mapeado" 
+      throw "Erro não mapeado"
     }
 
 

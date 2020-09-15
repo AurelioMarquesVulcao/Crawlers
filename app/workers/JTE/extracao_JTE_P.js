@@ -277,10 +277,12 @@ async function worker() {
 
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
+  
+
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
-      desligaAgendado()
+      desligaAgendado();
 
     } catch (e) {
       catchError++;
@@ -336,35 +338,5 @@ function desligaAgendado() {
     start = 0;
     console.log("vou desligar");
     process.exit();
-  }
-}
-
-function errosSequencia(catchError, contadorErros) {
-  //let testeErros1 = [];
-  //console.log(testeErros1);
-  //let testeErros2 = [];
-  //console.log(testeErros2);
-  //let resultado = [];
-  //console.log(resultado);
-  testeErros1.push(catchError);
-  testeErros2.push(contadorErros);
-  if (testeErros1.length > 3) {
-    let sequencia1 = [
-      testeErros1.length,
-      testeErros1.length - 1,
-      testeErros1.length - 2,
-    ];
-    let sequencia2 = [
-      testeErros2.length,
-      testeErros2.length - 1,
-      testeErros2.length - 2,
-    ];
-    for (mm in sequencia1) {
-      resultado.push(sequencia1[mm] - sequencia2[mm]);
-    }
-    let sequencia = resultado[2] - resultado[1];
-    if (sequencia == 1) {
-      process.exit();
-    }
   }
 }

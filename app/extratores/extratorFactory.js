@@ -8,6 +8,7 @@ const { ProcessoTJSP } = require("./ProcessoTJSP");
 const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { ProcJTE } = require('./ProcJTE');
 const { PeticaoTJSP } = require('./PeticaoTJSP');
+const { ExtratorTrtrj } = require('./processoTRT-RJ');
 
 
 class ExtratorFactory {
@@ -26,13 +27,13 @@ class ExtratorFactory {
       extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg', isDebug);
     }
 
-    if (/oab.TJRS/.test(fila)) {      
+    if (/oab.TJRS/.test(fila)) {
       extrator = new OabTJRS('https://www.tjrs.jus.br/site_php/consulta/index.php', isDebug);
     }
 
-    if (/processo.TJRS/.test(fila)) {      
+    if (/processo.TJRS/.test(fila)) {
       extrator = new ProcessoTJRS('https://www.tjrs.jus.br/site_php/consulta/index.php', isDebug);
-    }    
+    }
 
     if (/processo.JTE/.test(fila)) {
       extrator = new ProcJTE('https://jte.csjt.jus.br/', isDebug);
@@ -43,7 +44,7 @@ class ExtratorFactory {
     }
 
     if (/peticao.TJSP/.test(fila)) { // usa puppeteer
-      extrator = new PeticaoTJSP({headless: true});
+      extrator = new PeticaoTJSP({ headless: true });
     }
 
     if (/oab.TJSC/.test(fila)) {
@@ -59,6 +60,9 @@ class ExtratorFactory {
         'https://www4.tjmg.jus.br/juridico/sf/index_oab.jsp',
         isDebug
       );
+    }
+    if (/processo.TRTRJ/.test(fila)) {
+      extrator = new ExtratorTrtrj('https://www.trt1.jus.br/consulta-processual', isDebug);
     }
     return extrator;
   }

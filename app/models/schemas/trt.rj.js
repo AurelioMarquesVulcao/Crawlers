@@ -13,7 +13,7 @@ const capaSchema = new Schema(
     instancia: String,
     segredoJustica: Boolean,
     justicaGratuita: String,
-    valor:String
+    valor: String
   },
   { _id: false, versionKey: false }
 );
@@ -40,7 +40,7 @@ const parteSchema = new Schema(
   { _id: false, versionKey: false }
 );
 
-const processoSchema = new Schema(
+const processoTRTSchema = new Schema(
   {
     capa: capaSchema,
     detalhes: detalhesSchema,
@@ -64,7 +64,7 @@ const processoSchema = new Schema(
   }
 );
 
-processoSchema.methods.salvar = async function salvar() {
+processoTRTSchema.methods.salvar = async function salvar() {
   let processoObject = this.toObject();
   let pesquisaAndamentos = 0;
   delete processoObject['_id'];
@@ -127,7 +127,7 @@ processoSchema.methods.salvar = async function salvar() {
   };
 };
 
-processoSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
+processoTRTSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
   let detalhes = {};
 
   let cnjPartes = cnj.replace('-', '').split(/\D/);
@@ -144,7 +144,7 @@ processoSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
   return detalhes;
 };
 
-processoSchema.statics.listarProcessos = async function listarProcessos(dias) {
+processoTRTSchema.statics.listarProcessos = async function listarProcessos(dias) {
   let numeroProcessos = [];
 
   let docs = await Processo.find(
@@ -165,8 +165,8 @@ processoSchema.statics.listarProcessos = async function listarProcessos(dias) {
   return numeroProcessos;
 };
 
-processoSchema.index({ 'detalhes.numeroProcesso': 1, type: -1 });
+processoTRTSchema.index({ 'detalhes.numeroProcesso': 1, type: -1 });
 
-const Processo = mongoose.model('Processo', processoSchema, 'processos');
+const ProcessoTRT = mongoose.model('ProcessosTRT', processoTRTSchema, 'processosTRT');
 
-module.exports.Processo = Processo;
+module.exports.ProcessoTRT = ProcessoTRT;

@@ -1,0 +1,43 @@
+{id: 2300396, numero: "0100578-74.2020.5.01.0241", classe: "CumSen",…}
+assuntos: [{id: 1517, codigo: "2583", descricao: "Abono", principal: true}]
+0: {id: 1517, codigo: "2583", descricao: "Abono", principal: true}
+autuadoEm: "2020-09-02T17:23:07.099"
+classe: "CumSen"
+distribuidoEm: "2020-09-02T17:23:07.14"
+expedientes: [{destinatario: "A. E. S. S. A.", tipo: "Intimação", meio: "Correios",…},…]
+0: {destinatario: "A. E. S. S. A.", tipo: "Intimação", meio: "Correios",…}
+1: {destinatario: "E. T. S. E. E.", tipo: "Intimação", meio: "Correios",…}
+id: 2300396
+itensProcesso: [{titulo: "Expedido(a) intimação a(o) AMPLA ENERGIA E SERVICOS S.A.", tipoConteudo: "HTML",…},…]
+0: {titulo: "Expedido(a) intimação a(o) AMPLA ENERGIA E SERVICOS S.A.", tipoConteudo: "HTML",…}
+1: {titulo: "Expedido(a) intimação a(o) EVOLUTI TECNOLOGIA E SERVICOS EIRELI - EPP", tipoConteudo: "HTML",…}
+2: {id: 118469265, idUnicoDocumento: "337ab5e", titulo: "Despacho", tipo: "Despacho", tipoConteudo: "PDF",…}
+3: {titulo: "Proferido despacho de mero expediente", tipoConteudo: "HTML",…}
+4: {titulo: "Conclusos os autos para despacho (genérica) a ROBERTA LIMA CARVALHO", tipoConteudo: "HTML",…}
+5: {titulo: "Iniciada a execução", tipoConteudo: "HTML", data: "2020-09-03T12:10:29.159", ativo: true,…}
+6: {titulo: "Distribuído por sorteio", tipoConteudo: "HTML", data: "2020-09-02T17:23:07.256", ativo: true,…}
+justicaGratuita: true
+numero: "0100578-74.2020.5.01.0241"
+orgaoJulgador: "1ª Vara do Trabalho de Niterói"
+poloAtivo: [{id: 11994655, idPessoa: 2604676, nome: "L. N. S.", login: "14718475783", tipo: "EXEQUENTE",…}]
+poloPassivo: [,…]
+0: {id: 11994661, idPessoa: 232786, nome: "E. T. S. E. E.", login: "37010014000104", tipo: "EXECUTADO",…}
+id: 11994661
+idPessoa: 232786
+login: "37010014000104"
+nome: "E. T. S. E. E."
+polo: "PASSIVO"
+situacao: "ATIVO"
+tipo: "EXECUTADO"
+utilizaLoginSenha: false
+1: {id: 11994670, idPessoa: 12163, nome: "A. E. S. S. A.", login: "33050071000158", tipo: "EXECUTADO",…}
+id: 11994670
+idPessoa: 12163
+login: "33050071000158"
+nome: "A. E. S. S. A."
+polo: "PASSIVO"
+situacao: "ATIVO"
+tipo: "EXECUTADO"
+utilizaLoginSenha: false
+segredoJustica: false
+valorDaCausa: 30177.23

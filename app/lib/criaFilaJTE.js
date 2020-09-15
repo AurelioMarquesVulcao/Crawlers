@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-const re = require('xregexp');
+// const re = require('xregexp');
 const sleep = require('await-sleep');
 const { enums } = require("../configs/enums");
 
 const { GerenciadorFila } = require("../lib/filaHandler");
-const { ExtratorBase } = require('../extratores/extratores');
-const { JTEParser } = require('../parsers/JTEParser');
+// const { ExtratorBase } = require('../extratores/extratores');
+// const { JTEParser } = require('../parsers/JTEParser');
 const { Processo } = require('../models/schemas/processo');
 const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../models/schemas/jte')
 const { Cnj } = require('../lib/util')
@@ -34,10 +34,10 @@ class CriaFilaJTE {
 			status = "Não possui processos";
 			let obj2 = { status, estadoNumero, comarca, dataBusca, numeroUltimoProcecesso };
 			if (verifica.length == 0) {
-				
+
 				await new statusEstadosJTE(obj2).save()
 			} else {
-				await statusEstadosJTE.findOneAndUpdate(busca, obj2)	
+				await statusEstadosJTE.findOneAndUpdate(busca, obj2)
 			}
 
 		} else if (verifica.length == 0) {
@@ -184,7 +184,7 @@ class CriaFilaJTE {
 		let data = new Date();
 		// Guarda cada pedaço em uma variável
 		let dia = data.getDate();           // 1-31
-		let dia_sem = data.getDay();            // 0-6 (zero=domingo)
+		let dia_sem = data.getDay();        // 0-6 (zero=domingo)
 		let mes = data.getMonth();          // 0-11 (zero=janeiro)
 		let ano2 = data.getYear();           // 2 dígitos
 		let ano4 = data.getFullYear();       // 4 dígitos
@@ -225,11 +225,17 @@ class CriaFilaJTE {
 		}
 	}
 }
+
+class CriaFilaTRT {
+	async enviar(processo, fila) {
+		await this.enviaFila([{
+			NumeroProcesso: processo
+		}], fila)
+	}
+}
 // ------------------------------------funcoes complementares--------------------------------------------------------------------------------------------------------------------------------
 
 
-
-// ------------------------------------funcoes complementares----------------------------------------------------------------------------------------------------------------------------------
 function corrigeSequencial(sequencial) {
 	let novoSequencial = sequencial
 	let zero = ''
@@ -305,5 +311,5 @@ function mascaraNumero(numeroProcesso) {
 }
 module.exports.CriaFilaJTE = CriaFilaJTE;
 
-// revisar linha 369.
+
 module.exports.linkDocumento1 = linkDocumento;

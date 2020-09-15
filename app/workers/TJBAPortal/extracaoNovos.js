@@ -22,7 +22,7 @@ const logarExecucao = async (execucao) => {
 
   const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJBAPortal}.extracao.novos`;
 
-  new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+  new GerenciadorFila(false, 3).consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     console.table(message);

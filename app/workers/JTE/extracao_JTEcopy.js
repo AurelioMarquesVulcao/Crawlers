@@ -234,12 +234,11 @@ async function worker() {
         if (message.NovosProcessos == true) {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
+          // console.log(link);
           let listaArquivo = [];
-          let cnj = link[0].numeroProcesso.replace(/[-.]/g, "");
           //await console.log(link.length);
-
           for (let w = 0; w < link.length - 1; w++) {
-            console.log('entrou no laço');
+            // console.log(link[w]);
             await new CriaFilaJTE().salvaDocumentoLink(link[w]);
             let nome = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
             let linkDocumento = link[w].link;
@@ -251,10 +250,17 @@ async function worker() {
                 url: linkDocumento,
                 path: `${local}/${nome}`
               })
+            } else if (tipo == 'HTML') {
+              await new downloadFiles().covertePDF(nome, local, linkDocumento)
+              listaArquivo.push({
+                url: linkDocumento,
+                path: `${local}/${nome}`
+              })
             }
             await console.log('O link ' + w + ' Foi salvo');
           }
-          await new downloadFiles().enviarAWS(cnj, listaArquivo)
+          // enviar para AWS
+          // await new downloadFiles().enviarAWS(cnj, listaArquivo)
         }
 
         logger.info('Processo extraidos com sucesso');
@@ -290,10 +296,13 @@ async function worker() {
 
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
+      logger.info('Verificando se o processo é RJ');
+      enfileirarTRT_RJ(numeroProcesso);
+
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
-      desligaAgendado()
+      desligaAgendado();
 
     } catch (e) {
       catchError++;
@@ -349,5 +358,36 @@ function desligaAgendado() {
     start = 0;
     console.log("vou desligar");
     process.exit();
+  }
+}
+
+function enfileirarTRT_RJ(numero) {
+  let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
+  //console.log(regex);
+  if (regex) {
+    let mensagem = criaPost(numero);
+    fila.enviarMensagem("fila TRT-RJ", mensagem);
+    console.log("Processo enfileirado para Download");
+  }
+  function criaPost(numero) {
+    let post = `{
+      "ExecucaoConsultaId" : "${makeid()}",
+      "ConsultaCadastradaId" : "${makeid()}",
+      "DataEnfileiramento" : "${new Date}",
+      "NumeroProcesso" : "${numero}",
+      "NumeroOab" : "null",        
+      "SeccionalOab" : "SP",
+      "NovosProcessos" : true}`
+    return post
+  }
+
+  function makeid() {
+    let text = "5ed9";
+    let possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+    let letra = "abcdefghijklmnopqrstuvwxyz";
+    let numero = "0123456789";
+    for (var i = 0; i < 20; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
   }
 }

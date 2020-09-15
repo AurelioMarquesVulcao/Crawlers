@@ -317,7 +317,7 @@ class RoboPuppeteer3 {
             let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
             // if (!! document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > pdf-viewer")){ "pdf"};
             let tipo = "pdf"
-            console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            // console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
           } // se for um documento de texto 
           else {
@@ -329,7 +329,7 @@ class RoboPuppeteer3 {
             let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
             let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
             let tipo = "HTML"
-            console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            // console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
           }
 
@@ -369,7 +369,7 @@ class RoboPuppeteer3 {
             let link = document.querySelector("#linkPDF").href;
             let movimentacao = document.querySelector(`#popover-marcador-filtro > ion-item:nth-child(${k}) > span`).innerText.replace("\n", " ");
             let data = dataEProcesso.data;
-            let numeroProcesso = dataEProcesso.numeroProcesso;
+            let numeroProcesso = dataEProcesso.numeroProcesso.replace(/[-.]/g, "");
             let tipo = "PDF"
             console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }

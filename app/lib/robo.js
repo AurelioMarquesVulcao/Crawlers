@@ -44,12 +44,17 @@ class Requisicao {
 
   async enviarRequest(options) {
     const promise = new Promise((resolve) => {
+
+      // Alteração importante de segurança no código
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
       let statusCode = 500;
       axios(options)
         .then((res) => {
           if (res) {
             statusCode = res.status;
 
+            //if (statusCode >= 200 && statusCode < 300) {
             if (statusCode === 200) {
               const corpo = res.data ? res.data : true;
               resolve({
@@ -60,7 +65,17 @@ class Requisicao {
                 responseBody: corpo,
                 cookies: this.validarCookies(res.headers['set-cookie']),
               });
-            } else {
+            } else if ((statusCode === 204)) {
+              resolve({
+                code: 'HTTP_204',
+                status: statusCode,
+                message: `StatusCode: ${statusCode}.`,
+                responseContent: res,
+                responseBody: undefined,
+                cookies: this.validarCookies(res.headers['set-cookie']),
+              });
+            }
+            else {
               resolve({
                 code: 'HTTP_STATUS_NOT_200',
                 status: statusCode,
@@ -101,15 +116,13 @@ class Requisicao {
           response.code
         )
       ) {
-        const mensagem = `Parando script CODE: ${
-          response.code
-        } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
+        const mensagem = `Parando script CODE: ${response.code
+          } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
         throw new RequestException(response.code, response.status, mensagem);
       } else if (/HTTP_STATUS_NOT_200|HTTP_REPONSE_FAIL/.test(response.code)) {
         if (this.contadorTentativas < 1) {
           console.log(
-            `${response.code} | Tentativa ${this.contadorTentativas} para ${
-              options.url
+            `${response.code} | Tentativa ${this.contadorTentativas} para ${options.url
             } | ${options.proxy ? options.proxy : 'sem proxy'}`
           );
 
@@ -155,7 +168,7 @@ class Robo {
     encoding = '',
     usaProxy = false,
     usaJson = false,
-    params = null,
+    params = null, // body!
     headers = {},
     randomUserAgent = false,
   } = {}) {
@@ -167,6 +180,11 @@ class Robo {
       url: url,
       headers: headers,
       method: method,
+
+      strictSSL: false,
+      encoding: encoding,
+      followAllRedirects: true,
+      timeout: 100000
     };
 
     if (params) {
@@ -194,6 +212,7 @@ class Robo {
     // });
 
     options.timeout = 60000;
+    // console.log(options);
     return this.requisicao.enviarRequest(options);
   }
 }

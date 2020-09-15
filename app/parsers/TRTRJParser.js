@@ -56,18 +56,21 @@ class TRTParser extends BaseParser {
 
         return capa
     }
-    async assunto(extracao) {
+    assunto(extracao) {
         let resultado = [];
         let dados;
-        let resultadoJoin = []
-        console.log(extracao.assuntos[1].descricao);
-        for (let i = 0; i < extracao.assuntos.length; i++) {
-            dados = extracao.assuntos[i].descricao
-            resultado.push(dados)
+        let resultadoJoin = [];
+        if (extracao.assuntos.length == 0) {
+            return [""]
+        } else {
+            for (let i = 0; i < extracao.assuntos.length; i++) {
+                dados = extracao.assuntos[i].descricao;
+                resultado.push(dados);
+            }
+            resultadoJoin = resultado.join(" , ");
+            return [resultadoJoin]
         }
-        resultadoJoin = resultado.join()
-        console.log(resultadoJoin);
-        return resultadoJoin
+
     }
 
     regexVaraComarca(str) {
@@ -93,6 +96,6 @@ class TRTParser extends BaseParser {
 }
 module.exports.TRTParser = TRTParser;
 
-// (async () => {
-//     await new TRTParser().parse(Extracao)
-// })()
+(async () => {
+    await new TRTParser().parse(Extracao)
+})()

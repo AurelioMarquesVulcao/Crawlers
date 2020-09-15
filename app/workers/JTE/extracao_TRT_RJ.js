@@ -50,15 +50,14 @@ const parse = new TRTParser();
             // console.log(message.NumeroProcesso);
             // console.log(message);
             let extracao = await new ExtratorTrtrj().extrair(message.NumeroProcesso);
-            
+            logger.info('Iniciando Parse');
             let dadosProcesso = await parse.parse(extracao);
-            await dadosProcesso.processo.save()
-            console.log(!!dadosProcesso);
-            console.log("------------------ vou tentar salvar -----------------");
-            console.log(dadosProcesso.processo);
-
-            console.log("------------------ vou salvar -----------------");
-            
+            logger.info('Parse finalizado');
+            logger.info('Salvando capa do processo');
+            await dadosProcesso.processo.save();
+            logger.info('Capa de processo salva');
+                      
+            logger.info('Atualizando processo JTE');
             // console.log(message);
             let busca = { "_id": message._id }
             if (extracao.segredoJustica == true) {
@@ -85,6 +84,7 @@ const parse = new TRTParser();
                 await Processo.findOneAndUpdate(busca, resultado);
                 console.log("------------- Salvo com sucesso -------------------");
             }
+            logger.info('Processo JTE atualizado para JTE.TRT');
             // resultado = { "capa.segredoJustica": " ", "origemExtracao": "JTE.TRT", }
             // await Processo.findOneAndUpdate(busca, resultado);
             await sleep(100);

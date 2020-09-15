@@ -5,9 +5,10 @@
 
 
 const { BaseParser, removerAcentos } = require('./BaseParser');
-const { Processo } = require('../models/schemas/processo');
+//const { Processo } = require('../models/schemas/processo');
+const { ProcessoTRT } = require('../models/schemas/trt.rj');
 //const { Andamento } = require('../models/schemas/andamento');
-const Extracao = require('../assets/jte/Extracao.json')
+const Extracao = require('../assets/jte/testes.json')
 
 
 
@@ -23,13 +24,13 @@ class TRTParser extends BaseParser {
         let cnj = "";
         let dadosAndamento;
 
-        let dadosProcesso = new Processo({
+        let dadosProcesso = new ProcessoTRT({
             capa: this.capa(extracao),
-            oabs: "",
-            qtdAndamentos: "",
+            oabs: [],
+            qtdAndamentos: extracao.itensProcesso.length,
             origemExtracao: "TRT-RJ",
-            envolvidos: "",
-            detalhes: "",
+            envolvidos: [],
+            detalhes: ProcessoTRT.identificarDetalhes(extracao.numero),
         })
 
         return {
@@ -44,7 +45,7 @@ class TRTParser extends BaseParser {
             comarca: regex[2],
             vara: regex[1],
             fase: extracao.itensProcesso[0].instancia,
-            assunto: [extracao.assuntos[0].descricao],
+            assunto: this.assunto(extracao),
             classe: extracao.classe,
             dataDistribuicao: extracao.distribuidoEm,
             instancia: extracao.itensProcesso[0].instancia,
@@ -55,6 +56,20 @@ class TRTParser extends BaseParser {
 
         return capa
     }
+    async assunto(extracao) {
+        let resultado = [];
+        let dados;
+        let resultadoJoin = []
+        console.log(extracao.assuntos[1].descricao);
+        for (let i = 0; i < extracao.assuntos.length; i++) {
+            dados = extracao.assuntos[i].descricao
+            resultado.push(dados)
+        }
+        resultadoJoin = resultado.join()
+        console.log(resultadoJoin);
+        return resultadoJoin
+    }
+
     regexVaraComarca(str) {
         let regex = /\s*(.+?D[EO].+?)\s*D[EOA]\s*(.+)\s*/gim;
         let m;
@@ -76,9 +91,8 @@ class TRTParser extends BaseParser {
         return resultado
     }
 }
-// (async () => {
-//     console.log(new TRTParser().parse(Extracao));
-//     console.log(new TRTParser().parse(Extracao).processo.capa.assunto);
-//     // console.log(Extracao.assuntos[0].descricao);
+module.exports.TRTParser = TRTParser;
 
+// (async () => {
+//     await new TRTParser().parse(Extracao)
 // })()

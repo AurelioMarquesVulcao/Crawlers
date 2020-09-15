@@ -2,15 +2,18 @@ const mongoose = require('mongoose');
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Extracao } = require('../../models/schemas/extracao');
+//const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
-const { LogExecucao } = require('../../lib/logExecucao');
+//const { LogExecucao } = require('../../lib/logExecucao');
 const sleep = require('await-sleep');
 const { ExtratorTrtrj } = require('../../extratores/processoTRT-RJ');
 const { Processo } = require('../../models/schemas/processo');
+const { TRTParser}= require('../../parsers/TRTRJParser');
 // const logarExecucao = async (execucao) => {
 //   await LogExecucao.salvar(execucao);
 // };
+
+const parse = new TRTParser();
 
 (async () => {
     mongoose.connect(enums.mongo.connString, {
@@ -24,9 +27,9 @@ const { Processo } = require('../../models/schemas/processo');
 
     //const nomeFila = `fila TRT-RJ`;
     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos.2`;
-    // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos`;
 
-    new GerenciadorFila(false,5).consumir(nomeFila, async (ch, msg) => {
+    new GerenciadorFila(false,10).consumir(nomeFila, async (ch, msg) => {
         const dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
         console.table(message);
@@ -44,13 +47,21 @@ const { Processo } = require('../../models/schemas/processo');
             // extrator
             // const resultadoExtracao = await extrator.extrair(message.NumeroOab);
             // await new ExtratorTrtrj().extrair(message.NumeroProcesso);
-            console.log(message.NumeroProcesso);
-            console.log(message);
+            // console.log(message.NumeroProcesso);
+            // console.log(message);
             let extracao = await new ExtratorTrtrj().extrair(message.NumeroProcesso);
-            console.log(message);
+            
+            let dadosProcesso = await parse.parse(extracao);
+            await dadosProcesso.processo.save()
+            console.log(!!dadosProcesso);
+            console.log("------------------ vou tentar salvar -----------------");
+            console.log(dadosProcesso.processo);
+
+            console.log("------------------ vou salvar -----------------");
+            
+            // console.log(message);
             let busca = { "_id": message._id }
             if (extracao.segredoJustica == true) {
-
                 resultado = {
                     "capa.segredoJustica": extracao.segredoJustica,
                     "capa.valor": "",
@@ -58,7 +69,7 @@ const { Processo } = require('../../models/schemas/processo');
                     "origemExtracao": "JTE.TRT"
                 }
                 console.log(resultado);
-                console.log(busca);
+                // console.log(busca);
                 await Processo.findOneAndUpdate(busca, resultado);
                 console.log("------------- Salvo com sucesso -------------------");
             }
@@ -70,7 +81,7 @@ const { Processo } = require('../../models/schemas/processo');
                     "origemExtracao": "JTE.TRT"
                 }
                 console.log(resultado);
-                console.log(busca);
+                // console.log(busca);
                 await Processo.findOneAndUpdate(busca, resultado);
                 console.log("------------- Salvo com sucesso -------------------");
             }
@@ -107,9 +118,11 @@ const { Processo } = require('../../models/schemas/processo');
             logger.info(`Error: ${e.message}`);
 
             // Estou reprocessando automaticamente no fim da fila.
-            if (!!message.NovosProcessos) {
-                new GerenciadorFila().enviar(nomeFila, message);
-            }
+            // if (!!message.NovosProcessos) {
+            //     await new GerenciadorFila().enviar(nomeFila, message);
+            // }
+            await new GerenciadorFila().enviar(nomeFila, message);
+            await new GerenciadorFila().enviar(reConsumo, message);
 
             //     await logarExecucao({
             //         LogConsultaId: message.LogConsultaId,
@@ -130,64 +143,3 @@ const { Processo } = require('../../models/schemas/processo');
         }
     });
 })();
-
-
-
-
-
-async function atulizaProcessos(pulo) {
-    let busca;
-    let resultado;
-    let extracao;
-    let agregar = await Processo.aggregate([
-        {
-            $match: {
-                'detalhes.orgao': 5,
-                'detalhes.tribunal': 1,
-                'detalhes.ano': 2020,
-                "origemExtracao": "JTE"
-            }
-        },
-        {
-            $project: {
-                "detalhes.numeroProcesso": 1,
-                "_id": 1
-            }
-        }
-    ]).skip(pulo).limit(100);
-    console.log(await agregar);
-    for (i in agregar) {
-        busca = { "_id": agregar[i]._id }
-        extracao = await rj.extrair(agregar[i].detalhes.numeroProcesso);
-        //console.log(await extracao);
-        console.log(await !!extracao);
-        if (await !!extracao) {
-            if (extracao.segredoJustica == true) {
-
-                resultado = {
-                    "capa.segredoJustica": extracao.segredoJustica,
-                    "capa.valor": "",
-                    "capa.justicaGratuita": "",
-                    "origemExtracao": "JTE.TRT"
-                }
-                console.log(resultado);
-                await Processo.findOneAndUpdate(busca, resultado);
-            }
-            if (extracao.segredoJustica == false) {
-                resultado = {
-                    "capa.segredoJustica": extracao.segredoJustica,
-                    "capa.valor": `${extracao.valorDaCausa}`,
-                    "capa.justicaGratuita": extracao.justicaGratuita,
-                    "origemExtracao": "JTE.TRT"
-                }
-                console.log(resultado);
-                await Processo.findOneAndUpdate(busca, resultado);
-            }
-            // resultado = { "capa.segredoJustica": " ", "origemExtracao": "JTE.TRT", }
-            // await Processo.findOneAndUpdate(busca, resultado);
-            await sleep(100);
-            // console.log(resultado);
-        }
-
-    }
-}

@@ -70,7 +70,7 @@ mongoose.connection.on('error', (e) => {
     // await sleep(1800000)
 
 
-    await atulizaProcessosFila(22000);
+    await atulizaProcessosFila(0);
     await sleep(5000)
 
     // console.log(await atulizaProcessos("01001199020205010041")); // segredo de justiça
@@ -338,7 +338,7 @@ async function atulizaProcessosFila(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(200);
+    ]).skip(pulo).limit(6000);
     console.log(await agregar);
     for (i in agregar) {
         busca = `"${agregar[i]._id}"`;

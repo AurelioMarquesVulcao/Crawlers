@@ -191,7 +191,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaProcessos.yml --no-daemon --watch
+    command: pm2 start workers/JTE/criaProcessos.yml --no-daemon
 
     restart: always
     logging:
@@ -228,7 +228,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaTRT.RJ.js --no-daemon --watch
+    command: pm2 start workers/JTE/criaFilaTRT.RJ.js --no-daemon
     restart: always
     logging:
       driver: "json-file"

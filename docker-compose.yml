@@ -254,7 +254,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker01.yml --no-daemon --restart-delay=3600000
+    command: pm2 start workers/JTE/processDocker01.yml --no-daemon
     restart: always
     logging:
       driver: "json-file"
@@ -268,7 +268,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker01.yml --no-daemon --restart-delay=3600000
+    command: pm2 start workers/JTE/processDocker01.yml --no-daemon 
     restart: always
     logging:
       driver: "json-file"
@@ -282,7 +282,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker02.yml --no-daemon --restart-delay=3600000
+    command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
     restart: always
     logging:
       driver: "json-file"
@@ -296,7 +296,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker02.yml --no-daemon --restart-delay=3600000
+    command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
     restart: always
     logging:
       driver: "json-file"
@@ -310,7 +310,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker03.yml --no-daemon --restart-delay=3600000
+    command: pm2 start workers/JTE/processDocker03.yml --no-daemon
     restart: always
     logging:
       driver: "json-file"
@@ -324,7 +324,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker03.yml --no-daemon --restart-delay=3600000
+    command: pm2 start workers/JTE/processDocker03.yml --no-daemon 
     restart: always
     logging:
       driver: "json-file"
@@ -338,7 +338,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/extracao_TRT_RJ.js --no-daemon --restart-delay=3600000
+    command: pm2 start workers/JTE/extracao_TRT_RJ.js --no-daemon 
     restart: always
     logging:
       driver: "json-file"

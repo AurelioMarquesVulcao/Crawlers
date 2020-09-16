@@ -26,7 +26,7 @@ const parse = new TRTParser();
     });
 
     //const nomeFila = `fila TRT-RJ`;
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos.2`;
+    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos`;
     const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos`;
 
     new GerenciadorFila(false,10).consumir(nomeFila, async (ch, msg) => {

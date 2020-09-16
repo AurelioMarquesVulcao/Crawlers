@@ -6,9 +6,9 @@ const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Helper, Logger } = require('../../lib/util');
 //const { LogExecucao } = require('../../lib/logExecucao');
 const sleep = require('await-sleep');
-const { ExtratorTrtrj } = require('../../extratores/processoTRT-RJ');
+const { ExtratorTrtrj } = require('../../extratores/processoTRT-SP');
 const { Processo } = require('../../models/schemas/processo');
-const { TRTParser}= require('../../parsers/TRTRJParser');
+const { TRTParser}= require('../../parsers/TRTSPParser');
 // const logarExecucao = async (execucao) => {
 //   await LogExecucao.salvar(execucao);
 // };
@@ -26,15 +26,15 @@ const parse = new TRTParser();
     });
 
     //const nomeFila = `fila TRT-RJ`;
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos.2`;
-    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos`;
+    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos`;
+    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos`;
 
     new GerenciadorFila(false,10).consumir(nomeFila, async (ch, msg) => {
         const dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
         console.table(message);
         let logger = new Logger('info', 'logs/ProcessoTRTRJ/ProcessoTRT-RJInfo', {
-            nomeRobo: enums.nomesRobos.TRTRJ,
+            nomeRobo: enums.nomesRobos.TRTSP,
             NumeroDoProcesso: message.NumeroProcesso,
         });
         try {

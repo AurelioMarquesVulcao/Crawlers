@@ -8,7 +8,7 @@ class ExtratorTrtrj {
   constructor(url, isDebug) {
     // super(url, isDebug);
     this.robo = new Robo();
-    this.url = `http://pje.trt1.jus.br/pje-consulta-api`;
+    this.url = `http://pje.trt2.jus.br/pje-consulta-api`;
     this.qtdTentativas = 1;
   }
 
@@ -100,7 +100,7 @@ class ExtratorTrtrj {
     });
     const desafio = objResponseCaptcha.responseBody
     const captcha = {
-      refinador: "trt_1",
+      refinador: "trt_2",
       imagem: `${desafio.imagem}`
     }
     logger.info("Captcha obtido com sucesso");
@@ -127,7 +127,7 @@ class ExtratorTrtrj {
 
       // obtendo dados do processo.
       const detalheProcesso = await this.robo.acessar({
-        url: `https://pje.trt1.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`,
+        url: `https://pje.trt2.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`,
         method: "get",
         encoding: "utf8",
         usaProxy: true,

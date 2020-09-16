@@ -4,16 +4,16 @@ const sleep = require('await-sleep');
 const axios = require('axios');
 
 
-const { Cnj, Helper } = require('../../lib/util');
-const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
-const { enums } = require('../../configs/enums');
-const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../models/schemas/jte')
-const Estados = require('../../assets/jte/comarcascopy.json');
-const { Processo } = require('../../models/schemas/processo');
-const { JTEParser } = require('../../parsers/JTEParser');
-const { removerAcentos } = require('../../parsers/BaseParser');
+const { Cnj, Helper } = require('../../../lib/util');
+const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
+const { enums } = require('../../../configs/enums');
+const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../../models/schemas/jte')
+const Estados = require('../../../assets/jte/comarcascopy.json');
+const { Processo } = require('../../../models/schemas/processo');
+const { JTEParser } = require('../../../parsers/JTEParser');
+const { removerAcentos } = require('../../../parsers/BaseParser');
 const { Logform } = require('winston');
-const { ExtratorTrtrj } = require('../../extratores/processoTRT-RJ');
+const { ExtratorTrtrj } = require('../../../extratores/processoTRT-RJ');
 
 const fila = new CriaFilaJTE();
 const ajuste = new Cnj();

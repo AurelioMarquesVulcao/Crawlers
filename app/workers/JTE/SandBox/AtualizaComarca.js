@@ -70,7 +70,7 @@ mongoose.connection.on('error', (e) => {
     // await sleep(1800000)
 
 
-    await atulizaProcessosFila(0);
+    await atualizaOutrosProcessos(0);
     await sleep(5000)
 
     // console.log(await atulizaProcessos("01001199020205010041")); // segredo de justiça
@@ -338,7 +338,7 @@ async function atulizaProcessosFila(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(6000);
+    ]).skip(pulo).limit(60000);
     console.log(await agregar);
     for (i in agregar) {
         busca = `"${agregar[i]._id}"`;
@@ -349,17 +349,18 @@ async function atulizaProcessosFila(pulo) {
         console.log(await !!extracao);
         await enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
         console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
-        await sleep(20)
+        await sleep(10)
 
     }
 }
 
 async function enfileirarTRT_RJ(numero, busca) {
-    let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
+    // let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero));
+    let regex = true;
     //console.log(regex);
     if (regex) {
         let mensagem = criaPost(numero, busca);
-        await fila.enviarMensagem("processo.TRTRJ.extracao.novos.2", mensagem);
+        await fila.enviarMensagem("processo.JTE.extracao.novos", mensagem);
         console.log("Processo enfileirado para Download");
     }
     function criaPost(numero, busca) {
@@ -401,4 +402,35 @@ async function deleteUndefine() {
     console.log(obj);
 }
 
+
+async function atualizaOutrosProcessos(pulo) {
+    let busca;
+    let resultado;
+    let extracao;
+    let agregar = await Processo.aggregate([{
+        $match: {
+            "capa.comarca": "Não foi possivel obter",
+            "detalhes.tipo": "cnj",
+        }
+    },
+    {
+        $project: {
+            "detalhes.numeroProcesso": 1, "_id": 1
+        }
+    }
+    ]).skip(pulo).limit(60000);
+    console.log(await agregar);
+    for (i in agregar) {
+        busca = `"${agregar[i]._id}"`;
+
+        console.log(busca);
+        //extracao = await rj.extrair(agregar[i].detalhes.numeroProcesso);
+        //console.log(await extracao);
+        console.log(await !!extracao);
+        await enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
+        console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
+        await sleep(10)
+
+    }
+}
 

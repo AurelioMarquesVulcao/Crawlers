@@ -228,7 +228,19 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaTRT.RJ.js --no-daemon
+    command: pm2 start workers/TRTRJ/criaFilaTRT.RJ.js --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  novos-processos-trt-2:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: pm2 start workers/TRTSP/criaFilaTRT.SP.js --no-daemon
     restart: always
     logging:
       driver: "json-file"
@@ -236,6 +248,7 @@ services:
         max-size: "5m"
         max-file: "2"
        
+        
   # novos-processos-jte-all:
   #   extends:
   #     file: common-services.yml
@@ -338,13 +351,28 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/extracao_TRT_RJ.js --no-daemon 
+    command: pm2 start workers/TRTRJ/extracao_TRT_RJ.js --no-daemon 
     restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "5"
+
+  worker-trt-02:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: pm2 start workers/TRTSP/extracao_TRT_SP.js --no-daemon 
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
 
   # worker-jte-07:
   #   extends:

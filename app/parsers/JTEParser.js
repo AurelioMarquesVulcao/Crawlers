@@ -243,7 +243,6 @@ class JTEParser extends BaseParser {
     }
   }
 
-  // precisa de melhorias
   extraiVaraCapa($, contador) {
     // let resultado = "não possui vara"
     let resultado;
@@ -252,32 +251,28 @@ class JTEParser extends BaseParser {
     let processo = "";
 
     $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > p`).each(async function (element) {
-      // $('detalhes-aba-geral p').each(async function (element) {
       let datas = $(this).text().split('\n');
-      // console.log(datas);
       processo = datas[0]
-      // console.log(datas);
-      // if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
-      //   vara = datas[0].split('-')[1].split('de')[0].trim()
-      //   comarca = datas[0].split('-')[1].split('de')[1].trim()
-      //   resultado = {
-      //     vara: vara,
-      //     comarca: comarca,
-      //   }
-      // }
+
     })
-    // console.log(processo);
-    let data = this.regexVaraComarca(processo)
-    // console.log(data);
-    vara = removerAcentos(data[2])
-    comarca = removerAcentos(data[3])
-    resultado = { vara, comarca }
+    let data = this.regexVaraComarca(processo);
+    const regex = /(gabinete\sd[aoe])/i;
+    if (regex.test(data[2])) {
+      vara = ""
+      comarca = ""
+      resultado = { vara, comarca }
+    } else {
+      vara = removerAcentos(data[2])
+      comarca = removerAcentos(data[3])
+      resultado = { vara, comarca }
+    }
+
     console.log(resultado);
     return resultado
   }
 
   regexVaraComarca(str) {
-    let regex = /(?:^|\n[\t ]*).*?(\d)º.*?-\s*(.+?D[EO].+?)\s*D[EOA]\s*(.+)\s*/gim;
+    const regex = /(?:^|\n[\t ]*).*?(\d)º.*?-\s*(.+?D[EO].+?)\s*D[EOA]\s*(.+)\s*/gim;
     let m;
     let resultado = []
 

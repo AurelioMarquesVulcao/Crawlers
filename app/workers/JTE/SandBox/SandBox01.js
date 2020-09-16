@@ -20,7 +20,7 @@ const ajuste = new Cnj();
 const processoConection = new Processo();
 const rj = new ExtratorTrtrj();
 
-// liga ao banco de dados
+// Conecta ao banco de dados
 mongoose.connect(enums.mongo.connString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -63,15 +63,11 @@ mongoose.connection.on('error', (e) => {
     //console.log(Estados[0]);
 
     //await statusRaspagem()
-    // for (let i = 0; i < 20; i++) {
-    //     atulizaProcessos(i * 100);
-    //     await sleep(10000)
-    // }
-    // await sleep(1800000)
-
-
-    await atulizaProcessosFila(0);
-    await sleep(5000)
+    for (let i = 0; i < 20; i++) {
+        atulizaProcessos(i * 100);
+        await sleep(10000)
+    }
+    await sleep(1800000)
 
     // console.log(await atulizaProcessos("01001199020205010041")); // segredo de justiça
     // console.log(await atulizaProcessos("01002214120205010000")); // 2 instância "especial"
@@ -273,7 +269,7 @@ async function atulizaProcessos(pulo) {
     for (i in agregar) {
         busca = { "_id": agregar[i]._id }
         extracao = await rj.extrair(agregar[i].detalhes.numeroProcesso);
-        //console.log(await extracao);
+        console.log(await extracao);
         console.log(await !!extracao);
         if (await !!extracao) {
             if (extracao.segredoJustica == true) {
@@ -306,7 +302,6 @@ async function atulizaProcessos(pulo) {
     }
 
 
-
     // let resultado;
     // resultado = await rj.extrair(cnj)
     // return resultado
@@ -319,76 +314,6 @@ async function atulizaProcessos(pulo) {
 
 }
 
-async function atulizaProcessosFila(pulo) {
-    let busca;
-    let resultado;
-    let extracao;
-    let agregar = await Processo.aggregate([
-        {
-            $match: {
-                'detalhes.orgao': 5,
-                'detalhes.tribunal': 1,
-                'detalhes.ano': 2020,
-                "origemExtracao": "JTE"
-            }
-        },
-        {
-            $project: {
-                "detalhes.numeroProcesso": 1,
-                "_id": 1
-            }
-        }
-    ]).skip(pulo).limit(6000);
-    console.log(await agregar);
-    for (i in agregar) {
-        busca = `"${agregar[i]._id}"`;
-
-        console.log(busca);
-        //extracao = await rj.extrair(agregar[i].detalhes.numeroProcesso);
-        //console.log(await extracao);
-        console.log(await !!extracao);
-        await enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
-        console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
-        await sleep(20)
-
-    }
-}
-
-async function enfileirarTRT_RJ(numero, busca) {
-    let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
-    //console.log(regex);
-    if (regex) {
-        let mensagem = criaPost(numero, busca);
-        await fila.enviarMensagem("processo.TRTRJ.extracao.novos.2", mensagem);
-        console.log("Processo enfileirado para Download");
-    }
-    function criaPost(numero, busca) {
-        let post = `{
-        "ExecucaoConsultaId" : "${makeid()}",
-        "ConsultaCadastradaId" : "${makeid()}",
-        "DataEnfileiramento" : "${new Date}",
-        "NumeroProcesso" : "${numero}",
-        "NumeroOab" : "null",        
-        "SeccionalOab" : "RJ",
-        "NovosProcessos" : true,
-        "_id": ${busca}}`
-        return post
-    }
-
-    function makeid() {
-        let text = "5ed9";
-        let possible = "abcdefghijklmnopqrstuvwxyz0123456789";
-        let letra = "abcdefghijklmnopqrstuvwxyz";
-        let numero = "0123456789";
-        for (var i = 0; i < 20; i++)
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        return text;
-    }
-}
-
-
-
-
 async function deleteUndefine() {
     let obj = await statusEstadosJTE.find({ "comarca": "unde" })
     console.log(obj);
@@ -400,5 +325,3 @@ async function deleteUndefine() {
     // console.log(obj2);
     console.log(obj);
 }
-
-

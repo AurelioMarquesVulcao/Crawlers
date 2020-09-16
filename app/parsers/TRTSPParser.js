@@ -28,7 +28,7 @@ class TRTParser extends BaseParser {
             capa: this.capa(extracao),
             oabs: [],
             qtdAndamentos: extracao.itensProcesso.length,
-            origemExtracao: "TRT-RJ",
+            origemExtracao: "TRT-SP",
             envolvidos: [],
             detalhes: ProcessoTRT.identificarDetalhes(extracao.numero),
         })
@@ -41,7 +41,7 @@ class TRTParser extends BaseParser {
     capa(extracao) {
         let regex = this.regexVaraComarca(extracao.orgaoJulgador)
         let capa = {
-            uf: "RJ",
+            uf: "SP",
             comarca: regex.comarca,
             vara: regex.vara,
             fase: extracao.itensProcesso[0].instancia,

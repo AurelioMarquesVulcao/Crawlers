@@ -150,21 +150,14 @@ class JTEParser extends BaseParser {
 
 
   estado($, numeroProcesso) {
-
-
     let resultado = 'Estado indeterminado'
-
-
     let dados = this.detalhes(numeroProcesso).tribunal
-
-
     if (dados == 2 || dados == 15) resultado = 'SP';
     if (dados == 1) resultado = 'RJ';
     // if (dados == 15) resultado = 'SP'
     if (dados == 3) resultado = 'MG';
     // if (dados == 21) resultado = 'RN';
     if (dados == 5) resultado = 'BA';
-
     if (dados == 4) resultado = 'RS';
     if (dados == 6) resultado = 'PE';
     if (dados == 7) resultado = 'CE';
@@ -256,10 +249,12 @@ class JTEParser extends BaseParser {
 
     })
     let data = this.regexVaraComarca(processo);
+    let cnj = this.extraiNumeroProcesso($, contador).replace(/[-.]/g, "");
+    console.log(cnj);
     const regex = /(gabinete\sd[aoe])/i;
     if (regex.test(data[2])) {
-      vara = ""
-      comarca = ""
+      vara = `Região ${cnj.slice(cnj.length - 6, cnj.length - 4)}`;
+      comarca = "Tribunal Regional do Trabalho"
       resultado = { vara, comarca }
     } else {
       vara = removerAcentos(data[2])
@@ -319,6 +314,7 @@ class JTEParser extends BaseParser {
 
   // retorna array com numero do processo.
   extraiNumeroProcesso($, contador) {
+
     let datas = [];
     let resultado = ''
     $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > span.item-painel-titulo`).each(async function (element) {

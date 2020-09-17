@@ -18,18 +18,18 @@ services:
   #     - MONGO_LOG_DIR=/dev/null
   #     - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
   #     - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-  # rabbitmq:
-  #   image: rabbitmq:3.8.0-management
-  #   hostname: crawlers-rabbitmq
-  #   ports:
-  #     - 1${RABBITMQ_PORT}:15672
-  #     - ${RABBITMQ_PORT}:5672
-  #   expose:
-  #     - 1${RABBITMQ_PORT}
-  #   restart: always
-  #   environment:
-  #     - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
-  #     - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+  rabbitmq:
+    image: rabbitmq:3.8.0-management
+    hostname: crawlers-rabbitmq
+    ports:
+      - 1${RABBITMQ_PORT}:15672
+      - ${RABBITMQ_PORT}:5672
+    expose:
+      - 1${RABBITMQ_PORT}
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
   nginx:
     image: nginx:1.17.3
     ports:

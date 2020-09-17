@@ -100,7 +100,7 @@ class ExtratorTrtrj {
     });
     const desafio = objResponseCaptcha.responseBody
     const captcha = {
-      refinador: "trt_2",
+      refinador: "trt_1",
       imagem: `${desafio.imagem}`
     }
     logger.info("Captcha obtido com sucesso");

@@ -1,7 +1,7 @@
 
 const async = require('async');
 var teste2 = [];
-var loop = 200000;
+var loop = 700000;
 (async () => {
 	console.time("entrou na tarefa de linha");
 	let a = await teste()

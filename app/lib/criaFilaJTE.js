@@ -7,11 +7,16 @@ const { GerenciadorFila } = require("../lib/filaHandler");
 // const { ExtratorBase } = require('../extratores/extratores');
 // const { JTEParser } = require('../parsers/JTEParser');
 const { Processo } = require('../models/schemas/processo');
-const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../models/schemas/jte')
-const { Cnj } = require('../lib/util')
+const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../models/schemas/jte');
+const { Cnj } = require('../lib/util');
 require("dotenv/config");
 
 const util = new Cnj();
+// let devDbConection = process.env.MONGO_CONNECTION_STRING;
+// mongoose.connect(devDbConection, {
+// 	useNewUrlParser: true,
+// 	useUnifiedTopology: true
+// });
 
 
 class CriaFilaJTE {
@@ -224,7 +229,38 @@ class CriaFilaJTE {
 
 		}
 	}
+	async verificaComarcas(estado, comarca) {
+		let data = new Date();
+		// data.setDate(data.getDate() - 1);
+		data.getDate()
+		data.getMonth()
+		let busca = { "estadoNumero": estado, "comarca": comarca }
+		let checagem = await statusEstadosJTE.findOne(busca);
+		let { status, dataBusca:{dia, mes} } = checagem;
+		console.log(status, dia, mes);
+		// console.log(data.getDate(),data.getMonth());
+		//console.log(checagem);
+		console.log(status);
+		if (dia == data.getDate() && mes == data.getMonth()) {
+			if (status != "Ultimo Processo"){
+				return true;
+			} else { 
+				return false
+			}
+		} else {
+			return true
+		}
+	}
+
 }
+
+// (async () => {
+// 	console.log(await new CriaFilaJTE().verificaComarcas("15", "0003"));
+// 	console.log(await new CriaFilaJTE().verificaComarcas("18", "0003"));
+// 	console.log(await new CriaFilaJTE().verificaComarcas("23", "0003"));
+	
+// 	await sleep(3000)
+// })()
 
 class CriaFilaTRT {
 	async enviar(processo, fila) {
@@ -309,7 +345,11 @@ function mascaraNumero(numeroProcesso) {
 		+ '.' + numeroProcesso.slice(numeroProcesso.length - 4, numeroProcesso.length)
 	return resultado
 }
+
+
+
 module.exports.CriaFilaJTE = CriaFilaJTE;
 
 
 module.exports.linkDocumento1 = linkDocumento;
+

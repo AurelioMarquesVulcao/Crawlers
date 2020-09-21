@@ -32,7 +32,7 @@ mongoose.connection.on('error', (e) => {
 
 
 (async () => {
-    await comparaVolume()
+    await buscaMedia(Estados.rj)
     // data.setDate(data.getDate() - 2)
 
     // console.log(data.getDate(), data.getMonth());
@@ -46,21 +46,19 @@ mongoose.connection.on('error', (e) => {
     process.exit()
 })()
 
-
-async function comparaVolume() {
+// Gera array de objetos. {comarca, numero de processos}, que deveram ser buscados para aquele dia
+// com base na média dos dias anteriores.
+async function buscaMedia(estado) {
     let resultado = [];
     let mediaDias;
     let soma = 0;
     console.time("entrando na busca")
-    let dias7 = await BuscaBanco(dias = 7);
-    let dias21 = await BuscaBanco(dias = 21);
-    let dias28 = await BuscaBanco(dias = 28);
-    // console.log(dias7);
-    // console.log(dias21);
-    // console.log(dias28);
+    let dias7 = await BuscaBanco(dias = 7, estado);
+    let dias21 = await BuscaBanco(dias = 21, estado);
+    let dias28 = await BuscaBanco(dias = 28, estado);
     console.log("vou imprimir a média");
     for (i in dias7) {
-        mediaDias = media(dias7[i].quantidadeProcesso, dias21[i].quantidadeProcesso, dias21[i].quantidadeProcesso)
+        mediaDias = media(dias7[i].quantidadeProcesso, dias21[i].quantidadeProcesso, dias28[i].quantidadeProcesso)
         soma += mediaDias
         resultado.push({
             "comarcas": dias7[i].comarcas,
@@ -72,41 +70,37 @@ async function comparaVolume() {
     console.log(soma);
 
     console.timeEnd("entrando na busca")
+    // for (j in resultado){
+    //     if (resultado[j].comarcas == "0002"){console.log(resultado[j].quantidadeProcesso);}
+    // }
     return resultado
 }
 
-async function BuscaBanco(dias = 0) {
+async function BuscaBanco(dias = 0, estado) {
     data.setDate(data.getDate() - dias)
-    let estados = [
-        // Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
-        // Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
-        // Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
-        // Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
-        Estados.rj, // Estados.sp2, Estados.mg, Estados.pr, Estados.sp15
-    ];
     let resultado;
     let tribunal;
     let comarca;
-        tribunal = parseInt(estados[j].codigo)
-        comarca = estados[j].comarcas;
-        let agregar = await ultimoProcesso.aggregate([
-            {
-                $match: {
-                    "data.dia": data.getDate(),
-                    "data.mes": data.getMonth(),
-                    "tribunal": tribunal,
-                }
-            },
-            { $limit: 100000 },
-            {
-                $group: {
-                    '_id': null, 'Processo': { '$push': '$numeroProcesso' },
-                }
+    tribunal = parseInt(estado.codigo)
+    comarca = estado.comarcas;
+    let agregar = await ultimoProcesso.aggregate([
+        {
+            $match: {
+                "data.dia": data.getDate(),
+                "data.mes": data.getMonth(),
+                "tribunal": tribunal,
             }
-        ])
-        // console.log(data.getDate(), data.getMonth())
+        },
+        { $limit: 100000 },
+        {
+            $group: {
+                '_id': null, 'Processo': { '$push': '$numeroProcesso' },
+            }
+        }
+    ])
+    // console.log(data.getDate(), data.getMonth())
 
-        return contaProcessos(comarca, agregar[0].Processo);
+    return contaProcessos(comarca, agregar[0].Processo);
 };
 
 function contaProcessos(comarca, agregar) {
@@ -140,6 +134,16 @@ function contaElemento(array1, elemento) {
 };
 
 function media(a, b, c) {
+    if (typeof a != "number") {
+        a = 0
+    }
+    if (typeof b != "number") {
+        b = 0
+    }
+    if (typeof a != "number") {
+        c = 0
+    }
+    console.log(typeof a);
     let media = Math.round((a + b + c) / 3);
     if (media == 1) {
         media = 2
@@ -147,7 +151,7 @@ function media(a, b, c) {
     if (media == 0) {
         media = 1
     }
-    
+
     return media
 }
 

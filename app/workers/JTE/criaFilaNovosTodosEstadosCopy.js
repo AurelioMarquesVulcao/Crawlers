@@ -8,6 +8,8 @@ const Estados = require('../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
 const { Helper, Logger } = require('../../lib/util');
 const desligar = require('../../assets/jte/horarioRoboJTE.json');
+const data = new Date();
+const { ultimoProcesso } = require('../../models/schemas/jte');
 
 
 const Fila = new CriaFilaJTE();
@@ -56,13 +58,18 @@ var estados = [
       if (relogio.min == 30 && relogio.seg == 00 || start == 0 || !statusFila) {
         // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
         start = 1
+
         // if (!statusFila) {
         origens = estados[contador].comarcas;
         tribunal = parseInt(estados[contador].codigo);
         codigo = estados[contador].codigo;
         max = estados[contador].comarcas.length;
         timer = estados[contador].tempo;
-        await criador(origens, tribunal, codigo, max, timer, fila)
+        let estadoAtual = estados[contador]
+        // let numero = 1
+
+
+        await criador(origens, tribunal, codigo, max, timer, fila, estadoAtual)
         contador++
         // }
       }
@@ -75,8 +82,10 @@ var estados = [
 // Criador de fila:
 // Busca no banco de dados qual o ultimo processesso do estado/comarca,
 // Após isso tenta pegar o proximo processo em ordem númerica.
-async function criador(origens, tribunal, codigo, max, tempo, fila) {
-
+async function criador(origens, tribunal, codigo, max, tempo, fila, estadoAtual) {
+  let buscaNumeros = await buscaMedia(estadoAtual);
+  console.log(buscaNumeros);
+  let quantidadeBusca;
   let second = 0;
   let contaOrigem = 0;
   for (let w = 0; w < 1;) {
@@ -96,51 +105,68 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         // Pegará os processos
         console.log("Estamos na comarca: " + origens[contaOrigem]);
 
-        // if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
-        //   if (sequencial.data.mes < relogio.mes - 1) {
-        //     await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
-        //     console.log("----------------------- Estou dando um salto no Tempo--------------------------");
-        //   } else {
-        //     await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
-        //   }
-        //   await sleep(500)
-        // } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
-        //   if (sequencial.data.mes < relogio.mes - 1) {
-        //     await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
-        //     console.log("----------------------- Estou dando um salto no Tempo--------------------------");
-        //   } else {
-        //     await Fila.procura(numeroSequencial, comarca, 1, codigo, fila,)
-        //   }
-        //   await sleep(500)
-        // } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
-        //   if (sequencial.data.mes < relogio.mes - 1) {
-        //     await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
-        //     console.log("----------------------- Estou dando um salto no Tempo--------------------------");
-        //   } else {
-        //     await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
-        //   }
-        //   await sleep(500)
-        // }
 
-        await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
-        await sleep(500)
+        if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
+          if (sequencial.data.mes < relogio.mes - 1) {
+            await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+
+
+            console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+          } else {
+            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
+          }
+          await sleep(500)
+        } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
+          if (sequencial.data.mes < relogio.mes - 1) {
+            await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+
+
+            console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+          } else {
+            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila,)
+          }
+          await sleep(500)
+        } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
+          if (sequencial.data.mes < relogio.mes - 1) {
+            await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+
+
+            console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+          } else {
+            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
+          }
+          await sleep(500)
+        }
+
+        if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
+          for (i in buscaNumeros) {
+            if (buscaNumeros[i].comarcas == comarca) {
+              quantidadeBusca = buscaNumeros[i].quantidadeProcesso
+              await Fila.procura(numeroSequencial, comarca, quantidadeBusca, codigo, fila)
+            } else {
+              quantidadeBusca = 1;
+              await Fila.procura(numeroSequencial, comarca, quantidadeBusca, codigo, fila)
+            }
+          }
+        }
 
       } catch (e) {
-      // console.log(e);
-      console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
-      let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
-      await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
-    }
-    if (contaOrigem == max) {
-      await paraServico()
-      contaOrigem = 0;
-      // pausa o envio de processos até que a fila fique limpa.
-      //await testeFila(nomeFila);
-      if (contaOrigem == max) { break }
-    } else { contaOrigem++ };
+        // console.log(e);
+        console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
+        let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
+        await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
+      }
+      if (contaOrigem == max) {
+        process.exit()
+        await paraServico()
+        contaOrigem = 0;
+        // pausa o envio de processos até que a fila fique limpa.
+        //await testeFila(nomeFila);
+        if (contaOrigem == max) { break }
+      } else { contaOrigem++ };
+    };
   };
-};
-await sleep(2000)
+  await sleep(2000)
 };
 
 function maiorSequencial(obj) {
@@ -223,3 +249,113 @@ async function aguardaServico() {
     }
   }
 }
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Busca Especializada ++++++++++++++++++++++++++++++++++++++++++++++
+
+async function buscaMedia(estado) {
+  let resultado = [];
+  let mediaDias;
+  let soma = 0;
+  console.time("entrando na busca")
+  let dias7 = await BuscaBanco(dias = 7, estado);
+  let dias21 = await BuscaBanco(dias = 21, estado);
+  let dias28 = await BuscaBanco(dias = 28, estado);
+  console.log("vou imprimir a média");
+  for (i in dias7) {
+    mediaDias = media(dias7[i].quantidadeProcesso, dias21[i].quantidadeProcesso, dias28[i].quantidadeProcesso)
+    soma += mediaDias
+    resultado.push({
+      "comarcas": dias7[i].comarcas,
+      "quantidadeProcesso": mediaDias
+    })
+  }
+
+  // console.log(resultado);
+  console.log("quantidade de processos a enfileirar: " + soma);
+
+  console.timeEnd("entrando na busca")
+  return resultado
+}
+
+async function BuscaBanco(dias = 0, estado) {
+
+  data.setDate(data.getDate() - dias)
+  let resultado;
+  let tribunal;
+  let comarca;
+  tribunal = parseInt(estado.codigo)
+  comarca = estado.comarcas;
+  let agregar = await ultimoProcesso.aggregate([
+    {
+      $match: {
+        "data.dia": data.getDate(),
+        "data.mes": data.getMonth(),
+        "tribunal": tribunal,
+      }
+    },
+    { $limit: 100000 },
+    {
+      $group: {
+        '_id': null, 'Processo': { '$push': '$numeroProcesso' },
+      }
+    }
+  ])
+  // console.log(data.getDate(), data.getMonth())
+
+  return contaProcessos(comarca, agregar[0].Processo);
+};
+
+function contaProcessos(comarca, agregar) {
+  comarca.length = 5
+  let comarcas;
+  let quantidadeProcesso;
+  resultado = [];
+  let obj;
+  for (i in comarca) {
+    quantidadeProcesso = contaElemento(agregar, comarca[i]);
+    comarcas = comarca[i];
+    obj = { comarcas, quantidadeProcesso }
+    resultado.push(obj)
+  }
+  // console.log(resultado);
+  return resultado;
+};
+
+function contaElemento(array1, elemento) {
+  let array = [];
+  for (w in array1) {
+    array.push(array1[w].slice(array1[w].length - 4, array1[w].length))
+  }
+  var indices = [];
+  var idx = array.indexOf(elemento);
+  while (idx != -1) {
+    indices.push(idx);
+    idx = array.indexOf(elemento, idx + 1);
+  }
+  return indices.length
+};
+
+function media(a, b, c) {
+  if (typeof a != "number") {
+    a = 0
+  }
+  if (typeof b != "number") {
+    b = 0
+  }
+  if (typeof a != "number") {
+    c = 0
+  }
+  console.log(typeof a);
+  let media = Math.round((a + b + c) / 3);
+  if (media == 1) {
+    media = 2
+  }
+  if (media == 0) {
+    media = 1
+  }
+
+  return media
+}
+

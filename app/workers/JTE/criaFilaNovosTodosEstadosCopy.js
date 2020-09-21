@@ -11,7 +11,7 @@ const desligar = require('../../assets/jte/horarioRoboJTE.json');
 
 
 const Fila = new CriaFilaJTE();
-var fila = "";  // string de escolha de fila
+var fila = "teste";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos';
 // var desligado = [];
 var desligado = desligar.worker
@@ -86,7 +86,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       try {
         let relogio = Fila.relogio();
         //console.log("funcao criador");
-        if (relogio.min == 20) { break }
+
         // string de busca no banco de dados
         let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
         let buscar = await Fila.abreUltimo(parametroBusca);
@@ -96,47 +96,51 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         // Pegará os processos
         console.log("Estamos na comarca: " + origens[contaOrigem]);
 
-        if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
-          if (sequencial.data.mes < relogio.mes - 1) {
-            await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
-            console.log("----------------------- Estou dando um salto no Tempo--------------------------");
-          } else {
-            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
-          }
-          await sleep(500)
-        } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
-          if (sequencial.data.mes < relogio.mes - 1) {
-            await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
-            console.log("----------------------- Estou dando um salto no Tempo--------------------------");
-          } else {
-            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila,)
-          }
-          await sleep(500)
-        } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
-          if (sequencial.data.mes < relogio.mes - 1) {
-            await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
-            console.log("----------------------- Estou dando um salto no Tempo--------------------------");
-          } else {
-            await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
-          }
-          await sleep(500)
-        }
+        // if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
+        //   if (sequencial.data.mes < relogio.mes - 1) {
+        //     await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+        //     console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+        //   } else {
+        //     await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
+        //   }
+        //   await sleep(500)
+        // } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
+        //   if (sequencial.data.mes < relogio.mes - 1) {
+        //     await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+        //     console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+        //   } else {
+        //     await Fila.procura(numeroSequencial, comarca, 1, codigo, fila,)
+        //   }
+        //   await sleep(500)
+        // } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
+        //   if (sequencial.data.mes < relogio.mes - 1) {
+        //     await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+        //     console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+        //   } else {
+        //     await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
+        //   }
+        //   await sleep(500)
+        // }
+
+        await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
+        await sleep(500)
 
       } catch (e) {
-        // console.log(e);
-        console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
-        let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
-        await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
-      }
-      if (contaOrigem == max) {
-        await paraServico()
-        contaOrigem = 0;
-        // pausa o envio de processos até que a fila fique limpa.
-        await testeFila(nomeFila);
-      } else { contaOrigem++ };
-    };
+      // console.log(e);
+      console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
+      let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
+      await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
+    }
+    if (contaOrigem == max) {
+      await paraServico()
+      contaOrigem = 0;
+      // pausa o envio de processos até que a fila fique limpa.
+      //await testeFila(nomeFila);
+      if (contaOrigem == max) { break }
+    } else { contaOrigem++ };
   };
-  await sleep(2000)
+};
+await sleep(2000)
 };
 
 function maiorSequencial(obj) {

@@ -18,18 +18,18 @@ services:
   #     - MONGO_LOG_DIR=/dev/null
   #     - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
   #     - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-  rabbitmq:
-    image: rabbitmq:3.8.0-management
-    hostname: crawlers-rabbitmq
-    ports:
-      - 1${RABBITMQ_PORT}:15672
-      - ${RABBITMQ_PORT}:5672
-    expose:
-      - 1${RABBITMQ_PORT}
-    restart: always
-    environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+  # rabbitmq:
+  #   image: rabbitmq:3.8.0-management
+  #   hostname: crawlers-rabbitmq
+  #   ports:
+  #     - 1${RABBITMQ_PORT}:15672
+  #     - ${RABBITMQ_PORT}:5672
+  #   expose:
+  #     - 1${RABBITMQ_PORT}
+  #   restart: always
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+  #     - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
   nginx:
     image: nginx:1.17.3
     ports:
@@ -191,7 +191,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaProcessos.yml --no-daemon
+    command: pm2 start workers/JTE/criaFilaNovosPrincipais01.js --no-daemon
 
     restart: always
     logging:
@@ -200,29 +200,29 @@ services:
         max-size: "5m"
         max-file: "2"
 
-  # novos-processos-jte-2:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: pm2 start workers/JTE/criaFilaNovosSecundario.js --no-daemon --watch
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
+  novos-processos-jte-2:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: pm2 start workers/JTE/criaFilaNovosSecundario.js --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
 
-  # novos-processos-jte-3:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: pm2 start workers/JTE/criaFilaNovosTodosEstados.js --no-daemon --watch
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
+  novos-processos-jte-3:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: pm2 start workers/JTE/criaFilaNovosTodosEstados.js --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
 
   novos-processos-trt-1:
     extends:

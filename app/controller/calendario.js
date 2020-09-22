@@ -10,20 +10,20 @@ const util = new Util();
 
 // }, 2000);
 //util.dockerUp("worker-jte-01");
-util.dockerStop("worker-jte-01");
+//util.dockerStop("worker-jte-01");
 
 
-// (async () => {
-//     setInterval(async function () {
-//         console.log("vou executar shell");
-        
-//         //await util.dockerUp("worker-jte-01")
-//         // await sleep(5000)
+(async () => {
+    setInterval(async function () {
+        let time = util.timerNow();
+        console.log(time);
+        if (time.hora == 18 && time.min == 35 && time.seg == 00) {
+            util.dockerUp("worker-jte-01");
+        }
+        if (time.hora == 18 && time.min == 36 && time.seg == 00) {
+            util.dockerStop("worker-jte-01");
+        }
 
-//         console.log("executei Shell");
 
-//         // process.exit()
-
-
-//     }, 1000);
-// })()
+    }, 1000);
+})()

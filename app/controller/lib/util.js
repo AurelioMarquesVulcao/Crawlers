@@ -20,8 +20,17 @@ class Util{
     dockerUp(serviço){
         shell.exec(`docker-compose up -d ${serviço}`)
     }
+    dockerUpAll(serviço){
+        shell.exec('docker-compose up -d')
+    }
     dockerStop(serviço){
         shell.exec(`docker-compose stop ${serviço}`)
+    }
+    dockerStopAll(){
+        shell.exec('docker-compose stop')
+    }
+    dockerDownAll(){
+        shell.exec('docker-compose down')
     }
 }
 

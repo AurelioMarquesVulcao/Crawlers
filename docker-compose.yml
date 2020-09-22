@@ -7,7 +7,7 @@ services:
     command: npm start
     ports:
       - ${API_PORT}:3300
-    restart: on-failure
+    restart: always
   # mongodb:
   #   image: mongo
   #   ports:

@@ -12,7 +12,7 @@ const { LogExecucao } = require('../../lib/logExecucao');
 const { Andamento } = require('../../models/schemas/andamento');
 // const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const desligado = require('../../assets/jte/horarioRoboJTE.json');
 
@@ -214,7 +214,7 @@ async function worker() {
           // Enviando para Collection de controle *ultimosProcessos*
           // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
           logger.info("Salvando na Collection ultimosProcessos")
-          
+
           await new CriaFilaJTE().salvaUltimo({
             numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
             dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,

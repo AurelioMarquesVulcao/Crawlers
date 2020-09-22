@@ -17,8 +17,8 @@ var nomeFila = 'processo.JTE.extracao.novos';
 var desligado = desligar.worker
 var estados = [
   Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
-  Estados.to, Estados.am, Estados.sc, Estados.ac, // Estados.pb,
-  
+  Estados.to ,Estados.am, Estados.sc, Estados.ac, // Estados.pb,
+
 ];
 
 (async () => {
@@ -42,12 +42,12 @@ var estados = [
     let relogio = Fila.relogio();
     // console.log(estados[contador].estado);
     let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
-    await sleep(1000);
+    await sleep(100);
     // esse if mantem o enfilerador desligado na hora desejada
     if (!desligado.find(element => element == relogio.hora)) {
 
       // if (start == 0 || !statusFila) {
-        if (relogio.min == 30 && relogio.seg == 00 || start == 0 || !statusFila) {
+      if (relogio.min == 30 && relogio.seg == 00 || start == 0 || !statusFila) {
         // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
         start = 1
         // if (!statusFila) {
@@ -74,7 +74,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
   let second = 0;
   let contaOrigem = 0;
   for (let w = 0; w < 100;) {
-
+    // w = 0
     second++
 
     if ("a") {
@@ -83,17 +83,19 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         //console.log("funcao criador");
         // if (relogio.min == 20) { break }
         // string de busca no banco de dados
-        let parametroBusca = { "tribunal": tribunal, "origem": origens[contaOrigem] };
+        let parametroBusca = { "tribunal": tribunal, "origem": parseInt(origens[contaOrigem]) };
+        console.log(parametroBusca);
         let buscar = await Fila.abreUltimo(parametroBusca);
         let sequencial = maiorSequencial(buscar)
         let numeroSequencial = sequencial.numeroProcesso.slice(0, 7);
         let comarca = sequencial.numeroProcesso.slice(16, 20);
         let statusComarca = await Fila.verificaComarcas(`${codigo}`, comarca);
 
-        console.log("Estamos na comarca: " + origens[contaOrigem]);
-        console.log(codigo);
-        console.log("status comarca " + statusComarca);
+
         if (statusComarca) {
+          console.log("Estamos na comarca: " + origens[contaOrigem]);
+          console.log("Código do Estado.: " + codigo);
+          console.log("status comarca " + statusComarca);
           w++
 
 
@@ -126,24 +128,24 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         }
 
       } catch (e) {
-        console.log(e);
+        //console.log(e);
         console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
         let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
         await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
-      if (contaOrigem == max) {
+      if (contaOrigem == max - 1) {
         //await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.
         await testeFila(nomeFila);
-        if (w === 0) {
+        if (w == 0) {
           console.log("++++++++++++++++++++++++++++++!!!! parei esses estado !!!! +++++++++++++++++++++++++++++++++++++");
           break
         }
       } else { contaOrigem++ };
     };
   };
-  await sleep(2000)
+  await sleep(1000)
 };
 
 function maiorSequencial(obj) {

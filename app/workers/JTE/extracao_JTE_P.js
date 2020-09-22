@@ -214,19 +214,20 @@ async function worker() {
           await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso);
 
           // Enviando para Collection de controle *ultimosProcessos*
-          if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
-            logger.info("Salvando na Collection ultimosProcessos")
-            await new CriaFilaJTE().salvaUltimo({
-              numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
-              dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
-              origem: dadosProcesso.processo.detalhes.origem,
-              tribunal: dadosProcesso.processo.detalhes.tribunal,
-              data: {
-                dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(),
-                mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth(),
-              },
-            });
-          } 
+          // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
+          logger.info("Salvando na Collection ultimosProcessos")
+          
+          await new CriaFilaJTE().salvaUltimo({
+            numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
+            dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
+            origem: parseInt(dadosProcesso.processo.detalhes.origem),
+            tribunal: dadosProcesso.processo.detalhes.tribunal,
+            data: {
+              dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(),
+              mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth(),
+            },
+          });
+          // }
         }
 
 
@@ -277,12 +278,13 @@ async function worker() {
 
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
-  
+
 
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
       desligaAgendado();
+
 
     } catch (e) {
       catchError++;
@@ -340,3 +342,7 @@ function desligaAgendado() {
     process.exit();
   }
 }
+
+
+
+

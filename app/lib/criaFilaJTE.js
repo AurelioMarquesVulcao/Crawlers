@@ -168,7 +168,7 @@ class CriaFilaJTE {
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {
 				sequencial = parseInt(obj.seq)
-				let a = sequencial + 5 + i
+				let a = sequencial + 30 + i
 				if ((obj.zero + a).length > 7) {
 					zeros = obj.zero.substr(1)
 					processo = `${zeros}${a}4720205${tribunal}${origem}`
@@ -237,10 +237,10 @@ class CriaFilaJTE {
 		let busca = { "estadoNumero": estado, "comarca": comarca }
 		let checagem = await statusEstadosJTE.findOne(busca);
 		let { status, dataBusca:{dia, mes} } = checagem;
-		console.log(status, dia, mes);
+		// console.log(status, dia, mes);
 		// console.log(data.getDate(),data.getMonth());
-		//console.log(checagem);
-		console.log(status);
+		// console.log(checagem);
+		// console.log(status);
 		if (dia == data.getDate() && mes == data.getMonth()) {
 			if (status != "Ultimo Processo"){
 				return true;

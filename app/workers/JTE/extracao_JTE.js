@@ -12,7 +12,7 @@ const { LogExecucao } = require('../../lib/logExecucao');
 const { Andamento } = require('../../models/schemas/andamento');
 // const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
+const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
 const desligado = require('../../assets/jte/horarioRoboJTE.json');
 
@@ -212,19 +212,20 @@ async function worker() {
           await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso);
 
           // Enviando para Collection de controle *ultimosProcessos*
-          if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
-            logger.info("Salvando na Collection ultimosProcessos")
-            await new CriaFilaJTE().salvaUltimo({
-              numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
-              dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
-              origem: dadosProcesso.processo.detalhes.origem,
-              tribunal: dadosProcesso.processo.detalhes.tribunal,
-              data: {
-                dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(),
-                mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth(),
-              },
-            });
-          }
+          // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
+          logger.info("Salvando na Collection ultimosProcessos")
+          
+          await new CriaFilaJTE().salvaUltimo({
+            numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
+            dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,
+            origem: parseInt(dadosProcesso.processo.detalhes.origem),
+            tribunal: dadosProcesso.processo.detalhes.tribunal,
+            data: {
+              dia: dadosProcesso.processo.capa.dataDistribuicao.getDate(),
+              mes: dadosProcesso.processo.capa.dataDistribuicao.getMonth(),
+            },
+          });
+          // }
         }
 
 
@@ -275,8 +276,7 @@ async function worker() {
 
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
-      logger.info('Verificando se o processo é RJ');
-      enfileirarTRT_RJ(numeroProcesso);
+
 
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
@@ -341,33 +341,6 @@ function desligaAgendado() {
   }
 }
 
-function enfileirarTRT_RJ(numero) {
-  let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
-  //console.log(regex);
-  if (regex) {
-    let mensagem = criaPost(numero);
-    fila.enviarMensagem("fila TRT-RJ", mensagem);
-    console.log("Processo enfileirado para Download");
-  }
-  function criaPost(numero) {
-    let post = `{
-      "ExecucaoConsultaId" : "${makeid()}",
-      "ConsultaCadastradaId" : "${makeid()}",
-      "DataEnfileiramento" : "${new Date}",
-      "NumeroProcesso" : "${numero}",
-      "NumeroOab" : "null",        
-      "SeccionalOab" : "SP",
-      "NovosProcessos" : true}`
-    return post
-  }
 
-  function makeid() {
-    let text = "5ed9";
-    let possible = "abcdefghijklmnopqrstuvwxyz0123456789";
-    let letra = "abcdefghijklmnopqrstuvwxyz";
-    let numero = "0123456789";
-    for (var i = 0; i < 20; i++)
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
-  }
-}
+
+

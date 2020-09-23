@@ -17,7 +17,6 @@ var nomeFila = 'processo.JTE.extracao.novos.P';
 var desligado = desligar.worker;
 var estados = [
   Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15,
-  
 ];
 
 
@@ -47,7 +46,7 @@ var estados = [
     if (!desligado.find(element => element == relogio.hora)) {
 
       // if (start == 0 || !statusFila) {
-      if (relogio.min == 30 && relogio.seg == 00 || start == 0 || !statusFila) {
+      if (start == 0 || !statusFila) {
         // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
         start = 1
         // if (!statusFila) {

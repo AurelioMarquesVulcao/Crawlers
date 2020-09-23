@@ -17,10 +17,13 @@ class Util{
     
         return { dia, mes, hora, min, seg }
     }
+    limpaMemoria(){
+        shell.exec(`sudo sync && sudo sysctl vm.drop_caches=3`)
+    }
     dockerUp(serviço){
         shell.exec(`docker-compose up -d ${serviço}`)
     }
-    dockerUpAll(serviço){
+    dockerUpAll(){
         shell.exec('docker-compose up -d')
     }
     dockerStop(serviço){
@@ -32,6 +35,14 @@ class Util{
     dockerDownAll(){
         shell.exec('docker-compose down')
     }
+    entraContainer(servico){
+        // shell.exec(`docker-compose exec ${servico} --i pm2 scale worker-03 3`)
+        // shell.exec(`docker-compose exec ${servico} bash`,{ silent: true })
+    }
+    escalaContainer(servico,quantidade){
+        shell.exec(`docker-compose scale ${servico}=${quantidade}`)
+    }
+    
 }
 
 module.exports.Util = Util;

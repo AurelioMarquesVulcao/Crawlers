@@ -29,12 +29,12 @@ mongoose.connection.on('error', (e) => {
             await sleep(1000)
         }
         await sleep(1000)
-        if (relogio.hora == 6 && relogio.min == 1) {
-            start = 0
-        }
-        if (relogio.hora == 8 && relogio.min == 1) {
-            start = 0
-        }
+        // if (relogio.hora == 6 && relogio.min == 1) {
+        //     start = 0
+        // }
+        // if (relogio.hora == 8 && relogio.min == 1) {
+        //     start = 0
+        // }
     }
 })()
 
@@ -58,7 +58,7 @@ async function atulizaProcessosFila(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(2000);
+    ]).skip(pulo).limit(7000);
     console.log(await agregar);
     for (i in agregar) {
         busca = `"${agregar[i]._id}"`;

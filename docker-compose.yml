@@ -7,7 +7,7 @@ services:
     command: npm start
     ports:
       - ${API_PORT}:3300
-    restart: on-failure
+    restart: always
   # mongodb:
   #   image: mongo
   #   ports:
@@ -338,6 +338,20 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker03.yml --no-daemon 
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  worker-jte-07:
+    extends:
+      file: common-services.yml
+      service: base_node
+    mem_limit: ${PUPPETEER_MEMORIA_MAX}
+    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
+    command: pm2 start workers/JTE/processDocker04.yml --no-daemon 
     restart: always
     logging:
       driver: "json-file"

@@ -16,9 +16,9 @@ var nomeFila = 'processo.JTE.extracao.novos.S';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
-  
+  // Estados.es,
   Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
-  Estados.pi, Estados.mt, // Estados.rn, Estados.ms,
+  Estados.pi, Estados.mt, Estados.rn, Estados.ms,
 ];
 
 
@@ -48,7 +48,7 @@ var estados = [
     if (!desligado.find(element => element == relogio.hora)) {
 
       // if (start == 0 || !statusFila) {
-      if (relogio.min == 30 && relogio.seg == 00 || start == 0 || !statusFila) {
+      if (start == 0 || !statusFila) {
         // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
         start = 1
         // if (!statusFila) {
@@ -74,8 +74,8 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
   let second = 0;
   let contaOrigem = 0;
-  for (let w = 0; w < 100;) {
-    // w = 0
+  let contaLaco =0;
+  for (let w = 0; w < 1000;) {
     second++
 
     if ("a") {
@@ -94,15 +94,16 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
 
         if (statusComarca) {
+          contaLaco++
           console.log("Estamos na comarca: " + origens[contaOrigem]);
           console.log("Código do Estado.: " + codigo);
           console.log("status comarca " + statusComarca);
-          w++
+          
 
 
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+              await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
               console.log("----------------------- Estou dando um salto no Tempo--------------------------");
             } else {
               await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
@@ -127,22 +128,26 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           }
 
         }
-
+        // console.log("O contador vale.: " + contaLaco);
       } catch (e) {
         //console.log(e);
         console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
         let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
         await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
+      
       if (contaOrigem == max - 1) {
+        await sleep(30000)
         //await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.
-        await testeFila(nomeFila);
-        if (w == 0) {
+        console.log("O contador vale.: " + contaLaco);
+        await testeFila(nomeFila, contaLaco);
+        if (contaLaco == 0) {
           console.log("++++++++++++++++++++++++++++++!!!! parei esses estado !!!! +++++++++++++++++++++++++++++++++++++");
           break
         }
+        contaLaco = 0;
       } else { contaOrigem++ };
     };
   };
@@ -193,13 +198,13 @@ async function verificaFila(nomeFila) {
 }
 
 // aguarda a fila ficar limpa para inserir novos processos
-async function testeFila(nomeFila) {
+async function testeFila(nomeFila, contador) {
   for (let w = 0; w < 1;) {
     let relogio = Fila.relogio();
     let statusFila = await verificaFila(nomeFila);
     //console.log(statusFila + "----------------");
     //console.log("funcao teste fila");
-    if (relogio.min == 20) { break }
+    // if (contador == 0) { break }
     if (!statusFila) {
       console.log("A fila ainda não consumiu...");
       await sleep(10000)

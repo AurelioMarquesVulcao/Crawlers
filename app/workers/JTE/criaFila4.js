@@ -11,15 +11,14 @@ const desligar = require('../../assets/jte/horarioRoboJTE.json');
 
 
 const Fila = new CriaFilaJTE();
-var fila = ".P";  // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos.P';
-// var desligado = []; // Descomentar essa linha para rodar 24 horas por dia
-var desligado = desligar.worker;
+var fila = ".4";  // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos';
+// var desligado = [];
+var desligado = desligar.worker
 var estados = [
-  // Estados.rj,Estados.pr,
-  Estados.rj, Estados.sp2, Estados.mg, Estados.pr, Estados.sp15,
-];
+  Estados.pb, Estados.rn, Estados.ms,
 
+];
 
 (async () => {
   let origens;  // Comarcas de origens para serem inseridas.

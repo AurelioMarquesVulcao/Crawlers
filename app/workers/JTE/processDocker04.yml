@@ -1,7 +1,8 @@
 apps:
-  - script   : ./workers/JTE/criaFilaTRT.RJ.js
+  - script   : ./workers/JTE/extracao_JTE4.js
     name     : 'worker-01'
-  - script   : ./workers/JTE/extracao_TRT_RJ.js
+  - script   : ./workers/JTE/extracao_JTE4.js
     name     : 'worker-02'
-
+  - script   : ./workers/JTE/extracao_JTE4.js
+    name     : 'worker-03'
     

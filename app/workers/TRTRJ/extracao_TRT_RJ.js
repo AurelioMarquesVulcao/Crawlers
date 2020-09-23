@@ -30,6 +30,9 @@ const parse = new TRTParser();
     const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos`;
 
     new GerenciadorFila(false,10).consumir(nomeFila, async (ch, msg) => {
+        let testeSleep = numeroAleatorio(1,20)
+        console.log(testeSleep);
+        await sleep(testeSleep*1000)
         const dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
         console.table(message);
@@ -117,6 +120,7 @@ const parse = new TRTParser();
             //     logs: logger.logs,
             //     NomeRobo: enums.nomesRobos.TJBAPortal,
             // });
+            await sleep(5000)
         } catch (e) {
             logger.info('Encontrado erro durante a execução');
             logger.info(`Error: ${e.message}`);
@@ -147,3 +151,9 @@ const parse = new TRTParser();
         }
     });
 })();
+
+function numeroAleatorio(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}

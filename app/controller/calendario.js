@@ -14,9 +14,9 @@ const util = new Util();
 
 
 (async () => {
-    util.escalaContainer("worker-jte-06",2);
-    console.log("executado");
-    await sleep(100000)
+    // util.escalaContainer("worker-jte-06",2);
+    // console.log("executado");
+    // await sleep(100000)
     setInterval(async function () {
         let time = util.timerNow();
         console.log(time);

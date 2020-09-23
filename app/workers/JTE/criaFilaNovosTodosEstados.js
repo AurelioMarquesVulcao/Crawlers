@@ -136,6 +136,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       }
       
       if (contaOrigem == max - 1) {
+        await sleep(30000)
         //await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.

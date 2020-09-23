@@ -73,8 +73,8 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
   let second = 0;
   let contaOrigem = 0;
-  for (let w = 0; w < 100;) {
-    w = 0
+  let contaLaco =0;
+  for (let w = 0; w < 1000;) {
     second++
 
     if ("a") {
@@ -93,10 +93,11 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
 
         if (statusComarca) {
+          contaLaco++
           console.log("Estamos na comarca: " + origens[contaOrigem]);
           console.log("Código do Estado.: " + codigo);
           console.log("status comarca " + statusComarca);
-          w++
+          
 
 
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
@@ -126,7 +127,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           }
 
         }
-
+        // console.log("O contador vale.: " + contaLaco);
       } catch (e) {
         //console.log(e);
         console.log("------------- A comarca: " + origens[contaOrigem] + ' falhou na busca--------------------');
@@ -138,12 +139,13 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         //await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.
-        console.log("O contador vale.: " + w);
-        await testeFila(nomeFila, w);
-        if (w != 1) {
+        console.log("O contador vale.: " + contaLaco);
+        await testeFila(nomeFila, contaLaco);
+        if (contaLaco == 0) {
           console.log("++++++++++++++++++++++++++++++!!!! parei esses estado !!!! +++++++++++++++++++++++++++++++++++++");
           break
         }
+        contaLaco = 0;
       } else { contaOrigem++ };
     };
   };
@@ -200,7 +202,7 @@ async function testeFila(nomeFila, contador) {
     let statusFila = await verificaFila(nomeFila);
     //console.log(statusFila + "----------------");
     //console.log("funcao teste fila");
-    if (contador == 0) { break }
+    // if (contador == 0) { break }
     if (!statusFila) {
       console.log("A fila ainda não consumiu...");
       await sleep(10000)

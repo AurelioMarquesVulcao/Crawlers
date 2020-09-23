@@ -50,7 +50,8 @@ var start = 0;
 (async () => {
   setInterval(async function () {
     let relogio = fila.relogio();
-    if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
+    if (start == 0) {
+    // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
       await worker();
     } else {

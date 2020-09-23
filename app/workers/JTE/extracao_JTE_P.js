@@ -50,7 +50,8 @@ var start = 0;
 (async () => {
   setInterval(async function () {
     let relogio = fila.relogio();
-    if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
+    if (start == 0) {
+      // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
       await worker();
     } else {
@@ -216,7 +217,7 @@ async function worker() {
           // Enviando para Collection de controle *ultimosProcessos*
           // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
           logger.info("Salvando na Collection ultimosProcessos")
-          
+
           await new CriaFilaJTE().salvaUltimo({
             numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
             dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,

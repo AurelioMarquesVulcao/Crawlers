@@ -168,7 +168,7 @@ class CriaFilaJTE {
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {
 				sequencial = parseInt(obj.seq)
-				let a = sequencial + 30 + i
+				let a = sequencial + 1 + i
 				if ((obj.zero + a).length > 7) {
 					zeros = obj.zero.substr(1)
 					processo = `${zeros}${a}4720205${tribunal}${origem}`
@@ -236,15 +236,15 @@ class CriaFilaJTE {
 		data.getMonth()
 		let busca = { "estadoNumero": estado, "comarca": comarca }
 		let checagem = await statusEstadosJTE.findOne(busca);
-		let { status, dataBusca:{dia, mes} } = checagem;
+		let { status, dataBusca: { dia, mes } } = checagem;
 		// console.log(status, dia, mes);
 		// console.log(data.getDate(),data.getMonth());
 		// console.log(checagem);
 		// console.log(status);
 		if (dia == data.getDate() && mes == data.getMonth()) {
-			if (status != "Ultimo Processo"){
+			if (status != "Ultimo Processo") {
 				return true;
-			} else { 
+			} else {
 				return false
 			}
 		} else {
@@ -258,7 +258,7 @@ class CriaFilaJTE {
 // 	console.log(await new CriaFilaJTE().verificaComarcas("15", "0003"));
 // 	console.log(await new CriaFilaJTE().verificaComarcas("18", "0003"));
 // 	console.log(await new CriaFilaJTE().verificaComarcas("23", "0003"));
-	
+
 // 	await sleep(3000)
 // })()
 

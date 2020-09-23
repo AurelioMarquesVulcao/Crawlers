@@ -14,15 +14,39 @@ const util = new Util();
 
 
 (async () => {
+    util.escalaContainer("worker-jte-06",2);
+    console.log("executado");
+    await sleep(100000)
     setInterval(async function () {
         let time = util.timerNow();
         console.log(time);
-        if (time.hora == 18 && time.min == 35 && time.seg == 00) {
+        // Inicio dos serviços JTE
+        if (time.hora == 21 && time.min == 00 && time.seg == 00) {
+            util.dockerStop("worker-jte-01 worker-jte-02");
+            util.dockerStop("worker-jte-03 worker-jte-04");
+            util.dockerStop("worker-jte-05 worker-jte-06");
+        }
+        if (time.hora == 23 && time.min == 00 && time.seg == 00) {
             util.dockerUp("worker-jte-01");
+            util.dockerUp("worker-jte-03");
+            util.dockerUp("worker-jte-05");
         }
-        if (time.hora == 18 && time.min == 36 && time.seg == 00) {
-            util.dockerStop("worker-jte-01");
+        if (time.hora == 5 && time.min == 00 && time.seg == 00) {
+            util.dockerStop("worker-jte-01 worker-jte-02");
+            util.dockerStop("worker-jte-03 worker-jte-04");
+            util.dockerStop("worker-jte-05 worker-jte-06");
         }
+        if (time.hora == 8 && time.min == 00 && time.seg == 00) {
+            util.dockerUp("worker-jte-01");
+            util.dockerUp("worker-jte-03");
+            util.dockerUp("worker-jte-05");
+        }
+        // Fim dos serviços JTE
+
+        // Inicio dos serviços JPE
+        // if (time.hora == 21 && time.min == 5 && time.seg == 00) {
+            
+        // }
 
 
     }, 1000);

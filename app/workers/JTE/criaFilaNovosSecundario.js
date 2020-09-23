@@ -16,6 +16,7 @@ var nomeFila = 'processo.JTE.extracao.novos.S';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
+  // Estados.es,
   Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
   Estados.pi, Estados.mt, Estados.rn, Estados.ms,
 ];
@@ -47,7 +48,7 @@ var estados = [
     if (!desligado.find(element => element == relogio.hora)) {
 
       // if (start == 0 || !statusFila) {
-      if ( start == 0 || !statusFila) {
+      if (start == 0 || !statusFila) {
         // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
         start = 1
         // if (!statusFila) {
@@ -74,7 +75,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
   let second = 0;
   let contaOrigem = 0;
   for (let w = 0; w < 100;) {
-    // w = 0
+    w = 0
     second++
 
     if ("a") {
@@ -133,12 +134,14 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
         await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
+      
       if (contaOrigem == max - 1) {
         //await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.
+        console.log("O contador vale.: " + w);
         await testeFila(nomeFila, w);
-        if (w == 0) {
+        if (w != 1) {
           console.log("++++++++++++++++++++++++++++++!!!! parei esses estado !!!! +++++++++++++++++++++++++++++++++++++");
           break
         }

@@ -93,12 +93,12 @@ const parse = new TRTParser();
                 logger.info('Processo JTE atualizado para JTE.TRT');
 
 
-                // let dadosProcesso = await parse.parse(extracao);
-                // console.log(await dadosProcesso);
-                // logger.info('Parse finalizado');
-                // logger.info('Salvando capa do processo');
-                // await dadosProcesso.processo.save();
-                // logger.info('Capa de processo salva');
+                let dadosProcesso = await parse.parse(extracao);
+                console.log(await dadosProcesso);
+                logger.info('Parse finalizado');
+                logger.info('Salvando capa do processo');
+                await dadosProcesso.processo.save();
+                logger.info('Capa de processo salva');
 
             } else {
 

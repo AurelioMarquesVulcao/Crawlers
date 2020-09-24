@@ -3,20 +3,15 @@ const sleep = require('await-sleep');
 const { Util } = require('./lib/util');
 const util = new Util();
 
-// shell.exec('pkill chrome');
-// setInterval(async function () {
+// Testes locais
+(async () => {
+    util.escalaContainer("worker-jte-06", 2);
+    console.log("executado");
 
-//     console.log(util.timerNow());
-
-// }, 2000);
-//util.dockerUp("worker-jte-01");
-//util.dockerStop("worker-jte-01");
+});
 
 
 (async () => {
-    // util.escalaContainer("worker-jte-06",2);
-    // console.log("executado");
-    // await sleep(100000)
     setInterval(async function () {
         let time = util.timerNow();
         console.log(time);
@@ -45,9 +40,9 @@ const util = new Util();
 
         // Inicio dos serviços JPE
         // if (time.hora == 21 && time.min == 5 && time.seg == 00) {
-            
+
         // }
 
 
     }, 1000);
-})()
+})();

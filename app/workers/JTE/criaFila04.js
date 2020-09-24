@@ -12,7 +12,7 @@ const desligar = require('../../assets/jte/horarioRoboJTE.json');
 
 const Fila = new CriaFilaJTE();
 var fila = ".4";  // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos';
+var nomeFila = 'processo.JTE.extracao.novos.4';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
@@ -135,8 +135,10 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       }
 
       if (contaOrigem == max - 1) {
-        await sleep(30000)
-        //await paraServico()
+        if (contaLaco > 0) {
+          await sleep(30000)
+        }
+        await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.
         console.log("O contador vale.: " + contaLaco);

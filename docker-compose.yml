@@ -191,8 +191,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaNovosPrincipais01.js --no-daemon
-
+    command: pm2 start workers/JTE/criaFila01.js --no-daemon
     restart: always
     logging:
       driver: "json-file"
@@ -204,7 +203,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaNovosSecundario.js --no-daemon
+    command: pm2 start workers/JTE/criaFila02.js --no-daemon
     restart: always
     logging:
       driver: "json-file"
@@ -216,7 +215,19 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaNovosTodosEstados.js --no-daemon
+    command: pm2 start workers/JTE/criaFila03.js --no-daemon
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  novos-processos-jte-4:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: pm2 start workers/JTE/criaFila04.js --no-daemon
     restart: always
     logging:
       driver: "json-file"

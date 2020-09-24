@@ -11,15 +11,16 @@ const desligar = require('../../assets/jte/horarioRoboJTE.json');
 
 
 const Fila = new CriaFilaJTE();
-var fila = "";  // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos';
+var fila = ".2"; // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos.2';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
-  Estados.rs, Estados.ba, Estados.pe, Estados.ce, Estados.pa,
-  Estados.to, Estados.am, Estados.sc, Estados.ac, Estados.pb,
-
+  // Estados.es,
+  Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
+  Estados.pi, Estados.mt, Estados.rn, Estados.ms,
 ];
+
 
 (async () => {
   let origens;  // Comarcas de origens para serem inseridas.
@@ -136,8 +137,10 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       }
       
       if (contaOrigem == max - 1) {
-        await sleep(30000)
-        //await paraServico()
+        if (contaLaco > 0) {
+          await sleep(30000)
+        }
+        await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.
         console.log("O contador vale.: " + contaLaco);

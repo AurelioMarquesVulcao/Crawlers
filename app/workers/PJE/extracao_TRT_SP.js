@@ -6,9 +6,9 @@ const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Helper, Logger } = require('../../lib/util');
 //const { LogExecucao } = require('../../lib/logExecucao');
 const sleep = require('await-sleep');
-const { ExtratorTrtrj } = require('../../extratores/processoTRT-RJ');
+const { ExtratorTrtrj } = require('../../extratores/processoTRT-SP');
 const { Processo } = require('../../models/schemas/processo');
-const { TRTParser}= require('../../parsers/TRTRJParser');
+const { TRTParser } = require('../../parsers/TRTSPParser');
 // const logarExecucao = async (execucao) => {
 //   await LogExecucao.salvar(execucao);
 // };
@@ -26,10 +26,10 @@ const parse = new TRTParser();
     });
 
     //const nomeFila = `fila TRT-RJ`;
-    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos`;
-    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTRJ}.extracao.novos`;
+    const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos`;
+    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos`;
 
-    new GerenciadorFila(false,1).consumir(nomeFila, async (ch, msg) => {
+    new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
         // let testeSleep = numeroAleatorio(1,20)
         // console.log(testeSleep);
         // await sleep(testeSleep*1000)
@@ -37,7 +37,7 @@ const parse = new TRTParser();
         let message = JSON.parse(msg.content.toString());
         console.table(message);
         let logger = new Logger('info', 'logs/ProcessoTRTRJ/ProcessoTRT-RJInfo', {
-            nomeRobo: enums.nomesRobos.TRTRJ,
+            nomeRobo: enums.nomesRobos.TRTSP,
             NumeroDoProcesso: message.NumeroProcesso,
         });
         try {
@@ -54,43 +54,56 @@ const parse = new TRTParser();
             // console.log(message);
             let extracao = await new ExtratorTrtrj().extrair(message.NumeroProcesso);
             logger.info('Iniciando Parse');
-            //console.log(await extracao);
             
+            console.log({ texto: "Essa é a resposta do parse", resposta: extracao });
+
+            if (extracao === null){
+
+            } else if (extracao.processo){
+                console.log("entrou no IF");
             let dadosProcesso = await parse.parse(extracao);
-            console.log(await dadosProcesso);
-            logger.info('Parse finalizado');
-            logger.info('Salvando capa do processo');
-            await dadosProcesso.processo.save();
-            logger.info('Capa de processo salva');
-                      
+            // console.log(await dadosProcesso);
+            // logger.info('Parse finalizado');
+            // logger.info('Salvando capa do processo');
+            // // await dadosProcesso.processo.save();
+            // logger.info('Capa de processo salva');
+            } else if (extracao.segre){
+
+            }
+            
+
             logger.info('Atualizando processo JTE');
             // console.log(message);
             //console.log(extracao);
-            let busca = { "_id": message._id }
-            if (extracao.segredoJustica == true) {
-                resultado = {
-                    "capa.segredoJustica": extracao.segredoJustica,
-                    "capa.valor": "",
-                    "capa.justicaGratuita": "",
-                    "origemExtracao": "JTE.TRT"
-                }
-                console.log(resultado);
-                // console.log(busca);
-                await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------- Salvo com sucesso -------------------");
-            }
-            if (extracao.segredoJustica == false) {
-                resultado = {
-                    "capa.segredoJustica": extracao.segredoJustica,
-                    "capa.valor": `${extracao.valorDaCausa}`,
-                    "capa.justicaGratuita": extracao.justicaGratuita,
-                    "origemExtracao": "JTE.TRT"
-                }
-                console.log(resultado);
-                // console.log(busca);
-                await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------- Salvo com sucesso -------------------");
-            }
+
+
+            // let busca = { "_id": message._id }
+            // if (extracao.segredoJustica == true) {
+            //     resultado = {
+            //         "capa.segredoJustica": extracao.segredoJustica,
+            //         "capa.valor": "",
+            //         "capa.justicaGratuita": "",
+            //         "origemExtracao": "JTE.TRT"
+            //     }
+            //     console.log(resultado);
+            //     // console.log(busca);
+            //     await Processo.findOneAndUpdate(busca, resultado);
+            //     console.log("------------- Salvo com sucesso -------------------");
+            // }
+            // if (extracao.segredoJustica == false) {
+            //     resultado = {
+            //         "capa.segredoJustica": extracao.segredoJustica,
+            //         "capa.valor": `${extracao.valorDaCausa}`,
+            //         "capa.justicaGratuita": extracao.justicaGratuita,
+            //         "origemExtracao": "JTE.TRT"
+            //     }
+            //     console.log(resultado);
+            //     // console.log(busca);
+            //     await Processo.findOneAndUpdate(busca, resultado);
+            //     console.log("------------- Salvo com sucesso -------------------");
+            // }
+
+
             logger.info('Processo JTE atualizado para JTE.TRT');
             // resultado = { "capa.segredoJustica": " ", "origemExtracao": "JTE.TRT", }
             // await Processo.findOneAndUpdate(busca, resultado);
@@ -122,6 +135,7 @@ const parse = new TRTParser();
             // });
             await sleep(5000)
         } catch (e) {
+            console.log(e);
             logger.info('Encontrado erro durante a execução');
             logger.info(`Error: ${e.message}`);
 
@@ -151,9 +165,3 @@ const parse = new TRTParser();
         }
     });
 })();
-
-function numeroAleatorio(min, max) {
-	min = Math.ceil(min);
-	max = Math.floor(max);
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-}

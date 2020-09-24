@@ -58,7 +58,7 @@ async function atulizaProcessosFila(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(7000);
+    ]).skip(pulo).limit(100);
     console.log(await agregar);
     for (i in agregar) {
         busca = `"${agregar[i]._id}"`;

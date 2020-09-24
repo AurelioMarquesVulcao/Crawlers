@@ -26,12 +26,12 @@ mongoose.connection.on('error', (e) => {
     for (let w = 0; w < 1;) {
         let relogio = fila.relogio();
         if (start == 0) {
-            for (let i = 1; i < 25; i++) {
+            for (let i = 3; i < 25; i++) {
                 if (i != 15) {
                     await atulizaProcessosFila(0, i);
                 }
 
-                await sleep(55000)
+                await sleep(500)
             }
 
             await sleep(1000)
@@ -66,7 +66,7 @@ async function atulizaProcessosFila(pulo, tribunal) {
                 "_id": 1
             }
         }
-    ]).skip(1000).limit(500);
+    ]).skip(200).limit(300);
     console.log(await agregar);
     for (i in agregar) {
         busca = `"${agregar[i]._id}"`;
@@ -77,7 +77,7 @@ async function atulizaProcessosFila(pulo, tribunal) {
         console.log(await !!extracao);
         await enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
         console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
-        await sleep(200)
+        await sleep(50)
 
     }
 }
@@ -85,7 +85,7 @@ async function atulizaProcessosFila(pulo, tribunal) {
 async function enfileirarTRT_RJ(numero, busca) {
     let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(02)([0-9]{4})/g.test(numero))
     //console.log(regex);
-    if (regex) {
+    if (true) {
         let mensagem = criaPost(numero, busca);
         await new GerenciadorFila().enviar("processo.TRTSP.extracao.novos", mensagem);
         console.log("Processo enfileirado para Download");

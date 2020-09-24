@@ -136,7 +136,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
       if (contaOrigem == max - 1) {
         if (contaLaco > 0) {
-          await sleep(30000)
+          await sleep(10000)
         }
         await paraServico()
         contaOrigem = 0;

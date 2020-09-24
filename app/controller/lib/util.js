@@ -21,7 +21,7 @@ class Util {
     limpaMemoria() {
         shell.exec(`sudo sync && sudo sysctl vm.drop_caches=3`)
     }
-    resetPM2(time = 0) {
+    async resetPM2(time = 0) {
         await sleep(time)
         shell.exec("pm2 restart all")
     }

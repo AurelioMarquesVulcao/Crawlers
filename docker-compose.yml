@@ -390,7 +390,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/TRTSP/extracao_TRT_SP.js --no-daemon 
+    command: pm2 start workers/PJE/extracao_TRT_PJE.js --no-daemon 
     restart: always
     logging:
       driver: "json-file"

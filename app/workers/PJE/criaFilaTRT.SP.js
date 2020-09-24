@@ -26,7 +26,14 @@ mongoose.connection.on('error', (e) => {
     for (let w = 0; w < 1;) {
         let relogio = fila.relogio();
         if (start == 0) {
-            await atulizaProcessosFila(0);
+            for (let i = 1; i < 25; i++) {
+                if (i != 15) {
+                    await atulizaProcessosFila(0, i);
+                }
+
+                await sleep(55000)
+            }
+
             await sleep(1000)
         }
         await sleep(1000)
@@ -40,7 +47,7 @@ mongoose.connection.on('error', (e) => {
 })()
 
 
-async function atulizaProcessosFila(pulo) {
+async function atulizaProcessosFila(pulo, tribunal) {
     start = 1
     let busca;
     let extracao;
@@ -48,7 +55,7 @@ async function atulizaProcessosFila(pulo) {
         {
             $match: {
                 'detalhes.orgao': 5,
-                'detalhes.tribunal': 2,
+                'detalhes.tribunal': tribunal,
                 'detalhes.ano': 2020,
                 "origemExtracao": "JTE"
             }
@@ -59,7 +66,7 @@ async function atulizaProcessosFila(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(7000);
+    ]).skip(1000).limit(500);
     console.log(await agregar);
     for (i in agregar) {
         busca = `"${agregar[i]._id}"`;
@@ -70,7 +77,7 @@ async function atulizaProcessosFila(pulo) {
         console.log(await !!extracao);
         await enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
         console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
-        await sleep(20)
+        await sleep(200)
 
     }
 }

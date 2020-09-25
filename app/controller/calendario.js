@@ -90,6 +90,7 @@ Em produção
             util.dockerUp("worker-jte-05");
             util.dockerUp("novos-processos-jte-3");
             util.dockerUp("novos-processos-jte-1 novos-processos-jte-2");
+            util.escalaContainer("worker-trt-02", 8);
         }
 
         // Fim dos serviços JTE

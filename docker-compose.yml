@@ -251,7 +251,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/TRTSP/criaFilaTRT.SP.js --no-daemon
+    command: pm2 start workers/PJE/criaFilaTRT_PJE.js --no-daemon
     restart: always
     logging:
       driver: "json-file"

@@ -39,7 +39,7 @@ mongoose.connection.on('error', (e) => {
 })()
 
 
-async function atulizaProcessosFila(pulo) {
+async function atualizaProcessosFila(pulo) {
     start = 1
     let busca;
     let extracao;
@@ -104,17 +104,4 @@ async function enfileirarTRT_RJ(numero, busca) {
     }
 }
 
-async function desligaAgendado() {
-    console.log("Vou pausar a aplicação");
-    await sleep(3600000)
-    // setInterval(async function () {
-    //     let relogio = fila.relogio();
-    //     if (!!desligado.worker.find(element => element == relogio.hora)) {
-    //         console.log("Vou fechar a aplicação");
-    //         mongoose.connection.close();
-    //         await sleep(3600000)
-    //         process.exit()
-    //     }
-    // }, 1000);
-}
 

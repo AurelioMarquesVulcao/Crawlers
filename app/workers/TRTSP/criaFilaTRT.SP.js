@@ -41,7 +41,7 @@ mongoose.connection.on('error', (e) => {
 })()
 
 
-async function atulizaProcessosFila(pulo) {
+async function atualizaProcessosFila(pulo) {
     start = 1
     let busca;
     let extracao;

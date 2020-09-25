@@ -71,7 +71,7 @@ class CriaFilaPJE {
                     "_id": 1
                 }
             }
-        ]).skip(pulo).limit(25);
+        ]).skip(pulo).limit(200);
         // console.log(await agregar);
         for (let i = 0; i < agregar.length; i++) {
             busca = `"${agregar[i]._id}"`;
@@ -79,7 +79,7 @@ class CriaFilaPJE {
             console.log(await !!extracao);
             await this.enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
             console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
-            await sleep(200)
+            await sleep(20)
         }
     }
     async enfileirarTRT_RJ(numero, busca) {

@@ -16,7 +16,7 @@ class Util {
         let mseg = data.getMilliseconds();   // 0-999
         let tz = data.getTimezoneOffset(); // em minutos
 
-        return { dia, mes, hora, min, seg }
+        return { dia, mes, hora, min, seg, dia_sem }
     }
     limpaMemoria() {
         shell.exec(`sudo sync && sudo sysctl vm.drop_caches=3`)

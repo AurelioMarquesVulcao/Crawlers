@@ -79,7 +79,7 @@ class CriaFilaPJE {
             console.log(await !!extracao);
             await this.enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
             console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
-            await sleep(100)
+            await sleep(200)
         }
     }
     async enfileirarTRT_RJ(numero, busca) {

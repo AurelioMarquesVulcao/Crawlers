@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-var rabbitMQ = 'http://admin:crawler480@172.16.16.3:15676/api/queues';
+var rabbitMQ = 'http://admin:crawler480@172.16.16.39:15676/api/queues';
 
 module.exports.getFilas = async () => {
     return await axios.get(rabbitMQ).then(resp => {

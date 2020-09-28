@@ -328,7 +328,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  limpaCore:
+  limpa-core:
     extends:
       file: common-services.yml
       service: base_node

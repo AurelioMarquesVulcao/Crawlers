@@ -192,7 +192,6 @@ services:
       file: common-services.yml
       service: base_node
     command: pm2 start workers/JTE/criaFila01.yml --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -204,7 +203,6 @@ services:
       file: common-services.yml
       service: base_node
     command: pm2 start workers/JTE/criaFila02.yml --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -216,7 +214,6 @@ services:
       file: common-services.yml
       service: base_node
     command: pm2 start workers/JTE/criaFila03.yml --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -228,7 +225,6 @@ services:
       file: common-services.yml
       service: base_node
     command: pm2 start workers/JTE/criaFila04.yml --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -240,7 +236,6 @@ services:
       file: common-services.yml
       service: base_node
     command: pm2 start workers/TRTRJ/criaFilaTRT.RJ.js --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -252,7 +247,6 @@ services:
       file: common-services.yml
       service: base_node
     command: pm2 start workers/PJE/criaFilaTRT_PJE.js --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -279,7 +273,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker01.yml --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -293,7 +286,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker01.yml --no-daemon 
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -307,7 +299,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -321,7 +312,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -335,7 +325,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker03.yml --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -349,7 +338,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker03.yml --no-daemon 
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -363,7 +351,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker04.yml --no-daemon 
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -377,7 +364,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/TRTRJ/extracao_TRT_RJ.js --no-daemon 
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -391,94 +377,8 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/PJE/extracao_TRT_PJE.js --no-daemon 
-    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "5"
-
-
-  # worker-jte-07:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
-
-  # worker-jte-08:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-
-  # worker-jte-09:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-
-  # worker-jte-10:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-
-  # worker-jte-11:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-
-  # worker-jte-12:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"

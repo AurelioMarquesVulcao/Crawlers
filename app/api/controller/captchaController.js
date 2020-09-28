@@ -1,4 +1,5 @@
 const { LogCaptcha } = require("../../models/schemas/logCaptcha");
+const moment = require('moment');
 
 const captilize = (texto) => {
   return `${texto[0].toUpperCase()}${texto.slice(1)}`;
@@ -76,8 +77,14 @@ module.exports.CaptchaController = class CaptchaController {
         if(!/pagina|limite/.test(item)) {
           if (!/data/.test(item))
             query[captilize(item)] = context[item];
-          else
-            query[captilize(item)] = moment(context[item]);
+          else {
+            //montando range de data
+            query[captilize(item)] = {
+              $gte : moment(context[item]).format('YYYY-MM-DDT00:00:00.000Z'),
+              $lt : moment(context[item]).add(1, 'days').format('YYYY-MM-DDT00:00:00.000Z')
+            }
+          }
+            
         } else if (/pagina/.test(item))
           pagina = parseInt(context[item]);
         else if (/limite/.test(item))

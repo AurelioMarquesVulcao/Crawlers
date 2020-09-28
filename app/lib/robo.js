@@ -44,12 +44,17 @@ class Requisicao {
 
   async enviarRequest(options) {
     const promise = new Promise((resolve) => {
+
+      // Alteração importante de segurança no código
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
       let statusCode = 500;
       axios(options)
         .then((res) => {
           if (res) {
             statusCode = res.status;
 
+            //if (statusCode >= 200 && statusCode < 300) {
             if (statusCode === 200) {
               const corpo = res.data ? res.data : true;
               resolve({
@@ -60,7 +65,17 @@ class Requisicao {
                 responseBody: corpo,
                 cookies: this.validarCookies(res.headers['set-cookie']),
               });
-            } else {
+            } else if ((statusCode === 204)) {
+              resolve({
+                code: 'HTTP_204',
+                status: statusCode,
+                message: `StatusCode: ${statusCode}.`,
+                responseContent: res,
+                responseBody: undefined,
+                cookies: this.validarCookies(res.headers['set-cookie']),
+              });
+            }
+            else {
               resolve({
                 code: 'HTTP_STATUS_NOT_200',
                 status: statusCode,
@@ -80,15 +95,16 @@ class Requisicao {
           }
         })
         .catch((err) => {
-          console.log('Robo erro', err);
-          resolve({
-            code: err.code,
-            status: err.response.status,
-            message: err.response.statusText,
-            responseContent: null,
-            responseBody: err.response.data ? err.response.data : '',
-            headers: err.response.headers
-          });
+          console.log('----- Robo erro', err, '-----');
+          let resposta = {};
+          if (err.response) {
+            resposta.status = err.response.status;
+            resposta.message = err.response.statusText;
+            resposta.responseBody = err.response.data ? err.response.data : '';
+            resposta.headers = err.response.headers;
+          }
+          resposta.code = err.code;
+          resolve(resposta);
         });
     });
 
@@ -96,19 +112,17 @@ class Requisicao {
 
     if (response.code) {
       if (
-        /ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNRESET|ECONNREFUSED|ENOPROTOOPT/.test(
+        /ESOCKETTIMEDOUT|ETIMEDOUT|EBUSY|ECONNREFUSED|ENOPROTOOPT/.test(
           response.code
         )
       ) {
-        const mensagem = `Parando script CODE: ${
-          response.code
-        } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
+        const mensagem = `Parando script CODE: ${response.code
+          } | ${moment().format('DD/MM/YYYY HH:mm:ss')}`;
         throw new RequestException(response.code, response.status, mensagem);
       } else if (/HTTP_STATUS_NOT_200|HTTP_REPONSE_FAIL/.test(response.code)) {
         if (this.contadorTentativas < 1) {
           console.log(
-            `${response.code} | Tentativa ${this.contadorTentativas} para ${
-              options.url
+            `${response.code} | Tentativa ${this.contadorTentativas} para ${options.url
             } | ${options.proxy ? options.proxy : 'sem proxy'}`
           );
 
@@ -138,14 +152,15 @@ class Robo {
 
   /**
    * Acessa o site
-   * @param {string} url URL do site
-   * @param {string} method 'GET'ou 'POST'
-   * @param {string} encoding tipo de codificacao
-   * @param {boolean} usaProxy deve usar proxy
-   * @param {boolean} usaJson é do tipo querystring
-   * @param {object} params parametros para o form ou querystring
-   * @param {object} headers headers
-   * @param {boolean} randomUserAgent deve utilizar um user agent aleatorio?
+   * @param {Object} options opções para fazer a request
+   * @param {string} options.url URL do site
+   * @param {string} options.method 'GET'ou 'POST'
+   * @param {string} options.encoding tipo de codificacao
+   * @param {boolean} options.usaProxy deve usar proxy
+   * @param {boolean} options.usaJson é do tipo querystring
+   * @param {Object} options.params parametros para o form ou querystring
+   * @param {Object} options.headers headers
+   * @param {boolean} options.randomUserAgent deve utilizar um user agent aleatorio?
    */
   async acessar({
     url,
@@ -153,7 +168,7 @@ class Robo {
     encoding = '',
     usaProxy = false,
     usaJson = false,
-    params = null,
+    params = null, // body!
     headers = {},
     randomUserAgent = false,
   } = {}) {
@@ -165,6 +180,11 @@ class Robo {
       url: url,
       headers: headers,
       method: method,
+
+      strictSSL: false,
+      encoding: encoding,
+      followAllRedirects: true,
+      timeout: 100000
     };
 
     if (params) {
@@ -183,7 +203,7 @@ class Robo {
 
     if (usaProxy) {
       options.httpsAgent = new HttpsProxyAgent(
-        "http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181"
+        'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181'
       );
     }
     //   host: 'proxy-proadv.7lan.net',
@@ -191,7 +211,8 @@ class Robo {
     //   auth: 'proadvproxy:C4fMSSjzKR5v9dzg'
     // });
 
-    options.timeout = 60000;    
+    options.timeout = 60000;
+    // console.log(options);
     return this.requisicao.enviarRequest(options);
   }
 }

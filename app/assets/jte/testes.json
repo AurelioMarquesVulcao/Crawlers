@@ -1,0 +1,289 @@
+{
+  "id": 2279644,
+  "numero": "0100448-09.2020.5.01.0266",
+  "classe": "ATSum",
+  "orgaoJulgador": "6ª Vara do Trabalho de São Gonçalo",
+  "segredoJustica": false,
+  "justicaGratuita": true,
+  "distribuidoEm": "2020-07-29T19:30:32.971",
+  "autuadoEm": "2020-07-29T19:30:32.936",
+  "valorDaCausa": 4467.82,
+  "poloAtivo": [
+    {
+      "id": 11859871,
+      "idPessoa": 1961950,
+      "nome": "P. P. F. L.",
+      "login": "16034222770",
+      "tipo": "RECLAMANTE",
+      "polo": "ATIVO",
+      "situacao": "ATIVO",
+      "representantes": [
+        {
+          "id": 11859849,
+          "idPessoa": 1382196,
+          "nome": "RAFAEL FERRAZ DOS SANTOS",
+          "login": "09859629765",
+          "tipo": "ADVOGADO",
+          "documento": "098.596.297-65",
+          "tipoDocumento": "CPF",
+          "polo": "ATIVO",
+          "situacao": "ATIVO",
+          "papeis": [
+            { "id": 1005, "nome": "Advogado", "identificador": "advogado" }
+          ],
+          "utilizaLoginSenha": true
+        }
+      ],
+      "utilizaLoginSenha": false
+    }
+  ],
+  "poloPassivo": [
+    {
+      "id": 11859874,
+      "idPessoa": 1261408,
+      "nome": "T. B. M. M.",
+      "login": "19322900000183",
+      "tipo": "RECLAMADO",
+      "polo": "PASSIVO",
+      "situacao": "ATIVO",
+      "representantes": [
+        {
+          "id": 12039172,
+          "idPessoa": 35327,
+          "nome": "SERGIO ROBERTO SILVA NOVAES",
+          "login": "78414580700",
+          "tipo": "ADVOGADO",
+          "documento": "784.145.807-00",
+          "tipoDocumento": "CPF",
+          "endereco": {
+            "logradouro": "RUA JOSE CLEMENTE ",
+            "numero": "73, Sala 304",
+            "bairro": "CENTRO",
+            "municipio": "NITEROI",
+            "estado": "RJ",
+            "cep": "24020-104"
+          },
+          "polo": "PASSIVO",
+          "situacao": "ATIVO",
+          "papeis": [
+            { "id": 1005, "nome": "Advogado", "identificador": "advogado" }
+          ],
+          "utilizaLoginSenha": true
+        }
+      ],
+      "utilizaLoginSenha": false
+    }
+  ],
+  "assuntos": [
+    {
+      "id": 4864,
+      "codigo": "55097",
+      "descricao": "Reflexos",
+      "principal": true
+    },
+    {
+      "id": 4847,
+      "codigo": "5352",
+      "descricao": "Anotação / Baixa / Retificação",
+      "principal": false
+    },
+    {
+      "id": 4695,
+      "codigo": "55228",
+      "descricao": "Contratuais",
+      "principal": false
+    },
+    {
+      "id": 4842,
+      "codigo": "2033",
+      "descricao": "Depósito / Diferença de Recolhimento",
+      "principal": false
+    },
+    {
+      "id": 1530,
+      "codigo": "2666",
+      "descricao": "Décimo Terceiro Salário",
+      "principal": false
+    },
+    {
+      "id": 2439,
+      "codigo": "8820",
+      "descricao": "Décimo Terceiro Salário Proporcional",
+      "principal": false
+    },
+    {
+      "id": 2440,
+      "codigo": "8821",
+      "descricao": "Férias Proporcionais",
+      "principal": false
+    },
+    {
+      "id": 4756,
+      "codigo": "2086",
+      "descricao": "Horas Extras",
+      "principal": false
+    },
+    {
+      "id": 1479,
+      "codigo": "1998",
+      "descricao": "Multa de 40% do FGTS",
+      "principal": false
+    }
+  ],
+  "itensProcesso": [
+    {
+      "titulo": "Juntada a petição de Solicitação de Habilitação (Habilitação)",
+      "tipoConteudo": "HTML",
+      "data": "2020-09-15T11:56:00.683",
+      "ativo": true,
+      "documento": false,
+      "mostrarHeaderData": true
+    },
+    {
+      "titulo": "Decorrido o prazo de THE BEST MULTIMARCAS LTDA - ME em 04/09/2020",
+      "tipoConteudo": "HTML",
+      "data": "2020-09-07T00:12:04.791",
+      "ativo": true,
+      "documento": false,
+      "mostrarHeaderData": true
+    },
+    {
+      "titulo": "Decorrido o prazo de PEDRO PAULO DE FREITAS LIMA em 03/09/2020",
+      "tipoConteudo": "HTML",
+      "data": "2020-09-04T00:30:39.89",
+      "ativo": true,
+      "documento": false,
+      "mostrarHeaderData": true
+    },
+    {
+      "titulo": "Publicado(a) o(a) intimação em 27/08/2020",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-27T01:28:08.205",
+      "ativo": true,
+      "documento": false,
+      "mostrarHeaderData": true
+    },
+    {
+      "titulo": "Disponibilizado\n(a) o(a) intimação no Diário da Justiça Eletrônico",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-27T01:28:08.197",
+      "ativo": true,
+      "documento": false
+    },
+    {
+      "titulo": "Expedido(a) intimação a(o) THE BEST MULTIMARCAS LTDA - ME",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-26T16:08:14.365",
+      "ativo": true,
+      "documento": false,
+      "mostrarHeaderData": true
+    },
+    {
+      "titulo": "Expedido(a) intimação a(o) PEDRO PAULO DE FREITAS LIMA",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-26T16:08:14.19",
+      "ativo": true,
+      "documento": false
+    },
+    {
+      "titulo": "Audiência de conciliação (fase de conhecimento) designada (17/09/2020 11:20 06VTSG - 6ª Vara do Trabalho de São Gonçalo)",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-26T16:00:07.953",
+      "ativo": true,
+      "documento": false
+    },
+    {
+      "titulo": "Audiência de conciliação (fase de conhecimento) cancelada (01/09/2020 11:50 06VTSG - 6ª Vara do Trabalho de São Gonçalo)",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-26T15:59:13.678",
+      "ativo": true,
+      "documento": false
+    },
+    {
+      "titulo": "Audiência de conciliação (fase de conhecimento) designada (01/09/2020 11:50 06VTSG - 6ª Vara do Trabalho de São Gonçalo)",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-26T15:56:56.199",
+      "ativo": true,
+      "documento": false
+    },
+    {
+      "titulo": "Audiência una cancelada (21/10/2020 09:50 06VTSG - 6ª Vara do Trabalho de São Gonçalo)",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-26T15:56:56.156",
+      "ativo": true,
+      "documento": false
+    },
+    {
+      "id": 117805701,
+      "idUnicoDocumento": "599124f",
+      "titulo": "Despacho",
+      "tipo": "Despacho",
+      "tipoConteudo": "PDF",
+      "data": "2020-08-25T14:37:44.754",
+      "ativo": true,
+      "documentoSigiloso": false,
+      "usuarioPerito": false,
+      "documento": true,
+      "publico": true,
+      "mostrarHeaderData": true,
+      "usuarioJuntada": "RITA DE CASSIA LIGIERO ARMOND",
+      "instancia": "1"
+    },
+    {
+      "titulo": "Proferido despacho de mero expediente",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-25T14:37:44.754",
+      "ativo": true,
+      "documento": false
+    },
+    {
+      "titulo": "Conclusos os autos para despacho (genérica) a RITA DE CASSIA LIGIERO ARMOND",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-24T22:05:29.827",
+      "ativo": true,
+      "documento": false,
+      "mostrarHeaderData": true
+    },
+    {
+      "titulo": "Juntada a petição de Manifestação (Petição Requerendo Homologação de Acordo)",
+      "tipoConteudo": "HTML",
+      "data": "2020-08-04T11:01:59.566",
+      "ativo": true,
+      "documento": false,
+      "mostrarHeaderData": true
+    },
+    {
+      "titulo": "Audiência una designada (21/10/2020 09:50 - 6ª Vara do Trabalho de São Gonçalo)",
+      "tipoConteudo": "HTML",
+      "data": "2020-07-29T19:30:33.743",
+      "ativo": true,
+      "documento": false,
+      "mostrarHeaderData": true
+    },
+    {
+      "titulo": "Distribuído por sorteio",
+      "tipoConteudo": "HTML",
+      "data": "2020-07-29T19:30:33.039",
+      "ativo": true,
+      "documento": false
+    }
+  ],
+  "expedientes": [
+    {
+      "destinatario": "T. B. M. M.",
+      "tipo": "Intimação",
+      "meio": "Correios",
+      "dataCriacao": "2020-08-26T16:08:14.365",
+      "dataCiencia": "2020-08-28T23:59:59.999999",
+      "fechado": true
+    },
+    {
+      "destinatario": "P. P. F. L.",
+      "tipo": "Intimação",
+      "meio": "Diário Eletrônico",
+      "dataCriacao": "2020-08-26T16:08:14.19",
+      "dataCiencia": "2020-08-27T23:59:59.999999",
+      "fechado": true
+    }
+  ]
+}

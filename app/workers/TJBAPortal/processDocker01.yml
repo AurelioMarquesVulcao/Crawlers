@@ -1,0 +1,8 @@
+apps:
+  - script   : ./workers/TJBAPortal/extracaoNovos.js
+    name     : 'worker-01'
+  - script   : ./workers/TJBAPortal/extracaoNovos.js
+    name     : 'worker-02'
+  - script   : ./workers/TJBAPortal/extracaoNovos.js
+    name     : 'worker-03'
+    

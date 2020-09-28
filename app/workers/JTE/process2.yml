@@ -1,8 +1,10 @@
 apps:
-  - script   : ./app/workers/JTE/extracao_JTE.js
-    name     : 'worker-01'
-  - script   : ./app/workers/JTE/extracao_JTE.js
-    name     : 'worker-02'
-  - script   : ./app/workers/JTE/extracao_JTE.js
-    name     : 'worker-03'
+  - script   : ./app/workers/JTE/extracao_JTE_S.js
+    name     : 'worker-001'
+  - script   : ./app/workers/JTE/extracao_JTE_S.js
+    name     : 'worker-002'
+  - script   : ./app/workers/JTE/extracao_JTE_S.js
+    name     : 'worker-003'
+  - script   : ./app/workers/JTE/PM2_Reset.js
+    name     : 'reset'
     

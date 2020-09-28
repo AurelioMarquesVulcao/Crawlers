@@ -1,0 +1,123 @@
+{
+    "id": 2267368,
+    "numero": "0100519-03.2020.5.01.0010",
+    "classe": "CartPrecCiv",
+    "orgaoJulgador": "10ª Vara do Trabalho do Rio de Janeiro",
+    "segredoJustica": false,
+    "justicaGratuita": false,
+    "distribuidoEm": "2020-07-07T13:41:25.397",
+    "autuadoEm": "2020-07-07T13:41:25.37",
+    "valorDaCausa": 0.01,
+    "poloAtivo": [
+      {
+        "id": 11776738,
+        "idPessoa": 2565138,
+        "nome": "E. B.",
+        "login": "b649ecea-24ac-4dca-923d-ba084a9f0c63",
+        "tipo": "AUTOR",
+        "polo": "ATIVO",
+        "situacao": "ATIVO",
+        "utilizaLoginSenha": false
+      }
+    ],
+    "poloPassivo": [
+      {
+        "id": 11776743,
+        "idPessoa": 118273,
+        "nome": "P. C. R. H.",
+        "login": "34272435000107",
+        "tipo": "RÉU",
+        "polo": "PASSIVO",
+        "situacao": "ATIVO",
+        "utilizaLoginSenha": false
+      }
+    ],
+    "assuntos": [
+      {
+        "id": 5077,
+        "codigo": "11786",
+        "descricao": "Atos executórios",
+        "principal": true
+      }
+    ],
+    "itensProcesso": [
+      {
+        "id": 118791428,
+        "idUnicoDocumento": "0448cd9",
+        "titulo": "Despacho",
+        "tipo": "Despacho",
+        "tipoConteudo": "PDF",
+        "data": "2020-09-13T22:08:22.654",
+        "ativo": true,
+        "documentoSigiloso": false,
+        "usuarioPerito": false,
+        "documento": true,
+        "publico": true,
+        "mostrarHeaderData": true,
+        "usuarioJuntada": "JULIANA PINHEIRO DE TOLEDO PIZA",
+        "instancia": "1"
+      },
+      {
+        "titulo": "Proferido despacho de mero expediente",
+        "tipoConteudo": "HTML",
+        "data": "2020-09-13T22:08:22.654",
+        "ativo": true,
+        "documento": false
+      },
+      {
+        "titulo": "Conclusos os autos para despacho (genérica) a JULIANA PINHEIRO DE TOLEDO PIZA",
+        "tipoConteudo": "HTML",
+        "data": "2020-09-09T18:05:07.302",
+        "ativo": true,
+        "documento": false,
+        "mostrarHeaderData": true
+      },
+      {
+        "id": 115256342,
+        "idUnicoDocumento": "3c40beb",
+        "titulo": "Despacho",
+        "tipo": "Despacho",
+        "tipoConteudo": "PDF",
+        "data": "2020-07-13T13:07:06.745",
+        "ativo": true,
+        "documentoSigiloso": false,
+        "usuarioPerito": false,
+        "documento": true,
+        "publico": true,
+        "mostrarHeaderData": true,
+        "usuarioJuntada": "JULIANA PINHEIRO DE TOLEDO PIZA",
+        "instancia": "1"
+      },
+      {
+        "titulo": "Proferido despacho de mero expediente",
+        "tipoConteudo": "HTML",
+        "data": "2020-07-13T13:07:06.745",
+        "ativo": true,
+        "documento": false
+      },
+      {
+        "titulo": "Conclusos os autos para despacho (genérica) a JULIANA PINHEIRO DE TOLEDO PIZA",
+        "tipoConteudo": "HTML",
+        "data": "2020-07-10T15:38:46.771",
+        "ativo": true,
+        "documento": false,
+        "mostrarHeaderData": true
+      },
+      {
+        "titulo": "Iniciada a execução",
+        "tipoConteudo": "HTML",
+        "data": "2020-07-10T15:38:34.897",
+        "ativo": true,
+        "documento": false
+      },
+      {
+        "titulo": "Distribuído por sorteio",
+        "tipoConteudo": "HTML",
+        "data": "2020-07-07T13:41:25.546",
+        "ativo": true,
+        "documento": false,
+        "mostrarHeaderData": true
+      }
+    ]
+  }
+  

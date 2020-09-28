@@ -8,8 +8,6 @@ const {
   CredenciaisAdvogados,
 } = require('../models/schemas/credenciaisAdvogados');
 
-console.log(enums.mongo.connString);
-
 class PeticaoTJSP extends ExtratorPuppeteer {
   constructor({
     url = '',
@@ -26,7 +24,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
 
     this.args = [
       '--no-sandbox',
-      `--proxy-server=http://proxy-proadv.7lan.net:8181`,
+      // `--proxy-server=http://proxy-proadv.7lan.net:8181`,
       `--ignore-certificate-errors`,
     ];
     this.ignore = ['--disable-extensions'];
@@ -45,11 +43,12 @@ class PeticaoTJSP extends ExtratorPuppeteer {
 
   /**
    * Extrai os arquivos iniciais do processo
-   * @param {String} numeroProcesso numero do processo com mascara
-   * @param {Number} instancia default 1
+   * @param {string} numeroProcesso numero do processo com mascara
+   * @param {number} instancia default 1
    * @returns {Promise<{numeroProcesso: *}>}
    */
   async extrair(numeroProcesso, instancia = 1) {
+    instancia = Number(instancia);
     await new CredenciaisAdvogados({
       login: '103.890.517-64',
       senha: 'Senh@TJ123',
@@ -89,7 +88,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       await sleep(100);
 
       // Tratamento caso resultado da consulta retorne algo invalido
-      if (await this.page.$('#mensagemRetorno') !== null){
+      if ((await this.page.$('#mensagemRetorno')) !== null) {
         let alert = await this.page.$eval('#mensagemRetorno', (element) => {
           return {
             role: element.getAttribute('role'),
@@ -100,7 +99,6 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           throw new Error(alert.msg.trim());
         }
       }
-
 
       // Tratamento caso resultado da consulta retorne uma lista de processos
       let processos;
@@ -137,6 +135,7 @@ class PeticaoTJSP extends ExtratorPuppeteer {
         `Finalizado processo de extração de documentos ${this.numeroProcesso}`
       );
     } catch (e) {
+      console.log(e);
       this.logger.log('error', e);
       this.debug(`ERRO OCORRIDO:\n ${e}`);
 
@@ -184,7 +183,9 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.page.click('#pbEntrar'),
         ]);
 
-        continuar = await this.page.$$('#mensagemRetorno').then((selector) => Boolean(selector.length));
+        continuar = await this.page
+          .$$('#mensagemRetorno')
+          .then((selector) => Boolean(selector.length));
 
         if (continuar) {
           this.logger.log(
@@ -227,9 +228,9 @@ class PeticaoTJSP extends ExtratorPuppeteer {
     this.logger.info('Aguardando o carregamento da pagina');
 
     this.debug('Aguardando carregamento da pagina');
-    // Esse sleep é pq pode aleatoriamente ter uma mudança no dom que bloqueia a
-    // tela até que ela esteja completa.
-    await sleep(1500);
+
+    await this.page.waitForSelector('.sc-ifAKCX', { timeout: 15000 });
+
     this.debug('Pagina carregada');
     this.logger.info('Pagina carregada');
     this.logger.info('Digitando numero do processo');
@@ -279,13 +280,19 @@ class PeticaoTJSP extends ExtratorPuppeteer {
    */
   async resgataDocumentos() {
     this.logger.info('Iniciando procedimento de resgate dos documentos');
+    this.logger.info('Verificando se existe o documento "DECISAO"');
     this.logger.info('Selecionando documentos de interessa para download');
+
     await this.page.evaluate(() => {
       let elements = $('#arvore_principal > ul > li > a');
       let tam = elements.length;
 
       for (let i = 0; i < tam; i++) {
-        if (elements[i].innerText === 'Decisão') break;
+        if (
+          elements[i].innerText === 'Decisão' ||
+          elements[i].innerText === 'Despachos'
+        )
+          break;
         elements[i].firstElementChild.click();
       }
     });
@@ -314,13 +321,23 @@ class PeticaoTJSP extends ExtratorPuppeteer {
       downloadPath: './temp/peticoes/tjsp',
     });
 
+    // Interceptando request
+
+    await this.page.setRequestInterception(true);
+    this.page.on('request', async (request) => {
+      if (/getPDFImpressao\.do/.test(request._url)) {
+        this.resposta.urlOrigem = request._url;
+      }
+      request.continue();
+    });
     await this.page.click('#btnDownloadDocumento');
+    console.log('botaoClicado');
     this.logger.info('Download iniciado');
   }
 
   /**
    * Pega as credenciais de advogado para login
-   * @param estado
+   * @param {string} estado o estado para o qual esta tentando pegar as credenciais.
    * @returns {Promise<*>}
    */
   async getCredenciais(estado) {
@@ -348,7 +365,10 @@ class PeticaoTJSP extends ExtratorPuppeteer {
           this.logger.info('Download finalizado');
           return resolve(true);
         }
-        const size = fs.statSync(`./temp/peticoes/tjsp/${this.numeroProcesso}.pdf.crdownload`).size / 1000000.0
+        const size =
+          fs.statSync(
+            `./temp/peticoes/tjsp/${this.numeroProcesso}.pdf.crdownload`
+          ).size / 1000000.0;
         this.logger.info(`Download não finalizado | ${size} Mb baixados`);
         await sleep(5000);
       } while (true);

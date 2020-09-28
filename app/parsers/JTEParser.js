@@ -1,12 +1,13 @@
-const cheerio = require('cheerio');
-const moment = require('moment');
-const re = require('xregexp');
+// const cheerio = require('cheerio');
+// const moment = require('moment');
+// const re = require('xregexp');
 const { enums } = require('../configs/enums');
 
 
 const { BaseParser, removerAcentos } = require('./BaseParser');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
+
 
 
 class JTEParser extends BaseParser {
@@ -149,21 +150,14 @@ class JTEParser extends BaseParser {
 
 
   estado($, numeroProcesso) {
-
-
     let resultado = 'Estado indeterminado'
-
-
     let dados = this.detalhes(numeroProcesso).tribunal
-
-
     if (dados == 2 || dados == 15) resultado = 'SP';
     if (dados == 1) resultado = 'RJ';
     // if (dados == 15) resultado = 'SP'
     if (dados == 3) resultado = 'MG';
     // if (dados == 21) resultado = 'RN';
     if (dados == 5) resultado = 'BA';
-
     if (dados == 4) resultado = 'RS';
     if (dados == 6) resultado = 'PE';
     if (dados == 7) resultado = 'CE';
@@ -208,7 +202,7 @@ class JTEParser extends BaseParser {
         data = andamentos[i].data
       }
       //console.log(dados);
-      try{
+      try {
         if (!!dados) {
           let vara = dados.split('-')[1].split('de')[0].trim();
           //console.log(dados.split(/ DE /gmi)[1].replace(')', '').trim());
@@ -229,38 +223,66 @@ class JTEParser extends BaseParser {
             fase: fase,
           }
         }
-      } catch (e){
+      } catch (e) {
         let primeiraDistribuicao = data
-          return {
-            vara: "",
-            comarca: "",
-            primeiraDistribuicao: primeiraDistribuicao,
-            fase: fase,
-          }
+        return {
+          vara: "",
+          comarca: "",
+          primeiraDistribuicao: primeiraDistribuicao,
+          fase: fase,
+        }
       }
-      
+
     }
   }
 
-  // precisa de melhorias
   extraiVaraCapa($, contador) {
     // let resultado = "não possui vara"
     let resultado;
     let vara;
     let comarca;
+    let processo = "";
 
     $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > p`).each(async function (element) {
-      // $('detalhes-aba-geral p').each(async function (element) {
       let datas = $(this).text().split('\n');
-      if (!!datas[0].split('-')[1].split('de')[0] && datas[0].split('-')[1].split('de')[1]) {
-        vara = datas[0].split('-')[1].split('de')[0].trim()
-        comarca = datas[0].split('-')[1].split('de')[1].trim()
-        resultado = {
-          vara: vara,
-          comarca: comarca,
-        }
-      }
+      processo = datas[0]
+
     })
+    let data = this.regexVaraComarca(processo);
+    let cnj = this.extraiNumeroProcesso($, contador).replace(/[-.]/g, "");
+    console.log(cnj);
+    const regex = /(gabinete\sd[aoe])/i;
+    if (regex.test(data[2])) {
+      vara = `Região ${cnj.slice(cnj.length - 6, cnj.length - 4)}`;
+      comarca = "Tribunal Regional do Trabalho"
+      resultado = { vara, comarca }
+    } else {
+      vara = removerAcentos(data[2])
+      comarca = removerAcentos(data[3])
+      resultado = { vara, comarca }
+    }
+
+    console.log(resultado);
+    return resultado
+  }
+
+  regexVaraComarca(str) {
+    const regex = /(?:^|\n[\t ]*).*?(\d)º.*?-\s*(.+?D[EO].+?)\s*D[EOA]\s*(.+)\s*/gim;
+    let m;
+    let resultado = []
+
+    while ((m = regex.exec(str)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      }
+
+      // The result can be accessed through the `m`-variable.
+      m.forEach((match, groupIndex) => {
+        resultado.push(`${match}`)
+        // console.log(`Found match, group ${groupIndex}: ${match}`);
+      });
+    }
     return resultado
   }
   instancia($) {
@@ -292,6 +314,7 @@ class JTEParser extends BaseParser {
 
   // retorna array com numero do processo.
   extraiNumeroProcesso($, contador) {
+
     let datas = [];
     let resultado = ''
     $(`#mat-tab-content-${contador}-0 > div > detalhes-aba-geral > div > span.item-painel-titulo`).each(async function (element) {

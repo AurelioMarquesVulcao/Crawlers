@@ -1,0 +1,58 @@
+{
+    "_id" : ObjectId("5f500e1a464cf90b04d00ee7"),
+    "detalhes" : {
+        "tipo" : "cnj",
+        "numeroProcesso" : "01005787420205010241",
+        "numeroProcessoMascara" : "0100578-74.2020.5.01.0241",
+        "instancia" : 1,
+        "ano" : 2020,
+        "orgao" : 5,
+        "tribunal" : 1,
+        "origem" : 241
+    },
+    "capa" : {
+        "assunto" : [ 
+            "ABONO", 
+            "DIREITO DO TRABALHO", 
+            "REMUNERACAO, VERBAS INDENIZATORIAS E BENEFICIOS"
+        ],
+        "uf" : "RJ",
+        "comarca" : "Niterói",
+        "vara" : "1ª Vara do Trabalho",
+        "fase" : "Distribuido por sorteio",
+        "classe" : "Cumprimento de sentenca",
+        "dataDistribuicao" : ISODate("2020-09-02T03:00:00.000Z"),
+        "instancia" : "1"
+    },
+    "dataAtualizacao" : ISODate("2020-09-02T21:29:41.218Z"),
+    "dataCriacao" : ISODate("2020-09-02T21:24:42.407Z"),
+    "envolvidos" : [ 
+        {
+            "nome" : "LUCAS DO NASCIMENTO DA SILVA",
+            "tipo" : "Polo ativo"
+        }, 
+        {
+            "nome" : "AMPLA ENERGIA E SERVICOS S.A.",
+            "tipo" : "Polo passivo"
+        }, 
+        {
+            "nome" : "EVOLUTI TECNOLOGIA E SERVICOS EIRELI - EPP",
+            "tipo" : "Polo passivo"
+        }, 
+        {
+            "nome" : "(80645-RJ )DANIELE GABRICH GUEIROS",
+            "tipo" : "Advogado"
+        }, 
+        {
+            "nome" : "(154607A-RJ )MICHELLE GABRICH DE SOUZA",
+            "tipo" : "Advogado"
+        }
+    ],
+    "oabs" : [ 
+        "80645-RJ", 
+        "154607A-RJ"
+    ],
+    "origemExtracao" : "JTE",
+    "qtdAndamentos" : 18,
+    "temAndamentosNovos" : false
+}

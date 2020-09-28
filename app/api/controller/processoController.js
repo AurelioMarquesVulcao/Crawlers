@@ -318,14 +318,16 @@ class ProcessoController {
       if (Object.keys(filtros).length > 0) {        
         if (filtros.data) {          
           query.dataCriacao = {            
-            $gt: moment(filtros.data, 'YYYY-MM-DD').format('YYYY-MM-DDT00:00:00Z'),
+            $gte: moment(filtros.data, 'YYYY-MM-DD').format('YYYY-MM-DDT00:00:00Z'),
           }
         }
       }
 
-      const skip = filtros && filtros.pagina ? parseInt(filtros.pagina) : 0;
       const limit = filtros && filtros.limite ? parseInt(filtros.limite) : 1000;
+      let skip = filtros && filtros.pagina ? parseInt(filtros.pagina) : 0;      
       const sort = filtros && filtros.ord ? parseInt(filtros.ord) : 1;
+
+      skip = skip > 0 ? ((skip-1) * limit) : 0;
 
       const count = await Processo.countDocuments(query);
       const resProcessos = await Processo.find(query).skip(skip).limit(limit).sort({ _id: sort });

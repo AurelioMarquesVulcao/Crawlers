@@ -5,7 +5,7 @@ let Anticaptcha = require('../bin/js/anticaptcha')(
   '4b93beb6fe87d3bf3cfd92966ec841a6'
 );
 const CAPTCHAIO_KEY = '405d27c9-5ef38c01c76b79.16080721';
-const ANTICAPTCHA_KEY = '4b93beb6fe87d3bf3cfd92966ec841a6';
+const ANTICAPTCHA_KEY = '49e40ab829a227a307ad542c7d003c7d';
 
 const { Robo } = require('../lib/robo');
 const { LogCaptcha } = require('../models/schemas/logCaptcha');

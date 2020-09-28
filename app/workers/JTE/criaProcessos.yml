@@ -1,0 +1,8 @@
+apps:
+  - script   : ./workers/JTE/criaFilaNovosPrincipais01.js
+    name     : 'busca-01'
+  - script   : ./workers/JTE/criaFilaNovosSecundario.js
+    name     : 'busca-02'
+  - script   : ./workers/JTE/criaFilaNovosTodosEstados.js
+    name     : 'busca-03'
+    

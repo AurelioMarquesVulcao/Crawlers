@@ -1,78 +1,92 @@
 const mongoose = require("mongoose");
-const re = require('xregexp');
+// const re = require('xregexp');
 const sleep = require('await-sleep');
 const { enums } = require("../configs/enums");
-const { GerenciadorFila } = require("../lib/filaHandler");
 
-const { ExtratorBase } = require('../extratores/extratores');
-const { JTEParser } = require('../parsers/JTEParser');
+const { GerenciadorFila } = require("../lib/filaHandler");
+// const { ExtratorBase } = require('../extratores/extratores');
+// const { JTEParser } = require('../parsers/JTEParser');
 const { Processo } = require('../models/schemas/processo');
+const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../models/schemas/jte');
+const { Cnj } = require('../lib/util');
 require("dotenv/config");
 
+const util = new Cnj();
+// let devDbConection = process.env.MONGO_CONNECTION_STRING;
+// mongoose.connect(devDbConection, {
+// 	useNewUrlParser: true,
+// 	useUnifiedTopology: true
+// });
 
-
-var consultaCadastradas = mongoose.model('consultasCadastradas', {
-	NumeroProcesso: String,
-	DataCadastro: Date,
-	AtivoParaAtualizacao: Boolean,
-	DataUltimaConsultaTribunal: Date,
-	Instancia: String,
-	TipoConsulta: String,
-	Detalhes: {
-		Orgao: Number,
-		Tribunal: Number
-	}
-}, 'consultasCadastradas');
-
-var ultimoProcesso1 = new mongoose.Schema({
-	numeroProcesso: String,
-	dataCadastro: String,
-	origem: Number,
-	tribunal: Number,
-	data: { dia: Number, mes: Number },
-})
-var ultimoProcesso = mongoose.model('ultimosProcessos', ultimoProcesso1, 'ultimosProcessos');
-var ultimoProcessodb1 = mongoose.model('ultimos-processos', ultimoProcesso1, 'ultimos-processos');
-var ultimoProcessodb2 = mongoose.model('ultimosprocessos', ultimoProcesso1, 'ultimosprocessos');
-
-
-var linkDocumento1 = new mongoose.Schema({
-	link: String,
-	movimentacao: String,
-	data: String,
-	numeroProcesso: String,
-	tipo: String,
-})
-
-var linkDocumento = mongoose.model('salvaDocumentoLink', linkDocumento1, 'salvaDocumentoLink');
 
 class CriaFilaJTE {
+	async salvaStatusComarca(numero, data, raspagem, buscaProcesso) {
+		let cnj = util.processoSlice(numero);
+		let busca = buscaProcesso;
+		let verifica = await statusEstadosJTE.find(busca);
+		let estado = "";
+		let estadoNumero = cnj.estado;
+		let comarca = cnj.comarca;
+		let status = "Novo";
+		let dataBusca = { dia: this.relogio().dia, mes: this.relogio().mes }
+		let dataCriaçãoJTE = data;
+		let numeroUltimoProcecesso = numero;
+
+		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
+
+		if (cnj.sequencial == "0000000") {
+
+			status = "Não possui processos";
+			let obj2 = { status, estadoNumero, comarca, dataBusca, numeroUltimoProcecesso };
+			if (verifica.length == 0) {
+
+				await new statusEstadosJTE(obj2).save()
+			} else {
+				await statusEstadosJTE.findOneAndUpdate(busca, obj2)
+			}
+
+		} else if (verifica.length == 0) {
+			await new statusEstadosJTE(obj).save()
+		} else if (raspagem == true) {
+			status = "Ultimo Processo";
+			let obj2 = { status, dataBusca };
+			console.log("-------- update -------------");
+			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
+		} else {
+			status = "Atualizado";
+			let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
+			console.log("-------- update -------------");
+			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
+		}
+
+		function novoSequencial(numero) {
+			let resultado;
+			let cnj = util.processoSlice(numero);
+			let sequencial = cnj.sequencial;
+			let sequencialSlice = util.corrigeSequencial(sequencial);
+			let zero = sequencialSlice.zero;
+			let numeros = sequencialSlice.seq;
+			let numerosAnterior = parseInt(numeros) - 1
+			if ((numerosAnterior.toString().length + zero.length) < 7) {
+				resultado = zero + "0" + numerosAnterior
+			} else {
+				resultado = resultado = zero + numerosAnterior
+			}
+
+			return resultado
+		}
+	}
+
 	enviarMensagem(nome, message) {
 		new GerenciadorFila().enviar(nome, message);
 	}
 
 	async buscaDb(quantidade, salto) {
-		// let devDbConection = process.env.MONGO_CONNECTION_STRING
-
-		// mongoose.connect(devDbConection, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true
-		// });
-
 		return await consultaCadastradas.find({ "Detalhes.Tribunal": 5 }).limit(quantidade).skip(salto)
-		// return await consultaCadastradas.find({ "TipoConsulta": "processo" }).limit(quantidade).skip(salto)
 	}
 
 	async salvaUltimo(ultimo) {
-		//let devDbConection = process.env.MONGO_DEV_CONECTION
-		// let devDbConection = process.env.MONGO_CONNECTION_STRING
-		// mongoose.connect(devDbConection, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true
-		// });
 		let veirifica = await ultimoProcesso.find({ "numeroProcesso": ultimo.numeroProcesso })
-
-
 		if (!veirifica[0]) {
 			return await new ultimoProcesso(ultimo).save()
 		}
@@ -80,60 +94,22 @@ class CriaFilaJTE {
 	}
 
 	async salvaDocumentoLink(link) {
-		//let devDbConection = process.env.MONGO_DEV_CONECTION
-		// let devDbConection = process.env.MONGO_CONNECTION_STRING
-		// mongoose.connect(devDbConection, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true
-		// });
-
 		let verifica = await linkDocumento.find({ "numeroProcesso": link.numeroProcesso, "movimentacao": link.link })
-		// console.log(!verifica[0]);
 		if (!verifica[0]) {
 			return await new linkDocumento(link).save()
 		}
-
-
-
 	}
 
 	async abreUltimo(parametro) {
-		// let devDbConection = process.env.MONGO_CONNECTION_STRING
-
-		// mongoose.connect(devDbConection, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true
-		// });
-
-		// mongoose.connect(enums.mongo.connString, {
-		// 	useNewUrlParser: true,
-		// 	useUnifiedTopology: true,
-		//   });
-		//   mongoose.connection.on('error', (e) => {
-		// 	console.log(e);
-		//   });
-
 		let busca = await ultimoProcesso.find(parametro)
-		// console.log("abreUltimo", parametro);
-		// console.log(process.env.MONGO_CONNECTION_STRING);
-		// console.log(enums.mongo.connString);
-		// console.log(busca);
-		// process.exit()
 		let obj = busca;
-
 		return obj
 	}
-
-
 
 	async filtraTrunal() {
 		let recebeNumeros = [];
 		let resultado = [];
 		let dados = await this.buscaDb(60000, 0);
-		// console.log(dados);
-		// console.log(process.env.MONGO_CONNECTION_STRING);
-		// process.exit()
-
 		for (let i = 0; i < dados.length; i++) {
 			let numero = dados[i].NumeroProcesso
 			let sequencial = numero.slice(0, 7)
@@ -143,13 +119,10 @@ class CriaFilaJTE {
 				resultado.push([varaTrabalho, sequencial])
 			}
 		}
-
 		return resultado.sort()
 	}
 	async peganumero() {
 		let dados = await this.buscaDb(60000, 0)
-
-
 		for (let i = 0; i < dados.length; i++) {
 			let numero = dados[i].NumeroProcesso
 
@@ -162,22 +135,25 @@ class CriaFilaJTE {
 	}
 	async procura(sequencial, origem, tentativas, tribunal, fila) {
 		try {
-			// console.log("procura");
-			// console.log(process.env.MONGO_CONNECTION_STRING);
-			// process.exit()
 			let obj = corrigeSequencial(sequencial)
+			let zeros = ""
+			let processo = ""
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {
 				sequencial = parseInt(obj.seq)
 				let a = sequencial + 1 + i
-				let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				if ((obj.zero + a).length > 7) {
+					zeros = obj.zero.substr(1)
+					processo = `${zeros}${a}4720205${tribunal}${origem}`
+				} else {
+					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				}
 
 				await this.enviaFila([{
 					NumeroProcesso: processo
 				}], fila)
 				console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
 				console.log(`Estado ${tribunal}`);
-				//await this.enviaFila(`00109964720205150001`)
 			}
 		} catch (e) {
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);
@@ -186,15 +162,19 @@ class CriaFilaJTE {
 	}
 	async procura10(sequencial, origem, tentativas, tribunal, fila) {
 		try {
-			// console.log("procura10");
-			// console.log(process.env.MONGO_CONNECTION_STRING);
-			// process.exit()
 			let obj = corrigeSequencial(sequencial)
+			let zeros = ""
+			let processo = ""
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {
 				sequencial = parseInt(obj.seq)
-				let a = sequencial + 5 + i
-				let processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				let a = sequencial + 1 + i
+				if ((obj.zero + a).length > 7) {
+					zeros = obj.zero.substr(1)
+					processo = `${zeros}${a}4720205${tribunal}${origem}`
+				} else {
+					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				}
 
 				await this.enviaFila([{
 					NumeroProcesso: processo
@@ -209,7 +189,7 @@ class CriaFilaJTE {
 		let data = new Date();
 		// Guarda cada pedaço em uma variável
 		let dia = data.getDate();           // 1-31
-		let dia_sem = data.getDay();            // 0-6 (zero=domingo)
+		let dia_sem = data.getDay();        // 0-6 (zero=domingo)
 		let mes = data.getMonth();          // 0-11 (zero=janeiro)
 		let ano2 = data.getYear();           // 2 dígitos
 		let ano4 = data.getFullYear();       // 4 dígitos
@@ -246,69 +226,52 @@ class CriaFilaJTE {
 					conta1000 = 0
 				}
 			}
-			// if (tribunal == 2) {
-			//     await sleep(sleep1)
-			//     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
-			//     let message = criaPost(filtro[i].NumeroProcesso)
-
-			//     await this.enviarMensagem(nomeFila, message)
-			//     
-			//     conta1000++
-			//     if (conta1000 == 2000) {
-			//         await sleep(sleep4)
-			//         conta1000 = 0
-			//     }
-			// }
-			// if (tribunal == 3) {
-			//     await sleep(sleep1)
-			//     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-MG`;
-			//     let message = criaPost(filtro[i].NumeroProcesso)
-
-			//     await this.enviarMensagem(nomeFila, message)
-			//     
-			//     conta1000++
-			//     if (conta1000 == 2000) {
-			//         await sleep(sleep4)
-			//         conta1000 = 0
-			//     }
-			// }
-			// if (tribunal == 1) {
-			//     await sleep(sleep1)
-			//     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-RJ`;
-			//     let message = criaPost(filtro[i].NumeroProcesso)
-
-			//     await this.enviarMensagem(nomeFila, message)
-			//     
-			//     conta1000++
-			//     if (conta1000 == 2000) {
-			//         await sleep(sleep4)
-			//         conta1000 = 0
-			//     }
-			// }
-			// if (tribunal == 5) {
-			//     await sleep(sleep1)
-			//     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos-BA`;
-			//     let message = criaPost(filtro[i].NumeroProcesso)
-
-			//     await this.enviarMensagem(nomeFila, message)
-			//     
-			//     conta1000++
-			//     if (conta1000 == 2000) {
-			//         await sleep(sleep4)
-			//         conta1000 = 0
-			//     }
-			// }
-
-
 
 		}
+	}
+	async verificaComarcas(estado, comarca) {
+		let data = new Date();
+		// data.setDate(data.getDate() - 1);
+		data.getDate()
+		data.getMonth()
+		let busca = { "estadoNumero": estado, "comarca": comarca }
+		let checagem = await statusEstadosJTE.findOne(busca);
+		let { status, dataBusca: { dia, mes } } = checagem;
+		// console.log(status, dia, mes);
+		// console.log(data.getDate(),data.getMonth());
+		// console.log(checagem);
+		// console.log(status);
+		if (dia == data.getDate() && mes == data.getMonth()) {
+			if (status != "Ultimo Processo") {
+				return true;
+			} else {
+				return false
+			}
+		} else {
+			return true
+		}
+	}
+
+}
+
+// (async () => {
+// 	console.log(await new CriaFilaJTE().verificaComarcas("15", "0003"));
+// 	console.log(await new CriaFilaJTE().verificaComarcas("18", "0003"));
+// 	console.log(await new CriaFilaJTE().verificaComarcas("23", "0003"));
+
+// 	await sleep(3000)
+// })()
+
+class CriaFilaTRT {
+	async enviar(processo, fila) {
+		await this.enviaFila([{
+			NumeroProcesso: processo
+		}], fila)
 	}
 }
 // ------------------------------------funcoes complementares--------------------------------------------------------------------------------------------------------------------------------
 
 
-
-// ------------------------------------funcoes complementares----------------------------------------------------------------------------------------------------------------------------------
 function corrigeSequencial(sequencial) {
 	let novoSequencial = sequencial
 	let zero = ''
@@ -382,5 +345,11 @@ function mascaraNumero(numeroProcesso) {
 		+ '.' + numeroProcesso.slice(numeroProcesso.length - 4, numeroProcesso.length)
 	return resultado
 }
+
+
+
 module.exports.CriaFilaJTE = CriaFilaJTE;
-module.exports.linkDocumento1 = linkDocumento1;
+
+
+module.exports.linkDocumento1 = linkDocumento;
+

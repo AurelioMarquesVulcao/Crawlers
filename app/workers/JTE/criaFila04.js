@@ -104,7 +104,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
               await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
               console.log("----------------------- Estou dando um salto no Tempo--------------------------");
             } else {
-              await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
             }
             await sleep(500)
           } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
@@ -112,7 +112,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
               await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
               console.log("----------------------- Estou dando um salto no Tempo--------------------------");
             } else {
-              await Fila.procura(numeroSequencial, comarca, 2, codigo, fila,)
+              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila,)
             }
             await sleep(500)
           } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
@@ -120,7 +120,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
               await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
               console.log("----------------------- Estou dando um salto no Tempo--------------------------");
             } else {
-              await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
             }
             await sleep(500)
           }

@@ -1,3 +1,10 @@
+const shell = require('shelljs');
+const sleep = require('await-sleep');
+const { Util } = require('./lib/util');
+const util = new Util();
+// const Calendario = require('./lib/banco.json');
+
+const Calendario = [
     {
         "nome": "worker-jte-01",
         "peso": 15.78,
@@ -42,7 +49,7 @@
             "desliga": [21, 5],
             "escalar": [{ "horaScale": 8, "quantidade": 2 }, { "horaScale": 12, "quantidade": 1 }],
             "prioridade": 1
-        }
+        },
     },
     {
         "nome": "worker-jte-02",
@@ -278,5 +285,91 @@
             "prioridade": 1
         },
     },
+
+
+];
+
+
+
+class CalendarioServicos {
+    // constructor(Calendario) {
+    //     this.Calendario = Calendario
+    // };
+    async work() {
+        let start = 1
+        let horaAntiga;
+        setInterval(async function () {
+            let time = util.timerNow();
+            let { hora, min, seg, semana } = time
+            let calServ = new CalendarioServicos();
+            // let time = util.timerNow();
+
+            if (horaAntiga != hora || start == 1) {
+                // if (horaAntiga < hora || start == 1 || horaAntiga > hora) {
+                start++
+                console.log("rodou dentro");
+
+
+
+                calServ.ligaServicos(time);
+                calServ.desligaServicos(time);
+                calServ.escalaServico(time);
+
+
+
+                horaAntiga = hora
+            }
+            console.log("rodou fora", seg);
+
+        }, 1000);
+    }
+
+    async ligaServicos(time) {
+        let { hora, min, seg, semana } = time
+        // console.log(hora, semana);
+        for (let i = 0; i < Calendario.length; i++) {
+            let { nome, peso, [semana]: { liga, desliga, escalar, prioridade } } = Calendario[i];
+            // console.log(nome, peso, liga, desliga, escalar, prioridade);
+
+            // console.log(liga.find(element => element == hora));  
+            if (liga.find(element => element == hora)) {
+                util.dockerUp(nome)
+            }
+        }
+
+    }
+    async desligaServicos(time) {
+        let { hora, min, seg, semana } = time
+        for (let i = 0; i < Calendario.length; i++) {
+            let { nome, peso, [semana]: { liga, desliga, escalar, prioridade } } = Calendario[i];
+            if (desliga.find(element => element == hora)) {
+                util.dockerStop(nome)
+            }
+        }
+    }
+    async escalaServico(time) {
+        let { hora, min, seg, semana } = time
+        for (let i = 0; i < Calendario.length; i++) {
+            let { nome, peso, [semana]: { liga, desliga, escalar, prioridade } } = Calendario[i];
+            for (let j = 0; j < escalar.length; j++) {
+                let { horaScale, quantidade } = escalar[j];
+                if (horaScale == hora) {
+                    // if (horaScale.find(element => element == hora)) {
+                    util.escaleContainer(nome, quantidade)
+                }
+            }
+        }
+    }
+}
+
+(async () => {
+    let ativador = new CalendarioServicos();
+    ativador.work()
+
+    // process.exit();
+})();
+
+
+
 
 

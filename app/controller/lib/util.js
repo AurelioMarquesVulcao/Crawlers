@@ -4,6 +4,7 @@ const sleep = require('await-sleep');
 class Util {
     timerNow() {
         let data = new Date();
+        let Semana = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
         // Guarda cada pedaço em uma variável
         let dia = data.getDate();           // 1-31
         let dia_sem = data.getDay();        // 0-6 (zero=domingo)
@@ -15,8 +16,8 @@ class Util {
         let seg = data.getSeconds();        // 0-59
         let mseg = data.getMilliseconds();   // 0-999
         let tz = data.getTimezoneOffset(); // em minutos
-
-        return { dia, mes, hora, min, seg, dia_sem }
+        let semana = Semana[dia_sem];
+        return { dia, mes, hora, min, seg, semana }
     }
     limpaMemoria() {
         shell.exec(`sudo sync && sudo sysctl vm.drop_caches=3`)
@@ -44,7 +45,7 @@ class Util {
         // shell.exec(`docker-compose exec ${servico} --i pm2 scale worker-03 3`)
         // shell.exec(`docker-compose exec ${servico} bash`,{ silent: true })
     }
-    escalaContainer(servico, quantidade) {
+    escaleContainer(servico, quantidade) {
         shell.exec(`docker-compose scale ${servico}=${quantidade}`)
     }
 

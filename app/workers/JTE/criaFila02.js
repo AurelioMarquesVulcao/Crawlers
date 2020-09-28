@@ -16,9 +16,7 @@ var nomeFila = 'processo.JTE.extracao.novos.2';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
-  // Estados.es,
-  Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
-  Estados.pi, Estados.mt, Estados.rn, Estados.ms,
+  Estados.sp15, Estados.mg, Estados.ba,
 ];
 
 
@@ -74,7 +72,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
   let second = 0;
   let contaOrigem = 0;
-  let contaLaco =0;
+  let contaLaco = 0;
   for (let w = 0; w < 1000;) {
     second++
 
@@ -98,7 +96,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           console.log("Estamos na comarca: " + origens[contaOrigem]);
           console.log("Código do Estado.: " + codigo);
           console.log("status comarca " + statusComarca);
-          
+
 
 
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
@@ -135,7 +133,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
         await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
-      
+
       if (contaOrigem == max - 1) {
         if (contaLaco > 0) {
           await sleep(10000)

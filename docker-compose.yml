@@ -322,9 +322,18 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/PJE/extracao_TRT_PJE.js --no-daemon 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+  limpaCore:
+    extends:
+      file: common-services.yml
+      service: base_node
+    restart: always
+    command: pm2 start controller/limpaCoreDocker.js --no-daemon 
     logging:
       driver: "json-file"
       options:

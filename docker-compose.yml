@@ -175,17 +175,17 @@ services:
       service: base_node
     command: node workers/TJSP/extracaoPeticao.js
 
-  worker-tjsc-oab:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJSC/extracaoNovos.js
+  # worker-tjsc-oab:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJSC/extracaoNovos.js
 
-  worker-tjsc-processo:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJSC/extracaoProcesso.js
+  # worker-tjsc-processo:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJSC/extracaoProcesso.js
 
   novos-processos-jte-1:
     extends:

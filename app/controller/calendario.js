@@ -57,7 +57,7 @@ const Calendario = require('./lib/banco.json')
 
 
 
-Em produção
+// Em produção
 (async () => {
     setInterval(async function () {
         let time = util.timerNow();

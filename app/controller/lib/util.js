@@ -1,6 +1,7 @@
 const shell = require('shelljs');
+const sleep = require('await-sleep');
 
-class Util{
+class Util {
     timerNow() {
         let data = new Date();
         // Guarda cada pedaço em uma variável
@@ -14,35 +15,39 @@ class Util{
         let seg = data.getSeconds();        // 0-59
         let mseg = data.getMilliseconds();   // 0-999
         let tz = data.getTimezoneOffset(); // em minutos
-    
-        return { dia, mes, hora, min, seg }
+
+        return { dia, mes, hora, min, seg, dia_sem }
     }
-    limpaMemoria(){
+    limpaMemoria() {
         shell.exec(`sudo sync && sudo sysctl vm.drop_caches=3`)
     }
-    dockerUp(serviço){
+    async resetPM2(time = 0) {
+        await sleep(time)
+        shell.exec("pm2 restart all")
+    }
+    dockerUp(serviço) {
         shell.exec(`docker-compose up -d ${serviço}`)
     }
-    dockerUpAll(){
+    dockerUpAll() {
         shell.exec('docker-compose up -d')
     }
-    dockerStop(serviço){
+    dockerStop(serviço) {
         shell.exec(`docker-compose stop ${serviço}`)
     }
-    dockerStopAll(){
+    dockerStopAll() {
         shell.exec('docker-compose stop')
     }
-    dockerDownAll(){
+    dockerDownAll() {
         shell.exec('docker-compose down')
     }
-    entraContainer(servico){
+    entraContainer(servico) {
         // shell.exec(`docker-compose exec ${servico} --i pm2 scale worker-03 3`)
         // shell.exec(`docker-compose exec ${servico} bash`,{ silent: true })
     }
-    escalaContainer(servico,quantidade){
+    escalaContainer(servico, quantidade) {
         shell.exec(`docker-compose scale ${servico}=${quantidade}`)
     }
-    
+
 }
 
 module.exports.Util = Util;

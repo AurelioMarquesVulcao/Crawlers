@@ -5,4 +5,6 @@ apps:
     name     : 'worker-002'
   - script   : ./app/workers/JTE/extracao_JTE_S.js
     name     : 'worker-003'
+  - script   : ./app/workers/JTE/PM2_Reset.js
+    name     : 'reset'
     

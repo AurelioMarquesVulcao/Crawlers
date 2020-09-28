@@ -175,25 +175,23 @@ services:
       service: base_node
     command: node workers/TJSP/extracaoPeticao.js
 
-  worker-tjsc-oab:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJSC/extracaoNovos.js
+  # worker-tjsc-oab:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJSC/extracaoNovos.js
 
-  worker-tjsc-processo:
-    extends:
-      file: common-services.yml
-      service: base_node
-    command: node workers/TJSC/extracaoProcesso.js
+  # worker-tjsc-processo:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJSC/extracaoProcesso.js
 
   novos-processos-jte-1:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaNovosPrincipais01.js --no-daemon
-
-    restart: always
+    command: pm2 start workers/JTE/criaFila01.yml --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -204,8 +202,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaNovosSecundario.js --no-daemon
-    restart: always
+    command: pm2 start workers/JTE/criaFila02.yml --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -216,32 +213,40 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/criaFilaNovosTodosEstados.js --no-daemon
-    restart: always
+    command: pm2 start workers/JTE/criaFila03.yml --no-daemon
     logging:
       driver: "json-file"
       options:
         max-size: "5m"
         max-file: "2"
 
-  novos-processos-trt-1:
+  novos-processos-jte-4:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/TRTRJ/criaFilaTRT.RJ.js --no-daemon
-    restart: always
+    command: pm2 start workers/JTE/criaFila04.yml --no-daemon
     logging:
       driver: "json-file"
       options:
         max-size: "5m"
         max-file: "2"
+
+  # novos-processos-trt-1:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: pm2 start workers/PJE/criaFilaTRT_PJE.js --no-daemon
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
 
   novos-processos-trt-2:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/TRTSP/criaFilaTRT.SP.js --no-daemon
-    restart: always
+    command: pm2 start workers/PJE/criaFilaTRT_PJE.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -268,7 +273,6 @@ services:
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker01.yml --no-daemon
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -281,8 +285,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker01.yml --no-daemon 
-    restart: always
+    command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
     logging:
       driver: "json-file"
       options:
@@ -295,8 +298,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
-    restart: always
+    command: pm2 start workers/JTE/processDocker03.yml --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -309,64 +311,7 @@ services:
       service: base_node
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  worker-jte-05:
-    extends:
-      file: common-services.yml
-      service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker03.yml --no-daemon
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  worker-jte-06:
-    extends:
-      file: common-services.yml
-      service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker03.yml --no-daemon 
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  worker-jte-07:
-    extends:
-      file: common-services.yml
-      service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker04.yml --no-daemon 
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  worker-trt-01:
-    extends:
-      file: common-services.yml
-      service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/TRTRJ/extracao_TRT_RJ.js --no-daemon 
-    restart: always
     logging:
       driver: "json-file"
       options:
@@ -377,97 +322,20 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    mem_limit: ${PUPPETEER_MEMORIA_MAX}
-    mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/TRTSP/extracao_TRT_SP.js --no-daemon 
-    restart: always
+    command: pm2 start workers/PJE/extracao_TRT_PJE.js --no-daemon 
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "5"
-
-
-  # worker-jte-07:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
-
-  # worker-jte-08:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-
-  # worker-jte-09:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-
-  # worker-jte-10:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-
-  # worker-jte-11:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-
-  # worker-jte-12:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: pm2 start process.yml --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
+  limpa-core:
+    extends:
+      file: common-services.yml
+      service: base_node
+    restart: always
+    command: pm2 start controller/limpaCoreDocker.js --no-daemon 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

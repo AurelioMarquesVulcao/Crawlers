@@ -29,10 +29,10 @@ const parse = new TRTParser();
     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos`;
     const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos`;
 
-    new GerenciadorFila(false,10).consumir(nomeFila, async (ch, msg) => {
-        let testeSleep = numeroAleatorio(1,20)
-        console.log(testeSleep);
-        await sleep(testeSleep*1000)
+    new GerenciadorFila(false,1).consumir(nomeFila, async (ch, msg) => {
+        // let testeSleep = numeroAleatorio(1,20)
+        // console.log(testeSleep);
+        // await sleep(testeSleep*1000)
         const dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
         console.table(message);

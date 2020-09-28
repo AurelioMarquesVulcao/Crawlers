@@ -26,8 +26,8 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
-const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos`;
+const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.3`;
+const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.3`;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado
 var estadoDaFila;     // Recebe o estado da fila
@@ -67,7 +67,7 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 90) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 190) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
       if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }

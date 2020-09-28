@@ -11,16 +11,14 @@ const desligar = require('../../assets/jte/horarioRoboJTE.json');
 
 
 const Fila = new CriaFilaJTE();
-var fila = ".S"; // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos.S';
+var fila = ".3";  // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos.3';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
-  // Estados.es,
   Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
-  Estados.pi, Estados.mt, Estados.rn, Estados.ms,
+  Estados.pi, Estados.mt, Estados.rn, Estados.ms, Estados.pr
 ];
-
 
 (async () => {
   let origens;  // Comarcas de origens para serem inseridas.
@@ -74,7 +72,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
   let second = 0;
   let contaOrigem = 0;
-  let contaLaco =0;
+  let contaLaco = 0;
   for (let w = 0; w < 1000;) {
     second++
 
@@ -98,7 +96,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           console.log("Estamos na comarca: " + origens[contaOrigem]);
           console.log("Código do Estado.: " + codigo);
           console.log("status comarca " + statusComarca);
-          
+
 
 
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
@@ -106,7 +104,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
               await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
               console.log("----------------------- Estou dando um salto no Tempo--------------------------");
             } else {
-              await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
             }
             await sleep(500)
           } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
@@ -114,7 +112,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
               await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
               console.log("----------------------- Estou dando um salto no Tempo--------------------------");
             } else {
-              await Fila.procura(numeroSequencial, comarca, 2, codigo, fila,)
+              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila,)
             }
             await sleep(500)
           } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
@@ -122,7 +120,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
               await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
               console.log("----------------------- Estou dando um salto no Tempo--------------------------");
             } else {
-              await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
             }
             await sleep(500)
           }
@@ -135,10 +133,12 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
         let buscaProcesso = { "estadoNumero": codigo, "comarca": origens[contaOrigem] };
         await Fila.salvaStatusComarca(`00000000020205${codigo}${origens[contaOrigem]}`, "", "", buscaProcesso);
       }
-      
+
       if (contaOrigem == max - 1) {
-        await sleep(30000)
-        //await paraServico()
+        if (contaLaco > 0) {
+          await sleep(10000)
+        }
+        await paraServico()
         contaOrigem = 0;
         // pausa o envio de processos até que a fila fique limpa.
         console.log("O contador vale.: " + contaLaco);

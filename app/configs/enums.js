@@ -33,7 +33,7 @@ module.exports.enums = Object.freeze({
     TJMG: 'TJMG',
     JTE: 'JTE',
     TRTRJ: 'TRTRJ',
-    TRTSP: 'TRTSP'
+    TRTSP: 'PJE'
   },
   robos: {
     TJRS: {

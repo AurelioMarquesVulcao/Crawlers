@@ -26,8 +26,8 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.P`;
-const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.P`;
+const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.2`;
+const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.2`;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado
 var estadoDaFila;     // Recebe o estado da fila
@@ -51,7 +51,7 @@ var start = 0;
   setInterval(async function () {
     let relogio = fila.relogio();
     if (start == 0) {
-      // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
+    // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
       await worker();
     } else {
@@ -69,7 +69,7 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 90) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 190) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
       if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
@@ -217,7 +217,7 @@ async function worker() {
           // Enviando para Collection de controle *ultimosProcessos*
           // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
           logger.info("Salvando na Collection ultimosProcessos")
-
+          
           await new CriaFilaJTE().salvaUltimo({
             numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
             dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,

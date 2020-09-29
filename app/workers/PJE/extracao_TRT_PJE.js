@@ -124,7 +124,7 @@ const parse = new TRTParser();
             // Estou reprocessando automaticamente no fim da fila.
 
             await new GerenciadorFila().enviar(nomeFila, message);
-            await new GerenciadorFila().enviar(reConsumo, message);
+            // await new GerenciadorFila().enviar(reConsumo, message);
 
         } finally {
             logger.info('Reconhecendo mensagem ao RabbitMQ');

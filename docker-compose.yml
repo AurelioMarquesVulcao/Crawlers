@@ -322,7 +322,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/PJE/extracao_TRT_PJE.js --no-daemon 
+    command: pm2 start workers/PJE/processDocker01.yml --no-daemon 
     logging:
       driver: "json-file"
       options:

@@ -470,7 +470,7 @@
     
         },
         {
-            "nome": "novos-processos-trt-2",
+            "nome": "worker-tjba-portal",
             "peso": 1,
             "segunda": {
                 "liga": [1],

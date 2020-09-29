@@ -15,11 +15,11 @@ class CriaFilaPJE {
         this.fila = "processo.PJE.extracao.novos.1";
         this.criafila = new CriaFilaJTE();
     };
-    async worker(){
+    async worker() {
         await this.testaFila();
     }
     async montaFila() {
-                console.log("Fila concluída. Iniciando criador de fila.");
+        console.log("Fila concluída. Iniciando criador de fila.");
         for (let i = 1; i < 25; i++) {
             if (i != 15) {
                 await this.atualizaProcessosFila(0, i);
@@ -71,7 +71,7 @@ class CriaFilaPJE {
                     "_id": 1
                 }
             }
-        ]).skip(pulo).limit(200);
+        ]).skip(pulo).limit(50);
         // console.log(await agregar);
         for (let i = 0; i < agregar.length; i++) {
             busca = `"${agregar[i]._id}"`;

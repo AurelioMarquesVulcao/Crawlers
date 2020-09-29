@@ -10,5 +10,6 @@ router.use('/bigdata', bigdataRoutes);
 router.use('/feedback', feedbackRoutes);
 router.use('/mock', mockRoutes);
 router.use('/captcha', captchaRoutes);
+router.use('/healthcheck', require('./healthcheck'));
 
 module.exports = router;

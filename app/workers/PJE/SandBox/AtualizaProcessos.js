@@ -47,8 +47,8 @@ async function buscaBanco(pulo) {
                 // 'detalhes.tribunal': 1,
                 'detalhes.ano': 2020,
                 "origemExtracao": "JTE",
-                // 'capa.comarca': /Não\sfoi\spossivel\sobter/
-                'capa.vara': /gabinete/i
+                'capa.comarca': /Não\sfoi\spossivel\sobter/
+                // 'capa.vara': /gabinete/i
             }
         },
         {

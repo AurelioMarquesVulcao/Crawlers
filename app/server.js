@@ -23,7 +23,7 @@ console.log(enums.mongo.connString);
 
 mongoose.connect(enums.mongo.connString, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 });
 
 app.listen(3300, () => {

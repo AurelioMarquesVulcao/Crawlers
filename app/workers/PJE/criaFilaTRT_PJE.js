@@ -71,7 +71,7 @@ class CriaFilaPJE {
                     "_id": 1
                 }
             }
-        ]).skip(pulo).limit(50);
+        ]).skip(pulo).limit(20);
         // console.log(await agregar);
         for (let i = 0; i < agregar.length; i++) {
             busca = `"${agregar[i]._id}"`;

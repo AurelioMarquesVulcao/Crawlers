@@ -25,11 +25,18 @@ const parse = new TRTParser();
     const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
 
     new GerenciadorFila(false, 2).consumir(nomeFila, async (ch, msg) => {
-
-        // let testeSleep = numeroAleatorio(1, 20)
-        // console.log(testeSleep);
-        // await sleep(testeSleep * 1000)
-
+        var heartBeat = 0;    // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
+        let testeSleep = numeroAleatorio(1, 20)
+        await sleep(testeSleep * 1000)
+        setInterval(async function () {
+            heartBeat++;
+            if (heartBeat > 60) {
+              console.log('----------------- Fechando o processo por inatividade -------------------');
+              await mongoose.connection.close()
+              process.exit();
+            }
+          }, 1000);
+     
         const dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
         const numeroEstado = parseInt(new Cnj().processoSlice(message.NumeroProcesso).estado);
@@ -113,17 +120,17 @@ const parse = new TRTParser();
             await sleep(100);
             logger.info('Processos extraido');
             logger.info('Resultado da extracao salva');
-
-
+            console.log(`---------------------- Tempo de extração é de ${heartBeat} ----------------------`);
+            heartBeat = 0;
             await sleep(5000)
         } catch (e) {
             console.log(e);
             logger.info('Encontrado erro durante a execução');
             logger.info(`Error: ${e.message}`);
-
+            heartBeat = 0;
             // Estou reprocessando automaticamente no fim da fila.
 
-            await new GerenciadorFila().enviar(nomeFila, message);
+            // await new GerenciadorFila().enviar(nomeFila, message);
             // await new GerenciadorFila().enviar(reConsumo, message);
 
         } finally {

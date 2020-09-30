@@ -42,62 +42,7 @@ services:
       file: common-services.yml
       service: base_node
     command: node workers/enfileirador.js
-  # worker-jte-sp-2:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: node workers/JTE/extracaoNovos_Sp_2.js
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
-  # worker-jte-sp-15:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: node workers/JTE/extracaoNovos_Sp_15.js
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
-  # worker-jte-ba:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: node workers/JTE/extracaoNovos_Ba.js
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
-  # worker-jte-mg:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   mem_limit: ${PUPPETEER_MEMORIA_MAX}
-  #   mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-  #   command: node workers/JTE/extracaoNovos_Mg.js
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "5"
-  # worker-tjsp-processo:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/TJSP/extracaoProcesso.js
-
+ 
   # worker-tjsc-oab:
   #   extends:
   #     file: common-services.yml

@@ -1,7 +1,7 @@
 const { Robo } = require("../lib/robo");
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
-var heartBeat = 0;    // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
+
 
 
 class ExtratorTrtPje {
@@ -12,30 +12,23 @@ class ExtratorTrtPje {
 
   }
 
+
+
   /**
    * Executa a extração da capa do cnj desejado.
    * @param {string} cnj Numero de processo a ser buscado.
    */
   async extrair(cnj, numeroEstado) {
-    setInterval(async function () {
-      heartBeat++;
-      console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
-      if (heartBeat > 30) {
-        console.log('----------------- Fechando o processo por inatividade -------------------');
-        // await mongoose.connection.close()
-        process.exit();
-      }
-    }, 1000);
-
-
     let url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`;
     /**Logger para console de arquivos */
     var logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
-      nomeRobo: enums.nomesRobos.TRTRJ,
+      nomeRobo: enums.nomesRobos.PJE,
       NumeroDoProcesso: cnj,
     });
+
+
     let capturaProcesso;
-    logger.info("Extrator de processos TRT_RJ Iniciado");
+    logger.info("Extrator de processos TRT_PJE Iniciado");
     try {
       capturaProcesso = await this.tryCaptura(cnj, numeroEstado);
     } catch (e) {
@@ -58,7 +51,7 @@ class ExtratorTrtPje {
         throw error;
       }
     }
-    heartBeat = 0;
+    
     return capturaProcesso
   }
 

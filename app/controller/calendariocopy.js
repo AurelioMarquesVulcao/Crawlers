@@ -22,7 +22,7 @@ class CalendarioServicos {
             if (horaAntiga != hora || start == 1) {
                 // if (horaAntiga < hora || start == 1 || horaAntiga > hora) {
                 start++
-                console.log("rodou dentro");
+                console.log("Ligou!!!");
 
 
 
@@ -34,7 +34,7 @@ class CalendarioServicos {
 
                 horaAntiga = hora
             }
-            console.log("rodou fora", seg);
+            // console.log("rodou fora", seg);
 
         }, 1000);
     }

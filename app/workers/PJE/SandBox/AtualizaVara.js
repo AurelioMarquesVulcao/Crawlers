@@ -44,11 +44,12 @@ async function buscaBanco(pulo) {
         {
             $match: {
                 'detalhes.orgao': 5,
-                // 'detalhes.tribunal': 1,
+                // 'detalhes.tribunal':2,
                 'detalhes.ano': 2020,
-                // "origemExtracao": "JTE",
-                // 'capa.comarca': /Não\sfoi\spossivel\sobter/
-                'capa.vara': /gabinete/i
+                '$or': [
+                    {'capa.vara': {"$in": ["", null]}},
+                    {'capa.comarca': {"$in": ["", null]}},
+                ],
             }
         },
         {
@@ -57,7 +58,7 @@ async function buscaBanco(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(100000);
+    ]).skip(pulo).limit(2000);
     console.log(await agregar.length);
     return agregar
 }
@@ -68,7 +69,7 @@ async function enfileirar(numero) {
     //console.log(regex);
     if (true) {
         let mensagem = criaPost(numero);
-        await fila.enviarMensagem("processo.JTE.extracao.novos.2", mensagem);
+        await fila.enviarMensagem("ReprocessamentoJTE", mensagem);
         console.log("Processo enfileirado para Download");
     }
     function criaPost(numero) {

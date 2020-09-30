@@ -100,12 +100,7 @@ class CriaFilaPJE {
     }
     criaPost(numero, busca) {
         let post = `{
-        "ExecucaoConsultaId" : "${this.makeid()}",
-        "ConsultaCadastradaId" : "${this.makeid()}",
-        "DataEnfileiramento" : "${new Date}",
         "NumeroProcesso" : "${numero}",
-        "NumeroOab" : "null",        
-        "SeccionalOab" : "RJ",
         "NovosProcessos" : true,
         "_id": ${busca}}`
         return post

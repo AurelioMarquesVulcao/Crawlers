@@ -84,11 +84,9 @@ class CriaFilaPJE {
     }
     async enfileirarTRT_RJ(numero, busca) {
         let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
-        // if (true) {
         let mensagem = this.criaPost(numero, busca);
         await this.criafila.enviarMensagem(this.fila, mensagem);
         console.log("Processo enfileirado para Download");
-        // }
 
     }
     makeid() {
@@ -100,12 +98,7 @@ class CriaFilaPJE {
     }
     criaPost(numero, busca) {
         let post = `{
-        "ExecucaoConsultaId" : "${this.makeid()}",
-        "ConsultaCadastradaId" : "${this.makeid()}",
-        "DataEnfileiramento" : "${new Date}",
         "NumeroProcesso" : "${numero}",
-        "NumeroOab" : "null",        
-        "SeccionalOab" : "RJ",
         "NovosProcessos" : true,
         "_id": ${busca}}`
         return post

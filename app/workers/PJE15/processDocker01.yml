@@ -1,0 +1,5 @@
+apps:
+  - script   : ./workers/PJE/extracao_TRT_PJE_15.js
+    name     : 'worker-01'
+  # - script   : ./workers/PJE/PM2_Reset.js
+  #   name     : 'Reset'  

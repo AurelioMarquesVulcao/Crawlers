@@ -2,57 +2,7 @@ const shell = require('shelljs');
 const sleep = require('await-sleep');
 const { Util } = require('./lib/util');
 const util = new Util();
-const Calendario = require('./lib/banco.json')
-
-
-
-// class CalendarioServicos {
-//     constructor() {
-//         this.listaWorkerJte = [
-//             "worker-jte-01", "worker-jte-02",
-//             "worker-jte-03", "worker-jte-04",
-//             "worker-jte-05", "worker-jte-06", "worker-jte-07"
-//         ];
-//         this.listaFilaJte = [
-//             "novos-processos-jte-1", "novos-processos-jte-2",
-//             "novos-processos-jte-3", "novos-processos-jte-4",
-//         ];
-//         this.listaWorkerPje = [
-//             "worker-trt-01", "worker-trt-02",
-//         ];
-//         this.listaFilaPje = [
-
-//         ];
-//         this.listaWorkerTj = [
-//             "worker-tjba-portal"
-//         ];
-//     };
-//     async work(time) {
-//         this.desligaJte(time)
-//     }
-//     async desligaJte(time) {
-//         console.log();
-//         let desliga = [21, 5];
-//         for (i in desliga) {
-//             if (time.hora == i && time.min == 00 && time.seg == 00) {
-//                 let worker = this.listaWorkerJte.join(" ");
-//                 console.log(worker);
-//                 util.dockerStop(worker);
-//             }
-//         }
-//     }
-
-
-    
-// }
-
-// (async () => {
-//     let ativador = new CalendarioServicos();
-//     let time = util.timerNow();
-//     ativador.work(time)
-//     process.exit();
-// })();
-
+const Calendario = require('./lib/banco.json');
 
 
 

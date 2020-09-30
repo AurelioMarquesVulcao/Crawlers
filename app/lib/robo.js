@@ -171,6 +171,7 @@ class Robo {
     params = null, // body!
     headers = {},
     randomUserAgent = false,
+    responseType = ''
   } = {}) {
     if (!url || url === '') throw new Error('URL vazia!');
 
@@ -180,6 +181,8 @@ class Robo {
       url: url,
       headers: headers,
       method: method,
+      responseType: responseType,
+
 
       strictSSL: false,
       encoding: encoding,

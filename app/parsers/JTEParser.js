@@ -142,7 +142,7 @@ class JTEParser extends BaseParser {
     if (!resultado) return "Assunto nao Especificado";
     // console.log(resultado);
     if (resultado.length == 0) {
-      resultado = 'Não foi possivel obter'
+      resultado = ''
       // throw "Não pegou assunto, reprocessar"
     }
     return resultado

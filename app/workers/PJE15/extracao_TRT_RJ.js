@@ -54,7 +54,8 @@ const parse = new TRTParser();
             // console.log(message);
             let extracao = await new ExtratorTrtrj().extrair(message.NumeroProcesso);
             logger.info('Iniciando Parse');
-            //console.log(await extracao);
+            
+            console.log(await extracao);
             
             let dadosProcesso = await parse.parse(extracao);
             console.log(await dadosProcesso);
@@ -66,31 +67,35 @@ const parse = new TRTParser();
             logger.info('Atualizando processo JTE');
             // console.log(message);
             //console.log(extracao);
-            let busca = { "_id": message._id }
-            if (extracao.segredoJustica == true) {
-                resultado = {
-                    "capa.segredoJustica": extracao.segredoJustica,
-                    "capa.valor": "",
-                    "capa.justicaGratuita": "",
-                    "origemExtracao": "JTE.TRT"
-                }
-                console.log(resultado);
-                // console.log(busca);
-                await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------- Salvo com sucesso -------------------");
-            }
-            if (extracao.segredoJustica == false) {
-                resultado = {
-                    "capa.segredoJustica": extracao.segredoJustica,
-                    "capa.valor": `${extracao.valorDaCausa}`,
-                    "capa.justicaGratuita": extracao.justicaGratuita,
-                    "origemExtracao": "JTE.TRT"
-                }
-                console.log(resultado);
-                // console.log(busca);
-                await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------- Salvo com sucesso -------------------");
-            }
+
+
+            // let busca = { "_id": message._id }
+            // if (extracao.segredoJustica == true) {
+            //     resultado = {
+            //         "capa.segredoJustica": extracao.segredoJustica,
+            //         "capa.valor": "",
+            //         "capa.justicaGratuita": "",
+            //         "origemExtracao": "JTE.TRT"
+            //     }
+            //     console.log(resultado);
+            //     // console.log(busca);
+            //     await Processo.findOneAndUpdate(busca, resultado);
+            //     console.log("------------- Salvo com sucesso -------------------");
+            // }
+            // if (extracao.segredoJustica == false) {
+            //     resultado = {
+            //         "capa.segredoJustica": extracao.segredoJustica,
+            //         "capa.valor": `${extracao.valorDaCausa}`,
+            //         "capa.justicaGratuita": extracao.justicaGratuita,
+            //         "origemExtracao": "JTE.TRT"
+            //     }
+            //     console.log(resultado);
+            //     // console.log(busca);
+            //     await Processo.findOneAndUpdate(busca, resultado);
+            //     console.log("------------- Salvo com sucesso -------------------");
+            // }
+
+            
             logger.info('Processo JTE atualizado para JTE.TRT');
             // resultado = { "capa.segredoJustica": " ", "origemExtracao": "JTE.TRT", }
             // await Processo.findOneAndUpdate(busca, resultado);

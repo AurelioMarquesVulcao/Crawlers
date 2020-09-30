@@ -47,8 +47,8 @@ async function buscaBanco(pulo) {
                 // 'detalhes.tribunal': 1,
                 'detalhes.ano': 2020,
                 // "origemExtracao": "JTE",
-                // 'capa.comarca': /Não\sfoi\spossivel\sobter/
-                'capa.vara': /gabinete/i
+                'capa.comarca': /Não\sfoi\spossivel\sobter/
+                // 'capa.vara': /gabinete/i
             }
         },
         {
@@ -68,7 +68,7 @@ async function enfileirar(numero) {
     //console.log(regex);
     if (true) {
         let mensagem = criaPost(numero);
-        await fila.enviarMensagem("processo.JTE.extracao.novos.2", mensagem);
+        await fila.enviarMensagem("ReprocessamentoJTE", mensagem);
         console.log("Processo enfileirado para Download");
     }
     function criaPost(numero) {

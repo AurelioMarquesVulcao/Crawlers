@@ -5,7 +5,7 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Cnj, Logger } = require('../../lib/util');
-const { ExtratorTrtPje } = require('../../extratores/processoPJE');
+const { ExtratorTrtPje15 } = require('../../extratores/processoPJE15');
 const { Processo } = require('../../models/schemas/processo');
 const { TRTParser } = require('../../parsers/TRTSPParser');
 
@@ -68,7 +68,7 @@ var reset = '\u001b[0m';
             logger.info('Mensagem recebida');
             logger.info('Iniciando processo de extração');
             // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-            let extracao = await new ExtratorTrtPje().extrair(message.NumeroProcesso, numeroEstado);
+            let extracao = await new ExtratorTrtPje15().extrair(message.NumeroProcesso, numeroEstado);
             logger.info('Extração concluída');
             logger.info('Iniciando Parse');
 

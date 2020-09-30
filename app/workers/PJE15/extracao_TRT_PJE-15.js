@@ -1,69 +1,77 @@
 const mongoose = require('mongoose');
+const sleep = require('await-sleep');
+
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Cnj, Logger } = require('../../lib/util');
-const sleep = require('await-sleep');
-const { ExtratorTrtPje } = require('../../extratores/processoPJE');
+const { ExtratorTrtPje15 } = require('../../extratores/processoPJE15');
 const { Processo } = require('../../models/schemas/processo');
 const { TRTParser } = require('../../parsers/TRTSPParser');
 
 const parse = new TRTParser();
+var red = '\u001b[31m';
+var blue = '\u001b[34m';
+var reset = '\u001b[0m';
 
+/**
+ * Realiza o consumo de mensagens de uma fila de processos 
+ * e salva seu conteudo no banco de dados
+ * @param {Number} heartBeat Contador que verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
+ * @param {String} nomeFila Nome da fila que será consumida no Rabbit
+ * @param {String} testeSleep Gera um numero aleatório para que os robos não façam requisições simultâneas.
+ * @param {String} logger Gera um log a ser exibido no terminal de execução do robô
+ * @param {Object} extracao Objeto com o resultado da extração do robô
+ * @param {String} busca ID do processo que receberá os dados adionais raspados neste processo.
+ */
 (async () => {
     mongoose.connect(enums.mongo.connString, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     });
-
     mongoose.connection.on('error', (e) => {
         console.log(e);
     });
 
     //const nomeFila = `fila TRT-RJ`;
     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
-    const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
+    // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
 
     new GerenciadorFila(false, 2).consumir(nomeFila, async (ch, msg) => {
-        var heartBeat = 0;    // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
+        var heartBeat = 0;
+        // Desincroniza as requisições do robô
         let testeSleep = numeroAleatorio(1, 20)
         await sleep(testeSleep * 1000)
+        // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
         setInterval(async function () {
             heartBeat++;
             if (heartBeat > 60) {
-              console.log('----------------- Fechando o processo por inatividade -------------------');
-              await mongoose.connection.close()
-              process.exit();
+                console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
+                await mongoose.connection.close()
+                process.exit();
             }
-          }, 1000);
-     
+        }, 1000);
+        // Variaveis de Robô
         const dataInicio = new Date();
         let message = JSON.parse(msg.content.toString());
         const numeroEstado = parseInt(new Cnj().processoSlice(message.NumeroProcesso).estado);
-        console.table(message);
-        let logger = new Logger('info', 'logs/ProcessoTRTRJ/ProcessoTRT-RJInfo', {
-            nomeRobo: enums.nomesRobos.TRTSP,
+        let busca = { "_id": message._id }
+        let logger = new Logger('info', 'logs/ProcessoTRTPJE/ProcessoTRTPJEInfo', {
+            nomeRobo: enums.nomesRobos.PJE,
             NumeroDoProcesso: message.NumeroProcesso,
         });
-        // console.log("Numero de Processo ", numeroEstado);
+        // Exibe a mensagem a ser consumina como tabela.
+        console.table(message);
+
+        // Inicio do Robô
         try {
             logger.info('Mensagem recebida');
-            const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-
             logger.info('Iniciando processo de extração');
-
-
-            // extrator
-            // const resultadoExtracao = await extrator.extrair(message.NumeroOab);
-            // await new ExtratorTrtPje().extrair(message.NumeroProcesso);
-            // console.log(message.NumeroProcesso);
-            // console.log(message);
-            let extracao = await new ExtratorTrtPje().extrair(message.NumeroProcesso, numeroEstado);
+            // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
+            let extracao = await new ExtratorTrtPje15().extrair(message.NumeroProcesso, numeroEstado);
+            logger.info('Extração concluída');
             logger.info('Iniciando Parse');
 
-            // console.log({ texto: "Essa é a resposta do parse", resposta: extracao });
-
-            let busca = { "_id": message._id }
 
             // tratando a resposta do extrator
             if (extracao === null) {
@@ -72,8 +80,7 @@ const parse = new TRTParser();
                 throw error;
 
             } else if (extracao.segredoJustica === true) {
-                console.log("entrou no IF SEGREDO DE JUSTIÇA");
-                logger.info('Atualizando processo JTE');
+                logger.info('Atualizando Jte com os 3 campos adicionais.');
                 resultado = {
                     "capa.segredoJustica": extracao.segredoJustica,
                     "capa.valor": "",
@@ -82,11 +89,10 @@ const parse = new TRTParser();
                 }
                 console.log(resultado);
                 await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------- Salvo com sucesso -------------------");
+                console.log("------------------- Salvo com sucesso -------------------");
                 logger.info('Processo JTE atualizado para JTE.TRT');
 
             } else if (extracao) {
-
                 resultado = {
                     "capa.segredoJustica": extracao.segredoJustica,
                     "capa.valor": `${extracao.valorDaCausa}`,
@@ -94,35 +100,25 @@ const parse = new TRTParser();
                     "origemExtracao": "JTE.TRT"
                 }
                 console.log(resultado);
-                console.log(busca);
                 await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------- Salvo com sucesso -------------------");
+                console.log("------------------- Salvo com sucesso -------------------");
                 logger.info('Processo JTE atualizado para JTE.TRT');
-
-
+                logger.info('Parse Iniciado');
                 let dadosProcesso = await parse.parse(extracao);
-                console.log(await dadosProcesso);
+                // console.log(await dadosProcesso);
                 logger.info('Parse finalizado');
-                logger.info('Salvando capa do processo');
+                logger.info('Iniciando salvamento da capa do processo');
                 await dadosProcesso.processo.save();
-                logger.info('Capa de processo salva');
-
+                logger.info('Finalizado salvamento de capa de processo');
             } else {
 
                 const error = new Error('Erro não mapeado');
                 error.code = "Extração falhou";
                 throw error;
             }
-
-
-
-
-            await sleep(100);
-            logger.info('Processos extraido');
-            logger.info('Resultado da extracao salva');
-            console.log(`---------------------- Tempo de extração é de ${heartBeat} ----------------------`);
+            logger.info('Processos extraido com sucesso');
+            console.log(blue + `---------------------- Tempo de extração é de ${heartBeat} ----------------------` + reset);
             heartBeat = 0;
-            await sleep(5000)
         } catch (e) {
             console.log(e);
             logger.info('Encontrado erro durante a execução');
@@ -138,7 +134,6 @@ const parse = new TRTParser();
             ch.ack(msg);
             logger.info('Mensagem reconhecida');
             logger.info('Finalizando proceso');
-            await sleep(2000);
         }
     });
 })();

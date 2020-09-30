@@ -15,6 +15,7 @@ class ExtratorTrtPje15 {
   /**
    * Executa a extração da capa do cnj desejado.
    * @param {string} cnj Numero de processo a ser buscado.
+   * @param {Number} numeroEstado Numero a ser inserido na URL para busca do estado.
    */
   async extrair(cnj, numeroEstado) {
     let url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`;

@@ -134,6 +134,7 @@ class Tradutor {
       ValorDaCausa: 0,
       Instancia: processo.detalhes.instancia,
       DataDistribuicao: processo.capa.dataDistribuicao,
+      Vara: processo.capa.vara,
     };
   }
 

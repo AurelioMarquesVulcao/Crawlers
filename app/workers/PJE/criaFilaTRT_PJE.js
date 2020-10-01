@@ -22,7 +22,7 @@ class CriaFilaPJE {
         console.log("Fila concluída. Iniciando criador de fila.");
         for (let i = 1; i < 25; i++) {
             if (i != 15) {
-                await this.atualizaProcessosFila(0, i);
+                await this.atualizaProcessosFila(1000, i);
                 console.log("debug");
             }
             await sleep(500);

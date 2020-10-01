@@ -45,7 +45,7 @@ var reset = '\u001b[0m';
         // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
         setInterval(async function () {
             heartBeat++;
-            if (heartBeat > 60) {
+            if (heartBeat > 100) {
                 console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
                 await mongoose.connection.close()
                 process.exit();

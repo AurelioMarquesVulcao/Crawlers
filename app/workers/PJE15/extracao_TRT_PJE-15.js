@@ -37,11 +37,11 @@ var reset = '\u001b[0m';
     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
     // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
 
-    new GerenciadorFila(false, 2).consumir(nomeFila, async (ch, msg) => {
+    new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
         var heartBeat = 0;
         // Desincroniza as requisições do robô
-        let testeSleep = numeroAleatorio(1, 20)
-        await sleep(testeSleep * 1000)
+        // let testeSleep = numeroAleatorio(1, 20)
+        // await sleep(testeSleep * 1000)
         // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
         setInterval(async function () {
             heartBeat++;
@@ -71,7 +71,7 @@ var reset = '\u001b[0m';
             let extracao = await new ExtratorTrtPje15().extrair(message.NumeroProcesso, numeroEstado);
             logger.info('Extração concluída');
             logger.info('Iniciando Parse');
-
+            process.exit();
 
             // tratando a resposta do extrator
             if (extracao === null) {

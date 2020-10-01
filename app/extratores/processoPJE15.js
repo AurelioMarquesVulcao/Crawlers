@@ -26,33 +26,102 @@ class ExtratorTrtPje15 {
       NumeroDoProcesso: cnj,
     });
 
-
-    let capturaProcesso;
+    // let capturaProcesso;
     logger.info("Extrator de processos TRT_PJE Iniciado");
+
+
+
+    // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
+    setInterval(async function () {
+      heartBeat++;
+      if (heartBeat > 700) {
+        console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
+        await mongoose.connection.close()
+        process.exit();
+      }
+    }, 1000);
+    /**Logger para console de arquivos */
+    
+    let resultado;
+    let contaCaptcha = 0;
+
+
+
+
     try {
-      capturaProcesso = await this.tryCaptura(cnj, numeroEstado);
+      // capturaProcesso = await this.tryCaptura(cnj, numeroEstado);
+      // return capturaProcesso
+
+
+
+
+
+
+
+
+
+      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado);
+      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
+
+      if (captura) {
+        logger.info("Entrando no fluxo 01 - tentativa 01");
+        heartBeat = 0;
+        // console.log(captura);
+        return captura
+      } else {
+        // console.log(captura);
+        //logger.info("Entrando no fluxo 01 - tentativa 02");
+        heartBeat = 0;
+        return captura_2ins
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
     } catch (e) {
+      heartBeat = 0;
+      console.log(e);
+      logger.info("Entrando no fluxo 02 - tentativa 01");
+      if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
+        return { segredoJustica: true }
+      } else if (/Ocorreu um problema na solução do Captcha/.test(e.code) && 6 > contaCaptcha) {
+        contaCaptcha++
+        await this.tryCaptura(cnj, numeroEstado);
+      } else if (6 > contaCaptcha) {
+        contaCaptcha++
+        await this.tryCaptura(cnj, numeroEstado);
+      }
+
+
+
       logger.log('warn', `${e} CNJ: ${cnj}`);
 
-      if (/Ocorreu um problema na solução do Captcha/.test(e.code)) {
-        if (this.qtdTentativas < 5) {
-          logger.info(`Captcha falhou!`, this.qtdTentativas);
-          this.qtdTentativas += 1;
-          logger.info("Vou reiniciar a extração");
-          capturaProcesso = await this.extrair(cnj, numeroEstado);
-        } else {
-          const error = new Error('Não conseguimos resolver o capcha em 4 tentativas');
-          error.code = "Ocorreu um problema na solução do Captcha";
-          throw error;
-        }
-      } else if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
-        const error = new Error('Processo sigiloso');
-        error.code = "Processo sigiloso não exibe dados";
-        throw error;
-      }
+      // if (/Ocorreu um problema na solução do Captcha/.test(e.code)) {
+      //   if (this.qtdTentativas < 5) {
+      //     logger.info(`Captcha falhou!`, this.qtdTentativas);
+      //     this.qtdTentativas += 1;
+      //     logger.info("Vou reiniciar a extração");
+      //     capturaProcesso = await this.extrair(cnj, numeroEstado);
+      //   } else {
+      //     const error = new Error('Não conseguimos resolver o capcha em 4 tentativas');
+      //     error.code = "Ocorreu um problema na solução do Captcha";
+      //     throw error;
+      //   }
+      // } else if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
+      //   const error = new Error('Processo sigiloso');
+      //   error.code = "Processo sigiloso não exibe dados";
+      //   throw error;
+      // }
     }
-
-    return capturaProcesso
   }
 
   async tryCaptura(cnj, numeroEstado) {
@@ -73,19 +142,17 @@ class ExtratorTrtPje15 {
     let resultado;
     let contaCaptcha = 0;
     try {
-      logger.info("Entrando no fluxo 01 - tentativa 01");
-
       let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado);
-
-      //logger.info("Entrando no fluxo 01 - tentativa 02");
-
       let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
 
-
       if (captura) {
+        logger.info("Entrando no fluxo 01 - tentativa 01");
         heartBeat = 0;
+        // console.log(captura);
         return captura
       } else {
+        // console.log(captura);
+        //logger.info("Entrando no fluxo 01 - tentativa 02");
         heartBeat = 0;
         return captura_2ins
       }

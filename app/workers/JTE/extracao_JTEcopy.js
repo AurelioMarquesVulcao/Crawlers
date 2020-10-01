@@ -14,7 +14,7 @@ const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer copy');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
-const { downloadFiles } = require('../../lib/downloadFiles')
+const { downloadFiles } = require('../../lib/downloadFiles');
 const desligado = require('../../assets/jte/horarioRoboJTE.json');
 
 /**
@@ -260,7 +260,7 @@ async function worker() {
             await console.log('O link ' + w + ' Foi salvo');
           }
           // enviar para AWS
-          // await new downloadFiles().enviarAWS(cnj, listaArquivo)
+          await new downloadFiles().enviarAWS(cnj, listaArquivo)
         }
 
         logger.info('Processo extraidos com sucesso');

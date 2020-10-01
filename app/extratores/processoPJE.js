@@ -1,7 +1,7 @@
 const { Robo } = require("../lib/robo");
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
-
+var heartBeat = 0;
 
 
 class ExtratorTrtPje {
@@ -26,33 +26,104 @@ class ExtratorTrtPje {
       NumeroDoProcesso: cnj,
     });
 
-
     let capturaProcesso;
     logger.info("Extrator de processos TRT_PJE Iniciado");
     try {
       capturaProcesso = await this.tryCaptura(cnj, numeroEstado);
+      return capturaProcesso
     } catch (e) {
       logger.log('warn', `${e} CNJ: ${cnj}`);
 
-      if (/Ocorreu um problema na solução do Captcha/.test(e.code)) {
-        if (this.qtdTentativas < 5) {
-          logger.info(`Captcha falhou!`, this.qtdTentativas);
-          this.qtdTentativas += 1;
-          logger.info("Vou reiniciar a extração");
-          capturaProcesso = await this.extrair(cnj, numeroEstado);
-        } else {
-          const error = new Error('Não conseguimos resolver o capcha em 4 tentativas');
-          error.code = "Ocorreu um problema na solução do Captcha";
-          throw error;
-        }
-      } else if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
-        const error = new Error('Processo sigiloso');
-        error.code = "Processo sigiloso não exibe dados";
-        throw error;
-      }
+      // if (/Ocorreu um problema na solução do Captcha/.test(e.code)) {
+      //   if (this.qtdTentativas < 5) {
+      //     logger.info(`Captcha falhou!`, this.qtdTentativas);
+      //     this.qtdTentativas += 1;
+      //     logger.info("Vou reiniciar a extração");
+      //     capturaProcesso = await this.extrair(cnj, numeroEstado);
+      //   } else {
+      //     const error = new Error('Não conseguimos resolver o capcha em 4 tentativas');
+      //     error.code = "Ocorreu um problema na solução do Captcha";
+      //     throw error;
+      //   }
+      // } else if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
+      //   const error = new Error('Processo sigiloso');
+      //   error.code = "Processo sigiloso não exibe dados";
+      //   throw error;
+      // }
     }
-    
-    return capturaProcesso
+  }
+
+  async tryCaptura(cnj, numeroEstado) {
+    // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
+    setInterval(async function () {
+      heartBeat++;
+      if (heartBeat > 700) {
+        console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
+        await mongoose.connection.close()
+        process.exit();
+      }
+    }, 1000);
+    /**Logger para console de arquivos */
+    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
+      nomeRobo: enums.nomesRobos.TRTRJ,
+      NumeroDoProcesso: cnj,
+    });
+    let resultado;
+    let contaCaptcha = 0;
+    try {
+      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado);
+      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
+
+      if (captura) {
+        logger.info("Entrando no fluxo 01 - tentativa 01");
+        heartBeat = 0;
+        // console.log(captura);
+        return captura
+      } else {
+        logger.info("Entrando no fluxo 01 - tentativa 02");
+        heartBeat = 0;
+        return captura_2ins
+      }
+
+      // Promise.allSettled([captura, captura_2ins])
+      //   .then(res => {
+
+      //     // console.log(res[0]) 
+      //     // console.log(res[1].value)
+      //     if (res[0].value !== null) {
+      //       return res[0].value
+      //     } else {
+      //       return res[1].value
+      //     }
+      //   });
+
+      // if (captura_2ins && captura_2ins.andamentos && captura_2ins.andamentos.length > 0) {
+      //   if (!captura)
+      //     captura = captura_2ins;
+      //   else
+      //     captura.andamentos = captura.andamentos.concat(captura_2ins.andamentos);
+      // }
+      // resultado = captura
+      // return resultado
+
+    } catch (e) {
+      heartBeat = 0;
+      console.log(e);
+      logger.info("Entrando no fluxo 02 - tentativa 01");
+      if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
+        return { segredoJustica: true }
+      } else if (/Ocorreu um problema na solução do Captcha/.test(e.code) && 6 > contaCaptcha) {
+        contaCaptcha++
+        await this.tryCaptura(cnj, numeroEstado);
+      } else if (6 > contaCaptcha) {
+        contaCaptcha++
+        await this.tryCaptura(cnj, numeroEstado);
+      }
+      // const captura_2ins = await new ExtratorTrtPje().captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
+      // resultado = captura_2ins
+
+      // return resultado
+    }
   }
 
 
@@ -64,7 +135,7 @@ class ExtratorTrtPje {
    */
   async captura(header, cnj, numeroEstado) {
     let url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`;
-    /**Logger para console de arquivos */
+
     const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
       nomeRobo: enums.nomesRobos.TRTRJ,
       NumeroDoProcesso: cnj,
@@ -156,45 +227,6 @@ class ExtratorTrtPje {
   }
 
 
-  /**Existe processos que não possuem cadastro em primeira instancia e o servidor
-   * do TRT-RJ trava a requisição sendo necessario baixar direto em 2 instância
-   */
-  async tryCaptura(cnj, numeroEstado) {
-    /**Logger para console de arquivos */
-    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
-      nomeRobo: enums.nomesRobos.TRTRJ,
-      NumeroDoProcesso: cnj,
-    });
-    let resultado;
-    try {
-      logger.info("Entrando no fluxo 01 - tentativa 01");
-
-      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado);
-
-      logger.info("Entrando no fluxo 01 - tentativa 02");
-
-      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
-
-      if (captura_2ins && captura_2ins.andamentos && captura_2ins.andamentos.length > 0) {
-        if (!captura)
-          captura = captura_2ins;
-        else
-          captura.andamentos = captura.andamentos.concat(captura_2ins.andamentos);
-      }
-      resultado = captura
-      return resultado
-
-    } catch (e) {
-      logger.info("Entrando no fluxo 02 - tentativa 01");
-      if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
-        return { segredoJustica: true }
-      }
-      const captura_2ins = await new ExtratorTrtPje().captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
-      resultado = captura_2ins
-
-      return resultado
-    }
-  }
 }
 module.exports.ExtratorTrtPje = ExtratorTrtPje;
 

@@ -1,21 +1,22 @@
 const { Robo } = require("../lib/robo");
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
-
+var heartBeat = 0;
 
 
 class ExtratorTrtPje15 {
-  constructor() {
+  constructor(url, isDebug) {
     this.robo = new Robo();
-    this.url = `http://pje.trt15.jus.br/pje-consulta-api`;
+    this.url = `http://pje.trt1.jus.br/pje-consulta-api`;
     this.qtdTentativas = 1;
 
   }
 
+
+
   /**
    * Executa a extração da capa do cnj desejado.
    * @param {string} cnj Numero de processo a ser buscado.
-   * @param {Number} numeroEstado Numero a ser inserido na URL para busca do estado.
    */
   async extrair(cnj, numeroEstado) {
     let url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`;
@@ -54,6 +55,82 @@ class ExtratorTrtPje15 {
     return capturaProcesso
   }
 
+  async tryCaptura(cnj, numeroEstado) {
+    // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
+    setInterval(async function () {
+      heartBeat++;
+      if (heartBeat > 700) {
+        console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
+        await mongoose.connection.close()
+        process.exit();
+      }
+    }, 1000);
+    /**Logger para console de arquivos */
+    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
+      nomeRobo: enums.nomesRobos.TRTRJ,
+      NumeroDoProcesso: cnj,
+    });
+    let resultado;
+    let contaCaptcha = 0;
+    try {
+      logger.info("Entrando no fluxo 01 - tentativa 01");
+
+      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado);
+
+      //logger.info("Entrando no fluxo 01 - tentativa 02");
+
+      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
+
+
+      if (captura) {
+        heartBeat = 0;
+        return captura
+      } else {
+        heartBeat = 0;
+        return captura_2ins
+      }
+
+      // Promise.allSettled([captura, captura_2ins])
+      //   .then(res => {
+
+      //     // console.log(res[0]) 
+      //     // console.log(res[1].value)
+      //     if (res[0].value !== null) {
+      //       return res[0].value
+      //     } else {
+      //       return res[1].value
+      //     }
+      //   });
+
+      // if (captura_2ins && captura_2ins.andamentos && captura_2ins.andamentos.length > 0) {
+      //   if (!captura)
+      //     captura = captura_2ins;
+      //   else
+      //     captura.andamentos = captura.andamentos.concat(captura_2ins.andamentos);
+      // }
+      // resultado = captura
+      // return resultado
+
+    } catch (e) {
+      heartBeat = 0;
+      console.log(e);
+      logger.info("Entrando no fluxo 02 - tentativa 01");
+      if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
+        return { segredoJustica: true }
+      } else if (/Ocorreu um problema na solução do Captcha/.test(e.code) && 6 > contaCaptcha) {
+        contaCaptcha++
+        await this.tryCaptura(cnj, numeroEstado);
+      } else if (6 > contaCaptcha) {
+        contaCaptcha++
+        await this.tryCaptura(cnj, numeroEstado);
+      }
+      // const captura_2ins = await new ExtratorTrtPje().captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
+      // resultado = captura_2ins
+
+      // return resultado
+    }
+  }
+
 
   /** 
    * Captura o Processo informado usando a API de quebra de captcha da Impacta
@@ -63,7 +140,7 @@ class ExtratorTrtPje15 {
    */
   async captura(header, cnj, numeroEstado) {
     let url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`;
-    /**Logger para console de arquivos */
+
     const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
       nomeRobo: enums.nomesRobos.TRTRJ,
       NumeroDoProcesso: cnj,
@@ -155,45 +232,6 @@ class ExtratorTrtPje15 {
   }
 
 
-  /**Existe processos que não possuem cadastro em primeira instancia e o servidor
-   * do TRT-RJ trava a requisição sendo necessario baixar direto em 2 instância
-   */
-  async tryCaptura(cnj, numeroEstado) {
-    /**Logger para console de arquivos */
-    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
-      nomeRobo: enums.nomesRobos.TRTRJ,
-      NumeroDoProcesso: cnj,
-    });
-    let resultado;
-    try {
-      logger.info("Entrando no fluxo 01 - tentativa 01");
-
-      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado);
-
-      logger.info("Entrando no fluxo 01 - tentativa 02");
-
-      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
-
-      if (captura_2ins && captura_2ins.andamentos && captura_2ins.andamentos.length > 0) {
-        if (!captura)
-          captura = captura_2ins;
-        else
-          captura.andamentos = captura.andamentos.concat(captura_2ins.andamentos);
-      }
-      resultado = captura
-      return resultado
-
-    } catch (e) {
-      logger.info("Entrando no fluxo 02 - tentativa 01");
-      if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
-        return { segredoJustica: true }
-      }
-      const captura_2ins = await new ExtratorTrtPje().captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
-      resultado = captura_2ins
-
-      return resultado
-    }
-  }
 }
 module.exports.ExtratorTrtPje15 = ExtratorTrtPje15;
 

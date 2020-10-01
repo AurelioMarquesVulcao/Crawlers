@@ -1,24 +1,22 @@
 const { Robo } = require("../lib/robo");
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
-const async = require('async');
-
+var heartBeat = 0;
 
 
 class ExtratorTrtPje15 {
-  constructor() {
+  constructor(url, isDebug) {
     this.robo = new Robo();
-    this.url = `http://pje.trt15.jus.br/pje-consulta-api`;
+    this.url = `http://pje.trt1.jus.br/pje-consulta-api`;
     this.qtdTentativas = 1;
 
   }
 
+
+
   /**
-   * Executa a extração do site PJe, Onde obtemos todos os processos trabalhistas
-   * Neste site obtemos detalhes como valor de processo segredo de justiça
-   * 
+   * Executa a extração da capa do cnj desejado.
    * @param {string} cnj Numero de processo a ser buscado.
-   * @param {Number} numeroEstado Numero a ser inserido na URL para busca do estado.
    */
   async extrair(cnj, numeroEstado) {
     let url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`;
@@ -27,11 +25,10 @@ class ExtratorTrtPje15 {
       nomeRobo: enums.nomesRobos.PJE,
       NumeroDoProcesso: cnj,
     });
+
+
     let capturaProcesso;
     logger.info("Extrator de processos TRT_PJE Iniciado");
-
-    logger.info("Entrando no fluxo de captura de processo.");
-
     try {
       capturaProcesso = await this.tryCaptura(cnj, numeroEstado);
     } catch (e) {
@@ -58,37 +55,52 @@ class ExtratorTrtPje15 {
     return capturaProcesso
   }
 
-  /**Existe processos que não possuem cadastro em primeira instancia e o servidor
-   * do TRT-RJ trava a requisição sendo necessario baixar direto em 2 instância
-   * 
-   * @param {String} logger Cria logger para ser exibido no terminal
-   */
   async tryCaptura(cnj, numeroEstado) {
-    let resultado;
+    // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
+    setInterval(async function () {
+      heartBeat++;
+      if (heartBeat > 700) {
+        console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
+        await mongoose.connection.close()
+        process.exit();
+      }
+    }, 1000);
     /**Logger para console de arquivos */
     const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
-      nomeRobo: enums.nomesRobos.PJE,
+      nomeRobo: enums.nomesRobos.TRTRJ,
       NumeroDoProcesso: cnj,
     });
-
-
+    let resultado;
+    let contaCaptcha = 0;
     try {
-      // logger.info("Entrando no fluxo 01 - tentativa 01");
-      // logger.info("Entrando no fluxo 01 - tentativa 02");
-      logger.info("Verificando o processo na 1 e 2 instância.");
-      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado)
+      logger.info("Entrando no fluxo 01 - tentativa 01");
 
-      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado)
+      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado);
 
+      //logger.info("Entrando no fluxo 01 - tentativa 02");
 
-
-      // let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
-      Promise.all([captura, captura_2ins]).then(res => { console.log(res) })
+      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
 
 
+      if (captura) {
+        heartBeat = 0;
+        return captura
+      } else {
+        heartBeat = 0;
+        return captura_2ins
+      }
 
+      // Promise.allSettled([captura, captura_2ins])
+      //   .then(res => {
 
-
+      //     // console.log(res[0]) 
+      //     // console.log(res[1].value)
+      //     if (res[0].value !== null) {
+      //       return res[0].value
+      //     } else {
+      //       return res[1].value
+      //     }
+      //   });
 
       // if (captura_2ins && captura_2ins.andamentos && captura_2ins.andamentos.length > 0) {
       //   if (!captura)
@@ -100,14 +112,22 @@ class ExtratorTrtPje15 {
       // return resultado
 
     } catch (e) {
-      // logger.info("Entrando no fluxo 02 - tentativa 01");
-      // if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
-      //   return { segredoJustica: true }
-      // }
+      heartBeat = 0;
+      console.log(e);
+      logger.info("Entrando no fluxo 02 - tentativa 01");
+      if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
+        return { segredoJustica: true }
+      } else if (/Ocorreu um problema na solução do Captcha/.test(e.code) && 6 > contaCaptcha) {
+        contaCaptcha++
+        await this.tryCaptura(cnj, numeroEstado);
+      } else if (6 > contaCaptcha) {
+        contaCaptcha++
+        await this.tryCaptura(cnj, numeroEstado);
+      }
       // const captura_2ins = await new ExtratorTrtPje().captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
       // resultado = captura_2ins
 
-      return resultado
+      // return resultado
     }
   }
 
@@ -117,60 +137,15 @@ class ExtratorTrtPje15 {
    * @param {string} cnj Numero de processo a ser buscado.
    * @param {string} objResponse Obtem objeto inicial para a captura do processo.
    * @param {string} objResponseCaptcha Obtem a imagem em base64 do captcha
-   * @param {string} url_1 Url base do tribunal para a raspagem.
-   * @param {object} info Infomações basicas do processo no tribunal, como id.
-   * @param {object} captcha Objeto a ser passado para a api de resolução de capcha.
-   * @param {object} captchaSolved Retorno da Api de resolução de captcha
-   * @param {object} desafio Possui todas as informações do capcha
-   * @param {object} detalheProcesso Todas as informações do processo fornecidas pela pagina
    */
   async captura(header, cnj, numeroEstado) {
     let url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`;
-    /**Logger para console de arquivos */
+
     const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
-      nomeRobo: enums.nomesRobos.PJE,
+      nomeRobo: enums.nomesRobos.TRTRJ,
       NumeroDoProcesso: cnj,
     });
-    logger.info("Iniciado captura do processo");
-    const info = await this.tryRepostaInicial(url_1, cnj, header);
-
-    // obtem a imagem em base64 do captcha
-    const desafio = await this.pegaCapcha(url_1, info);
-    const captcha = {
-      refinador: "trt_1",
-      imagem: `${desafio.imagem}`
-    }
-    logger.info("Captcha obtido com sucesso");
-
-    logger.info("Iniciado processo de solução do captcha")
-    const captchaSolved = await this.resolveCaptcha(captcha);
-
-    if (captchaSolved.sucesso) {
-      logger.info("Solução do captcha é: " + captchaSolved.texto);
-      try {
-        const detalheProcesso = await this.pegaProcesso(
-          captchaSolved,
-          numeroEstado,
-          info,
-          desafio,
-          header
-        );
-        logger.info("Dados do processo obtidos com sucesso.")
-        return detalheProcesso
-      } catch (e) { console.log(e); }
-
-
-    } else {
-      logger.info("Não foi possível resolver o captcha");
-      // await this.captura(header, cnj, numeroEstado);
-    }
-  }
-
-  async tryRepostaInicial(url_1, cnj, header) {
-    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
-      nomeRobo: enums.nomesRobos.PJE,
-      NumeroDoProcesso: cnj,
-    });
+    logger.info("Iniciado captura do processo.");
     const url = `${url_1}/api/processos/dadosbasicos/${cnj}`;
     // Primeira requisição ao TRT-RJ    
     const objResponse = await this.robo.acessar({
@@ -187,22 +162,26 @@ class ExtratorTrtPje15 {
       return null;
     }
 
+    const info = bodyRes[0];
 
-    return bodyRes[0]
-  }
-  async pegaCapcha(url_1, info) {
+
+    // obtem a imagem em base64 do captcha
     const objResponseCaptcha = await this.robo.acessar({
       url: `${url_1}/api/processos/${info.id}`,
       method: "GET",
       encoding: "latin1",
       usaProxy: true,
+
     });
     const desafio = objResponseCaptcha.responseBody
+    const captcha = {
+      refinador: "trt_1",
+      imagem: `${desafio.imagem}`
+    }
+    logger.info("Captcha obtido com sucesso");
 
-    return desafio
-  }
-  async resolveCaptcha(captcha) {
-    console.time("Resolução do Capcha")
+    logger.info("Iniciado processo de solução do captcha")
+
     // envia captcha para API de resolução
     const resQuebrarCaptcha = await this.robo.acessar({
       url: `http://172.16.16.8:8082/api/refinar/`,
@@ -211,38 +190,47 @@ class ExtratorTrtPje15 {
       usaProxy: false,
       usaJson: true,
       params: captcha,
+
     });
     const captchaSolved = resQuebrarCaptcha.responseBody;
-    console.timeEnd("Resolução do Capcha")
-    return captchaSolved
-  }
-  async pegaProcesso(captchaSolved, numeroEstado, info, desafio, header) {
-    // removendo caracteres especiais da solução do captcha
-    const texto = captchaSolved.texto.replace(/[^a-z0-9]/g, "");
-    // const texto = captchaSolved.texto.replace(/[a-z0-9]/g, ""); // cria erro para testes
 
-    // obtendo dados do processo.
-    const detalheProcesso = await this.robo.acessar({
-      url: `https://pje.trt${numeroEstado}.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`,
-      method: "get",
-      encoding: "utf8",
-      usaProxy: true,
-      headers: header,
-    });
-    if (detalheProcesso.responseBody.mensagem) {
-      const error = new Error('Captcha invalido');
-      error.code = "Ocorreu um problema na solução do Captcha";
-      throw error;
-    }
 
-    if (!!detalheProcesso.responseBody.mensagemErro) {
-      const error = new Error('Processo sigiloso');
-      error.code = "Não é possível obter devido ao processo ser sigiliso";
-      throw error;
+    if (captchaSolved.sucesso) {
+      logger.info("Solução do captcha é: " + captchaSolved.texto);
+
+      // removendo caracteres especiais da solução do captcha
+      const texto = captchaSolved.texto.replace(/[^a-z0-9]/g, "");
+      // const texto = captchaSolved.texto.replace(/[a-z0-9]/g, ""); // cria erro para testes
+
+      // obtendo dados do processo.
+      const detalheProcesso = await this.robo.acessar({
+        url: `https://pje.trt${numeroEstado}.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`,
+        method: "get",
+        encoding: "utf8",
+        usaProxy: true,
+        headers: header,
+        // responseType: 'stream'
+
+      });
+      if (detalheProcesso.responseBody.mensagem) {
+        const error = new Error('Captcha invalido');
+        error.code = "Ocorreu um problema na solução do Captcha";
+        throw error;
+      }
+      // logger.info("passei aqui");
+      if (!!detalheProcesso.responseBody.mensagemErro) {
+        const error = new Error('Processo sigiloso');
+        error.code = "Não é possível obter devido ao processo ser sigiliso";
+        throw error;
+      }
+
+      logger.info("Dados do processo obtidos com sucesso.")
+      return detalheProcesso.responseBody
+    } else {
+      logger.info("Não foi possível resolver o captcha");
     }
-    // console.log(detalheProcesso.responseBody);
-    return detalheProcesso.responseBody
   }
+
 
 }
 module.exports.ExtratorTrtPje15 = ExtratorTrtPje15;

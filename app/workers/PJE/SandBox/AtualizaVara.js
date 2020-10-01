@@ -23,7 +23,7 @@ mongoose.connection.on('error', (e) => {
 (async () => {
     let regex1 = /Não\sfoi\spossivel\sobter/;
     let regex2 = /gabinete/i;
-    const dados = await buscaBanco(1000);
+    const dados = await buscaBanco(13000);
     for (i in await dados) {
         console.log(dados[i].detalhes.numeroProcesso);
         await enfileirar(dados[i].detalhes.numeroProcesso);
@@ -58,7 +58,7 @@ async function buscaBanco(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(2000);
+    ]).skip(pulo).limit(10000);
     console.log(await agregar.length);
     return agregar
 }

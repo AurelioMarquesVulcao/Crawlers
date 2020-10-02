@@ -23,12 +23,12 @@ mongoose.connection.on('error', (e) => {
 (async () => {
     let regex1 = /Não\sfoi\spossivel\sobter/;
     let regex2 = /gabinete/i;
-    const dados = await buscaBanco(1000);
-    for (i in await dados){
+    const dados = await buscaBanco(13000);
+    for (i in await dados) {
         console.log(dados[i].detalhes.numeroProcesso);
         await enfileirar(dados[i].detalhes.numeroProcesso);
         await sleep(100);
-        
+
     }
 
     mongoose.connection.close();
@@ -47,8 +47,8 @@ async function buscaBanco(pulo) {
                 // 'detalhes.tribunal':2,
                 'detalhes.ano': 2020,
                 '$or': [
-                    {'capa.vara': {"$in": ["", null]}},
-                    {'capa.comarca': {"$in": ["", null]}},
+                    { 'capa.vara': { "$in": ["", null] } },
+                    { 'capa.comarca': { "$in": ["", null] } },
                 ],
             }
         },
@@ -58,7 +58,7 @@ async function buscaBanco(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(2000);
+    ]).skip(pulo).limit(600000);
     console.log(await agregar.length);
     return agregar
 }
@@ -74,12 +74,7 @@ async function enfileirar(numero) {
     }
     function criaPost(numero) {
         let post = `{
-        "ExecucaoConsultaId" : "${makeid()}",
-        "ConsultaCadastradaId" : "${makeid()}",
-        "DataEnfileiramento" : "${new Date}",
         "NumeroProcesso" : "${numero}",
-        "NumeroOab" : "null",        
-        "SeccionalOab" : "RJ",
         "NovosProcessos" : true }`
         return post
     }

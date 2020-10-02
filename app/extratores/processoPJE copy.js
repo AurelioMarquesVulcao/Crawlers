@@ -3,9 +3,6 @@ const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 var heartBeat = 0;
 
-var red = '\u001b[31m';
-var blue = '\u001b[34m';
-var reset = '\u001b[0m';
 
 class ExtratorTrtPje {
   constructor(url, isDebug) {
@@ -29,67 +26,12 @@ class ExtratorTrtPje {
       NumeroDoProcesso: cnj,
     });
 
-    // let capturaProcesso;
+    let capturaProcesso;
     logger.info("Extrator de processos TRT_PJE Iniciado");
-
-
-    // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
-    setInterval(async function () {
-      heartBeat++;
-      if (heartBeat > 420) {
-        console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
-        // await mongoose.connection.close()
-        process.exit();
-      }
-    }, 1000);
-    /**Logger para console de arquivos */
-
-    let resultado;
-    let contaCaptcha = 0;
-
-
     try {
-      // capturaProcesso = await this.tryCaptura(cnj, numeroEstado);
-      // return capturaProcesso
-
-
-
-      let captura = await this.captura({ "X-Grau-Instancia": "1" }, cnj, numeroEstado);
-      let captura_2ins = await this.captura({ "X-Grau-Instancia": "2" }, cnj, numeroEstado);
-
-      if (captura) {
-        logger.info("Entrando no fluxo 01 - tentativa 01");
-        heartBeat = 0;
-        // console.log(captura);
-        return captura
-      } else {
-        // console.log(captura);
-        //logger.info("Entrando no fluxo 01 - tentativa 02");
-        heartBeat = 0;
-        return captura_2ins
-      }
-
-
-
-
-
-
+      capturaProcesso = await this.tryCaptura(cnj, numeroEstado);
+      return capturaProcesso
     } catch (e) {
-      heartBeat = 0;
-      console.log(e);
-      logger.info("Entrando no fluxo 02 - tentativa 01");
-      if (/Não é possível obter devido ao processo ser sigiliso/.test(e.code)) {
-        return { segredoJustica: true }
-      } else if (/Ocorreu um problema na solução do Captcha/.test(e.code) && 6 > contaCaptcha) {
-        contaCaptcha++
-        await this.tryCaptura(cnj, numeroEstado);
-      } else if (6 > contaCaptcha) {
-        contaCaptcha++
-        await this.tryCaptura(cnj, numeroEstado);
-      }
-
-
-
       logger.log('warn', `${e} CNJ: ${cnj}`);
 
       // if (/Ocorreu um problema na solução do Captcha/.test(e.code)) {
@@ -115,18 +57,15 @@ class ExtratorTrtPje {
     // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
     setInterval(async function () {
       heartBeat++;
-      if (heartBeat > 340) {
-        console.log(red + '----------------- Fechando o processo por Indisponibilidade -------------------' + reset);
-        // await mongoose.connection.close()
-        // process.exit();
-        const error = new Error('Tempo de tentativa de resolução esgotado');
-        error.code = "Não é possível obter o processo em 5 minutos";
-        throw error;
+      if (heartBeat > 700) {
+        console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
+        await mongoose.connection.close()
+        process.exit();
       }
     }, 1000);
     /**Logger para console de arquivos */
     const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoTRT-RJInfo.log', {
-      nomeRobo: enums.nomesRobos.PJE,
+      nomeRobo: enums.nomesRobos.TRTRJ,
       NumeroDoProcesso: cnj,
     });
     let resultado;
@@ -141,8 +80,7 @@ class ExtratorTrtPje {
         // console.log(captura);
         return captura
       } else {
-        // console.log(captura);
-        //logger.info("Entrando no fluxo 01 - tentativa 02");
+        logger.info("Entrando no fluxo 01 - tentativa 02");
         heartBeat = 0;
         return captura_2ins
       }

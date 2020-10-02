@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
 const sleep = require('await-sleep');
+const amqpCA = require('amqplib/callback_api');
+const amqp = require('amqplib');
 
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const { enums } = require('../../../configs/enums');
 const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../../models/schemas/jte')
 const Estados = require('../../../assets/jte/comarcascopy.json');
 const { Processo } = require('../../../models/schemas/processo');
+const { GerenciadorFila } = require("../../../lib/filaHandler");
 const { Logform } = require('winston');
 
 const fila = new CriaFilaJTE();
@@ -21,16 +24,18 @@ mongoose.connection.on('error', (e) => {
 
 
 (async () => {
+    let lista = []
     let regex1 = /Não\sfoi\spossivel\sobter/;
     let regex2 = /gabinete/i;
     const dados = await buscaBanco(0);
-    for (i in await dados){
-        console.log(dados[i].detalhes.numeroProcesso);
-        await enfileirar(dados[i].detalhes.numeroProcesso);
-        await sleep(100);
+
+    for (i in await dados) {
+        lista.push(await enfileirar(dados[i].detalhes.numeroProcesso));
+        
+
         
     }
-
+    await new GerenciadorFila().enfileirarLote("ReprocessamentoJTE", lista)
     mongoose.connection.close();
     process.exit()
 })()
@@ -68,8 +73,9 @@ async function enfileirar(numero) {
     //console.log(regex);
     if (true) {
         let mensagem = criaPost(numero);
-        await fila.enviarMensagem("ReprocessamentoJTE", mensagem);
-        console.log("Processo enfileirado para Download");
+        // await fila.enviarMensagem("ReprocessamentoJTE", mensagem);
+        // console.log("Processo enfileirado para Download");
+        return mensagem
     }
     function criaPost(numero) {
         let post = `{
@@ -92,6 +98,7 @@ async function enfileirar(numero) {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
         return text;
     }
+    
 }
 
 

@@ -45,7 +45,7 @@ var reset = '\u001b[0m';
         // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
         setInterval(async function () {
             heartBeat++;
-            if (heartBeat > 100) {
+            if (heartBeat > 700) {
                 console.log(red + '----------------- Fechando o processo por inatividade -------------------' + reset);
                 await mongoose.connection.close()
                 process.exit();
@@ -71,7 +71,8 @@ var reset = '\u001b[0m';
             let extracao = await new ExtratorTrtPje().extrair(message.NumeroProcesso, numeroEstado);
             logger.info('Extração concluída');
             logger.info('Iniciando Parse');
-
+            //console.log(extracao);
+            // process.exit();
 
             // tratando a resposta do extrator
             if (extracao === null) {
@@ -79,6 +80,28 @@ var reset = '\u001b[0m';
                 error.code = "Extração falhou";
                 throw error;
 
+            } else if (await !extracao) {
+                logger.info('Não recebi extracao');
+                process.exit()
+            } else if (extracao) {
+                logger.info('Processo completo. Vamos processar todas as alterações');
+                resultado = {
+                    "capa.segredoJustica": extracao.segredoJustica,
+                    "capa.valor": `${extracao.valorDaCausa}`,
+                    "capa.justicaGratuita": extracao.justicaGratuita,
+                    "origemExtracao": "JTE.TRT"
+                }
+                console.log(resultado);
+                await Processo.findOneAndUpdate(busca, resultado);
+                console.log(blue + "------------------- Salvo com sucesso -------------------" + reset);
+                logger.info('Processo JTE atualizado para JTE.TRT');
+                logger.info('Parse Iniciado');
+                let dadosProcesso = await parse.parse(extracao);
+                // console.log(await dadosProcesso);
+                logger.info('Parse finalizado');
+                logger.info('Iniciando salvamento da capa do processo');
+                await dadosProcesso.processo.save();
+                logger.info('Finalizado salvamento de capa de processo');
             } else if (extracao.segredoJustica === true) {
                 logger.info('Atualizando Jte com os 3 campos adicionais.');
                 resultado = {
@@ -89,27 +112,9 @@ var reset = '\u001b[0m';
                 }
                 console.log(resultado);
                 await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------------- Salvo com sucesso -------------------");
+                console.log(blue + "------------------- Salvo com sucesso -------------------" + reset);
                 logger.info('Processo JTE atualizado para JTE.TRT');
 
-            } else if (extracao) {
-                resultado = {
-                    "capa.segredoJustica": extracao.segredoJustica,
-                    "capa.valor": `${extracao.valorDaCausa}`,
-                    "capa.justicaGratuita": extracao.justicaGratuita,
-                    "origemExtracao": "JTE.TRT"
-                }
-                console.log(resultado);
-                await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------------- Salvo com sucesso -------------------");
-                logger.info('Processo JTE atualizado para JTE.TRT');
-                logger.info('Parse Iniciado');
-                let dadosProcesso = await parse.parse(extracao);
-                // console.log(await dadosProcesso);
-                logger.info('Parse finalizado');
-                logger.info('Iniciando salvamento da capa do processo');
-                await dadosProcesso.processo.save();
-                logger.info('Finalizado salvamento de capa de processo');
             } else {
 
                 const error = new Error('Erro não mapeado');
@@ -119,10 +124,12 @@ var reset = '\u001b[0m';
             logger.info('Processos extraido com sucesso');
             console.log(blue + `---------------------- Tempo de extração é de ${heartBeat} ----------------------` + reset);
             heartBeat = 0;
+
+
         } catch (e) {
             console.log(e);
             logger.info('Encontrado erro durante a execução');
-            logger.info(`Error: ${e.message}`);
+            logger.info(red + `Error: ${e.message}` + reset);
             heartBeat = 0;
             // Estou reprocessando automaticamente no fim da fila.
 

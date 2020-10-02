@@ -58,7 +58,7 @@ async function buscaBanco(pulo) {
                 "_id": 1
             }
         }
-    ]).skip(pulo).limit(10000);
+    ]).skip(pulo).limit(600000);
     console.log(await agregar.length);
     return agregar
 }

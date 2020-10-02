@@ -20,7 +20,7 @@ console.log('até aqui');
         // await fila.procura("0000350", `${origem[i]}`, 3, "09")
         // await fila.procura("0000370", `${origem[i]}`, 3, "09")
         //await fila.procura("0000502", `${origem[i]}`, 3, "22", "")
-        await fila.procura("0000167", `${origem[i]}`, 280, "06", ".1")
+        await fila.procura("0000438", `${origem[i]}`, 25, "06", ".1")
         // await fila.procura("0000105", `${origem[i]}`, 5, "13", "")
         // await fila.procura("0000205", `${origem[i]}`, 5, "13", "")
         // await fila.procura("0000305", `${origem[i]}`, 5, "13", "")

@@ -37,7 +37,7 @@ var reset = '\u001b[0m';
     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
     // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
 
-    new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
+    new GerenciadorFila(false, 2).consumir(nomeFila, async (ch, msg) => {
         var heartBeat = 0;
         // Desincroniza as requisições do robô
         // let testeSleep = numeroAleatorio(1, 20)

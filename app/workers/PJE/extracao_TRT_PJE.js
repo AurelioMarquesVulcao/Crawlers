@@ -93,7 +93,7 @@ var reset = '\u001b[0m';
                 }
                 console.log(resultado);
                 await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------------- Salvo com sucesso -------------------");
+                console.log(blue + "------------------- Salvo com sucesso -------------------" + reset);
                 logger.info('Processo JTE atualizado para JTE.TRT');
                 logger.info('Parse Iniciado');
                 let dadosProcesso = await parse.parse(extracao);
@@ -112,7 +112,7 @@ var reset = '\u001b[0m';
                 }
                 console.log(resultado);
                 await Processo.findOneAndUpdate(busca, resultado);
-                console.log("------------------- Salvo com sucesso -------------------");
+                console.log(blue + "------------------- Salvo com sucesso -------------------" + reset);
                 logger.info('Processo JTE atualizado para JTE.TRT');
 
             } else {
@@ -129,7 +129,7 @@ var reset = '\u001b[0m';
         } catch (e) {
             console.log(e);
             logger.info('Encontrado erro durante a execução');
-            logger.info(`Error: ${e.message}`);
+            logger.info(red + `Error: ${e.message}` + reset);
             heartBeat = 0;
             // Estou reprocessando automaticamente no fim da fila.
 

@@ -248,7 +248,10 @@ async function worker() {
             await new CriaFilaJTE().salvaDocumentoLink(link[w]);
             let nome = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
             let linkDocumento = link[w].link;
-            let local = '/home/aurelio/crawlers-bigdata/downloads'
+
+            let local = '/home/aurelio/crawlers-bigdata/downloads';
+            let local = '/downloads';
+            
             let tipo = link[w].tipo;
             if (tipo == 'pdf') {
               await new downloadFiles().download(nome, linkDocumento, local)

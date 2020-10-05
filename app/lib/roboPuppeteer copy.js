@@ -360,12 +360,12 @@ class RoboPuppeteer3 {
           return document.querySelectorAll('#popover-marcador-filtro > ion-item').length;
         })
         for (let k = 1; k < quantidadeDocumentos + 1; k++) {
-          await sleep(1000)
+          await sleep(1500)
           // abro o popup e abro o link do documento
           await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
-          //await sleep(2000)
+          await sleep(1000)
           let link = await this.page.evaluate(async (k, dataEProcesso) => {
-            await new Promise(function (resolve) { setTimeout(resolve, 500); });
+            await new Promise(function (resolve) { setTimeout(resolve, 1000); });
 
             let link = document.querySelector("#linkPDF").href;
             let movimentacao = document.querySelector(`#popover-marcador-filtro > ion-item:nth-child(${k}) > span`).innerText.replace("\n", " ");

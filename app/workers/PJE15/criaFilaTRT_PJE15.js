@@ -20,19 +20,16 @@ class CriaFilaPJE {
     }
     async montaFila() {
         let fila = [];
+        let estado = [];
         console.log("Fila concluída. Iniciando criador de fila.");
         for (let i = 1; i < 25; i++) {
             if (i != 15) {
-                
-                fila.push(await this.atualizaProcessosFila(0, i)[0]);
-                
-                console.log("debug");
+                estado = await this.atualizaProcessosFila(0, i)[0]
             }
-            await sleep(500);
         }
-        await sleep(5000);
+        await sleep(125000);
         await this.testaFila();
-        console.log(fila);
+
     }
 
     async testaFila() {
@@ -76,19 +73,22 @@ class CriaFilaPJE {
                     "_id": 1
                 }
             }
-        ]).skip(pulo).limit(5);
+        ]).skip(pulo).limit(1000);
         // console.log(await agregar);
         let mensagens = [];
+        let fila = "processo.PJE.extracao.novos.1"
         for (let i = 0; i < agregar.length; i++) {
             busca = `"${agregar[i]._id}"`;
             // console.log(busca);
-            console.log(await !!extracao);
-            mensagem.push(agregar[i].detalhes.numeroProcesso, busca);
+            // console.log(await !!extracao);
+            mensagens.push(this.criaPost(agregar[i].detalhes.numeroProcesso, busca));
             // await this.enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
-            console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
-            await sleep(20)
+            // console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
+            // await sleep(20)
         }
-        return mensagens
+        await new GerenciadorFila().enfileirarLote(fila, mensagens)
+        // console.log(mensagens);
+        // return mensagens
     }
     async enfileirarTRT_RJ(numero, busca) {
         let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
@@ -105,10 +105,7 @@ class CriaFilaPJE {
         return text;
     }
     criaPost(numero, busca) {
-        let post = `{
-        "NumeroProcesso" : "${numero}",
-        "NovosProcessos" : true,
-        "_id": ${busca}}`
+        let post = `{"NumeroProcesso" : "${numero}", "NovosProcessos" : true, "_id": ${busca}}`
         return post
     }
 
@@ -123,5 +120,5 @@ class CriaFilaPJE {
         console.log(e);
     });
     new CriaFilaPJE().worker()
-   
+
 })()

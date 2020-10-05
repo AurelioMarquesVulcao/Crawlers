@@ -112,8 +112,8 @@ async function worker() {
     logger.info('Mensagem recebida');
     logger.info('Buscando novo processo,o número CNJ é: ' + novosProcesso);
     // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-    
-    
+
+
 
     logger.info('Iniciando processo de extração');
     //-------------------------------------------------- inicio do extrator--------------------------------------------
@@ -273,7 +273,7 @@ async function worker() {
             "crawler.JTE",
             envioAWS.status,
             envioAWS.resposta,
-            
+
           )
           console.log(envioAWS);
 

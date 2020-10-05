@@ -125,7 +125,7 @@ class GerenciadorFila {
       for (let i = 0, si = lote.length; i < si; i++) {
         channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
         }));
-        await sleep(20);
+        await sleep(10);
         console.log("enviei mensagem"+[i]);
       }
 

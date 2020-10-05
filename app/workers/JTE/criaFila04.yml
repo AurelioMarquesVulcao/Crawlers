@@ -1,5 +1,5 @@
 apps:
-  - script   : ./workers/JTE/criadoresFila/criaFila04.js
+  - script   : workers/JTE/criadoresFila/criaFila04.js
     name     : 'busca-01'
   - script   : ./workers/JTE/PM2_Reset.js
-    name     : 'busca-02'
+    name     : 'reset'

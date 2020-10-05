@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const sleep = require('await-sleep');
-const desligado = require('../../assets/jte/horarioRoboTRTRJ.json');
+const desligado = require('../../../assets/jte/horarioRoboTRTRJ.json');
 
 
-const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
-const { enums } = require('../../configs/enums');
-const { Processo } = require('../../models/schemas/processo');
+const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
+const { enums } = require('../../../configs/enums');
+const { Processo } = require('../../../models/schemas/processo');
 
 const fila = new CriaFilaJTE();
 var start = 0;

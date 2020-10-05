@@ -3,19 +3,18 @@ const cheerio = require('cheerio');
 const shell = require('shelljs');
 const sleep = require('await-sleep');
 
-const { enums } = require('../../configs/enums');
-const { GerenciadorFila } = require('../../lib/filaHandler');
-// const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Extracao } = require('../../models/schemas/extracao');
-const { Logger, Cnj } = require('../../lib/util');
-const { LogExecucao } = require('../../lib/logExecucao');
-const { Andamento } = require('../../models/schemas/andamento');
-// const { ExtratorBase } = require('../../extratores/extratores');
-const { JTEParser } = require('../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
-const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
-const { downloadFiles } = require('../../lib/downloadFiles');
-const desligado = require('../../assets/jte/horarioRoboJTE.json');
+const { enums } = require('../../../configs/enums');
+const { GerenciadorFila } = require('../../../lib/filaHandler');
+const { ExtratorFactory } = require('../../../extratores/extratorFactory');
+const { Extracao } = require('../../../models/schemas/extracao');
+const { Helper, Logger, Cnj } = require('../../../lib/util');
+const { LogExecucao } = require('../../../lib/logExecucao');
+const { Andamento } = require('../../../models/schemas/andamento');
+const { ExtratorBase } = require('../../../extratores/extratores');
+const { JTEParser } = require('../../../parsers/JTEParser');
+const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer');
+const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
+const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 
 /**
  * Logger para console e arquivo
@@ -27,8 +26,8 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `peticao.JTE.extracao`;
-const reConsumo = `peticao.JTE.extracao`;
+const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.1`;
+const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.1`;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado
 var estadoDaFila;     // Recebe o estado da fila
@@ -41,16 +40,18 @@ var testeErros2 = []; // Contador de erros
 var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicação
 var resultado = [];
 var catchError = 0;   // Captura erros;
-var start = 0;        // server de marcador para as funções que devem carregar na inicialização
+var start = 0;
 
 
 
 
+
+// posso aplicar condições para rodar o worker
 (async () => {
   setInterval(async function () {
     let relogio = fila.relogio();
     if (start == 0) {
-    // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
+      // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
       await worker();
     } else {
@@ -132,19 +133,19 @@ async function worker() {
       }
 
       // // desliga o worker para parar de baixar as iniciais
-      if (message.inicial == true && logadoParaIniciais == true) {
+      // // if (message.inicial == true && logadoParaIniciais == true) {
       // if (!message.NovosProcessos && logadoParaIniciais == true) {
-        logadoParaIniciais = false;
-        await mongoose.connection.close()
-        process.exit();
-      }
-      // reinicia o worker para baixarmos os processos iniciais.
-      if (message.inicial == true && contador != 0 && logadoParaIniciais == false) {
+      //   logadoParaIniciais = false;
+      //   await mongoose.connection.close()
+      //   process.exit();
+      // }
+      // // reinicia o worker para baixarmos os processos iniciais.
+      // // if (message.inicial == true && contador != 0 && logadoParaIniciais == false) {
       // if (message.NovosProcessos == true && contador != 0 && logadoParaIniciais == false) {
-        //console.log('vou deslogar a aplicação ----01');
-        await mongoose.connection.close()
-        process.exit();
-      }
+      //   //console.log('vou deslogar a aplicação ----01');
+      //   await mongoose.connection.close()
+      //   process.exit();
+      // }
 
       estadoAnterior = estadoDaFila;
       logger.info('O Estado do consumer é o numero: ' + estadoAnterior);
@@ -164,14 +165,14 @@ async function worker() {
         }
 
         // loga para pegar iniciais
-        if (message.inicial == true  && logadoParaIniciais == false) {
+        // if (message.inicial == true  && logadoParaIniciais == false) {
         // condicional provisório para testes
         //console.log(logadoParaIniciais);
-        logger.info("Logando para pegar documentos iniciais")
+        // logger.info("Logando para pegar documentos iniciais")
         // if (message.NovosProcessos == true && logadoParaIniciais == false) {
-          await puppet.loga();
-          logadoParaIniciais = true;
-        }
+        //   await puppet.loga();
+        //   logadoParaIniciais = true;
+        // }
 
 
         // caregando as variaveis que receberam os dados do parser
@@ -232,41 +233,18 @@ async function worker() {
 
 
 
-        if (message.inicial == true) {
+        // if (message.inicial == true) {
         // condicional provisório para testes
         // if (message.NovosProcessos == true) {
-          console.log('---------- Vou baixar link das iniciais-------');
-          let link = await puppet.pegaInicial();
-          // console.log(link);
-          let listaArquivo = [];
-          //await console.log(link.length);
-          for (let w = 0; w < link.length - 1; w++) {
-            // console.log(link[w]);
-            await new CriaFilaJTE().salvaDocumentoLink(link[w]);
-            let nome = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
-            let linkDocumento = link[w].link;
-            let local = '/home/aurelio/crawlers-bigdata/downloads'
-            let tipo = link[w].tipo;
-            if (tipo == 'pdf') {
-              await new downloadFiles().download(nome, linkDocumento, local)
-              listaArquivo.push({
-                url: linkDocumento,
-                path: `${local}/${nome}`
-              })
-            } else if (tipo == 'HTML') {
-              // await new downloadFiles().covertePDF(nome, local, linkDocumento)
-              // listaArquivo.push({
-              //   url: linkDocumento,
-              //   path: `${local}/${nome}`
-              // })
-            }
-            await console.log('O link ' + w + ' Foi salvo');
-          }
-          // enviar para AWS
-          let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
-          let cnj = util.processoSlice(numeroAtualProcesso);
-          await new downloadFiles().enviarAWS(cnj, listaArquivo)
-        }
+        //   console.log('---------- Vou baixar link das iniciais-------');
+        //   let link = await puppet.pegaInicial();
+        //   await console.log(link.length);
+        //   for (let w = 0; w < link.length; w++) {
+        //     console.log('entrou no laço');
+        //     await new CriaFilaJTE().salvaDocumentoLink(link[w]);
+        //     await console.log('O link ' + w + ' Foi salvo');
+        //   }
+        // }
 
         logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {
@@ -303,7 +281,7 @@ async function worker() {
       console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
 
 
-      // ch.ack(msg);
+      ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
       desligaAgendado();
@@ -311,7 +289,7 @@ async function worker() {
 
     } catch (e) {
       catchError++;
-      console.log(e)
+      // console.log(e)
       if (e == "ultimo processo") {
         catchError--;
         // salvando status 
@@ -346,7 +324,7 @@ async function worker() {
       }
       logger.info(`Error: ${e.message}`);
       logger.info('Reenviando mensagem ao RabbitMQ');
-      // ch.ack(msg);
+      ch.ack(msg);
       logger.info('Mensagem enviada ao reprocessamento');
       logger.info('\033[31m' + 'Finalizando processo de extração');
       desligaAgendado()

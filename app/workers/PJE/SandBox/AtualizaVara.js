@@ -7,8 +7,10 @@ const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } =
 const Estados = require('../../../assets/jte/comarcascopy.json');
 const { Processo } = require('../../../models/schemas/processo');
 const { Logform } = require('winston');
+const { GerenciadorFila } = require("../../../lib/filaHandler");
 
 const fila = new CriaFilaJTE();
+const rabbit = new GerenciadorFila()
 
 // Conecta ao banco de dados
 mongoose.connect(enums.mongo.connString, {
@@ -23,13 +25,14 @@ mongoose.connection.on('error', (e) => {
 (async () => {
     let regex1 = /Não\sfoi\spossivel\sobter/;
     let regex2 = /gabinete/i;
-    const dados = await buscaBanco(13000);
-    for (i in await dados) {
-        console.log(dados[i].detalhes.numeroProcesso);
-        await enfileirar(dados[i].detalhes.numeroProcesso);
-        await sleep(100);
+    const dados = await buscaBanco(0);
+    await enfileirar(dados)
+    // for (i in await dados) {
+    //     console.log(dados[i].detalhes.numeroProcesso);
+    //     await enfileirar(dados[i].detalhes.numeroProcesso);
+    //     await sleep(100);
 
-    }
+    // }
 
     mongoose.connection.close();
     process.exit()
@@ -64,14 +67,14 @@ async function buscaBanco(pulo) {
 }
 
 
-async function enfileirar(numero) {
-    let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
-    //console.log(regex);
-    if (true) {
-        let mensagem = criaPost(numero);
-        await fila.enviarMensagem("ReprocessamentoJTE", mensagem);
-        console.log("Processo enfileirado para Download");
+async function enfileirar(dados) {
+    let mensagens = [];
+    // let mensagem;
+    for (i in dados) {
+        mensagens.push(criaPost(dados[i].detalhes.numeroProcesso));
     }
+    await rabbit.enfileirarLote("ReprocessamentoJTE", mensagens)
+
     function criaPost(numero) {
         let post = `{
         "NumeroProcesso" : "${numero}",

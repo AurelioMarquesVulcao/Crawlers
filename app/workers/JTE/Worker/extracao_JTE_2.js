@@ -3,18 +3,18 @@ const cheerio = require('cheerio');
 const shell = require('shelljs');
 const sleep = require('await-sleep');
 
-const { enums } = require('../../configs/enums');
-const { GerenciadorFila } = require('../../lib/filaHandler');
-const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Extracao } = require('../../models/schemas/extracao');
-const { Helper, Logger, Cnj } = require('../../lib/util');
-const { LogExecucao } = require('../../lib/logExecucao');
-const { Andamento } = require('../../models/schemas/andamento');
-const { ExtratorBase } = require('../../extratores/extratores');
-const { JTEParser } = require('../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
-const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
-const desligado = require('../../assets/jte/horarioRoboJTE.json');
+const { enums } = require('../../../configs/enums');
+const { GerenciadorFila } = require('../../../lib/filaHandler');
+const { ExtratorFactory } = require('../../../extratores/extratorFactory');
+const { Extracao } = require('../../../models/schemas/extracao');
+const { Helper, Logger, Cnj } = require('../../../lib/util');
+const { LogExecucao } = require('../../../lib/logExecucao');
+const { Andamento } = require('../../../models/schemas/andamento');
+const { ExtratorBase } = require('../../../extratores/extratores');
+const { JTEParser } = require('../../../parsers/JTEParser');
+const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer');
+const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
+const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 
 /**
  * Logger para console e arquivo
@@ -26,9 +26,8 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `ReprocessamentoJTE`;
-// const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.1`;
-const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.1`;
+const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.2`;
+const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.2`;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado
 var estadoDaFila;     // Recebe o estado da fila
@@ -52,7 +51,7 @@ var start = 0;
   setInterval(async function () {
     let relogio = fila.relogio();
     if (start == 0) {
-      // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
+    // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
       await worker();
     } else {
@@ -218,7 +217,7 @@ async function worker() {
           // Enviando para Collection de controle *ultimosProcessos*
           // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
           logger.info("Salvando na Collection ultimosProcessos")
-
+          
           await new CriaFilaJTE().salvaUltimo({
             numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
             dataCadastro: dadosProcesso.processo.capa.dataDistribuicao,

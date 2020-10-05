@@ -1,6 +1,7 @@
 const amqpCA = require('amqplib/callback_api');
 const amqp = require('amqplib');
 const { enums } = require('../configs/enums');
+const sleep = require('await-sleep');
 
 const pred = (params) => {
 
@@ -53,52 +54,58 @@ class GerenciadorFila {
     });
   }
 
-  /** Envia uma lista de mensagens para uma fila.
-   * @param {String} fila String com o nome da fila
-   * @param {Array} lista Array de JSON
-   */
-  enviarLista(fila, lista) {
-    amqpCA.connect(this.host, (err, conn) => {
-      if (err) throw new Error(err);
+//   /** Trata e envia uma mensagem para uma fila.
+//  * @param {String} fila     String que contém o nome da fila.
+//  * @param {any} lista    Lista de Mensagem a serem enviadas.
+//  */
+//   enviarLista(fila, lista) {
+//     if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
 
-      conn.createChannel((err, ch) => {
-        if (err) throw new Error(err);
+//     amqpCA.connect(this.host, (err, conn) => {
+//       if (err) throw new Error(err);
 
-        for (let i = 0; i < lista.length; i++) {
-          this.enviarMensagem(ch, fila, lista[i]);
-        }
-      });
+//       conn.createChannel((err, ch) => {
+//         if (err) throw new Error(err);
 
-      setTimeout(() => {
-        console.log(`${lista.lenght} mensagem enviada(s) para fila!`);
-        conn.close();
-      }, lista.lenght * 500);
-    });
-  }
+//         ch.assertQueue(fila, {
+//           durable: true,
+//           noAck: false,
+//           maxPriority: 9,
+//         });
+//         for (i in lista) {
+//           this.enviarMensagem(ch, fila, lista[i]);
+//         }
+
+//       });
+//     });
+//     conn.close();
+//   }
+
 
   /**
    * Enfileirar um lote de mensagens para uma fila
    * @param {string} fila String com o nome da fila
-   * @param {Array} lote Array com o lote de mensagens
+   * @param {array} lote Array com o lote de mensagens, 
+   * os elementos desse array devem ser tipo string
    */
   async enfileirarLote(fila, lote) {
     try {
-      
+      console.log("mensagens");
       const conn = await amqp.connect(this.host);
       const channel = await conn.createChannel();
-  
+
       channel.assertQueue(fila, {
         durable: true,
         noAck: false,
         maxPriority: 9,
       });
-  
-      for (let i = 0, si = lote.length; i < si; i++) {
-        channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
 
-        }));
+      for (let i = 0, si = lote.length; i < si; i++) {
+        channel.sendToQueue(fila, Buffer.from(lote[i]));
+        await sleep(1);
+        console.log("enviei mensagem" + [i]);
       }
-  
+
     } catch (e) {
       pred(e);
     }

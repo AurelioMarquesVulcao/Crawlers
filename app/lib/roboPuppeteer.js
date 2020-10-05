@@ -308,7 +308,7 @@ class RoboPuppeteer3 {
         // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
         let link = await this.page.evaluate(async (i, iniciaisArray) => {
           // sleep para poder dar tempo de fazer o if
-          await new Promise(function (resolve) { setTimeout(resolve, 300); });
+          await new Promise(function (resolve) { setTimeout(resolve, 1000); });
           // ser for um documento com link pegue o link
           if (!!document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe")) {
             let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
@@ -317,19 +317,19 @@ class RoboPuppeteer3 {
             let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
             // if (!! document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > pdf-viewer")){ "pdf"};
             let tipo = "pdf"
-            console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            // console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
           } // se for um documento de texto 
           else {
             // esse await new promise, vai criar um sleep manual no pupputeer, assim não gero problemas para capturar o documento.
-            await new Promise(function (resolve) { setTimeout(resolve, 500); });
+            await new Promise(function (resolve) { setTimeout(resolve, 1000); });
             // let link = document.querySelector("#documentoEmbutido").innerHTML;
             let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div").innerHTML;
             let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
             let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
             let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
             let tipo = "HTML"
-            console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            // console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
           }
 
@@ -337,6 +337,7 @@ class RoboPuppeteer3 {
         }, i, iniciaisArray);
         //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
         links.push(link)
+        await sleep(2000);
       }
       // entra na terceira forma de apresentação de documentos.
       // documentos multiplus.
@@ -359,12 +360,12 @@ class RoboPuppeteer3 {
           return document.querySelectorAll('#popover-marcador-filtro > ion-item').length;
         })
         for (let k = 1; k < quantidadeDocumentos + 1; k++) {
-          await sleep(1000)
+          await sleep(1500)
           // abro o popup e abro o link do documento
           await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
-          //await sleep(2000)
+          await sleep(1500)
           let link = await this.page.evaluate(async (k, dataEProcesso) => {
-            await new Promise(function (resolve) { setTimeout(resolve, 500); });
+            await new Promise(function (resolve) { setTimeout(resolve, 1000); });
 
             let link = document.querySelector("#linkPDF").href;
             let movimentacao = document.querySelector(`#popover-marcador-filtro > ion-item:nth-child(${k}) > span`).innerText.replace("\n", " ");

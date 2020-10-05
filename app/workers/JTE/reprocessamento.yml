@@ -3,7 +3,3 @@ apps:
     name     : 'r-01'
   - script   : ./workers/JTE/reprocessamento.js
     name     : 'r-02'
-  - script   : ./workers/JTE/reprocessamento.js
-    name     : 'r-03'
-  - script   : ./workers/JTE/reprocessamento.js
-    name     : 'r-04'

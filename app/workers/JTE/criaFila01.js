@@ -13,7 +13,6 @@ const desligar = require('../../assets/jte/horarioRoboJTE.json');
 const Fila = new CriaFilaJTE();
 var fila = ".1";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.1';
-// var desligado = []; // Descomentar essa linha para rodar 24 horas por dia
 var desligado = desligar.worker;
 var estados = [
   // Estados.rj,Estados.pr,

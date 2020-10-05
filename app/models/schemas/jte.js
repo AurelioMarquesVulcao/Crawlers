@@ -56,4 +56,5 @@ const comarcaSchema = new mongoose.Schema({
 })
 
 const statusEstadosJTE = mongoose.model('comarcasJTE', comarcaSchema, 'comarcasJTE');
+
 module.exports.statusEstadosJTE = statusEstadosJTE;

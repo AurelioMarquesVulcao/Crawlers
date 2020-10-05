@@ -16,15 +16,15 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
-      // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      // args: ['--ignore-certificate-errors']
+      args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -69,7 +69,7 @@ class RoboPuppeteer3 {
     // // this.page = await this.browser.newPage();
 
     // await sleep(timerSleep2)
-    
+
     await shell.exec('pkill chrome');
     //this.finalizar()
     process.exit()
@@ -135,7 +135,7 @@ class RoboPuppeteer3 {
       //console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
     } catch (e) {
       console.log("----- Este é o ultimo processo dessa comarca até o momento. -----");
-      throw "Erro não mapeado" 
+      throw "Erro não mapeado"
     }
 
 
@@ -308,7 +308,7 @@ class RoboPuppeteer3 {
         // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
         let link = await this.page.evaluate(async (i, iniciaisArray) => {
           // sleep para poder dar tempo de fazer o if
-          await new Promise(function (resolve) { setTimeout(resolve, 300); });
+          await new Promise(function (resolve) { setTimeout(resolve, 1000); });
           // ser for um documento com link pegue o link
           if (!!document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe")) {
             let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
@@ -317,19 +317,19 @@ class RoboPuppeteer3 {
             let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
             // if (!! document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > pdf-viewer")){ "pdf"};
             let tipo = "pdf"
-            // console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
           } // se for um documento de texto 
           else {
             // esse await new promise, vai criar um sleep manual no pupputeer, assim não gero problemas para capturar o documento.
-            await new Promise(function (resolve) { setTimeout(resolve, 500); });
+            await new Promise(function (resolve) { setTimeout(resolve, 1000); });
             // let link = document.querySelector("#documentoEmbutido").innerHTML;
             let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div").innerHTML;
             let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
             let data = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`).innerText;
             let numeroProcesso = document.querySelector("#numeroProcessoFormatado > div").innerText;
             let tipo = "HTML"
-            // console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
           }
 
@@ -337,6 +337,7 @@ class RoboPuppeteer3 {
         }, i, iniciaisArray);
         //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
         links.push(link)
+        await sleep(2000);
       }
       // entra na terceira forma de apresentação de documentos.
       // documentos multiplus.
@@ -359,17 +360,17 @@ class RoboPuppeteer3 {
           return document.querySelectorAll('#popover-marcador-filtro > ion-item').length;
         })
         for (let k = 1; k < quantidadeDocumentos + 1; k++) {
-          await sleep(1000)
+          await sleep(1500)
           // abro o popup e abro o link do documento
           await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
-          //await sleep(2000)
+          await sleep(1000)
           let link = await this.page.evaluate(async (k, dataEProcesso) => {
-            await new Promise(function (resolve) { setTimeout(resolve, 500); });
+            await new Promise(function (resolve) { setTimeout(resolve, 1000); });
 
             let link = document.querySelector("#linkPDF").href;
             let movimentacao = document.querySelector(`#popover-marcador-filtro > ion-item:nth-child(${k}) > span`).innerText.replace("\n", " ");
             let data = dataEProcesso.data;
-            let numeroProcesso = dataEProcesso.numeroProcesso.replace(/[-.]/g, "");
+            let numeroProcesso = dataEProcesso.numeroProcesso;
             let tipo = "PDF"
             console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
@@ -528,68 +529,5 @@ function processaNumero(numero) {
 //   await sleep(1000)
 //   await puppet.pegaInicial()
 // })()
-// (async () => {
-//   let puppet = new RoboPuppeteer3()
 
-//   await puppet.iniciar()
-
-//   await sleep(1000)
-//   await puppet.acessar("https://jte.csjt.jus.br/")
-//   await sleep(1000)
-//   await puppet.preencheTribunal('00105492920205150001')
-//   await sleep(2000)
-//   await puppet.loga()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109906220205150001", 0)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00109936220205150001", 1)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00079274720205150000", 2)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-//   await sleep(1000)
-//   // await puppet.preencheProcesso("00109936220205150001", 3)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109364720205150069", 4)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109886220205150001", 5)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109886220205150001", 6)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109886220205150001", 7)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109876220205150001", 8)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109846220205150001", 9)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-//   // await puppet.preencheProcesso("00109916220205150001", 10)
-//   // await sleep(1000)
-//   // await puppet.pegaInicial()
-//   // await sleep(1000)
-
-// })()
-// 0011051-65.2020.5.15.0001  
-// 00109474720205150042   -- verificar esse numero
-// 00109364720205150069
-// 10007714720205020045
-// 00106894720205150101
-// 00079274720205150000
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

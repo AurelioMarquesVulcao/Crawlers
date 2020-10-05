@@ -140,7 +140,7 @@ async function statusRaspagem() {
     );
 }
 
-// conta as comarcas que pussuo até agora.
+// conta as comarcas que possuo até agora.
 function contarComarcas(Estados) {
     let comarcas = 0;
     let estados = [

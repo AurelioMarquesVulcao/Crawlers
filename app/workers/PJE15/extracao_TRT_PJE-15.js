@@ -22,7 +22,7 @@ var reset = '\u001b[0m';
  * @param {String} testeSleep Gera um numero aleatório para que os robos não façam requisições simultâneas.
  * @param {String} logger Gera um log a ser exibido no terminal de execução do robô
  * @param {Object} extracao Objeto com o resultado da extração do robô
- * @param {String} busca ID do processo que receberá os dados adionais raspados neste processo.
+ * @param {String} busca ID do processo que receberá os dados adicionais raspados neste processo.
  */
 (async () => {
     mongoose.connect(enums.mongo.connString, {
@@ -60,7 +60,7 @@ var reset = '\u001b[0m';
             nomeRobo: enums.nomesRobos.PJE,
             NumeroDoProcesso: message.NumeroProcesso,
         });
-        // Exibe a mensagem a ser consumina como tabela.
+        // Exibe a mensagem a ser consumida como tabela.
         console.table(message);
 
         // Inicio do Robô
@@ -69,14 +69,14 @@ var reset = '\u001b[0m';
             logger.info('Iniciando processo de extração');
             // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
             let extracao = await new ExtratorTrtPje15().extrair(message.NumeroProcesso, numeroEstado);
-            logger.info('Extração concluída');
+            logger.info('Extração concluída')
             logger.info('Iniciando Parse');
             console.log(extracao);
             // process.exit();
 
             // tratando a resposta do extrator
             if (extracao === null) {
-                const error = new Error('Extração falhou, processo será reenfileirado');
+                const error = new Error('Extração falhou, processo será colocado na fila novamente');
                 error.code = "Extração falhou";
                 throw error;
 

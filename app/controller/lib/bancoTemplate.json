@@ -381,43 +381,43 @@
         "segunda": {
             "liga": [1],
             "desliga": [],
-            "escalar": [{ "horaScale": 21, "quantidade": 8 }, { "horaScale": 23, "quantidade": 1 }, { "horaScale": 3, "quantidade": 8 }, { "horaScale": 9, "quantidade": 1 }],
+            "escalar": [{ "horaScale": 21, "quantidade": 10 }, { "horaScale": 23, "quantidade": 3 }, { "horaScale": 3, "quantidade": 10 }, { "horaScale": 9, "quantidade": 3 }],
             "prioridade": 1
         },
         "terca": {
             "liga": [1],
             "desliga": [],
-            "escalar": [{ "horaScale": 21, "quantidade": 8 }, { "horaScale": 23, "quantidade": 1 }, { "horaScale": 3, "quantidade": 8 }, { "horaScale": 9, "quantidade": 1 }],
+            "escalar": [{ "horaScale": 21, "quantidade": 10 }, { "horaScale": 23, "quantidade": 3 }, { "horaScale": 3, "quantidade": 10 }, { "horaScale": 9, "quantidade": 3 }],
             "prioridade": 1
         },
         "quarta": {
             "liga": [1],
             "desliga": [],
-            "escalar": [{ "horaScale": 21, "quantidade": 8 }, { "horaScale": 23, "quantidade": 1 }, { "horaScale": 3, "quantidade": 8 }, { "horaScale": 9, "quantidade": 1 }],
+            "escalar": [{ "horaScale": 21, "quantidade": 10 }, { "horaScale": 23, "quantidade": 3 }, { "horaScale": 3, "quantidade": 10 }, { "horaScale": 9, "quantidade": 3 }],
             "prioridade": 1
         },
         "quinta": {
             "liga": [1],
             "desliga": [],
-            "escalar": [{ "horaScale": 21, "quantidade": 8 }, { "horaScale": 23, "quantidade": 1 }, { "horaScale": 3, "quantidade": 8 }, { "horaScale": 9, "quantidade": 1 }],
+            "escalar": [{ "horaScale": 21, "quantidade": 10 }, { "horaScale": 23, "quantidade": 3 }, { "horaScale": 3, "quantidade": 10 }, { "horaScale": 9, "quantidade": 3 }],
             "prioridade": 1
         },
         "sexta": {
             "liga": [],
             "desliga": [],
-            "escalar": [{ "horaScale": 21, "quantidade": 8 }, { "horaScale": 23, "quantidade": 1 }, { "horaScale": 3, "quantidade": 8 }, { "horaScale": 9, "quantidade": 1 }],
+            "escalar": [{ "horaScale": 21, "quantidade": 10 }, { "horaScale": 23, "quantidade": 3 }, { "horaScale": 3, "quantidade": 10 }, { "horaScale": 9, "quantidade": 3 }],
             "prioridade": 1
         },
         "sabado": {
             "liga": [],
             "desliga": [3],
-            "escalar": [{ "horaScale": 1, "quantidade": 8 }],
+            "escalar": [{ "horaScale": 1, "quantidade": 12 }],
             "prioridade": 1
         },
         "domingo": {
             "liga": [],
             "desliga": [],
-            "escalar": [{ "horaScale": 23, "quantidade": 1 }],
+            "escalar": [{ "horaScale": 23, "quantidade": 3 }],
             "prioridade": 1
         }
 
@@ -426,25 +426,25 @@
         "nome": "novos-processos-trt-2",
         "peso": 1,
         "segunda": {
-            "liga": [1],
+            "liga": [],
             "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
         "terca": {
-            "liga": [1],
+            "liga": [],
             "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
         "quarta": {
-            "liga": [1],
+            "liga": [],
             "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
         "quinta": {
-            "liga": [1],
+            "liga": [],
             "desliga": [],
             "escalar": [],
             "prioridade": 1
@@ -457,7 +457,7 @@
         },
         "sabado": {
             "liga": [],
-            "desliga": [3],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },

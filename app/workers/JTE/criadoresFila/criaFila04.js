@@ -12,6 +12,7 @@ const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 
 
 const Fila = new CriaFilaJTE();
+const rabbit = new GerenciadorFila();
 var fila = ".4";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.4';
 // var desligado = [];

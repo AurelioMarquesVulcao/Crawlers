@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const cheerio = require('cheerio');
 const re = require('xregexp');
 const sleep = require('await-sleep');
-const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
-const comarcas = require('../../assets/jte/comarcas');
-const Estados = require('../../assets/jte/comarcascopy.json');
-const { getFilas } = require('./get_fila');
-const { Helper, Logger } = require('../../lib/util');
-const desligar = require('../../assets/jte/horarioRoboJTE.json');
+const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
+const comarcas = require('../../../assets/jte/comarcas');
+const Estados = require('../../../assets/jte/comarcascopy.json');
+const { getFilas } = require('../get_fila');
+const { Helper, Logger } = require('../../../lib/util');
+const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 
 
 const Fila = new CriaFilaJTE();
@@ -69,13 +69,12 @@ var estados = [
 // Busca no banco de dados qual o ultimo processesso do estado/comarca,
 // Após isso tenta pegar o proximo processo em ordem númerica.
 async function criador(origens, tribunal, codigo, max, tempo, fila) {
-
+  let mensagens = [];
   let second = 0;
   let contaOrigem = 0;
   let contaLaco = 0;
   for (let w = 0; w < 1000;) {
     second++
-
     if ("a") {
       try {
         let relogio = Fila.relogio();
@@ -101,28 +100,31 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
-              console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+              mensagens.push(
+                await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+              );
             } else {
-              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
+              mensagens.push(
+                await Fila.procura(numeroSequencial, comarca, 1, codigo, fila));
             }
-            await sleep(500)
           } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
-              console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+              mensagens.push(
+                await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+              );
             } else {
-              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila,)
+              mensagens.push(
+                await Fila.procura(numeroSequencial, comarca, 1, codigo, fila));
             }
-            await sleep(500)
           } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
-              console.log("----------------------- Estou dando um salto no Tempo--------------------------");
+              mensagens.push(
+                await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+              );
             } else {
-              await Fila.procura(numeroSequencial, comarca, 1, codigo, fila)
+              mensagens.push(
+                await Fila.procura(numeroSequencial, comarca, 1, codigo, fila));
             }
-            await sleep(500)
           }
 
         }
@@ -135,6 +137,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       }
 
       if (contaOrigem == max - 1) {
+        await rabbit.enfileirarLote(nomeFila,mensagens);
         if (contaLaco > 0) {
           await sleep(10000)
         }
@@ -148,10 +151,11 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           break
         }
         contaLaco = 0;
+
       } else { contaOrigem++ };
     };
   };
-  await sleep(1000)
+  // await sleep(1000)
 };
 
 function maiorSequencial(obj) {

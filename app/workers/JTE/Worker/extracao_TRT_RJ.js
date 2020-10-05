@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
-const { enums } = require('../../configs/enums');
-const { GerenciadorFila } = require('../../lib/filaHandler');
-const { ExtratorFactory } = require('../../extratores/extratorFactory');
+const { enums } = require('../../../configs/enums');
+const { GerenciadorFila } = require('../../../lib/filaHandler');
+const { ExtratorFactory } = require('../../../extratores/extratorFactory');
 //const { Extracao } = require('../../models/schemas/extracao');
-const { Helper, Logger } = require('../../lib/util');
+const { Helper, Logger } = require('../../../lib/util');
 //const { LogExecucao } = require('../../lib/logExecucao');
 const sleep = require('await-sleep');
 const { ExtratorTrtrj } = require('../../extratores/processoTRT-RJ');
-const { Processo } = require('../../models/schemas/processo');
-const { TRTParser}= require('../../parsers/TRTRJParser');
+const { Processo } = require('../../../models/schemas/processo');
+const { TRTParser}= require('../../../parsers/TRTRJParser');
 // const logarExecucao = async (execucao) => {
 //   await LogExecucao.salvar(execucao);
 // };

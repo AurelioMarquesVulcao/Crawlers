@@ -19,8 +19,10 @@ class CriaFilaPJE {
     async worker() {
         await this.testaFila();
     }
+    /**
+     * Monta a os blocos de estados a serem enfileirados
+     */
     async montaFila() {
-        let fila = [];
         let estado = [];
         console.log("Fila concluída. Iniciando criador de fila.");
         for (let i = 1; i < 25; i++) {
@@ -35,8 +37,7 @@ class CriaFilaPJE {
 
     /**
      * Verifica se a fila possui menos de 100 mensagens, caso tenha menos de 100 mensagens,
-     * enfileira 1000 processos de cada estado.
-     * 
+     * enfileira 300 processos de cada estado.
      */
     async testaFila() {
         console.log("Testando Fila");
@@ -60,11 +61,15 @@ class CriaFilaPJE {
         }
     }
 
-
+    /**
+     * Busca no banco de dados por processos extraidos do JTE
+     * que não possuem a capa atualizada. E os envia para fila.
+     * @param {number} pulo salta uma quantidade de processos apartir do inicio.
+     * @param {number} tribunal Tribunal/Estado ao qual o processo pertence.
+     */
     async atualizaProcessosFila(pulo, tribunal) {
-        let start = 1
         let busca;
-        let extracao;
+        let mensagens = [];
         let agregar = await Processo.aggregate([
             {
                 $match: {
@@ -80,36 +85,32 @@ class CriaFilaPJE {
                     "_id": 1
                 }
             }
-        ]).skip(pulo).limit(1000);
-        // console.log(await agregar);
-        let mensagens = [];
-        
+        ]).skip(pulo).limit(300);
         for (let i = 0; i < agregar.length; i++) {
-            busca = `"${agregar[i]._id}"`;
+            busca = `${agregar[i]._id}`;
             mensagens.push(this.criaPost(agregar[i].detalhes.numeroProcesso, busca));
         }
         await this.rabbit.enfileirarLote(this.fila, mensagens)
     }
 
 
-    async enfileirarTRT_RJ(numero, busca) {
-        let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
-        let mensagem = this.criaPost(numero, busca);
-        await this.criafila.enviarMensagem(this.fila, mensagem);
-        console.log("Processo enfileirado para Download");
+    // async enfileirarTRT_RJ(numero, busca) {
+    //     let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))
+    //     let mensagem = this.criaPost(numero, busca);
+    //     await this.criafila.enviarMensagem(this.fila, mensagem);
+    //     console.log("Processo enfileirado para Download");
+    // }
 
-    }
-
-
-    makeid() {
-        let text = "5ed9";
-        let possible = "abcdefghijklmnopqrstuvwxyz0123456789";
-        for (var i = 0; i < 20; i++)
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        return text;
-    }
+    /**
+    * Cria um post para ser enviado como mensagem para o rabbit
+    * @param {string} numero Numero de Processo
+    * @param {string} busca Objeto Id para busca no MONGO-DB
+    * @return {string} return.: {"NumeroProcesso" : "00004618720205130032","NovosProcessos" : true, "_id" : "5f6cb256f0375ab99a7cf367"}
+    */
     criaPost(numero, busca) {
-        let post = `{"NumeroProcesso" : "${numero}", "NovosProcessos" : true, "_id": ${busca}}`
+        let busca2 = busca.toString()
+        let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true, "_id" : "${busca2}"}`;
+        console.log(post);
         return post
     }
 

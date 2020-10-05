@@ -3,18 +3,18 @@ const cheerio = require('cheerio');
 const shell = require('shelljs');
 const sleep = require('await-sleep');
 
-const { enums } = require('../../configs/enums');
-const { GerenciadorFila } = require('../../lib/filaHandler');
-const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Extracao } = require('../../models/schemas/extracao');
-const { Helper, Logger, Cnj } = require('../../lib/util');
-const { LogExecucao } = require('../../lib/logExecucao');
-const { Andamento } = require('../../models/schemas/andamento');
-const { ExtratorBase } = require('../../extratores/extratores');
-const { JTEParser } = require('../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../lib/roboPuppeteer');
-const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
-const desligado = require('../../assets/jte/horarioRoboJTE.json');
+const { enums } = require('../../../configs/enums');
+const { GerenciadorFila } = require('../../../lib/filaHandler');
+const { ExtratorFactory } = require('../../../extratores/extratorFactory');
+const { Extracao } = require('../../../models/schemas/extracao');
+const { Helper, Logger, Cnj } = require('../../../lib/util');
+const { LogExecucao } = require('../../../lib/logExecucao');
+const { Andamento } = require('../../../models/schemas/andamento');
+const { ExtratorBase } = require('../../../extratores/extratores');
+const { JTEParser } = require('../../../parsers/JTEParser');
+const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer');
+const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
+const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 
 /**
  * Logger para console e arquivo

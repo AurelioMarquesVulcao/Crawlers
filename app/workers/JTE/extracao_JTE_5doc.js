@@ -96,7 +96,7 @@ async function worker() {
   // tudo que está abaixo é acionado para cada consumer na fila.
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     contadorErros++;
-    heartBeat = 0;  // Zero o Contador indicando que a aplicação esta consumindo a fila.
+    heartBeat = 0;  // Zera o Contador indicando que a aplicação esta consumindo a fila.
     let dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     let novosProcesso = message.NovosProcessos;
@@ -108,18 +108,18 @@ async function worker() {
     });
 
     logger.info('Mensagem recebida');
-    logger.info('É busca de novo processo novo processo ' + novosProcesso);
+    logger.info('Buscando novo processo,o número CNJ é: ' + novosProcesso);
     // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
 
     logger.info('Iniciando processo de extração');
     //-------------------------------------------------- inicio do extrator--------------------------------------------
     try {
-      // Quando o worker liga, ele marca qual o primeiro estado da fila
+      // Quando o worker liga, ele marca qual é o primeiro estado da fila
       if (contador == 0) {
         estadoAnterior = puppet.processaNumero(numeroProcesso).estado;
       }
-      logger.info('O primeiro Estado é o numero: ' + estadoAnterior);
+      logger.info('O número do primeiro Estado é: ' + estadoAnterior);
 
       // verifica qual é o estado de origem do pedido de raspagem.
       estadoDaFila = puppet.processaNumero(numeroProcesso).estado;
@@ -174,7 +174,7 @@ async function worker() {
         }
 
 
-        // caregando as variaveis que receberam os dados do parser
+        // carregando as variaveis que receberam os dados do parser
         let dadosProcesso;
         var processo;
         let parser = new JTEParser();
@@ -324,7 +324,7 @@ async function worker() {
       // Salva meus erros nos logs
       logger.log("info", numeroProcesso + " " + e);
       console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
-      // caso o puppeteer fique perdido na sequencias de clicks nós o reiniciamos.
+      // caso o puppeteer fique perdido na sequencias de clicks o reiniciamos.
       if (catchError > 4) {
         //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close()

@@ -72,7 +72,7 @@ class Arquivamento {
                 res.data.pipe(fs.createWriteStream(path));
                 console.log(`gravando ${nomeArquivo} - OK`);
               });
-              // console.log('despois de gravar o arquivo');
+              // console.log('depois de gravar o arquivo');
               i++;
             }
           }

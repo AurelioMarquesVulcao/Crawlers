@@ -123,6 +123,5 @@ class CriaFilaPJE {
         console.log(e);
     });
     new CriaFilaPJE().worker()
-    // força criar a fila
-    // new CriaFilaPJE().montaFila()
+   
 })()

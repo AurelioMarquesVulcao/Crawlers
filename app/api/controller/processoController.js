@@ -1,8 +1,8 @@
 const moment = require('moment');
 const Tribunal = require('../../models/schemas/tribunal');
 const { GerenciadorFila } = require('../../lib/filaHandler');
-const { Processo } = require("../../models/schemas/processo");
-const { Andamento } = require("../../models/schemas/andamento");
+const { Processo } = require('../../models/schemas/processo');
+const { Andamento } = require('../../models/schemas/andamento');
 const { Helper, CnjValidator } = require('../../lib/util');
 
 // const context = {
@@ -14,7 +14,6 @@ const { Helper, CnjValidator } = require('../../lib/util');
 // };
 
 const identificarTribunal = (cnj) => {
-
   let tribunal;
   let idTribunalMatch = cnj.match(/\.([0-9]\.[0-9]{2})\./);
 
@@ -22,43 +21,51 @@ const identificarTribunal = (cnj) => {
     if (/5.[0-9]{2}/.test(idTribunalMatch[1])) {
       tribunal = 'JTE';
     } else {
-      switch(idTribunalMatch[1]) {
-        case '8.05': tribunal = 'TJBA'; break; // TJBA
-        case '8.13': tribunal = 'TJMG'; break; // TJMG     
-        case '8.24': tribunal = 'TJSC'; break; // TJSC
-        case '8.26': tribunal = 'TJSP'; break; // TJSP      
-        default: tribunal = ''; break;
+      switch (idTribunalMatch[1]) {
+        case '8.05':
+          tribunal = 'TJBA';
+          break; // TJBA
+        case '8.13':
+          tribunal = 'TJMG';
+          break; // TJMG
+        case '8.24':
+          tribunal = 'TJSC';
+          break; // TJSC
+        case '8.26':
+          tribunal = 'TJSP';
+          break; // TJSP
+        default:
+          tribunal = '';
+          break;
       }
     }
   }
 
   return tribunal;
-
-}
+};
 
 const identificarFila = (lista) => {
-  
   // let lote = { tribunal: "", processos: [] };
   let lote = [];
   // 8.05 // TJBA
   // 8.24 // TJSC
-  // 8.26 // TJSP    
+  // 8.26 // TJSP
   // 8.13 // TJMG
-  // 5.* //   
+  // 5.* //
 
-  for(let i = 0, si = lista.length; i < si; i++) {
-
-    const cnj = lista[i].NumeroProcesso.replace(/([0-9]{7})([0-9]{2})([0-9]{4})([0-9]{1})([0-9]{2})([0-9]{4})/, "$1-$2.$3.$4.$5.$6");
+  for (let i = 0, si = lista.length; i < si; i++) {
+    const cnj = lista[i].NumeroProcesso.replace(
+      /([0-9]{7})([0-9]{2})([0-9]{4})([0-9]{1})([0-9]{2})([0-9]{4})/,
+      '$1-$2.$3.$4.$5.$6'
+    );
 
     lista[i].tribunal = identificarTribunal(cnj);
-
   }
 
   return lista.reduce((acc, curVal) => {
+    let index = acc.findIndex((x) => x.tribunal === curVal.tribunal);
 
-    let index = acc.findIndex(x => x.tribunal === curVal.tribunal);
-
-    if (index === -1) {      
+    if (index === -1) {
       let obj = {};
       obj.tribunal = curVal.tribunal;
       delete curVal.tribunal;
@@ -71,32 +78,36 @@ const identificarFila = (lista) => {
 
     return acc;
   }, []);
-
-}
+};
 
 class Tradutor {
-
   /**
    * Monta a capa do processo.
    * @param {JSON} processo JSON do processo original para montar a capa nova.
    * @param {JSON} ultimoAndamento JSON do primeiro andamento adicionado a lista de andamentos.
    */
   montarCapa(processo) {
-    const capa = processo.capa;    
-    const envolvidos = processo.envolvidos.map((envolvido)=> {
-      
+    const capa = processo.capa;
+    const envolvidos = processo.envolvidos.map((envolvido) => {
       const tipo = /advogado/i.test(envolvido.tipo) ? true : false;
       let oabs = [];
 
       if (tipo) {
-        const oabMatch = envolvido.nome.match(/(\((?<numero>\d+)(?<tipo>\w{0,1})-?(?<secc>\w{2})\s?\))/);
+        const oabMatch = envolvido.nome.match(
+          /(\((?<numero>\d+)(?<tipo>\w{0,1})-?(?<secc>\w{2})\s?\))/
+        );
         if (oabMatch) {
-          oabs = [{
-            Inscricao: oabMatch.groups.numero.replace(/\(|\)/g,'').trim(),
-            TipoInscricao: oabMatch.groups.tipo,
-            Seccional:  oabMatch.groups.secc
-          }];
-          envolvido.nome = envolvido.nome.replace(/(\((?<numero>\d+)(?<tipo>\w{0,1})-?(?<secc>\w{2})\s?\))/ig,'');
+          oabs = [
+            {
+              Inscricao: oabMatch.groups.numero.replace(/\(|\)/g, '').trim(),
+              TipoInscricao: oabMatch.groups.tipo,
+              Seccional: oabMatch.groups.secc,
+            },
+          ];
+          envolvido.nome = envolvido.nome.replace(
+            /(\((?<numero>\d+)(?<tipo>\w{0,1})-?(?<secc>\w{2})\s?\))/gi,
+            ''
+          );
         }
       }
 
@@ -107,28 +118,29 @@ class Tradutor {
         Chave: envolvido.tipo.toLowerCase(),
         Telefones: [],
         Oabs: oabs,
-        IsAdvogado: tipo
-      }
+        IsAdvogado: tipo,
+      };
     });
 
     return {
       Envolvidos: envolvidos,
       Assuntos: capa.assunto,
       Situacao: 'ativo',
-      Classe: capa.classe,      
+      Classe: capa.classe,
       Comarca: capa.comarca,
       Metadados: {},
       JusticaGratuita: false,
       SegredoDeJustica: false,
       ValorDaCausa: 0,
       Instancia: processo.detalhes.instancia,
-      DataDistribuicao: processo.capa.dataDistribuicao
+      DataDistribuicao: processo.capa.dataDistribuicao,
+      Vara: processo.capa.vara,
     };
   }
 
   /**
    * Monta dos detalhes da numeracao do processo.
-   * @param {string} numeroMascara Numero do proocesso com mascara 
+   * @param {string} numeroMascara Numero do proocesso com mascara
    */
   montarDetalhes(numeroMascara) {
     const cnj = numeroMascara.split(/[-.]/);
@@ -148,7 +160,10 @@ class Tradutor {
    * @param {JSON} ultimoAndamento JSON do primeiro andamento adicionado a lista de andamentos.
    */
   verificarDataDistribuicao(ultimoAndamento) {
-    return ultimoAndamento && /distribui(do|cao)/i.test(ultimoAndamento.descricao) ? ultimoAndamento.data : '';    
+    return ultimoAndamento &&
+      /distribui(do|cao)/i.test(ultimoAndamento.descricao)
+      ? ultimoAndamento.data
+      : '';
   }
 
   /**
@@ -160,7 +175,7 @@ class Tradutor {
     return {
       NumeroCNJ: processo.detalhes.numeroProcesso,
       Capa: this.montarCapa(processo),
-      CnjDetalhes: this.montarDetalhes(processo.detalhes.numeroProcessoMascara)
+      CnjDetalhes: this.montarDetalhes(processo.detalhes.numeroProcessoMascara),
     };
   }
 
@@ -177,15 +192,14 @@ class Tradutor {
         Conteudo: andamento.descricao,
         Documentos: [],
         ChavePrimariaTribunal: '',
-        Observacao: andamento.obs ? andamento.obs : ''
+        Observacao: andamento.obs ? andamento.obs : '',
       });
-     }
+    }
     return listaAndamentosNovos;
   }
-};
+}
 
 class ProcessoController {
-  
   static async enfileirar(req, res) {
     try {
       // TODO descomentar
@@ -209,9 +223,8 @@ class ProcessoController {
   }
 
   static async contarDocumentos(req, res) {
-
     let response = {};
-    
+
     try {
       const results = await Processo.countDocuments({});
       response.status = 200;
@@ -227,41 +240,40 @@ class ProcessoController {
   }
 
   static async obterProcesso(req, res) {
-    
     const response = {};
 
     try {
       const numeroProcesso = req.params.numeroProcesso.replace(/[.-]/g, '');
       response.status = 200;
-      response.data = await Processo.findOne({"detalhes.numeroProcesso": numeroProcesso });
+      response.data = await Processo.findOne({
+        'detalhes.numeroProcesso': numeroProcesso,
+      });
       response.error = null;
     } catch (e) {
       console.log(e);
       response.status = 500;
       response.data = '';
-      response.error = e.message;      
+      response.error = e.message;
     }
 
     res.status(response.status).send(response);
-
   }
 
   static async obterAndamentos(req, res) {
-
     const response = {};
 
     try {
       const numeroProcesso = req.params.numeroProcesso.replace(/[.-]/g, '');
-      response.status =  200;
-      response.data = await Andamento.find({numeroProcesso});
+      response.status = 200;
+      response.data = await Andamento.find({ numeroProcesso });
       response.error = null;
     } catch (e) {
       console.log(e);
       response.status = 500;
       response.data = '';
-      response.error = e.message;        
+      response.error = e.message;
     }
-    
+
     res.status(response.status).send(response);
   }
 
@@ -271,17 +283,24 @@ class ProcessoController {
     try {
       const cnj = req.params.numeroProcesso;
       const numeroProcesso = /[.-]/.test(cnj) ? cnj.replace(/[.-]/g, '') : cnj;
-      const resProcesso = await Processo.findOne({"detalhes.numeroProcesso": numeroProcesso });
+      const resProcesso = await Processo.findOne({
+        'detalhes.numeroProcesso': numeroProcesso,
+      });
 
       response.status = 200;
       response.data = new Tradutor().traduzirProcesso(resProcesso);
       response.error = null;
-      console.log(`Consulta do processo ${numeroProcesso} realizada com sucesso!\n`);
+      console.log(
+        `Consulta do processo ${numeroProcesso} realizada com sucesso!\n`
+      );
     } catch (e) {
       response.status = 500;
       response.data = '';
       response.error = e.message;
-      console.log(`Consulta do processo ${numeroProcesso} não realizada com sucesso!\n`, e.message);
+      console.log(
+        `Consulta do processo ${numeroProcesso} não realizada com sucesso!\n`,
+        e.message
+      );
     }
 
     res.status(response.status).send(response.data);
@@ -302,7 +321,7 @@ class ProcessoController {
       console.log(e);
       response.status = 500;
       response.data = '';
-      response.error = e.message;       
+      response.error = e.message;
     }
 
     res.status(response.status).send(response.data);
@@ -315,57 +334,71 @@ class ProcessoController {
       const filtros = req.query;
       const query = {};
 
-      if (Object.keys(filtros).length > 0) {        
-        if (filtros.data) {          
-          query.dataCriacao = {            
-            $gte: moment(filtros.data, 'YYYY-MM-DD').format('YYYY-MM-DDT00:00:00Z'),
-          }
+      if (Object.keys(filtros).length > 0) {
+        if (filtros.data) {
+          query.dataCriacao = {
+            $gte: moment(filtros.data, 'YYYY-MM-DD').format(
+              'YYYY-MM-DDT00:00:00Z'
+            ),
+          };
         }
       }
 
       const limit = filtros && filtros.limite ? parseInt(filtros.limite) : 1000;
-      let skip = filtros && filtros.pagina ? parseInt(filtros.pagina) : 0;      
+      let skip = filtros && filtros.pagina ? parseInt(filtros.pagina) : 0;
       const sort = filtros && filtros.ord ? parseInt(filtros.ord) : 1;
 
-      skip = skip > 0 ? ((skip-1) * limit) : 0;
+      skip = skip > 0 ? (skip - 1) * limit : 0;
 
       const count = await Processo.countDocuments(query);
-      const resProcessos = await Processo.find(query).skip(skip).limit(limit).sort({ _id: sort });
-      
+      const resProcessos = await Processo.find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort({ _id: sort });
+
       const tradutor = new Tradutor();
       const listaProcessos = [];
 
       for (let i = 0, si = resProcessos.length; i < si; i++) {
-        listaProcessos.push(tradutor.traduzirProcesso(resProcessos[i]));        
+        listaProcessos.push(tradutor.traduzirProcesso(resProcessos[i]));
       }
 
       response.status = 200;
-      response.data = { totalRegistros: count, pagina: skip, limite: limit, resultados: listaProcessos };
+      response.data = {
+        totalRegistros: count,
+        pagina: skip,
+        limite: limit,
+        resultados: listaProcessos,
+      };
       response.error = null;
     } catch (e) {
       console.log(e);
       response.status = 500;
       response.data = '';
-      response.error = e.message;       
+      response.error = e.message;
     }
 
     res.status(response.status).send(response.data);
   }
 
   static async enfileirarDocumentos(req, res) {
-    const response = {status: 500, data: '', error: null};
+    const response = { status: 500, data: '', error: null };
     try {
-
-      const context = req.body; 
+      const context = req.body;
 
       const lote = identificarFila(context);
       let contador = 0;
 
-      for(let i = 0, si = lote.length; i < si; i++) {
-        console.log(`peticao.${lote[i].tribunal}.extracao`, lote[i].processos.length);
+      for (let i = 0, si = lote.length; i < si; i++) {
+        console.log(
+          `peticao.${lote[i].tribunal}.extracao`,
+          lote[i].processos.length
+        );
         contador += lote[i].processos.length;
-        await new GerenciadorFila()
-          .enfileirarLote(`peticao.${lote[i].tribunal}.extracao`, lote[i].processos);
+        await new GerenciadorFila().enfileirarLote(
+          `peticao.${lote[i].tribunal}.extracao`,
+          lote[i].processos
+        );
       }
 
       response.status = 200;
@@ -375,14 +408,11 @@ class ProcessoController {
       console.log(e);
       response.status = 500;
       response.data = '';
-      response.error = e.message;       
+      response.error = e.message;
     } finally {
       res.status(response.status).send(response.data);
     }
-
-    
   }
-
 }
 
 module.exports.ProcessoController = ProcessoController;

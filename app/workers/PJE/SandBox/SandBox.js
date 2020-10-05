@@ -58,7 +58,7 @@ mongoose.connection.on('error', (e) => {
     //console.log(varaComarca("Processo no 1º grau - 1ª Vara do Trabalho de Campinas")); 
     //console.log(varaComarca("Processo no 1º grau - 5ª Vara do Trabalho do Rio de Janeiro"));
 
-    // yasmin23await corrigeBanco()
+    // await corrigeBanco()
 
     //console.log(Estados[0]);
 
@@ -226,7 +226,7 @@ async function corrigeBanco() {
             for (i in agregar) {
                 busca = { "_id": agregar[i]._id };
                 let teste01 = new JTEParser().regexVaraComarca("Processo no 1º grau - " + agregar[i].capa.vara.replace(")", ""))
-                console.log(teste01 + " imprimonedo teste");
+                console.log(teste01 + " imprimindo teste");
                 if (agregar[i].capa.comarca == teste01[3]) {
                     vara = teste01[2]
                     comarca = removerAcentos(teste01[3])

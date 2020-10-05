@@ -19,17 +19,22 @@ class CriaFilaPJE {
         await this.testaFila();
     }
     async montaFila() {
+        let fila = [];
         console.log("Fila concluída. Iniciando criador de fila.");
         for (let i = 1; i < 25; i++) {
             if (i != 15) {
-                await this.atualizaProcessosFila(0, i);
+                
+                fila.push(await this.atualizaProcessosFila(0, i)[0]);
+                
                 console.log("debug");
             }
             await sleep(500);
         }
         await sleep(5000);
         await this.testaFila();
+        console.log(fila);
     }
+
     async testaFila() {
         console.log("Testando Fila");
         let statusFila = false
@@ -71,16 +76,19 @@ class CriaFilaPJE {
                     "_id": 1
                 }
             }
-        ]).skip(pulo).limit(20);
+        ]).skip(pulo).limit(5);
         // console.log(await agregar);
+        let mensagens = [];
         for (let i = 0; i < agregar.length; i++) {
             busca = `"${agregar[i]._id}"`;
             // console.log(busca);
             console.log(await !!extracao);
-            await this.enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
+            mensagem.push(agregar[i].detalhes.numeroProcesso, busca);
+            // await this.enfileirarTRT_RJ(agregar[i].detalhes.numeroProcesso, busca);
             console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
             await sleep(20)
         }
+        return mensagens
     }
     async enfileirarTRT_RJ(numero, busca) {
         let regex = (/([0-9]{7})([0-9]{2})(2020)(5)(01)([0-9]{4})/g.test(numero))

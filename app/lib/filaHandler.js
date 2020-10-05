@@ -81,34 +81,12 @@ class GerenciadorFila {
     conn.close();
   }
 
-  /** Envia uma lista de mensagens para uma fila.
-   * @param {String} fila String com o nome da fila
-   * @param {Array} lista Array de JSON
-   */
-  // enviarLista(fila, lista) {
-  //   amqpCA.connect(this.host, (err, conn) => {
-  //     if (err) throw new Error(err);
-
-  //     conn.createChannel((err, ch) => {
-  //       if (err) throw new Error(err);
-
-  //       for (let i = 0; i < lista.length; i++) {
-  //         this.enviarMensagem(ch, fila, lista[i]);
-  //         console.log("envio");
-  //       }
-  //     });
-
-  //     setTimeout(() => {
-  //       console.log(`${lista.lenght} mensagem enviada(s) para fila!`);
-  //       conn.close();
-  //     }, lista.lenght * 500);
-  //   });
-  // }
 
   /**
    * Enfileirar um lote de mensagens para uma fila
    * @param {string} fila String com o nome da fila
-   * @param {Array} lote Array com o lote de mensagens
+   * @param {array} lote Array com o lote de mensagens, 
+   * os elementos desse array devem ser tipo string
    */
   async enfileirarLote(fila, lote) {
     try {
@@ -123,10 +101,9 @@ class GerenciadorFila {
       });
 
       for (let i = 0, si = lote.length; i < si; i++) {
-        channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
-        }));
+        channel.sendToQueue(fila, Buffer.from(lote[i]));
         await sleep(10);
-        console.log("enviei mensagem"+[i]);
+        console.log("enviei mensagem" + [i]);
       }
 
     } catch (e) {

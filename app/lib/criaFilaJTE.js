@@ -133,7 +133,17 @@ class CriaFilaJTE {
 			}
 		}
 	}
+	/**
+	 * Cria um numero de processo para ser enviado para fila
+	 * @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
+	 * @param {string} origem comarca do esdo que será buscada
+	 * @param {number} tentativas numero de processos a serem testados
+	 * @param {string} tribunal referêncial numerico do estado a ser buscado
+	 * @param {string} fila fila que receberá a mensagem.
+	 * @return {string} Retorna um numero CNJ para ser buscado
+	 */
 	async procura(sequencial, origem, tentativas, tribunal, fila) {
+		let mensagens = [];
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -148,19 +158,31 @@ class CriaFilaJTE {
 				} else {
 					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
 				}
-
-				await this.enviaFila([{
-					NumeroProcesso: processo
-				}], fila)
-				console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
-				console.log(`Estado ${tribunal}`);
+				mensagens.push(processo)
+				// await this.enviaFila([{
+				// 	NumeroProcesso: processo
+				// }], fila)
+				// console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
+				// console.log(`Estado ${tribunal}`);
 			}
+			return mensagens
 		} catch (e) {
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);
 		}
 
 	}
+	
+	/**
+	 * Cria um numero de processo para ser enviado para fila
+	 * @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
+	 * @param {string} origem comarca do esdo que será buscada
+	 * @param {number} tentativas numero de processos a serem testados
+	 * @param {string} tribunal referêncial numerico do estado a ser buscado
+	 * @param {string} fila fila que receberá a mensagem.
+	 * @return {string} Retorna um numero CNJ para ser buscado
+	 */
 	async procura10(sequencial, origem, tentativas, tribunal, fila) {
+		let mensagens = [];
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -175,11 +197,12 @@ class CriaFilaJTE {
 				} else {
 					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
 				}
-
-				await this.enviaFila([{
-					NumeroProcesso: processo
-				}], fila)
+				mensagens.push(processo)
+				// await this.enviaFila([{
+				// 	NumeroProcesso: processo
+				// }], fila)
 			}
+			return mensagens
 			console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
 		} catch (e) {
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);

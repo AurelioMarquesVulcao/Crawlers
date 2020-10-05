@@ -54,32 +54,32 @@ class GerenciadorFila {
     });
   }
 
-  /** Trata e envia uma mensagem para uma fila.
- * @param {String} fila     String que contém o nome da fila.
- * @param {any} lista    Lista de Mensagem a serem enviadas.
- */
-  enviarLista(fila, lista) {
-    if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
+//   /** Trata e envia uma mensagem para uma fila.
+//  * @param {String} fila     String que contém o nome da fila.
+//  * @param {any} lista    Lista de Mensagem a serem enviadas.
+//  */
+//   enviarLista(fila, lista) {
+//     if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
 
-    amqpCA.connect(this.host, (err, conn) => {
-      if (err) throw new Error(err);
+//     amqpCA.connect(this.host, (err, conn) => {
+//       if (err) throw new Error(err);
 
-      conn.createChannel((err, ch) => {
-        if (err) throw new Error(err);
+//       conn.createChannel((err, ch) => {
+//         if (err) throw new Error(err);
 
-        ch.assertQueue(fila, {
-          durable: true,
-          noAck: false,
-          maxPriority: 9,
-        });
-        for (i in lista) {
-          this.enviarMensagem(ch, fila, lista[i]);
-        }
+//         ch.assertQueue(fila, {
+//           durable: true,
+//           noAck: false,
+//           maxPriority: 9,
+//         });
+//         for (i in lista) {
+//           this.enviarMensagem(ch, fila, lista[i]);
+//         }
 
-      });
-    });
-    conn.close();
-  }
+//       });
+//     });
+//     conn.close();
+//   }
 
 
   /**

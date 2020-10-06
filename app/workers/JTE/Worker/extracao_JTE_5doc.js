@@ -236,17 +236,12 @@ async function worker() {
 
 
         if (message.inicial == true) {
-          // condicional provisório para testes
-          // if (message.NovosProcessos == true) {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
-          // console.log(link);
           let listaArquivo = [];
-          //await console.log(link.length);
           for (let w = 0; w < link.length - 1; w++) {
-            // console.log(link[w]);
             await new CriaFilaJTE().salvaDocumentoLink(link[w]);
-            let nome = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
+            let cnj = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
             let linkDocumento = link[w].link;
 
             // let local = '/home/aurelio/crawlers-bigdata/downloads';
@@ -254,10 +249,10 @@ async function worker() {
 
             let tipo = link[w].tipo;
             if (tipo == 'pdf') {
-              await new downloadFiles().download(nome, linkDocumento, local)
+              await new downloadFiles().download(cnj, linkDocumento, local)
               listaArquivo.push({
                 url: linkDocumento,
-                path: `${local}/${nome}`
+                path: `${local}/${cnj}`
               })
             } else if (tipo == 'HTML') {
               // await new downloadFiles().covertePDF(nome, local, linkDocumento)
@@ -266,9 +261,8 @@ async function worker() {
               //   path: `${local}/${nome}`
               // })
             }
-            await console.log('O link ' + w + ' Foi salvo');
           }
-          console.log(listaArquivo);
+          logger.info('Iniciando envio para AWS');
           // enviar para AWS
           let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
           let cnj = numeroAtualProcesso;
@@ -326,7 +320,7 @@ async function worker() {
 
     } catch (e) {
       catchError++;
-      // console.log(e)
+      console.log(e)
       if (e == "ultimo processo") {
         catchError--;
         // salvando status 
@@ -348,7 +342,7 @@ async function worker() {
       }
 
       // envia a mensagem para a fila de reprocessamento
-      if (!novosProcesso) {
+      if (message.inicial == true) {
         new GerenciadorFila().enviar(nomeFila, message);
       }
 

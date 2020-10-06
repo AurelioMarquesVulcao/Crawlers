@@ -93,6 +93,10 @@ class CriaFilaJTE {
 
 	}
 
+	/**
+	 * Salva os links dos documentos no banco de dados
+	 * @param {object} link Objeto com o link e movimentação do processo.
+	 */
 	async salvaDocumentoLink(link) {
 		let verifica = await linkDocumento.find({ "numeroProcesso": link.numeroProcesso, "movimentacao": link.link })
 		if (!verifica[0]) {

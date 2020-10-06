@@ -103,7 +103,10 @@ class GerenciadorFila {
       for (let i = 0, si = lote.length; i < si; i++) {
         channel.sendToQueue(fila, Buffer.from(lote[i]));
         await sleep(1);
-        console.log("enviei mensagem" + [i]);
+        console.log(lote[i]);
+        // console.log("enviei mensagem" + [i]);
+        // await sleep(5000);
+        // process.exit()
       }
 
     } catch (e) {

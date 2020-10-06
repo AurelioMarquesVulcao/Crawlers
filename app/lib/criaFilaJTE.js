@@ -158,7 +158,7 @@ class CriaFilaJTE {
 				} else {
 					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
 				}
-				mensagens=criaPost(processo);
+				mensagens = criaPost(processo);
 				// await this.enviaFila([{
 				// 	NumeroProcesso: processo
 				// }], fila)
@@ -182,7 +182,7 @@ class CriaFilaJTE {
 	 * @return {string} Retorna um numero CNJ para ser buscado
 	 */
 	async procura10(sequencial, origem, tentativas, tribunal, fila) {
-		let mensagens = [];
+		let mensagens;
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -197,7 +197,7 @@ class CriaFilaJTE {
 				} else {
 					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
 				}
-				mensagens.push(processo)
+				mensagens = criaPost(processo);
 				// await this.enviaFila([{
 				// 	NumeroProcesso: processo
 				// }], fila)
@@ -273,13 +273,6 @@ class CriaFilaJTE {
 
 }
 
-// (async () => {
-// 	console.log(await new CriaFilaJTE().verificaComarcas("15", "0003"));
-// 	console.log(await new CriaFilaJTE().verificaComarcas("18", "0003"));
-// 	console.log(await new CriaFilaJTE().verificaComarcas("23", "0003"));
-
-// 	await sleep(3000)
-// })()
 
 class CriaFilaTRT {
 	async enviar(processo, fila) {

@@ -249,9 +249,9 @@ async function worker() {
             let nome = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
             let linkDocumento = link[w].link;
 
-            let local = '/home/aurelio/crawlers-bigdata/downloads';
-            let local = '/downloads';
-            
+            // let local = '/home/aurelio/crawlers-bigdata/downloads';
+            let local = '/app/downloads';
+
             let tipo = link[w].tipo;
             if (tipo == 'pdf') {
               await new downloadFiles().download(nome, linkDocumento, local)
@@ -268,6 +268,7 @@ async function worker() {
             }
             await console.log('O link ' + w + ' Foi salvo');
           }
+          console.log(listaArquivo);
           // enviar para AWS
           let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
           let cnj = numeroAtualProcesso;

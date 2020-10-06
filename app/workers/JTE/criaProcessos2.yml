@@ -7,6 +7,4 @@ apps:
     name     : 'busca-03'
   - script   : ./app/workers/JTE/criaFila04.js
     name     : 'busca-04'
-  - script   : ./app/workers/JTE/PM2_Reset.js
-    name     : 'reset'
-    
+   

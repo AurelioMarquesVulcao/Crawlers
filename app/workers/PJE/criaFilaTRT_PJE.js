@@ -74,7 +74,7 @@ class CriaFilaPJE {
             {
                 $match: {
                     'detalhes.orgao': 5,
-                    'detalhes.tribunal': tribunal,
+                    'detalhes.tribunal': 1,
                     'detalhes.ano': 2020,
                     "origemExtracao": "JTE"
                 }
@@ -82,10 +82,13 @@ class CriaFilaPJE {
             {
                 $project: {
                     "detalhes.numeroProcesso": 1,
+                    "dataAtualizacao":1,
                     "_id": 1
                 }
-            }
-        ]).skip(pulo).limit(300);
+            },
+            {$sort:{_id:-1}},
+            {$limit:10}
+        ]).skip(pulo);
         for (let i = 0; i < agregar.length; i++) {
             busca = `${agregar[i]._id}`;
             mensagens.push(this.criaPost(agregar[i].detalhes.numeroProcesso, busca));

@@ -215,7 +215,7 @@ class RoboPuppeteer3 {
     await sleep(2000)
     await this.page.type("#formLogin > ion-item > ion-input > input", login)
     console.log('digido login');
-    await sleep(1000)
+    await sleep(3000)
     await this.page.click("#formLogin > ion-toolbar > ion-button")
     console.log('clicado no primeiro botão');
     await sleep(1000)

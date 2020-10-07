@@ -212,6 +212,45 @@ class CriaFilaJTE {
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);
 		}
 	}
+
+	/**
+ 	* Cria um numero de processo para ser enviado para fila
+ 	* @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
+ 	* @param {string} origem comarca do esdo que será buscada
+ 	* @param {number} tentativas numero de processos a serem testados
+ 	* @param {string} tribunal referêncial numerico do estado a ser buscado
+ 	* @param {string} fila fila que receberá a mensagem.
+ 	* @return {string} Retorna um numero CNJ para ser buscado
+ 	*/
+	async procuraEspecial(sequencial, origem, tentativas, tribunal, fila) {
+		let mensagens = [];
+		try {
+			let obj = corrigeSequencial(sequencial)
+			let zeros = ""
+			let processo = ""
+			origem = corrigeOrigem(origem)
+			for (let i = 0; i < tentativas; i++) {
+				sequencial = parseInt(obj.seq)
+				let a = sequencial + 1 + i
+				if ((obj.zero + a).length > 7) {
+					zeros = obj.zero.substr(1)
+					processo = `${zeros}${a}4720205${tribunal}${origem}`
+				} else {
+					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				}
+				mensagens.push(criaPost(processo));
+				// await this.enviaFila([{
+				// 	NumeroProcesso: processo
+				// }], fila)
+				// console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
+				// console.log(`Estado ${tribunal}`);
+			}
+			return mensagens
+		} catch (e) {
+			console.log(`O Processo numero: ${processo} FALHOU !!!`);
+		}
+
+	}
 	relogio() {
 		let data = new Date();
 		// Guarda cada pedaço em uma variável

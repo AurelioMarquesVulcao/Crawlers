@@ -27,11 +27,11 @@ class RoboPuppeteer3 {
       slowMo: 1,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      // args: ['--ignore-certificate-errors']
+      // args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8181']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -44,7 +44,7 @@ class RoboPuppeteer3 {
     try {
       await this.page.goto(url, {
         waitUntil: "load",
-        timeout: 40000,
+        timeout: 20000,
         // waitUntil: 'networkidle2'
       });
       // isso me da o url completo
@@ -97,9 +97,9 @@ class RoboPuppeteer3 {
     await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper')
     await sleep(timerSleep)
     await this.page.click(`#mat-option-${escolheEstado(numero)}`)
-    await sleep(timerSleep)
+    await sleep(700)
     await this.page.click('ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span')
-    await sleep(2200)
+    await sleep(2500)
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual')
     await sleep(timerSleep)
@@ -209,24 +209,38 @@ class RoboPuppeteer3 {
   async loga() {
     let login = "10389051764";
     let senha = "Senh@JTE123";
+    // let email = "karine_mrm@hotmail.com";
     console.log('Login iniciado');
     await this.page.click("#inner > ion-toolbar > ion-buttons:nth-child(5)")
     console.log('clicado no item de login');
-    await sleep(2000)
+    await sleep(3500)
     await this.page.type("#formLogin > ion-item > ion-input > input", login)
     console.log('digido login');
-    await sleep(3000)
+    await sleep(2500)
     await this.page.click("#formLogin > ion-toolbar > ion-button")
     console.log('clicado no primeiro botão');
-    await sleep(1000)
-    await this.page.type("#senha > input", senha)
-    console.log('digitando senha');
-    await sleep(2000)
+    await sleep(2500)
+    try {
+      await this.page.type("#senha > input", senha)
+      console.log('digitando senha');
+    } catch (e) {
+      // await this.page.type("#email > input", email)
+      // await sleep(2500)
+      // await this.page.type("#confirmaEmail > input", email)
+      // await sleep(2500)
+
+    }
+
+    await sleep(3500)
     await this.page.click("#formLogin > ion-toolbar > ion-button")
     console.log('confirmando senha');
     await sleep(9000)
     await this.page.click('#consultaProcessual > ion-card')
     console.log('clicado no botão de busca');
+
+    //     document.querySelector("#email > input")
+    // <input class=​"native-input sc-ion-input-md" aria-labelledby=​"ion-input-1-lbl" autocapitalize=​"off" autocomplete=​"off" autocorrect=​"off" maxlength=​"40" name=​"email" placeholder=​"Informe um email ativo" type=​"text">​
+    // document.querySelector("#confirmaEmail > input")
   }
 
   /**
@@ -240,6 +254,7 @@ class RoboPuppeteer3 {
       console.log("Arquivos simples " + iniciaisArray)
       console.log("Arquivos paginados " + iniciaisMultiplas)
 
+      this.logger.info(`Iniciando captura de documentos Simples`);
       for (let i = 0; i < (await iniciaisArray).length; i++) {
         await sleep(timerSleep)
         await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`)
@@ -248,7 +263,7 @@ class RoboPuppeteer3 {
         // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
         let link = await this.page.evaluate(async (i, iniciaisArray) => {
           // sleep para poder dar tempo de fazer o if
-          await new Promise(function (resolve) { setTimeout(resolve, 1000); });
+          await new Promise(function (resolve) { setTimeout(resolve, 1200); });
           // ser for um documento com link pegue o link
           if (!!document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe")) {
             let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe").src;
@@ -262,7 +277,7 @@ class RoboPuppeteer3 {
           } // se for um documento de texto 
           else {
             // esse await new promise, vai criar um sleep manual no pupputeer, assim não gero problemas para capturar o documento.
-            await new Promise(function (resolve) { setTimeout(resolve, 1000); });
+            await new Promise(function (resolve) { setTimeout(resolve, 1200); });
             // let link = document.querySelector("#documentoEmbutido").innerHTML;
             let link = document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div").innerHTML;
             let movimentacao = document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`).innerText;
@@ -279,34 +294,78 @@ class RoboPuppeteer3 {
         //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
         links.push(link)
         await sleep(2000);
+
       }
+      this.logger.info(`Finalizado captura de documentos Simples`);
+
+      this.logger.info(`Iniciando captura de documentos Multiplos`);
       // entra na terceira forma de apresentação de documentos.
       // documentos multiplus.
       for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
-        await sleep(timerSleep)
+        // this.logger.info(`Cliquei no documento numero ${iniciaisArray[j]}`);
+        await sleep(500)
         let dataEProcesso = await this.page.evaluate(async (j, iniciaisMultiplas) => {
           return {
             data: document.querySelector(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-label > ion-text > h4`).innerText,
             numeroProcesso: document.querySelector("#numeroProcessoFormatado > div").innerText
           }
         }, j, iniciaisMultiplas)
-        await sleep(timerSleep)
-        await sleep(timerSleep)
+        await sleep(500)
         // entra no documento multiplo
-        await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
-        await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
-        await sleep(timerSleep)
+
+
+        let buttonRun = null;
+        while (buttonRun != "Lista de documentos") {
+          console.log(buttonRun);
+          console.log("tentando click");
+          await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+          // await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+          
+          this.logger.info(`Cliquei no documento numero ${iniciaisMultiplas[j]}`);
+
+          console.log("tentei");
+
+          buttonRun = await this.page.evaluate(async () => {
+            await new Promise(function (resolve) { setTimeout(resolve, 1000); });
+            if(document.querySelector("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title")){
+              return document.querySelector("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title").innerText;
+            } else {
+              return null
+            }
+            
+          });
+          
+          console.log(buttonRun);
+          console.log("tentei novamente");
+          await sleep(1000);
+        }
+
+        console.log("Sai do while ");
+
+
+
+
+
+        // await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+
+
+
+
+        await sleep(500)
+
+
         // conta quantos documentos devo raspar
         let quantidadeDocumentos = await this.page.evaluate(async () => {
           return document.querySelectorAll('#popover-marcador-filtro > ion-item').length;
         })
         for (let k = 1; k < quantidadeDocumentos + 1; k++) {
+          this.logger.info(`Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`);
           await sleep(1500)
           // abro o popup e abro o link do documento
           await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
-          await sleep(1000)
+          await sleep(1200)
           let link = await this.page.evaluate(async (k, dataEProcesso) => {
-            await new Promise(function (resolve) { setTimeout(resolve, 1000); });
+            await new Promise(function (resolve) { setTimeout(resolve, 1500); });
 
             let link = document.querySelector("#linkPDF").href;
             let movimentacao = document.querySelector(`#popover-marcador-filtro > ion-item:nth-child(${k}) > span`).innerText.replace("\n", " ");
@@ -340,10 +399,35 @@ class RoboPuppeteer3 {
         await this.page.click("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button")
         await sleep(timerSleep)
       }
+      this.logger.info(`Finalizado captura de documentos Multiplos`);
       // console.log(links);
       return links
     } catch (e) { console.log("Não pegou os Documentos"); console.log(e); }
   }
+
+  /**
+   * Tenta entrar nos documentos multiplos para baixar seus links
+   * @param {number} numero Numero do child da tabela.
+   */
+  async clicaMultiplo(numero) {
+    await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${numero}) > ion-icon`)
+    await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${numero}) > ion-icon`)
+    this.logger.info(`Cliquei no documento numero ${numero}`);
+
+    console.log("tentei");
+
+    let buttonRun = await this.page.evaluate(async () => {
+      await new Promise(function (resolve) { setTimeout(resolve, 200); });
+      let teste = document.querySelector("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button");
+      return teste
+
+    });
+    console.log(buttonRun);
+    if (buttonRun == null) {
+      throw "Erro tente novamente"
+    }
+  }
+
 
   // busca os numeros dos filhos da lista de movimentacoes que possuem:  documentos anexos e estão antes da petição inicial
   // dessa forma pego apenas os anexos das iníciais.

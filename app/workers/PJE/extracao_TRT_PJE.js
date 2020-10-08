@@ -37,10 +37,10 @@ var reset = '\u001b[0m';
     const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
     // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
 
-    new GerenciadorFila(false, 2).consumir(nomeFila, async (ch, msg) => {
+    new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
         var heartBeat = 0;
         // Desincroniza as requisições do robô
-        let testeSleep = numeroAleatorio(1, 20)
+        let testeSleep = numeroAleatorio(1, 30)
         await sleep(testeSleep * 1000)
         // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
         setInterval(async function () {
@@ -100,6 +100,7 @@ var reset = '\u001b[0m';
                 // console.log(await dadosProcesso);
                 logger.info('Parse finalizado');
                 logger.info('Iniciando salvamento da capa do processo');
+                console.log(blue + `---------------------- Tempo de extração é de ${heartBeat} ----------------------` + reset);
                 await dadosProcesso.processo.save();
                 logger.info('Finalizado salvamento de capa de processo');
             } else if (extracao.segredoJustica === true) {

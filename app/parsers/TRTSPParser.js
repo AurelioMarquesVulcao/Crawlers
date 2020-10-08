@@ -5,9 +5,7 @@
 
 
 const { BaseParser, removerAcentos } = require('./BaseParser');
-//const { Processo } = require('../models/schemas/processo');
 const { ProcessoTRT } = require('../models/schemas/trt.rj');
-//const { Andamento } = require('../models/schemas/andamento');
 const Extracao = require('../assets/jte/testes.json')
 
 
@@ -28,7 +26,7 @@ class TRTParser extends BaseParser {
             capa: this.capa(extracao),
             oabs: [],
             qtdAndamentos: extracao.itensProcesso.length,
-            origemExtracao: "TRT-SP",
+            origemExtracao: "TRT-PJE",
             envolvidos: [],
             detalhes: ProcessoTRT.identificarDetalhes(extracao.numero),
         })
@@ -41,7 +39,7 @@ class TRTParser extends BaseParser {
     capa(extracao) {
         let regex = this.regexVaraComarca(extracao.orgaoJulgador)
         let capa = {
-            uf: "SP",
+            uf: "",
             comarca: regex.comarca,
             vara: regex.vara,
             fase: extracao.itensProcesso[0].instancia,
@@ -106,7 +104,3 @@ class TRTParser extends BaseParser {
     }
 }
 module.exports.TRTParser = TRTParser;
-
-(async () => {
-    await new TRTParser().parse(Extracao)
-})()

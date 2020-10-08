@@ -97,7 +97,7 @@ class CriaFilaPJE {
             busca = `${agregar[i]._id}`;
             mensagens.push(this.criaPost(agregar[i].detalhes.numeroProcesso, busca));
         }
-        await this.rabbit.enfileirarLote(this.fila, mensagens)
+        await this.rabbit.enfileirarLoteTRT(this.fila, mensagens)
     }
 
 

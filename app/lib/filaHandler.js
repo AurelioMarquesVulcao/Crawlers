@@ -54,32 +54,62 @@ class GerenciadorFila {
     });
   }
 
-//   /** Trata e envia uma mensagem para uma fila.
-//  * @param {String} fila     String que contém o nome da fila.
-//  * @param {any} lista    Lista de Mensagem a serem enviadas.
-//  */
-//   enviarLista(fila, lista) {
-//     if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
+  /** Trata e envia uma mensagem para uma fila.
+ * @param {String} fila     String que contém o nome da fila.
+ * @param {any} lista    Lista de Mensagem a serem enviadas.
+ */
+  enviarLista(fila, lista) {
+    if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
 
-//     amqpCA.connect(this.host, (err, conn) => {
-//       if (err) throw new Error(err);
+    amqpCA.connect(this.host, (err, conn) => {
+      if (err) throw new Error(err);
 
-//       conn.createChannel((err, ch) => {
-//         if (err) throw new Error(err);
+      conn.createChannel((err, ch) => {
+        if (err) throw new Error(err);
 
-//         ch.assertQueue(fila, {
-//           durable: true,
-//           noAck: false,
-//           maxPriority: 9,
-//         });
-//         for (i in lista) {
-//           this.enviarMensagem(ch, fila, lista[i]);
-//         }
+        ch.assertQueue(fila, {
+          durable: true,
+          noAck: false,
+          maxPriority: 9,
+        });
+        for (i in lista) {
+          this.enviarMensagem(ch, fila, lista[i]);
+        }
 
-//       });
-//     });
-//     conn.close();
-//   }
+      });
+    });
+    conn.close();
+  }
+
+
+/**
+   * Enfileirar um lote de mensagens para uma fila
+   * @param {string} fila String com o nome da fila
+   * @param {Array} lote Array com o lote de mensagens
+   */
+  async enfileirarLote(fila, lote) {
+    try {
+      
+      const conn = await amqp.connect(this.host);
+      const channel = await conn.createChannel();
+  
+      channel.assertQueue(fila, {
+        durable: true,
+        noAck: false,
+        maxPriority: 9,
+      });
+  
+      for (let i = 0, si = lote.length; i < si; i++) {
+        channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
+
+        }));
+      }
+  
+    } catch (e) {
+      pred(e);
+    }
+  }
+
 
 
   /**
@@ -88,7 +118,7 @@ class GerenciadorFila {
    * @param {array} lote Array com o lote de mensagens, 
    * os elementos desse array devem ser tipo string
    */
-  async enfileirarLote(fila, lote) {
+  async enfileirarLoteTRT(fila, lote) {
     try {
       console.log("mensagens");
       const conn = await amqp.connect(this.host);

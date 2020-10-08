@@ -23,11 +23,16 @@ class CriaFilaPJE {
      * Monta a os blocos de estados a serem enfileirados
      */
     async montaFila() {
+        let data = new Date();
+        data = new Date()
+        data.setDate(data.getDate() - 2)
+        console.log(data);
+
         let estado = [];
         console.log("Fila concluída. Iniciando criador de fila.");
         for (let i = 1; i < 25; i++) {
             if (i != 15) {
-                estado = await this.atualizaProcessosFila(0, i)[0]
+                estado = await this.atualizaProcessosFila(0, i, data)[0]
             }
         }
         await sleep(125000);
@@ -66,8 +71,9 @@ class CriaFilaPJE {
      * que não possuem a capa atualizada. E os envia para fila.
      * @param {number} pulo salta uma quantidade de processos apartir do inicio.
      * @param {number} tribunal Tribunal/Estado ao qual o processo pertence.
+     * @param {date} data Data do dia anterior para a busca de processos
      */
-    async atualizaProcessosFila(pulo, tribunal) {
+    async atualizaProcessosFila(pulo, tribunal, data) {
         let busca;
         let mensagens = [];
         let agregar = await Processo.aggregate([
@@ -78,7 +84,7 @@ class CriaFilaPJE {
                     'detalhes.ano': 2020,
                     "origemExtracao": "JTE",
                     'dataAtualizacao': {
-                        '$lt': new Date('2020-10-07'),
+                        '$lt': data,
                         '$gt': new Date('2020-10-01')
                     }
                 }
@@ -86,12 +92,12 @@ class CriaFilaPJE {
             {
                 $project: {
                     "detalhes.numeroProcesso": 1,
-                    "dataAtualizacao":1,
+                    "dataAtualizacao": 1,
                     "_id": 1
                 }
             },
-            {$sort:{_id:-1}},
-            {$limit:20}
+            { $sort: { _id: -1 } },
+            { $limit: 20 }
         ]).skip(pulo);
         for (let i = 0; i < agregar.length; i++) {
             busca = `${agregar[i]._id}`;

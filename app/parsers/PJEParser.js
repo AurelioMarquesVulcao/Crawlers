@@ -5,7 +5,7 @@
 
 
 const { BaseParser, removerAcentos } = require('./BaseParser');
-const { ProcessoTRT } = require('../models/schemas/trt.rj');
+const { ProcessoTRT } = require('../models/schemas/pje');
 const Extracao = require('../assets/jte/testes.json')
 
 

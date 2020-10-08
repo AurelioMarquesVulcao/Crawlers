@@ -74,9 +74,13 @@ class CriaFilaPJE {
             {
                 $match: {
                     'detalhes.orgao': 5,
-                    'detalhes.tribunal': 1,
+                    'detalhes.tribunal': tribunal,
                     'detalhes.ano': 2020,
-                    "origemExtracao": "JTE"
+                    "origemExtracao": "JTE",
+                    'dataAtualizacao': {
+                        '$lt': new Date('2020-10-07'),
+                        '$gt': new Date('2020-10-01')
+                    }
                 }
             },
             {
@@ -87,7 +91,7 @@ class CriaFilaPJE {
                 }
             },
             {$sort:{_id:-1}},
-            {$limit:10}
+            {$limit:20}
         ]).skip(pulo);
         for (let i = 0; i < agregar.length; i++) {
             busca = `${agregar[i]._id}`;

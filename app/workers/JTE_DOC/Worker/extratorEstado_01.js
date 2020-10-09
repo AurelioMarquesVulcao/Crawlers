@@ -29,7 +29,7 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `peticao.JTE.extracao.teste`;
+const nomeFila = process.argv[2];
 const reConsumo = `peticao.JTE.extracao`;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado

@@ -22,13 +22,13 @@
         },
         "quinta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [12],
             "escalar": [{ "horaScale": 9, "quantidade": 2 },{ "horaScale": 11, "quantidade": 1 }],
             "prioridade": 1
         },
         "sexta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [12],
             "escalar": [{ "horaScale": 9, "quantidade": 2 },{ "horaScale": 11, "quantidade": 1 }],
             "prioridade": 1
         },
@@ -69,13 +69,13 @@
         },
         "quinta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [12],
             "escalar": [{ "horaScale": 9, "quantidade": 2 },{ "horaScale": 11, "quantidade": 1 }],
             "prioridade": 1
         },
         "sexta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [12],
             "escalar": [{ "horaScale": 9, "quantidade": 2 },{ "horaScale": 11, "quantidade": 1 }],
             "prioridade": 1
         },
@@ -116,13 +116,13 @@
         },
         "quinta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [12],
             "escalar": [{ "horaScale": 9, "quantidade": 2 },{ "horaScale": 11, "quantidade": 1 }],
             "prioridade": 1
         },
         "sexta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [12],
             "escalar": [{ "horaScale": 9, "quantidade": 2 },{ "horaScale": 11, "quantidade": 1 }],
             "prioridade": 1
         },
@@ -163,13 +163,13 @@
         },
         "quinta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [12],
             "escalar": [{ "horaScale": 9, "quantidade": 2 },{ "horaScale": 11, "quantidade": 1 }],
             "prioridade": 1
         },
         "sexta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [12],
             "escalar": [{ "horaScale": 9, "quantidade": 2 },{ "horaScale": 11, "quantidade": 1 }],
             "prioridade": 1
         },
@@ -210,13 +210,13 @@
         },
         "quinta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
         "sexta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
@@ -257,13 +257,13 @@
         },
         "quinta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
         "sexta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
@@ -304,13 +304,13 @@
         },
         "quinta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
         "sexta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
@@ -351,13 +351,13 @@
         },
         "quinta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
         "sexta": {
             "liga": [23],
-            "desliga": [21, 3, 12],
+            "desliga": [],
             "escalar": [],
             "prioridade": 1
         },
@@ -517,3 +517,4 @@
 
     }
 ]
+ban

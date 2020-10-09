@@ -89,11 +89,11 @@ class JTEParser extends BaseParser {
       );
       resultado = [{ data: Helper.data(parse[1]), tipo: 'N/I' }];
     } catch (e) {
-      resultado = [{ data: '', tipo: '' }];
+      resultado = [];
     }
 
-    console.log(resultado);
-    process.exit();
+    // console.log(resultado);
+    // process.exit();
     return resultado;
   }
 

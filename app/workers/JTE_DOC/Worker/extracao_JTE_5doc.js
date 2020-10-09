@@ -5,16 +5,19 @@ const sleep = require('await-sleep');
 
 const { enums } = require('../../../configs/enums');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
-const { ExtratorFactory } = require('../../../extratores/extratorFactory');
+// const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../../models/schemas/extracao');
-const { Helper, Logger, Cnj } = require('../../../lib/util');
+const { Logger, Cnj, Helper } = require('../../../lib/util');
 const { LogExecucao } = require('../../../lib/logExecucao');
 const { Andamento } = require('../../../models/schemas/andamento');
-const { ExtratorBase } = require('../../../extratores/extratores');
+// const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer');
+const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
+const { downloadFiles } = require('../../../lib/downloadFiles');
+const { Log } = require('../../../models/schemas/logsEnvioAWS')
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
+
 
 /**
  * Logger para console e arquivo
@@ -26,8 +29,8 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.1`;
-const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.1`;
+const nomeFila = `peticao.JTE.extracao.teste`;
+const reConsumo = `peticao.JTE.extracao`;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado
 var estadoDaFila;     // Recebe o estado da fila
@@ -40,13 +43,11 @@ var testeErros2 = []; // Contador de erros
 var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicação
 var resultado = [];
 var catchError = 0;   // Captura erros;
-var start = 0;
+var start = 0;        // server de marcador para as funções que devem carregar na inicialização
 
 
 
 
-
-// posso aplicar condições para rodar o worker
 (async () => {
   setInterval(async function () {
     let relogio = fila.relogio();
@@ -71,7 +72,7 @@ async function worker() {
     if (logadoParaIniciais == false) {
       if (heartBeat > 300) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
-      if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 560) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
   }, 1000);
 
@@ -85,6 +86,7 @@ async function worker() {
   });
 
 
+
   // Ligando o puppeteer.
   await puppet.iniciar();
   await sleep(3000);
@@ -94,33 +96,38 @@ async function worker() {
 
 
   contador = 0;
+
+
+
   // tudo que está abaixo é acionado para cada consumer na fila.
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
-    contadorErros++;
-    heartBeat = 0;  // Zero o Contador indicando que a aplicação esta consumindo a fila.
-    let dataInicio = new Date();
-    let message = JSON.parse(msg.content.toString());
-    let novosProcesso = message.NovosProcessos;
-    let numeroProcesso = message.NumeroProcesso;
-
-    let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
-      nomeRobo: enums.nomesRobos.JTE,
-      NumeroDoProcesso: message.NumeroProcesso,
-    });
-
-    logger.info('Mensagem recebida');
-    logger.info('É busca de novo processo novo processo ' + novosProcesso);
-    // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-
-
-    logger.info('Iniciando processo de extração');
-    //-------------------------------------------------- inicio do extrator--------------------------------------------
     try {
-      // Quando o worker liga, ele marca qual o primeiro estado da fila
+      contadorErros++;
+      heartBeat = 0;  // Zera o Contador indicando que a aplicação esta consumindo a fila.
+      let dataInicio = new Date();
+      let message = JSON.parse(msg.content.toString());
+      let novosProcesso = message.NovosProcessos;
+      let numeroProcesso = message.NumeroProcesso;
+
+      let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
+        nomeRobo: enums.nomesRobos.JTE,
+        NumeroDoProcesso: message.NumeroProcesso,
+      });
+
+      logger.info('Mensagem recebida');
+      logger.info('Buscando novo processo,o número CNJ é: ' + novosProcesso);
+      // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
+
+
+
+      logger.info('Iniciando processo de extração');
+      //-------------------------------------------------- inicio do extrator--------------------------------------------
+
+      // Quando o worker liga, ele marca qual é o primeiro estado da fila
       if (contador == 0) {
         estadoAnterior = puppet.processaNumero(numeroProcesso).estado;
       }
-      logger.info('O primeiro Estado é o numero: ' + estadoAnterior);
+      logger.info('O número do primeiro Estado é: ' + estadoAnterior);
 
       // verifica qual é o estado de origem do pedido de raspagem.
       estadoDaFila = puppet.processaNumero(numeroProcesso).estado;
@@ -133,19 +140,19 @@ async function worker() {
       }
 
       // // desliga o worker para parar de baixar as iniciais
-      // // if (message.inicial == true && logadoParaIniciais == true) {
-      // if (!message.NovosProcessos && logadoParaIniciais == true) {
-      //   logadoParaIniciais = false;
-      //   await mongoose.connection.close()
-      //   process.exit();
-      // }
-      // // reinicia o worker para baixarmos os processos iniciais.
-      // // if (message.inicial == true && contador != 0 && logadoParaIniciais == false) {
-      // if (message.NovosProcessos == true && contador != 0 && logadoParaIniciais == false) {
-      //   //console.log('vou deslogar a aplicação ----01');
-      //   await mongoose.connection.close()
-      //   process.exit();
-      // }
+      if (message.inicial == true && logadoParaIniciais == true) {
+        // if (!message.NovosProcessos && logadoParaIniciais == true) {
+        logadoParaIniciais = false;
+        await mongoose.connection.close()
+        process.exit();
+      }
+      // reinicia o worker para baixarmos os processos iniciais.
+      if (message.inicial == true && contador != 0 && logadoParaIniciais == false) {
+        // if (message.NovosProcessos == true && contador != 0 && logadoParaIniciais == false) {
+        //console.log('vou deslogar a aplicação ----01');
+        await mongoose.connection.close()
+        process.exit();
+      }
 
       estadoAnterior = estadoDaFila;
       logger.info('O Estado do consumer é o numero: ' + estadoAnterior);
@@ -165,17 +172,17 @@ async function worker() {
         }
 
         // loga para pegar iniciais
-        // if (message.inicial == true  && logadoParaIniciais == false) {
-        // condicional provisório para testes
-        //console.log(logadoParaIniciais);
-        // logger.info("Logando para pegar documentos iniciais")
-        // if (message.NovosProcessos == true && logadoParaIniciais == false) {
-        //   await puppet.loga();
-        //   logadoParaIniciais = true;
-        // }
+        if (message.inicial == true && logadoParaIniciais == false) {
+          // condicional provisório para testes
+          //console.log(logadoParaIniciais);
+          logger.info("Logando para pegar documentos iniciais")
+          // if (message.NovosProcessos == true && logadoParaIniciais == false) {
+          await puppet.loga();
+          logadoParaIniciais = true;
+        }
 
 
-        // caregando as variaveis que receberam os dados do parser
+        // carregando as variaveis que receberam os dados do parser
         let dadosProcesso;
         var processo;
         let parser = new JTEParser();
@@ -233,18 +240,47 @@ async function worker() {
 
 
 
-        // if (message.inicial == true) {
-        // condicional provisório para testes
-        // if (message.NovosProcessos == true) {
-        //   console.log('---------- Vou baixar link das iniciais-------');
-        //   let link = await puppet.pegaInicial();
-        //   await console.log(link.length);
-        //   for (let w = 0; w < link.length; w++) {
-        //     console.log('entrou no laço');
-        //     await new CriaFilaJTE().salvaDocumentoLink(link[w]);
-        //     await console.log('O link ' + w + ' Foi salvo');
-        //   }
-        // }
+        if (message.inicial == true) {
+          console.log('---------- Vou baixar link das iniciais-------');
+          let link = await puppet.pegaInicial();
+          let listaArquivo = [];
+          for (let w = 0; w < link.length - 1; w++) {
+            await new CriaFilaJTE().salvaDocumentoLink(link[w]);
+            let cnj = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
+            let linkDocumento = link[w].link;
+
+            let local = '/home/aurelio/crawlers-bigdata/downloads';
+            // let local = '/app/downloads';
+
+            let tipo = link[w].tipo;
+            if (tipo == 'pdf') {
+              await new downloadFiles().download(cnj, linkDocumento, local)
+              listaArquivo.push({
+                url: linkDocumento,
+                path: `${local}/${cnj}`
+              })
+            } else if (tipo == 'HTML') {
+              // await new downloadFiles().covertePDF(nome, local, linkDocumento)
+              // listaArquivo.push({
+              //   url: linkDocumento,
+              //   path: `${local}/${nome}`
+              // })
+            }
+          }
+          logger.info('Iniciando envio para AWS');
+          // enviar para AWS
+          let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
+          let cnj = numeroAtualProcesso;
+          const envioAWS = await new downloadFiles().enviarAWS(cnj, listaArquivo);
+          // await new downloadFiles().saveLog(
+          //   "crawler.JTE",
+          //   envioAWS.status,
+          //   envioAWS.resposta,
+
+          // )
+          // console.log(envioAWS);
+
+        }
 
         logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {
@@ -289,7 +325,7 @@ async function worker() {
 
     } catch (e) {
       catchError++;
-      // console.log(e)
+      console.log(e)
       if (e == "ultimo processo") {
         catchError--;
         // salvando status 
@@ -302,7 +338,7 @@ async function worker() {
       // Salva meus erros nos logs
       logger.log("info", numeroProcesso + " " + e);
       console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
-      // caso o puppeteer fique perdido na sequencias de clicks nós o reiniciamos.
+      // caso o puppeteer fique perdido na sequencias de clicks o reiniciamos.
       if (catchError > 4) {
         //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close()
@@ -311,8 +347,8 @@ async function worker() {
       }
 
       // envia a mensagem para a fila de reprocessamento
-      if (!novosProcesso) {
-        new GerenciadorFila().enviar(reConsumo, message);
+      if (message.inicial == true) {
+        new GerenciadorFila().enviar(nomeFila, message);
       }
 
       logger.info('Encontrado erro durante a execução');

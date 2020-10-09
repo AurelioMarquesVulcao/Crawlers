@@ -25,7 +25,7 @@ class CriaFilaPJE {
     async montaFila() {
         let data = new Date();
         data = new Date()
-        data.setDate(data.getDate() - 2)
+        data.setDate(data.getDate() - 1)
         console.log(data);
 
         let estado = [];

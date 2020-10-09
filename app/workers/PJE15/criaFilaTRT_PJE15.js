@@ -86,7 +86,7 @@ class CriaFilaPJE {
             // console.log(" Postado : " + agregar[i].detalhes.numeroProcesso);
             // await sleep(20)
         }
-        await new GerenciadorFila().enfileirarLote(fila, mensagens)
+        await new GerenciadorFila().enfileirarLoteTRT(fila, mensagens)
         // console.log(mensagens);
         // return mensagens
     }

@@ -10,6 +10,19 @@ const { Robo } = require('../lib/robo');
 
 class Helper {
   /**
+   * Converte data comum para formato Date. sem alterar o fuso horário
+   * @param {string} data Data comum. Ex.: 25/02/2020 09:40
+   * @returns {string} 2020-01-01T10:10.000Z
+   */
+  static data(data){
+    // O GMT-0000 mantem a hora que você inseriu sem alterar fuso -3
+    // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
+    //GMT-0300
+    let regex = data.replace(/([0-9]{2})\W([0-9]{2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2})/gi, '$3-$2-$1 $4 GMT-0000');
+    return new Date(regex);
+  }
+
+  /**
    * Gera um hash em sha1 para o parametro fornecido
    * @param {string} texto Texto para gerar o hash
    */

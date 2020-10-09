@@ -13,7 +13,8 @@ const capaSchema = new Schema(
     instancia: String,
     segredoJustica: Boolean,
     justicaGratuita: String,
-    valor: String
+    valor: String,
+    audiencias: [{ data: Date, tipo: String }]
   },
   { _id: false, versionKey: false }
 );

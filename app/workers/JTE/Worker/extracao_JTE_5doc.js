@@ -12,7 +12,7 @@ const { LogExecucao } = require('../../../lib/logExecucao');
 const { Andamento } = require('../../../models/schemas/andamento');
 // const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer');
+const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const { downloadFiles } = require('../../../lib/downloadFiles');
 const { Log } = require('../../../models/schemas/logsEnvioAWS')
@@ -70,7 +70,7 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 190) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 300) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
       if (heartBeat > 560) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
@@ -86,6 +86,7 @@ async function worker() {
   });
 
 
+
   // Ligando o puppeteer.
   await puppet.iniciar();
   await sleep(3000);
@@ -95,29 +96,33 @@ async function worker() {
 
 
   contador = 0;
+
+
+
   // tudo que está abaixo é acionado para cada consumer na fila.
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
-    contadorErros++;
-    heartBeat = 0;  // Zera o Contador indicando que a aplicação esta consumindo a fila.
-    let dataInicio = new Date();
-    let message = JSON.parse(msg.content.toString());
-    let novosProcesso = message.NovosProcessos;
-    let numeroProcesso = message.NumeroProcesso;
-
-    let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
-      nomeRobo: enums.nomesRobos.JTE,
-      NumeroDoProcesso: message.NumeroProcesso,
-    });
-
-    logger.info('Mensagem recebida');
-    logger.info('Buscando novo processo,o número CNJ é: ' + novosProcesso);
-    // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-
-
-
-    logger.info('Iniciando processo de extração');
-    //-------------------------------------------------- inicio do extrator--------------------------------------------
     try {
+      contadorErros++;
+      heartBeat = 0;  // Zera o Contador indicando que a aplicação esta consumindo a fila.
+      let dataInicio = new Date();
+      let message = JSON.parse(msg.content.toString());
+      let novosProcesso = message.NovosProcessos;
+      let numeroProcesso = message.NumeroProcesso;
+
+      let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
+        nomeRobo: enums.nomesRobos.JTE,
+        NumeroDoProcesso: message.NumeroProcesso,
+      });
+
+      logger.info('Mensagem recebida');
+      logger.info('Buscando novo processo,o número CNJ é: ' + novosProcesso);
+      // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
+
+
+
+      logger.info('Iniciando processo de extração');
+      //-------------------------------------------------- inicio do extrator--------------------------------------------
+
       // Quando o worker liga, ele marca qual é o primeiro estado da fila
       if (contador == 0) {
         estadoAnterior = puppet.processaNumero(numeroProcesso).estado;
@@ -244,8 +249,8 @@ async function worker() {
             let cnj = link[w].numeroProcesso.replace(/[-.]/g, "") + "-" + w + ".pdf";
             let linkDocumento = link[w].link;
 
-            // let local = '/home/aurelio/crawlers-bigdata/downloads';
-            let local = '/app/downloads';
+            let local = '/home/aurelio/crawlers-bigdata/downloads';
+            // let local = '/app/downloads';
 
             let tipo = link[w].tipo;
             if (tipo == 'pdf') {

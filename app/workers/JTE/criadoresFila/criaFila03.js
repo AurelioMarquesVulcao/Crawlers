@@ -103,7 +103,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
               mensagens.push(
-                await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+                await Fila.procura10(numeroSequencial, comarca, 1, codigo, fila)
               );
             } else {
               mensagens.push(
@@ -112,7 +112,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
               mensagens.push(
-                await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+                await Fila.procura10(numeroSequencial, comarca, 1, codigo, fila)
               );
             } else {
               mensagens.push(
@@ -121,7 +121,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
               mensagens.push(
-                await Fila.procura10(numeroSequencial, comarca, 3, codigo, fila)
+                await Fila.procura10(numeroSequencial, comarca, 1, codigo, fila)
               );
             } else {
               mensagens.push(
@@ -139,7 +139,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       }
 
       if (contaOrigem == max - 1) {
-        await rabbit.enfileirarLote(nomeFila,mensagens);
+        await rabbit.enfileirarLoteTRT(nomeFila,mensagens);
         if (contaLaco > 0) {
           await sleep(10000)
         }

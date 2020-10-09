@@ -3,15 +3,18 @@ const cheerio = require('cheerio');
 const re = require('xregexp');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../lib/criaFilaJTE');
+const { GerenciadorFila } = require('../../lib/filaHandler');
 
-const fila = new CriaFilaJTE()
+const fila = new CriaFilaJTE();
+const rabbit =  new GerenciadorFila();
 
 
 console.log('até aqui');
 
 (async () => {
+    let mensagens;
     var origem = [
-        '0203'
+        '0658'
       ]
       ;
     console.log('carregou a var');
@@ -22,7 +25,7 @@ console.log('até aqui');
         // await fila.procura("0000350", `${origem[i]}`, 3, "09")
         // await fila.procura("0000370", `${origem[i]}`, 3, "09")
         //await fila.procura("0000502", `${origem[i]}`, 3, "22", "")
-        await fila.procura("00210895", `${origem[i]}`, 15, "04", ".1")
+        mensagens = await fila.procuraEspecial("0000715", `${origem[i]}`, 100, "09", ".1")
         // await fila.procura("0000105", `${origem[i]}`, 5, "13", "")
         // await fila.procura("0000205", `${origem[i]}`, 5, "13", "")
         // await fila.procura("0000305", `${origem[i]}`, 5, "13", "")
@@ -49,9 +52,12 @@ console.log('até aqui');
         // await fila.procura("0000100", `${origem[i]}`, 2, "22","")
         // await fila.procura("0000050", `${origem[i]}`, 2, "22","")
 
-        console.log(origem[i]);
+        // console.log(origem[i]);
         //await insert2(0, origem[i])
     }
+    console.log(mensagens);
+    await rabbit.enfileirarLote("processo.JTE.extracao.novos.1",mensagens);
+    await sleep(2000);
     process.exit();
 })();
 
@@ -5088,7 +5094,7 @@ var processo = [
     "00002022120205210016"
 ];
 
-localizaProcessos()
+// localizaProcessos()
 //console.log( fila.buscaDb(6000, 0));
 async function localizaProcessos() {
     let dados = processo//await fila.buscaDb(6000, 0);

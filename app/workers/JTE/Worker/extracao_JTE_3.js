@@ -309,9 +309,9 @@ async function worker() {
       }
 
       // envia a mensagem para a fila de reprocessamento
-      if (!novosProcesso) {
-        new GerenciadorFila().enviar(reConsumo, message);
-      }
+      // if (!novosProcesso) {
+      //   new GerenciadorFila().enviar(reConsumo, message);
+      // }
 
       logger.info('Encontrado erro durante a execução');
       // trata erro especifico para falha na extração

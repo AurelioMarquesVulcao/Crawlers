@@ -18,6 +18,7 @@ var nomeFila = 'processo.JTE.extracao.novos.1';
 var desligado = desligar.worker;
 var estados = [
   // Estados.rj,Estados.pr,
+  // Estados.sp2,
   Estados.rj, Estados.sp2,
 ];
 
@@ -141,8 +142,9 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       if (contaOrigem == max - 1) {
         console.log(mensagens.length);
         await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
+
         if (contaLaco > 0) {
-          await sleep(10000)
+          await sleep(20000)
         }
         await paraServico()
         contaOrigem = 0;

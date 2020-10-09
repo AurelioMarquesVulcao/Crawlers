@@ -150,7 +150,7 @@ var reset = '\u001b[0m';
       );
       heartBeat = 0;
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       logger.info('Encontrado erro durante a execução');
       logger.info(red + `Error: ${e.message}` + reset);
       heartBeat = 0;

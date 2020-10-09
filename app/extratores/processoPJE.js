@@ -32,7 +32,7 @@ class ExtratorTrtPje {
     // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
     setInterval(async function () {
       heartBeat++;
-      if (heartBeat > 420) {
+      if (heartBeat > 45) {
         console.log(
           red +
             '----------------- Fechando o processo por inatividade -------------------' +
@@ -115,7 +115,7 @@ class ExtratorTrtPje {
     // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
     setInterval(async function () {
       heartBeat++;
-      if (heartBeat > 340) {
+      if (heartBeat > 30) {
         console.log(
           red +
             '----------------- Fechando o processo por Indisponibilidade -------------------' +
@@ -226,81 +226,93 @@ class ExtratorTrtPje {
     logger.info('Iniciado captura do processo.');
     const url = `${url_1}/api/processos/dadosbasicos/${cnj}`;
     // Primeira requisição ao TRT-RJ
-    const objResponse = await this.robo.acessar({
-      url: url,
-      encoding: 'latin1',
-      usaProxy: true,
-      headers: header,
-    });
-    const bodyRes = objResponse.responseBody;
-
-    if (bodyRes === undefined) {
-      logger.info('Não foi possivel obter a resposta inicial');
-      return null;
-    }
-
-    const info = bodyRes[0];
-
-    // obtem a imagem em base64 do captcha
-    const objResponseCaptcha = await this.robo.acessar({
-      url: `${url_1}/api/processos/${info.id}`,
-      method: 'GET',
-      encoding: 'latin1',
-      usaProxy: true,
-    });
-    const desafio = objResponseCaptcha.responseBody;
-    const captcha = {
-      refinador: 'trt_1',
-      imagem: `${desafio.imagem}`,
-    };
-    logger.info('Captcha obtido com sucesso');
-
-    logger.info('Iniciado processo de solução do captcha');
-
-    // envia captcha para API de resolução
-    const resQuebrarCaptcha = await this.robo.acessar({
-      url: `http://172.16.16.8:8082/api/refinar/`,
-      // url: `http://127.0.0.1:8082/api/refinar/`,
-      method: 'POST',
-      encoding: 'utf8',
-      usaProxy: false,
-      usaJson: true,
-      params: captcha,
-    });
-    const captchaSolved = resQuebrarCaptcha.responseBody;
-
-    if (captchaSolved.sucesso) {
-      logger.info('Solução do captcha é: ' + captchaSolved.texto);
-
-      // removendo caracteres especiais da solução do captcha
-      const texto = captchaSolved.texto.replace(/[^a-z0-9]/g, '');
-      // const texto = captchaSolved.texto.replace(/[a-z0-9]/g, ""); // cria erro para testes
-
-      // obtendo dados do processo.
-      const detalheProcesso = await this.robo.acessar({
-        url: `https://pje.trt${numeroEstado}.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`,
-        method: 'get',
-        encoding: 'utf8',
+    try {
+      const objResponse = await this.robo.acessar({
+        url: url,
+        encoding: 'latin1',
         usaProxy: true,
         headers: header,
-        // responseType: 'stream'
       });
-      if (detalheProcesso.responseBody.mensagem) {
-        const error = new Error('Captcha invalido');
-        error.code = 'Ocorreu um problema na solução do Captcha';
-        throw error;
-      }
-      // logger.info("passei aqui");
-      if (!!detalheProcesso.responseBody.mensagemErro) {
-        const error = new Error('Processo sigiloso');
-        error.code = 'Não é possível obter devido ao processo ser sigiliso';
-        throw error;
+      const bodyRes = objResponse.responseBody;
+
+      if (bodyRes === undefined) {
+        logger.info('Não foi possivel obter a resposta inicial');
+        return null;
       }
 
-      logger.info('Dados do processo obtidos com sucesso.');
-      return detalheProcesso.responseBody;
-    } else {
-      logger.info('Não foi possível resolver o captcha');
+      const info = bodyRes[0];
+
+      // obtem a imagem em base64 do captcha
+      const objResponseCaptcha = await this.robo.acessar({
+        url: `${url_1}/api/processos/${info.id}`,
+        method: 'GET',
+        encoding: 'latin1',
+        usaProxy: true,
+      });
+      const desafio = objResponseCaptcha.responseBody;
+      const captcha = {
+        refinador: 'trt_1',
+        imagem: `${desafio.imagem}`,
+      };
+      logger.info('Captcha obtido com sucesso');
+
+      logger.info('Iniciado processo de solução do captcha');
+
+      // envia captcha para API de resolução
+      const resQuebrarCaptcha = await this.robo.acessar({
+        url: `http://172.16.16.8:8082/api/refinar/`,
+        // url: `http://127.0.0.1:8082/api/refinar/`,
+        method: 'POST',
+        encoding: 'utf8',
+        usaProxy: false,
+        usaJson: true,
+        params: captcha,
+      });
+      const captchaSolved = resQuebrarCaptcha.responseBody;
+
+      if (captchaSolved.sucesso) {
+        logger.info('Solução do captcha é: ' + captchaSolved.texto);
+
+        // removendo caracteres especiais da solução do captcha
+        const texto = captchaSolved.texto.replace(/[^a-z0-9]/g, '');
+
+        if (texto.lenth < 6) {
+          logger.info(
+            'Não foi possivél resolver o Captcha corretamente, reiniciando o processo!'
+          );
+          throw 'A resolução do captcha está errada!';
+        }
+
+        // const texto = captchaSolved.texto.replace(/[a-z0-9]/g, ""); // cria erro para testes
+
+        // obtendo dados do processo.
+        const detalheProcesso = await this.robo.acessar({
+          url: `https://pje.trt${numeroEstado}.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`,
+          method: 'get',
+          encoding: 'utf8',
+          usaProxy: true,
+          headers: header,
+          // responseType: 'stream'
+        });
+        if (detalheProcesso.responseBody.mensagem) {
+          const error = new Error('Captcha invalido');
+          error.code = 'Ocorreu um problema na solução do Captcha';
+          throw error;
+        }
+        // logger.info("passei aqui");
+        if (!!detalheProcesso.responseBody.mensagemErro) {
+          const error = new Error('Processo sigiloso');
+          error.code = 'Não é possível obter devido ao processo ser sigiliso';
+          throw error;
+        }
+
+        logger.info('Dados do processo obtidos com sucesso.');
+        return detalheProcesso.responseBody;
+      } else {
+        logger.info('Não foi possível resolver o captcha');
+      }
+    } catch (e) {
+      await this.captura(header, cnj, numeroEstado);
     }
   }
 }

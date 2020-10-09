@@ -77,7 +77,7 @@ processoTRTSchema.methods.salvar = async function salvar() {
       },
       (err, doc) => {
         if (err) {
-          console.log(err);
+          // console.log(err);
           reject(err);
         }
         resolve(doc);
@@ -97,7 +97,7 @@ processoTRTSchema.methods.salvar = async function salvar() {
       { upsert: true },
       (err, doc) => {
         if (err) {
-          console.log(err);
+          // console.log(err);
           reject(err);
         }
         resolve(doc);

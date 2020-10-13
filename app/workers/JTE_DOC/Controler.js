@@ -77,15 +77,19 @@ class Worker {
     const fila = await Fila.getFila();
     console.log(fila);
 
-    if (fila.length > 0){
-      console.log(fila.length);
-      for (let i = 0; i< length){
-
+    if (fila.length > 0) {
+      
+      for (let i = 0; i < fila.length; i++) {
+        console.log(fila.length);
+        await this.consumir(fila.nome);
       }
-    } else{
-      console.log("não foi atribuido");
+    } else {
+      console.log('não foi atribuido');
     }
     // Util.ligaWorker('peticao.JTE.extracao_01');
+  }
+  async consumir(){
+
   }
 }
 

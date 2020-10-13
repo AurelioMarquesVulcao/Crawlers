@@ -1,7 +1,7 @@
 const shell = require('shelljs');
 const sleep = require('await-sleep');
 const axios = require('axios');
-require('dotenv').config()
+require('dotenv').config();
 
 class Util {
   static timerNow() {
@@ -39,18 +39,17 @@ class Util {
   static teste(serviço) {
     shell.exec(`node app/workers/JTE_DOC/Worker/teste.js ${serviço}`);
   }
-  static ligaWorker(fila){
-    shell.exec(`node app/workers/JTE_DOC/Worker/extratorEstado_01.js peticao.JTE.extracao_01`);
-    
+  static ligaWorker(fila) {
+    shell.exec(`node app/workers/JTE_DOC/Worker/extratorEstado_01.js ${fila}`);
   }
 }
 
 class Fila {
-    static urlRabbit(){
-        const rabbit = process.env.RABBITMQ_CONNECTION_STRING
-        const regex = rabbit.replace(/amqp(.*)([0-9]{4})$/,"http$11$2/api/queues")
-        return regex
-    }
+  static urlRabbit() {
+    const rabbit = process.env.RABBITMQ_CONNECTION_STRING;
+    const regex = rabbit.replace(/amqp(.*)([0-9]{4})$/, 'http$11$2/api/queues');
+    return regex;
+  }
   static async getFila() {
     var rabbitMQ = this.urlRabbit();
     return await axios.get(rabbitMQ).then((resp) => {
@@ -65,25 +64,33 @@ class Fila {
         })
         .filter(
           (x) =>
-            x.qtd == 0 &&
-            x.status == 'Aguardando' &&
+            x.qtd > 0 &&
+            // x.status == 'Aguardando' &&
             /^peticao\.jte\.extracao/i.test(x.nome)
         );
     });
   }
 }
 
-class Worker{
-    static ligar(){
-        
-        
+class Worker {
+  static async ligar() {
+    const fila = await Fila.getFila();
+    console.log(fila);
+
+    if (fila.length > 0){
+      console.log(fila.length);
+      for (let i = 0; i< length){
+
+      }
+    } else{
+      console.log("não foi atribuido");
     }
+    // Util.ligaWorker('peticao.JTE.extracao_01');
+  }
 }
 
-Util.teste('foi');
+// Util.teste('foi');
 // console.log(Fila.urlRabbit());
 (async () => {
-
-  console.log(await Fila.getFila());
-  Util.ligaWorker()
+  Worker.ligar();
 })();

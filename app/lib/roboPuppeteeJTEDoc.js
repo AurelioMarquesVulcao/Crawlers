@@ -23,7 +23,7 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
@@ -319,7 +319,7 @@ class RoboPuppeteer3 {
           console.log(buttonRun);
           console.log("tentando click");
           await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
-          // await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+          await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
           
           this.logger.info(`Cliquei no documento numero ${iniciaisMultiplas[j]}`);
 

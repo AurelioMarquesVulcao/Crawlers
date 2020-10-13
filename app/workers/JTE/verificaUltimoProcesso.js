@@ -8,6 +8,7 @@ const blue = '\u001b[34m';
 const reset = '\u001b[0m';
 
 
+
 class Busca{
   static async buscaBigdata(tribunal){
         let resultado;

@@ -29,7 +29,7 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `peticao.JTE.extracao`;
+const nomeFila = `peticao.JTE.extracao.teste`;
 const reConsumo = `peticao.JTE.extracao`;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado
@@ -272,13 +272,13 @@ async function worker() {
           let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
           let cnj = numeroAtualProcesso;
           const envioAWS = await new downloadFiles().enviarAWS(cnj, listaArquivo);
-          await new downloadFiles().saveLog(
-            "crawler.JTE",
-            envioAWS.status,
-            envioAWS.resposta,
+          // await new downloadFiles().saveLog(
+          //   "crawler.JTE",
+          //   envioAWS.status,
+          //   envioAWS.resposta,
 
-          )
-          console.log(envioAWS);
+          // )
+          // console.log(envioAWS);
 
         }
 

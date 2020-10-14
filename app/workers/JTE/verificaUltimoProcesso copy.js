@@ -131,7 +131,9 @@ class Busca {
     } catch (e) {
       console.log(red + "Falhou" + reset);
     }
-
+    if (!resultado){
+      throw "Preciso reprocessar"
+    }
     // console.log(resultado.length);
     return resultado
   }
@@ -140,8 +142,8 @@ class Busca {
   /**
    * Cria um numero CNJ para consumo.
    * @param {number} ultimoSequencial Ultimo numero sequencial obtido no BigData V2
-   * @param {number} Tribunal Numero que repre
-   * @param {number} unidadeOrigem 
+   * @param {number} Tribunal Numero que representa o Estado
+   * @param {number} unidadeOrigem Numero da comarca
    */
   static organizaCNJ(ultimoSequencial, Tribunal, unidadeOrigem) {
     // console.log(ultimoSequencial, Tribunal, unidadeOrigem);
@@ -151,6 +153,11 @@ class Busca {
     return `${sequencial}0020205${tribunal}${origem}`
   }
 
+  /**
+   * Ajusta o numero para string e completa com zeros para ficar no padrão do numero CNJ
+   * @param {number} numero 
+   * @param {string} tipo 
+   */
   static completaNumero(numero, tipo) {
     let teste;
     if (tipo == "unidadeOrigem") {
@@ -183,9 +190,6 @@ class Busca {
     const regex = /([0-9]{7})([0-9]{2})([0-9]{4})([0-9]{1})([0-9]{2})([0-9]{4})/;
     let estadoNumero = numero.replace(regex, '$5');
     let comarca = numero.replace(regex, '$6');
-    // console.log(estadoNumero);
-    // console.log(comarca);
-    // console.log("Buscanco ultimo processo ");
     let busca = await statusEstadosJTE.find({
       "estadoNumero": estadoNumero,
       "comarca": comarca,
@@ -196,9 +200,6 @@ class Busca {
       return numero
       return null
     }
-
-    // console.log("iniciando validação");
-    // console.log(busca.numeroUltimoProcecesso);
     let ultimoSequencial = busca[0].numeroUltimoProcecesso;
     let sequencial = numero.slice(0, 7);
     // console.log(ultimoSequencial.slice(0, 7));
@@ -207,16 +208,10 @@ class Busca {
     } else {
       return null
     }
-
-
   }
-
-
 }
+
 (async () => {
-  // await Busca.buscaBigdata(2)
-  // console.log(await Busca.buscaBigdata(2));
-  // await Busca.criaNumerosCNJ();
   await Busca.posta()
   await mongoose.connection.close()
 })()

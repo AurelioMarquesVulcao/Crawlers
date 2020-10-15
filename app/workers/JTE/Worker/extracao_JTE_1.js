@@ -12,7 +12,7 @@ const { LogExecucao } = require('../../../lib/logExecucao');
 const { Andamento } = require('../../../models/schemas/andamento');
 const { ExtratorBase } = require('../../../extratores/extratores');
 const { JTEParser } = require('../../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer copy');
+const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 
@@ -311,9 +311,9 @@ async function worker() {
       }
 
       // envia a mensagem para a fila de reprocessamento
-      if (!novosProcesso) {
-        new GerenciadorFila().enviar(reConsumo, message);
-      }
+      // if (!novosProcesso) {
+      //   new GerenciadorFila().enviar(reConsumo, message);
+      // }
 
       logger.info('Encontrado erro durante a execução');
       // trata erro especifico para falha na extração

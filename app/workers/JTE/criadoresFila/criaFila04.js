@@ -39,31 +39,36 @@ var estados = [
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-  for (let w = 0; w < 1;) {
-    let relogio = Fila.relogio();
-    // console.log(estados[contador].estado);
-    let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
-    await sleep(100);
-    // esse if mantem o enfilerador desligado na hora desejada
-    if (!desligado.find(element => element == relogio.hora)) {
-
-      // if (start == 0 || !statusFila) {
-      if (start == 0 || !statusFila) {
-        // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
-        start = 1
-        // if (!statusFila) {
-        origens = estados[contador].comarcas;
-        tribunal = parseInt(estados[contador].codigo);
-        codigo = estados[contador].codigo;
-        max = estados[contador].comarcas.length;
-        timer = estados[contador].tempo;
-        await criador(origens, tribunal, codigo, max, timer, fila)
-        contador++
-        // }
+  try{
+    for (let w = 0; w < 1;) {
+      let relogio = Fila.relogio();
+      // console.log(estados[contador].estado);
+      let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
+      await sleep(100);
+      // esse if mantem o enfilerador desligado na hora desejada
+      if (!desligado.find(element => element == relogio.hora)) {
+  
+        // if (start == 0 || !statusFila) {
+        if (start == 0 || !statusFila) {
+          // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
+          start = 1
+          // if (!statusFila) {
+          origens = estados[contador].comarcas;
+          tribunal = parseInt(estados[contador].codigo);
+          codigo = estados[contador].codigo;
+          max = estados[contador].comarcas.length;
+          timer = estados[contador].tempo;
+          await criador(origens, tribunal, codigo, max, timer, fila)
+          contador++
+          // }
+        }
+        console.log(relogio);
+        if (contador == estados.length) { contador = 0 }
       }
-      console.log(relogio);
-      if (contador == estados.length) { contador = 0 }
     }
+  }catch(e){
+    await sleep(120000);
+    process.exit()
   }
 })()
 

@@ -300,7 +300,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  worker-verificaNovos:
+  verifica-novos:
     extends:
       file: common-services.yml
       service: base_node

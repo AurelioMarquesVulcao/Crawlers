@@ -139,7 +139,10 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
       }
 
       if (contaOrigem == max - 1) {
-        await rabbit.enfileirarLoteTRT(nomeFila,mensagens);
+        console.log(mensagens.length);
+        await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
+        mensagens = [];
+
         if (contaLaco > 0) {
           await sleep(20000)
         }

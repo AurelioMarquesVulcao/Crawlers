@@ -3,34 +3,32 @@ const Fs = require('fs');
 const Path = require('path');
 const async = require('async');
 const mongoose = require('mongoose');
-const { enums } = require('../../configs/enums');
 
+const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require("../../lib/filaHandler");
 const { statusEstadosJTE } = require("../../models/schemas/jte")
 const rabbit = new GerenciadorFila();
-
-mongoose.connect(enums.mongo.connString, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-mongoose.connection.on('error', (e) => {
-  console.log(e);
-});
 
 
 const red = '\u001b[31m';
 const blue = '\u001b[34m';
 const reset = '\u001b[0m';
 
-
-
+/** Busca */
 class Busca {
   /**
    * Envia para o Rabbit todos as comarcas que possuem numero desatualizado.
    */
   static async posta() {
     let cnj = await this.criaNumerosCNJ();
-    await rabbit.enfileirarLoteTRT("ReprocessamentoJTE", cnj);
+    try {
+      await rabbit.enfileirarLoteTRT("ReprocessamentoJTE", cnj);
+      // estou enviando 2 vezes para garantir que o processo será processado pelo worker
+      await rabbit.enfileirarLoteTRT("ReprocessamentoJTE", cnj);
+    } catch (e) {
+      console.log(red + "Falhou o envio para a fila reiniciando processo" + reset);
+      this.posta()
+    }
   }
 
   /**
@@ -42,6 +40,16 @@ class Busca {
     let resultado = [];
     let estado;
     let valido;
+
+    // Conecta com o Banco de dados
+    mongoose.connect(enums.mongo.connString, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    mongoose.connection.on('error', (e) => {
+      console.log(e);
+    });
+
     // laco com estados
     for (let i = 0; i < estados.length; i++) {
       estado = estados[i];
@@ -50,26 +58,29 @@ class Busca {
         console.log("Validando estados");
         // Array com os numeros CJN ja construidos, prontos para serem consumidos na fila.
         valido = await this.validaCNJ(this.organizaCNJ(estado[j].UltimoSequencial, estado[j].Tribunal, estado[j].UnidadeOrigem))
+        // quando o numero sequencial é menor que o numero já extraido pelo robo JTE
+        // o retorno é null
         if (valido != null) {
           resultado.push(this.criaPost(valido));
         }
       }
     }
-    if(resultado.length<1){
-      console.log(blue+"Não obtive processos novos em minha busca"+reset);
+    if (resultado.length < 1) {
+      console.log(blue + "Não obtive processos novos em minha busca" + reset);
     }
+    // Desconecta do banco de dados
+    await mongoose.connection.close();
+
     return resultado
   }
 
-
+  /**
+   * Cria a mensagem a ser enviada para a fila
+   * @param {string} numero 
+   */
   static criaPost(numero) {
-    let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true}`;
+    let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : false}`;
     return post
-  }
-  processArray(element) {
-    for (let i = 0; i < element.length; i++) {
-
-    }
   }
 
   /**
@@ -78,17 +89,21 @@ class Busca {
   static async pegaEstado() {
     let resultados = [];
     let estado;
-    let contador = 0;
     for (let i = 1; i < 25; i++) {
       console.log(`Pegando o estado ${i}, aguardado resposta.`);
-      try{
-        if(contador == 6){
+      let contador = 0;
+      try {
+        if (contador == 4) {
           i++
           contador = 0;
         }
         estado = await this.buscaBigdata(i);
-      } catch(e){
-        contador ++
+        
+        if (!estado) {
+          throw "Preciso reprocessar"
+        }
+      } catch (e) {
+        contador++
         estado = await this.buscaBigdata(i);
       }
       resultados.push(estado);
@@ -105,6 +120,7 @@ class Busca {
     let url = "http://172.16.16.3:8083/processos/obterUltimosSequenciaisPorUnidade";
     let resultado;
     console.log(`${url}/?orgao=5&tribunal=${tribunal}&ano=2020`);
+    console.log(" --------- Inicio da extração do estado --------- ");
     try {
       await Axios({
         url: `${url}/?orgao=5&tribunal=${tribunal}&ano=2020`,
@@ -126,18 +142,19 @@ class Busca {
         .catch((err) => {
           console.log(err.config);
           console.log(err.response.data);
-          throw err;
+          // throw err;
         });
+
+      // verifica se o resultado é valido.
+      if (!resultado) {
+        throw "Preciso reprocessar"
+      }
     } catch (e) {
       console.log(red + "Falhou" + reset);
     }
-    if (!resultado){
-      throw "Preciso reprocessar"
-    }
-    // console.log(resultado.length);
     return resultado
   }
-  
+
   // ----------------------------------------------- Funções complementares -------------------------------------------
   /**
    * Cria um numero CNJ para consumo.
@@ -185,6 +202,7 @@ class Busca {
   /**
    * Verifica se o numero CNJ obtido é maior que o ultimo rapado pelo robô JTE
    * @param {string} numero Recebe numero CNJ
+   * @returns retorna: Numero para ser enfileirado ou Null
    */
   static async validaCNJ(numero) {
     const regex = /([0-9]{7})([0-9]{2})([0-9]{4})([0-9]{1})([0-9]{2})([0-9]{4})/;
@@ -212,6 +230,8 @@ class Busca {
 }
 
 (async () => {
-  await Busca.posta()
+  for (let i = 0; i < 2; i++) {
+    await Busca.posta()
+  }
   await mongoose.connection.close()
 })()

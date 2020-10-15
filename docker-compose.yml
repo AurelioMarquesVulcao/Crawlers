@@ -304,7 +304,7 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    command: pm2 start workers/JTE/verificaUltimoProcesso.js --no-daemon 
+    command: pm2 start workers/JTEMonitoria/verificaUltimoProcesso.js --no-daemon 
     logging:
       driver: "json-file"
       options:

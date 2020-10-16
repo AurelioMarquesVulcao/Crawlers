@@ -311,6 +311,17 @@ services:
         max-size: "10m"
         max-file: "5"
 
+  verifica-sequencial:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: pm2 start workers/JTEMonitoria/workerCnjSequencial.js --no-daemon 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
   limpa-core:
     extends:
       file: common-services.yml

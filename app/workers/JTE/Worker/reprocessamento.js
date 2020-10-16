@@ -28,7 +28,7 @@ const util = new Cnj();
 // Filas a serem usadas
 const nomeFila = `ReprocessamentoJTE`;
 // const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.1`;
-const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.1`;
+const reConsumo = `ReprocessamentoJTE`;;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado
 var estadoDaFila;     // Recebe o estado da fila

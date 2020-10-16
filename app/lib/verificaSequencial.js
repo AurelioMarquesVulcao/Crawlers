@@ -4,10 +4,10 @@ const Path = require('path');
 const async = require('async');
 const mongoose = require('mongoose');
 
-const { enums } = require('../../configs/enums');
-const { GerenciadorFila } = require("../../lib/filaHandler");
-const { statusEstadosJTE, ultimoProcesso } = require("../../models/schemas/jte")
-const { Processo } = require("../../models/schemas/processo");
+const { enums } = require('../configs/enums');
+const { GerenciadorFila } = require("../lib/filaHandler");
+const { statusEstadosJTE, ultimoProcesso } = require("../models/schemas/jte")
+const { Processo } = require("../models/schemas/processo");
 const rabbit = new GerenciadorFila();
 
 
@@ -16,11 +16,10 @@ const red = '\u001b[31m';
 const blue = '\u001b[34m';
 const reset = '\u001b[0m';
 
-class VerificaNumeracao {
-
+class Verificador {
 	/**
 	 * Gera os numeros sequenciais que precisam ser completados
-	 * @param {*} sequenciais 
+	 * @param {array} sequenciais Recebe um array de numeros
 	 */
 	static async verificaSequencia(sequenciais) {
 		let resultado = [];
@@ -37,12 +36,6 @@ class VerificaNumeracao {
 			}
 		}
 		console.log(sequenciais);
-
-
-		// let sequenciais = await this.buscaProcessos;
-		// for (let i = 0; i < sequenciais.length; i++) {
-		// 	let compara = sequenciais[i+1]-sequenciais[i]
-		// }
 		return resultado
 	}
 
@@ -57,26 +50,47 @@ class VerificaNumeracao {
 			"comarca": comarca,
 		});
 		return busca[0]
-	}
-
+  }
+  
+  /**
+	 * Busca no controle de comarcas todas as comarcas.
+   * @returns Retorna um array de comarcas e estados [{estadoNumero: "01", comarca: "0001"}]
+	 */
+	static async buscaTodasComarcas() {
+    let busca = await statusEstadosJTE.aggregate([{
+			$match: {	
+			}
+		},
+		{
+			$project: {
+        "estadoNumero": 1,
+        "comarca":1,
+				"_id": 0
+			}
+		},])
+    
+		return busca
+  }
+  
+  	
 	/**
 	 * Busca na base de processos todos os processos de um determinado periodo
-	 * @param {number} dia Dia desejado
-	 * @param {number} mes Mes desejado
-	 * @param {string} comarca comarca desejada
+	 * @param {number} tribunal Tribunal a ser bucado
+	 * @param {number} comarca Comarca a ser buscada
+	 * @param {number} periodo quantidade de dias a serem pesquisados, por padrão adotamos 7
 	 * @returns Array de sequenciais em ordem numérica
-	*/
-	static async buscaProcessos(dia, mes, comarca) {
+	 */
+	static async buscaProcessos(tribunal,comarca,periodo=7) {
 		let data = new Date()
 		// cria uma data 10 dias no passado
-		data.setDate(data.getDate() - 10);
+		data.setDate(data.getDate() - periodo);
 		let sequencial = [];
 		let busca = await Processo.aggregate([{
 			$match: {
 				"detalhes.ano": 2020,
 				"detalhes.orgao": 5,
-				"detalhes.tribunal": 1,
-				"detalhes.origem": 1,
+				"detalhes.tribunal": tribunal,
+				"detalhes.origem": comarca,
 				'dataAtualizacao': {
 					'$lt': new Date,
 					'$gt': data
@@ -115,20 +129,4 @@ class VerificaNumeracao {
 		await mongoose.connection.close()
 	}
 }
-(async () => {
-	await VerificaNumeracao.onDB()
-	console.log(await VerificaNumeracao.verificaSequencia(
-		[
-			100798, 100799, 100800, 100818,
-			100819, 100820, 100821, 100822,
-			100823, 100824, 100825, 100826,
-			100827, 100828, 100829, 100830,
-			100831, 100832, 100833, 100834,
-			100835, 100836, 100837, 100838,
-			100839, 100840, 100841, 100842,
-			100843, 100844, 100845
-		]
-	));
-	// console.log(await VerificaNumeracao.buscaProcessos(1, 9, "0025"));
-	await VerificaNumeracao.offDB()
-})()
+module.exports.Verificador = Verificador;

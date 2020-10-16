@@ -32,10 +32,10 @@ class ExtratorTrtPje {
     // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
     setInterval(async function () {
       heartBeat++;
-      if (heartBeat > 45) {
+      if (heartBeat > 180) {
         console.log(
           red +
-            '----------------- Fechando o processo por inatividade -------------------' +
+            '----------------- Fechando o processo por inatividade 180 -------------------' +
             reset
         );
         // await mongoose.connection.close()
@@ -115,10 +115,10 @@ class ExtratorTrtPje {
     // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
     setInterval(async function () {
       heartBeat++;
-      if (heartBeat > 30) {
+      if (heartBeat > 120) {
         console.log(
           red +
-            '----------------- Fechando o processo por Indisponibilidade -------------------' +
+            '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
             reset
         );
         // await mongoose.connection.close()

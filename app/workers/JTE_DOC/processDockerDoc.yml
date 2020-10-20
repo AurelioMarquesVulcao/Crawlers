@@ -1,0 +1,7 @@
+apps:
+  # - script   : ./workers/JTE/Worker/extracao_JTE_5doc.js
+  #   name     : 'worker-01'
+  # - script   : ./workers/JTE/PM2_Reset.js
+  #   name     : 'reset'
+  - script   : .app/workers/JTE_DOC/Worker/teste.js -- name 
+    name     : 'reset'

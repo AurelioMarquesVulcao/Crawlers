@@ -81,36 +81,44 @@ class GerenciadorFila {
     conn.close();
   }
 
-  /** Envia uma lista de mensagens para uma fila.
-   * @param {String} fila String com o nome da fila
-   * @param {Array} lista Array de JSON
-   */
-  // enviarLista(fila, lista) {
-  //   amqpCA.connect(this.host, (err, conn) => {
-  //     if (err) throw new Error(err);
 
-  //     conn.createChannel((err, ch) => {
-  //       if (err) throw new Error(err);
-
-  //       for (let i = 0; i < lista.length; i++) {
-  //         this.enviarMensagem(ch, fila, lista[i]);
-  //         console.log("envio");
-  //       }
-  //     });
-
-  //     setTimeout(() => {
-  //       console.log(`${lista.lenght} mensagem enviada(s) para fila!`);
-  //       conn.close();
-  //     }, lista.lenght * 500);
-  //   });
-  // }
-
-  /**
+/**
    * Enfileirar um lote de mensagens para uma fila
    * @param {string} fila String com o nome da fila
    * @param {Array} lote Array com o lote de mensagens
    */
   async enfileirarLote(fila, lote) {
+    try {
+      
+      const conn = await amqp.connect(this.host);
+      const channel = await conn.createChannel();
+  
+      channel.assertQueue(fila, {
+        durable: true,
+        noAck: false,
+        maxPriority: 9,
+      });
+  
+      for (let i = 0, si = lote.length; i < si; i++) {
+        channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
+
+        }));
+      }
+  
+    } catch (e) {
+      pred(e);
+    }
+  }
+
+
+
+  /**
+   * Enfileirar um lote de mensagens para uma fila
+   * @param {string} fila String com o nome da fila
+   * @param {array} lote Array com o lote de mensagens, 
+   * os elementos desse array devem ser tipo string
+   */
+  async enfileirarLoteTRT(fila, lote) {
     try {
       console.log("mensagens");
       const conn = await amqp.connect(this.host);
@@ -123,10 +131,12 @@ class GerenciadorFila {
       });
 
       for (let i = 0, si = lote.length; i < si; i++) {
-        channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
-        }));
-        await sleep(10);
-        console.log("enviei mensagem"+[i]);
+        channel.sendToQueue(fila, Buffer.from(lote[i]));
+        await sleep(1);
+        console.log(lote[i]);
+        // console.log("enviei mensagem" + [i]);
+        // await sleep(5000);
+        // process.exit()
       }
 
     } catch (e) {

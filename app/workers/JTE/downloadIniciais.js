@@ -80,16 +80,16 @@ class Arquivamento {
 
 
 let go = new Arquivamento();
-(async () => {
-    let link = await go.busca();
-    //console.log(link[0].link);
-    let obj = link[0].link;
-    let nome = link[0].numeroProcesso + ".pdf"
-    //console.log(nome);
-    //await go.download(nome, URL);
-    // Example call:
-    await go.fileToBase64("0020453-31.2020.5.04.0405.pdf", "'../../../downloads/0020453-31.2020.5.04.0405.pdf'").then(result => {
-        console.log(result);
-    });
-    process.exit()
-})()
+// (async () => {
+//     let link = await go.busca();
+//     //console.log(link[0].link);
+//     let obj = link[0].link;
+//     let nome = link[0].numeroProcesso + ".pdf"
+//     //console.log(nome);
+//     //await go.download(nome, URL);
+//     // Example call:
+//     await go.fileToBase64("0020453-31.2020.5.04.0405.pdf", "'../../../downloads/0020453-31.2020.5.04.0405.pdf'").then(result => {
+//         console.log(result);
+//     });
+//     process.exit()
+// })()

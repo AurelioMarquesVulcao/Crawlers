@@ -93,6 +93,10 @@ class CriaFilaJTE {
 
 	}
 
+	/**
+	 * Salva os links dos documentos no banco de dados
+	 * @param {object} link Objeto com o link e movimentação do processo.
+	 */
 	async salvaDocumentoLink(link) {
 		let verifica = await linkDocumento.find({ "numeroProcesso": link.numeroProcesso, "movimentacao": link.link })
 		if (!verifica[0]) {
@@ -133,7 +137,17 @@ class CriaFilaJTE {
 			}
 		}
 	}
+	/**
+	 * Cria um numero de processo para ser enviado para fila
+	 * @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
+	 * @param {string} origem comarca do esdo que será buscada
+	 * @param {number} tentativas numero de processos a serem testados
+	 * @param {string} tribunal referêncial numerico do estado a ser buscado
+	 * @param {string} fila fila que receberá a mensagem.
+	 * @return {string} Retorna um Array de numeros CNJ para serem buscados
+	 */
 	async procura(sequencial, origem, tentativas, tribunal, fila) {
+		let mensagens= [];
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -144,23 +158,35 @@ class CriaFilaJTE {
 				let a = sequencial + 1 + i
 				if ((obj.zero + a).length > 7) {
 					zeros = obj.zero.substr(1)
-					processo = `${zeros}${a}4720205${tribunal}${origem}`
+					processo = `${zeros}${a}0020205${tribunal}${origem}`
 				} else {
-					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+					processo = `${obj.zero}${a}0020205${tribunal}${origem}`
 				}
-
-				await this.enviaFila([{
-					NumeroProcesso: processo
-				}], fila)
-				console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
-				console.log(`Estado ${tribunal}`);
+				mensagens.push(criaPost(processo));
+				// await this.enviaFila([{
+				// 	NumeroProcesso: processo
+				// }], fila)
+				// console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
+				// console.log(`Estado ${tribunal}`);
 			}
+			return mensagens
 		} catch (e) {
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);
 		}
 
 	}
+
+	/**
+	 * Cria um numero de processo para ser enviado para fila
+	 * @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
+	 * @param {string} origem comarca do esdo que será buscada
+	 * @param {number} tentativas numero de processos a serem testados
+	 * @param {string} tribunal referêncial numerico do estado a ser buscado
+	 * @param {string} fila fila que receberá a mensagem.
+	 * @return {string} Retorna um numero CNJ para ser buscado
+	 */
 	async procura10(sequencial, origem, tentativas, tribunal, fila) {
+		let mensagens= [];
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -175,15 +201,55 @@ class CriaFilaJTE {
 				} else {
 					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
 				}
-
-				await this.enviaFila([{
-					NumeroProcesso: processo
-				}], fila)
+				mensagens.push(criaPost(processo));
+				// await this.enviaFila([{
+				// 	NumeroProcesso: processo
+				// }], fila)
 			}
-			console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
+			return mensagens
+			// console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
 		} catch (e) {
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);
 		}
+	}
+
+	/**
+ 	* Cria um numero de processo para ser enviado para fila
+ 	* @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
+ 	* @param {string} origem comarca do esdo que será buscada
+ 	* @param {number} tentativas numero de processos a serem testados
+ 	* @param {string} tribunal referêncial numerico do estado a ser buscado
+ 	* @param {string} fila fila que receberá a mensagem.
+ 	* @return {string} Retorna um numero CNJ para ser buscado
+ 	*/
+	async procuraEspecial(sequencial, origem, tentativas, tribunal, fila) {
+		let mensagens = [];
+		try {
+			let obj = corrigeSequencial(sequencial)
+			let zeros = ""
+			let processo = ""
+			origem = corrigeOrigem(origem)
+			for (let i = 0; i < tentativas; i++) {
+				sequencial = parseInt(obj.seq)
+				let a = sequencial + 1 + i
+				if ((obj.zero + a).length > 7) {
+					zeros = obj.zero.substr(1)
+					processo = `${zeros}${a}4720205${tribunal}${origem}`
+				} else {
+					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+				}
+				mensagens.push(criaPost(processo));
+				// await this.enviaFila([{
+				// 	NumeroProcesso: processo
+				// }], fila)
+				// console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
+				// console.log(`Estado ${tribunal}`);
+			}
+			return mensagens
+		} catch (e) {
+			console.log(`O Processo numero: ${processo} FALHOU !!!`);
+		}
+
 	}
 	relogio() {
 		let data = new Date();
@@ -202,33 +268,29 @@ class CriaFilaJTE {
 		return { dia, mes, hora, min, seg }
 	}
 
-	// direciona as mensagens para suas devidas filas
-	async enviaFila(numeroProcesso, fila) {
-		const sleep4 = 5;
-		const sleep1 = 2;
-		let filtro = numeroProcesso;
-		let conta1000 = 0;
+	/**
+	 * decontinuado...
+	 * @param {*} numeroProcesso 
+	 * @param {*} fila 
+	 */
+	// async enviaFila(numeroProcesso, fila) {
+	// 	let filtro = numeroProcesso;
+	// 	for (let i = 0; i < filtro.length; i++) {
+	// 		let tribunal = 0
+	// 		tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
+	// 		// estou usando uma fila unica o código abaixo esta obsoleto.
+	// 		if (tribunal != 150000) {
+	// 			const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos${fila}`;
+	// 			let message = criaPost(filtro[i].NumeroProcesso)
 
-		for (let i = 0; i < filtro.length; i++) {
-			let tribunal = 0
-			tribunal = detalhes(filtro[i].NumeroProcesso).tribunal;
-			// estou usando uma fila unica o código abaixo esta obsoleto.
-			if (tribunal != 150000) {
-				await sleep(sleep1)
-				const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos${fila}`;
-				let message = criaPost(filtro[i].NumeroProcesso)
+	// 			// await this.enviarMensagem(nomeFila, message)
 
-				await this.enviarMensagem(nomeFila, message)
 
-				conta1000++
-				if (conta1000 == 2000) {
-					await sleep(sleep4)
-					conta1000 = 0
-				}
-			}
 
-		}
-	}
+	// 		}
+
+	// 	}
+	// }
 	async verificaComarcas(estado, comarca) {
 		let data = new Date();
 		// data.setDate(data.getDate() - 1);
@@ -254,13 +316,6 @@ class CriaFilaJTE {
 
 }
 
-// (async () => {
-// 	console.log(await new CriaFilaJTE().verificaComarcas("15", "0003"));
-// 	console.log(await new CriaFilaJTE().verificaComarcas("18", "0003"));
-// 	console.log(await new CriaFilaJTE().verificaComarcas("23", "0003"));
-
-// 	await sleep(3000)
-// })()
 
 class CriaFilaTRT {
 	async enviar(processo, fila) {
@@ -298,16 +353,12 @@ function corrigeOrigem(origem) {
 	return zero + origem
 }
 
+/**
+ * Cria Mensagem para ser enviada ao rabbit
+ * @param {string} numero Numero CNJ que será usado para criar mensagem
+ */
 function criaPost(numero) {
-	let post = `{
-        "ExecucaoConsultaId" : "${makeid()}",
-        "ConsultaCadastradaId" : "${makeid()}",
-        "DataEnfileiramento" : "${new Date}",
-        "NumeroProcesso" : "${numero}",
-        "NumeroOab" : "null",        
-        "SeccionalOab" : "SP",
-        "NovosProcessos" : true
-    }`
+	let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true}`;
 	return post
 }
 

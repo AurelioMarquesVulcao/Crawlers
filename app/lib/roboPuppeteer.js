@@ -4,6 +4,8 @@ const sleep = require('await-sleep')
 require("dotenv/config");
 const { JTEParser } = require('../parsers/JTEParser');
 const shell = require('shelljs');
+const { Logger } = require('./util');
+const { enums } = require('../configs/enums');
 
 
 const ajustes = new JTEParser();
@@ -11,7 +13,12 @@ const ajustes = new JTEParser();
 var timerSleep = 200
 
 class RoboPuppeteer3 {
-
+  constructor() {
+    this.logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
+      nomeRobo: enums.nomesRobos.JTE,
+      // NumeroDoProcesso: cnj,
+    });
+  }
 
   async iniciar() {
     // para abrir o navegador use o headless: false
@@ -22,9 +29,9 @@ class RoboPuppeteer3 {
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      //args: ['--ignore-certificate-errors']
+      // args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
     // await this.acessar('https://www.meuip.com.br/');
@@ -37,7 +44,7 @@ class RoboPuppeteer3 {
     try {
       await this.page.goto(url, {
         waitUntil: "load",
-        timeout: 20000,
+        timeout: 40000,
         // waitUntil: 'networkidle2'
       });
       // isso me da o url completo
@@ -198,77 +205,6 @@ class RoboPuppeteer3 {
   }
 
 
-  // async pegaAudiencia() {
-  //   // #mat-tab-content-0-0 > div > detalhes-aba-geral > div > mat-accordion > mat-expansion-panel
-  //   // click para pegar o assunto
-  //   await this.page.click(`mat-expansion-panel`)
-  //   // click para pegar audiencias
-  //   // #mat-expansion-panel-header-1 > span.mat-content > mat-panel-description
-
-  //   await this.page.click(`#mat-expansion-panel-header-1 > span.mat-content > mat-panel-description`)
-  //   await sleep(timerSleep)
-  //   await sleep(2000)
-  //   //await this.page.waitFor(`ion-item:nth-child(1)`)
-  //   // click dos documentos
-  //   //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(1)
-  //   //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
-  //   //#cdk-accordion-child-2 > div > ion-list > ion-item:nth-child(2)
-  //   await this.page.click(`#cdk-accordion-child-1 > div > ion-list > ion-item:nth-child(1) > div`)
-  //   await sleep(2000)
-  //   let html9 = await this.page.evaluate(async () => {
-  //     let text = await document.querySelector('#menu-content > detalhe-documento > ion-content').innerText;
-  //     return text
-  //   })
-  //   await console.log(html9);
-  //   await sleep(timerSleep)
-
-  //   await sleep(2000)
-  //   await this.page.click(`#menu-content > detalhe-documento > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button > button`)
-
-  //   await sleep(timerSleep)
-  // }
-
-
-
-
-  // No site do TJE não funciona a troca de tribunal em 100% das vezes, pela provável instrabilidade. O cõdigo está perfeitamente funcionando.
-  // async mudaTribunal(estado) {
-  //   let child = estado + 1
-  //   console.log("o estado para mudar é : " + estado);
-  //   let contador = 1;
-  //   let timerSleep2 = 2000
-  //   try {
-  //     console.log("Tentando alterar o estado, Tentativa " + contador);
-  //     await sleep(timerSleep2)
-  //     await this.page.click("#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button");
-  //     await sleep(timerSleep2)
-  //     await this.page.click("ng-component > div > mat-form-field:nth-child(4) > div > div > div > mat-select");
-  //     await sleep(timerSleep2)
-  //     await this.page.click(`body > div > div > div > div > div > mat-option:nth-child(${child})`); // "body > div[2] > div[4] > div > div > div"
-  //     await sleep(timerSleep2)
-  //     await this.page.click("body>div>div>div>mat-dialog-container>ng-component>div>button:nth-child(2)")
-  //     await sleep(timerSleep2)
-  //     let tribunalAtual = await this.page.evaluate(async (i, iniciaisArray) => {
-  //       await new Promise(function (resolve) { setTimeout(resolve, 500); });
-  //       let tribunal = document.querySelector("#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button > ion-label").innerText;
-  //       return tribunal
-  //     })
-  //     console.log("tribunal capturado" + tribunalAtual);
-
-  //     await sleep(timerSleep2)
-  //     let tribunalDesejado = "TRT" + estado;
-  //     console.log("tribunal desejado" + tribunalDesejado);
-  //     await sleep(timerSleep2)
-  //     if (tribunalDesejado != tribunalAtual) {
-  //       throw "O estado não foi alterado"
-  //     }
-  //   } catch (e) {
-  //     contador++
-  //     this.mudaTribunal(estado)
-  //   }
-  //   await sleep(timerSleep2)
-  // }
-
 
   async loga() {
     let login = "10389051764";
@@ -279,7 +215,7 @@ class RoboPuppeteer3 {
     await sleep(2000)
     await this.page.type("#formLogin > ion-item > ion-input > input", login)
     console.log('digido login');
-    await sleep(1000)
+    await sleep(3000)
     await this.page.click("#formLogin > ion-toolbar > ion-button")
     console.log('clicado no primeiro botão');
     await sleep(1000)
@@ -293,17 +229,21 @@ class RoboPuppeteer3 {
     console.log('clicado no botão de busca');
   }
 
+  /**
+   * Cern da extração de documentos. È aqui que será aberto cada documento e capturado cada link
+   */
   async pegaInicial() {
     try {
       let links = [];
       let iniciaisArray = await (await this.numerosIniciaisLaco()).numero2;
       let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
-      console.log(iniciaisArray)
-      console.log(iniciaisMultiplas)
+      console.log("Arquivos simples " + iniciaisArray)
+      console.log("Arquivos paginados " + iniciaisMultiplas)
 
       for (let i = 0; i < (await iniciaisArray).length; i++) {
         await sleep(timerSleep)
         await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`)
+        this.logger.info(`Cliquei no documento numero ${iniciaisArray[i]}`);
         await sleep(timerSleep)
         // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
         let link = await this.page.evaluate(async (i, iniciaisArray) => {
@@ -335,6 +275,7 @@ class RoboPuppeteer3 {
 
           // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
         }, i, iniciaisArray);
+        this.logger.info(`Peguei o documento numero ${iniciaisArray[i]}`);
         //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
         links.push(link)
         await sleep(2000);
@@ -363,7 +304,7 @@ class RoboPuppeteer3 {
           await sleep(1500)
           // abro o popup e abro o link do documento
           await this.page.click(`#popover-marcador-filtro > ion-item:nth-child(${k})> span`)
-          await sleep(1500)
+          await sleep(1000)
           let link = await this.page.evaluate(async (k, dataEProcesso) => {
             await new Promise(function (resolve) { setTimeout(resolve, 1000); });
 
@@ -372,7 +313,7 @@ class RoboPuppeteer3 {
             let data = dataEProcesso.data;
             let numeroProcesso = dataEProcesso.numeroProcesso;
             let tipo = "PDF"
-            console.log({ numeroProcesso, data, movimentacao, link, tipo })
+            // console.log({ numeroProcesso, data, movimentacao, link, tipo })
             return { numeroProcesso, data, movimentacao, link, tipo }
             // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
           }, k, dataEProcesso);
@@ -385,7 +326,7 @@ class RoboPuppeteer3 {
             // await console.log("Aguarde mais um pouco")
             pages = await this.browser.pages();
           }
-          console.log(pages.length)
+          // console.log(pages.length)
           const popup = pages[pages.length - 1];
           await popup.close();
           await sleep(timerSleep)
@@ -395,11 +336,11 @@ class RoboPuppeteer3 {
         await sleep(timerSleep)
         await sleep(timerSleep)
         await sleep(timerSleep)
-        await sleep(2000)
+        await sleep(3000)
         await this.page.click("#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button")
         await sleep(timerSleep)
       }
-      console.log(links);
+      // console.log(links);
       return links
     } catch (e) { console.log("Não pegou os Documentos"); console.log(e); }
   }

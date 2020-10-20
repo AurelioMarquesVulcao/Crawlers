@@ -1,5 +1,7 @@
 apps:
-  - script   : ./workers/JTE/reprocessamento.js
+  - script   : ./workers/JTE/Worker/reprocessamento.js
     name     : 'r-01'
-  - script   : ./workers/JTE/reprocessamento.js
+  - script   : ./workers/JTE/Worker/reprocessamento.js
     name     : 'r-02'
+  - script   : ./workers/JTE/PM2_Reset.js
+    name     : 'reset'

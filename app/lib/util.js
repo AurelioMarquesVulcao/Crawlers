@@ -10,6 +10,19 @@ const { Robo } = require('../lib/robo');
 
 class Helper {
   /**
+   * Converte data comum para formato Date. sem alterar o fuso horário
+   * @param {string} data Data comum. Ex.: 25/02/2020 09:40
+   * @returns {string} 2020-01-01T10:10.000Z
+   */
+  static data(data){
+    // O GMT-0000 mantem a hora que você inseriu sem alterar fuso -3
+    // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
+    //GMT-0300
+    let regex = data.replace(/([0-9]{2})\W([0-9]{2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2})/gi, '$3-$2-$1 $4 GMT-0000');
+    return new Date(regex);
+  }
+
+  /**
    * Gera um hash em sha1 para o parametro fornecido
    * @param {string} texto Texto para gerar o hash
    */
@@ -365,7 +378,63 @@ class Cnj {
     }; let seq = novoSequencial;
     return { seq, zero }
   }
+// --------- Funções melhoradas ---------
+
+  /**
+   * Cria a mensagem a ser enviada para a fila
+   * @param {string} numero 
+   */
+  static criaPostJTE(numero) {
+    let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true}`;
+    return post
+  }
+
+  /**
+   * Cria um numero CNJ para consumo.
+   * @param {number} ultimoSequencial Ultimo numero sequencial obtido no BigData V2.
+   * @param {number} Tribunal Numero que representa o Estado.
+   * @param {number} unidadeOrigem Numero da comarca.
+   * @returns String com cnj valido.
+   */
+  static organizaCNJ(ultimoSequencial, Tribunal, unidadeOrigem) {
+    // console.log(ultimoSequencial, Tribunal, unidadeOrigem);
+    let sequencial = this.completaNumero(ultimoSequencial, "ultimoSequencial");
+    let tribunal = this.completaNumero(Tribunal, "Tribunal");
+    let origem = this.completaNumero(unidadeOrigem, "unidadeOrigem");
+    return `${sequencial}0020205${tribunal}${origem}`
+  }
+
+  /**
+   * Ajusta o numero para string e completa com zeros para ficar no padrão do numero CNJ
+   * @param {number} numero 
+   * @param {string} tipo 
+   */
+  static completaNumero(numero, tipo) {
+    let teste;
+    if (tipo == "unidadeOrigem") {
+      teste = 4;
+    } else if (tipo == "Tribunal") {
+      teste = 2;
+    } else if (tipo == "ultimoSequencial") {
+      teste = 7;
+    }
+    let resultado = ''
+    numero = numero.toString();
+    if (numero.length < teste) {
+      let zero = teste - numero.length
+      for (let i = 0; i < zero; i++) {
+        resultado += "0"
+      }
+      resultado = resultado + numero
+    } else {
+      resultado = numero;
+    }
+    return resultado
+  }
+
 }
+
+
 
 module.exports.Helper = Helper;
 module.exports.CnjValidator = CnjValidator;

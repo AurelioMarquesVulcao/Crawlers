@@ -27,7 +27,7 @@ module.exports.Filas = async function Filas() {
           }
           console.log(" Mensagesn.: ", tribunal, comarca, "Criadas...");
         })
-        // if (i == 20) {
+        // if (i == 2) {
         //   break
         // }
     }

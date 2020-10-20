@@ -26,6 +26,8 @@ class Email {
         </tem:EnviarEmail>
       </soapenv:Body>
     </soapenv:Envelope>`;
+    // console.log(corpo);
+    // process.exit()
 
     try {
       const email = await robo.acessar({
@@ -37,12 +39,11 @@ class Email {
         params: corpo,
         headers: headers,
       });
-      
       if (/>1</.test(email.responseBody)) {
         console.table({
           Envio: true,
           Titulo: titulo,
-          Destinatarios: destinatario,
+          Destinatarios: destinatario.toString(),
           Conteudo: conteudo
         })
       }

@@ -1,0 +1,22 @@
+{
+    "jte": {
+        "destinatarios": [
+            "amarques@impacta.adv.br",
+            "amarques@impacta.adv.br"
+        ],
+        "titulo": "Status das filas JTE",
+        "mensagem": "As filas estao paradas, verifique o status do servidor.",
+        "filas": [
+            "processo.JTE.extracao.novos.1",
+            "processo.JTE.extracao.novos.2",
+            "processo.JTE.extracao.novos.3",
+            "processo.JTE.extracao.novos.4"
+        ]
+    },
+    "pje": {
+        "titulo": "Status das filas PJE"
+    },
+    "jteDocumentos": {
+        "titulo": "Status das filas download documentos"
+    }
+}

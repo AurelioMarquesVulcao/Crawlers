@@ -1,4 +1,5 @@
 const cheerio = require('cheerio');
+const mongoose = require('mongoose');
 const puppeteer = require('puppeteer');
 const sleep = require('await-sleep')
 require("dotenv/config");
@@ -27,7 +28,7 @@ class RoboPuppeteer3 {
       slowMo: 1,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
-      //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8182']
       args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8182']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
@@ -89,25 +90,37 @@ class RoboPuppeteer3 {
 
 
   async preencheTribunal(numero) {
-    // await console.log(`foi escolhido o estado numero ${escolheEstado(numero)}`);
-    //await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
-    // para esperar carregar o elemento onde fica o tribunal
-    await sleep(timerSleep)
-    await this.page.waitFor('mat-form-field');
-    await sleep(timerSleep)
-    await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper')
-    await sleep(timerSleep)
-    // console.log(!! await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper'));
-    await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper')
-    await sleep(timerSleep)
-    await this.page.click(`#mat-option-${escolheEstado(numero)}`)
-    await sleep(timerSleep)
-    await this.page.click('ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span')
-    await sleep(2200)
-    // await this.page.waitFor('#consultaProcessual')
-    await this.page.click('#consultaProcessual')
-    await sleep(timerSleep)
-    //await console.log("Logado ao tribunal desejado");
+    try {
+
+      // await console.log(`foi escolhido o estado numero ${escolheEstado(numero)}`);
+      //await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
+      // para esperar carregar o elemento onde fica o tribunal
+      await sleep(timerSleep)
+      await this.page.waitFor('mat-form-field');
+      await sleep(timerSleep)
+      await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper')
+      await sleep(timerSleep)
+      // console.log(!! await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper'));
+      await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper')
+      await sleep(timerSleep)
+      await this.page.click(`#mat-option-${escolheEstado(numero)}`)
+      await sleep(timerSleep)
+      await this.page.click('ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span')
+      await sleep(10200)
+      // await this.page.waitFor('#consultaProcessual')
+      await this.page.click('#consultaProcessual')
+      await sleep(timerSleep)
+      //await console.log("Logado ao tribunal desejado");
+
+
+    } catch (e) {
+      console.log(" ------- Ocorreu um erro no log ------- ");
+      await shell.exec('pkill chrome');
+      await mongoose.connection.close()
+      process.exit()
+
+      
+    }
 
   }
 

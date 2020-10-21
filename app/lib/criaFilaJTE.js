@@ -265,7 +265,7 @@ class CriaFilaJTE {
 		let mseg = data.getMilliseconds();   // 0-999
 		let tz = data.getTimezoneOffset(); // em minutos
 
-		return { dia, mes, hora, min, seg }
+		return { dia, mes, ano4, hora, min, seg }
 	}
 
 	/**

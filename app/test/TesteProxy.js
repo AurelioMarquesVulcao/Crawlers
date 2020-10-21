@@ -25,7 +25,10 @@ describe('Test proxy', () => {
   it('Deve retornar a pagina carrega do Horário de Brasília através do puppeteer', function () {
     return new Promise(async (resolve) => {
       const browser = await puppeter.launch({
-        args: ['--proxy-server=http://proxy-proadv.7lan.net:8182 --no-sandbox'],
+        args: [
+          '--proxy-server=http://proxy-proadv.7lan.net:8182',
+          '--no-sandbox',
+        ],
       });
 
       const page = await browser.newPage();

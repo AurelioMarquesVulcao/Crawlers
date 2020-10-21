@@ -28,12 +28,16 @@ class RoboPuppeteer3 {
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8182']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       //args: [process.env.ARGS_PUPPETTER_CONECTION]
       // args: ['--ignore-certificate-errors']
     });
     this.page = await this.browser.newPage();
+    await this.page.authenticate({
+      username: 'proadvproxy',
+      password: 'C4fMSSjzKR5v9dzg',
+    });
     // await this.acessar('https://www.meuip.com.br/');
     // await sleep(30000)
     console.log('O Puppeteer foi Iniciado corretamente');

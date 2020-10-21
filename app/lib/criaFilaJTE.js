@@ -144,10 +144,10 @@ class CriaFilaJTE {
 	 * @param {number} tentativas numero de processos a serem testados
 	 * @param {string} tribunal referêncial numerico do estado a ser buscado
 	 * @param {string} fila fila que receberá a mensagem.
-	 * @return {string} Retorna um numero CNJ para ser buscado
+	 * @return {string} Retorna um Array de numeros CNJ para serem buscados
 	 */
 	async procura(sequencial, origem, tentativas, tribunal, fila) {
-		let mensagens;
+		let mensagens= [];
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -158,11 +158,11 @@ class CriaFilaJTE {
 				let a = sequencial + 1 + i
 				if ((obj.zero + a).length > 7) {
 					zeros = obj.zero.substr(1)
-					processo = `${zeros}${a}4720205${tribunal}${origem}`
+					processo = `${zeros}${a}0020205${tribunal}${origem}`
 				} else {
-					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+					processo = `${obj.zero}${a}0020205${tribunal}${origem}`
 				}
-				mensagens = criaPost(processo);
+				mensagens.push(criaPost(processo));
 				// await this.enviaFila([{
 				// 	NumeroProcesso: processo
 				// }], fila)
@@ -186,7 +186,7 @@ class CriaFilaJTE {
 	 * @return {string} Retorna um numero CNJ para ser buscado
 	 */
 	async procura10(sequencial, origem, tentativas, tribunal, fila) {
-		let mensagens;
+		let mensagens= [];
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -201,13 +201,13 @@ class CriaFilaJTE {
 				} else {
 					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
 				}
-				mensagens = criaPost(processo);
+				mensagens.push(criaPost(processo));
 				// await this.enviaFila([{
 				// 	NumeroProcesso: processo
 				// }], fila)
 			}
 			return mensagens
-			console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
+			// console.log(`O Processo numero: ${processo} foi enviado para a fila.`);
 		} catch (e) {
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);
 		}
@@ -265,7 +265,7 @@ class CriaFilaJTE {
 		let mseg = data.getMilliseconds();   // 0-999
 		let tz = data.getTimezoneOffset(); // em minutos
 
-		return { dia, mes, hora, min, seg }
+		return { dia, mes, ano4, hora, min, seg }
 	}
 
 	/**

@@ -200,7 +200,7 @@ class Busca {
   }
 
   /**
-   * Verifica se o numero CNJ obtido é maior que o ultimo rapado pelo robô JTE
+   * Verifica se o numero CNJ obtido é maior que o ultimo raspado pelo robô JTE
    * @param {string} numero Recebe numero CNJ
    * @returns retorna: Numero para ser enfileirado ou Null
    */

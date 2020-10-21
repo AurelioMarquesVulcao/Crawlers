@@ -39,7 +39,7 @@ var estados = [
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-  try{
+  try {
     for (let w = 0; w < 1;) {
       let relogio = Fila.relogio();
       // console.log(estados[contador].estado);
@@ -47,7 +47,7 @@ var estados = [
       await sleep(100);
       // esse if mantem o enfilerador desligado na hora desejada
       if (!desligado.find(element => element == relogio.hora)) {
-  
+
         // if (start == 0 || !statusFila) {
         if (start == 0 || !statusFila) {
           // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
@@ -66,7 +66,7 @@ var estados = [
         if (contador == estados.length) { contador = 0 }
       }
     }
-  }catch(e){
+  } catch (e) {
     await sleep(120000);
     process.exit()
   }
@@ -107,33 +107,42 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              mensagens.push(
-                await Fila.procura10(numeroSequencial, comarca, 1, codigo, fila)
-              );
+              let arrayMensages = await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+              for (let ii = 0; ii < arrayMensages.length; ii++) {
+                mensagens.push(arrayMensages[ii]);
+              }
             } else {
-              mensagens.push(
-                await Fila.procura(numeroSequencial, comarca, 1, codigo, fila));
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
+              for (let ii = 0; ii < arrayMensages.length; ii++) {
+                mensagens.push(arrayMensages[ii]);
+              }
             }
           } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              mensagens.push(
-                await Fila.procura10(numeroSequencial, comarca, 1, codigo, fila)
-              );
+              let arrayMensages = await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+              for (let ii = 0; ii < arrayMensages.length; ii++) {
+                mensagens.push(arrayMensages[ii]);
+              }
+
             } else {
-              mensagens.push(
-                await Fila.procura(numeroSequencial, comarca, 1, codigo, fila));
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
+              for (let ii = 0; ii < arrayMensages.length; ii++) {
+                mensagens.push(arrayMensages[ii]);
+              }
             }
           } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              mensagens.push(
-                await Fila.procura10(numeroSequencial, comarca, 1, codigo, fila)
-              );
+              let arrayMensages = await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+              for (let ii = 0; ii < arrayMensages.length; ii++) {
+                mensagens.push(arrayMensages[ii]);
+              }
             } else {
-              mensagens.push(
-                await Fila.procura(numeroSequencial, comarca, 1, codigo, fila));
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
+              for (let ii = 0; ii < arrayMensages.length; ii++) {
+                mensagens.push(arrayMensages[ii]);
+              }
             }
           }
-
         }
         // console.log("O contador vale.: " + contaLaco);
       } catch (e) {

@@ -22,23 +22,31 @@ describe('Test proxy', () => {
       .catch(done);
   });
 
-  it('Deve retornar a pagina carrega do Horário de Brasília através do puppeteer', () => {
-    const browser = await puppeter.launch({
-      // args: [
-      //   '--proxy-server=http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182',
-      // ],
-    });
+  it('Deve retornar a pagina carrega do Horário de Brasília através do puppeteer', function () {
+    return new Promise(async (resolve) => {
+      const browser = await puppeter.launch({
+        args: ['--proxy-server=http://proxy-proadv.7lan.net:8182'],
+      });
 
-    const page = await browser.newPage();
-    try {
-      await page.goto('https://www.horariodebrasilia.org/');g
-    } catch (e) {
+      const page = await browser.newPage();
+
+      page.on('response', (data) => {
+        assert(data.status() === 200);
+      });
+
+      await page.authenticate({
+        username: 'proadvproxy',
+        password: 'C4fMSSjzKR5v9dzg',
+      });
+      try {
+        await page.goto('https://www.horariodebrasilia.org/');
+      } catch (e) {
+        await browser.close();
+        resolve(e);
+        return;
+      }
       await browser.close();
-      done(e);
-      return;
-    }
-    console.log(await page.evaluate(() => document.body.innerHTML));
-    await browser.close();
-    done();
+      resolve();
+    });
   });
 });

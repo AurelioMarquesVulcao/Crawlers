@@ -1,4 +1,5 @@
 const axios = require('axios');
+const puppeter = require('puppeteer');
 const assert = require('assert');
 const HttpsProxyAgent = require('https-proxy-agent');
 
@@ -19,5 +20,33 @@ describe('Test proxy', () => {
         done();
       })
       .catch(done);
+  });
+
+  it('Deve retornar a pagina carrega do Horário de Brasília através do puppeteer', function () {
+    return new Promise(async (resolve) => {
+      const browser = await puppeter.launch({
+        args: ['--proxy-server=http://proxy-proadv.7lan.net:8182'],
+      });
+
+      const page = await browser.newPage();
+
+      page.on('response', (data) => {
+        assert(data.status() === 200);
+      });
+
+      await page.authenticate({
+        username: 'proadvproxy',
+        password: 'C4fMSSjzKR5v9dzg',
+      });
+      try {
+        await page.goto('https://www.horariodebrasilia.org/');
+      } catch (e) {
+        await browser.close();
+        resolve(e);
+        return;
+      }
+      await browser.close();
+      resolve();
+    });
   });
 });

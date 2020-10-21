@@ -231,6 +231,7 @@ async function worker() {
           // }
         }
 
+        
 
 
         // if (message.inicial == true) {

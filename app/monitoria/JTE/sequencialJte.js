@@ -35,21 +35,26 @@ class Sequencial {
       let data;
       const busca = await statusEstadosJTE.findOne({ "numeroUltimoProcecesso": numero });
       // console.log(numero);
+      // console.log(busca);
+      // console.log(busca.dataBusca);
       // Verifico se existe ano no resultado da buca
-      if (("ano" in busca.dataBusca)) {
-        ano = busca.dataBusca.ano
-      } else {
-        ano = 2020
+      if (busca != null){
+        if (("ano" in busca.dataBusca)) {
+          ano = busca.dataBusca.ano
+        } else {
+          ano = 2020
+        }
+        // data = Helper.data(`12/09/2020 00:00`);
+        data = Helper.data(`${busca.dataBusca.dia}/${busca.dataBusca.mes+1}/${ano} 00:00`);
+        // console.log(`${busca.dataBusca.dia}/${busca.dataBusca.mes}/${ano} 00:00`);
+        return {
+          estado: busca.estadoNumero,
+          comarca: busca.comarca,
+          status: busca.status,
+          dataUltimaVerificacao: data
+        }
       }
-      // data = Helper.data(`12/09/2020 00:00`);
-      data = Helper.data(`${busca.dataBusca.dia}/${busca.dataBusca.mes+1}/${ano} 00:00`);
-      // console.log(`${busca.dataBusca.dia}/${busca.dataBusca.mes}/${ano} 00:00`);
-      return {
-        estado: busca.estadoNumero,
-        comarca: busca.comarca,
-        status: busca.status,
-        dataUltimaVerificacao: data
-      }
+      
     } catch (e) {
       console.log(e);
       console.log(" Erro Busca de Detalhes Falhou");
@@ -101,7 +106,7 @@ class Sequencial {
   static async bucaComarca() {
     try {
       // tratei na busca para remover as comarcas que possuem data de criação = null
-      const comarcas = await statusEstadosJTE.find({ "dataCriaçãoJTE": { $ne: null } }).limit(200)
+      const comarcas = await statusEstadosJTE.find({ "dataCriaçãoJTE": { $ne: null } }).limit()
       return comarcas.map((res) => {
         return {
           processo: res.numeroUltimoProcecesso,
@@ -157,16 +162,3 @@ class Sequencial {
 
 }
 module.exports.Sequencial = Sequencial;
-
-// (async () => {
-//   await Sequencial.onDB()
-
-//   // await Sequencial.teste()
-//   // console.log(await Sequencial.teste());
-//   // console.log(await Sequencial.buscaDetalhes("00001758820205110251"));
-//   console.log(await Sequencial.geraEmail());
-//   await sleep(5000)
-
-//   await Sequencial.offDB()
-// })()
-

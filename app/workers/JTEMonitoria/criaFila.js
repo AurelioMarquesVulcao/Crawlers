@@ -13,26 +13,27 @@ module.exports.Filas = async function Filas() {
     let resultado = [];
     let tribunal;
     let comarca;
+    let processo;
     const comarcas = await Verificador.buscaTodasComarcas();
     for (let i = 0; i < comarcas.length; i++) {
       tribunal = parseInt(comarcas[i].estadoNumero)
       comarca = parseInt(comarcas[i].comarca)
       console.log(" iniciando comarca.: ", tribunal, comarca);
 
-      await Verificador.buscaProcessos(tribunal, comarca, 2)
+      await Verificador.buscaProcessos(tribunal, comarca, 7)
         .then(res => {
           for (let ii = 0; ii < res.length; ii++) {
             console.log("Criando mensagem.:" + ii);
-            resultado.push(Cnj.criaPostJTE(Cnj.organizaCNJ(res[ii], tribunal, comarca)))
+              resultado.push(Cnj.criaPostJTE(Cnj.organizaCNJ(res[ii], tribunal, comarca)))
           }
           console.log(" Mensagesn.: ", tribunal, comarca, "Criadas...");
         })
-      // if (i == 2) {
+      // if (i == 50) {
       //   break
       // }
     }
     await Verificador.offDB()
-    console.log(resultado);
+    // console.log(resultado);
     return resultado
 
   } catch (e) {

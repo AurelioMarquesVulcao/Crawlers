@@ -21,7 +21,7 @@ class Verificador {
 	 * Gera os numeros sequenciais que precisam ser completados
 	 * @param {array} sequenciais Recebe um array de numeros
 	 */
-	static async verificaSequencia(sequenciais) {
+	static verificaSequencia(sequenciais) {
 		let resultado = [];
 		let sequencia = [];
 		let max = Math.max.apply(Math, sequenciais);
@@ -30,12 +30,14 @@ class Verificador {
 		for (let i = 0; i < quantidade + 1; i++) {
 			sequencia.push(min + i)
 		}
+		// console.log("ta aqui", sequencia);
 		for (let i = 0; i < sequencia.length; i++) {
 			if (sequenciais.indexOf(sequencia[i]) < 0) {
 				resultado.push(sequencia[i])
 			}
 		}
-		console.log(sequenciais);
+		// console.log(sequenciais);
+		console.log(resultado);
 		return resultado
 	}
 
@@ -50,29 +52,28 @@ class Verificador {
 			"comarca": comarca,
 		});
 		return busca[0]
-  }
-  
-  /**
-	 * Busca no controle de comarcas todas as comarcas.
-   * @returns Retorna um array de comarcas e estados [{estadoNumero: "01", comarca: "0001"}]
-	 */
+	}
+
+	/**
+	* Busca no controle de comarcas todas as comarcas.
+	* @returns Retorna um array de comarcas e estados [{estadoNumero: "01", comarca: "0001"}]
+	*/
 	static async buscaTodasComarcas() {
-    let busca = await statusEstadosJTE.aggregate([{
-			$match: {	
+		let busca = await statusEstadosJTE.aggregate([{
+			$match: {
 			}
 		},
 		{
 			$project: {
-        "estadoNumero": 1,
-        "comarca":1,
+				"estadoNumero": 1,
+				"comarca": 1,
 				"_id": 0
 			}
 		},])
-    
 		return busca
-  }
-  
-  	
+	}
+
+
 	/**
 	 * Busca na base de processos todos os processos de um determinado periodo
 	 * @param {number} tribunal Tribunal a ser bucado
@@ -80,10 +81,12 @@ class Verificador {
 	 * @param {number} periodo quantidade de dias a serem pesquisados, por padrão adotamos 7
 	 * @returns Array de sequenciais em ordem numérica
 	 */
-	static async buscaProcessos(tribunal,comarca,periodo=7) {
+	static async buscaProcessos(tribunal, comarca, periodo) {
 		let data = new Date()
-		// cria uma data 10 dias no passado
+		// cria uma data 7 dias no passado
 		data.setDate(data.getDate() - periodo);
+		// console.log(data);
+		// console.log(new Date);
 		let sequencial = [];
 		let busca = await Processo.aggregate([{
 			$match: {
@@ -91,7 +94,7 @@ class Verificador {
 				"detalhes.orgao": 5,
 				"detalhes.tribunal": tribunal,
 				"detalhes.origem": comarca,
-				'dataAtualizacao': {
+				'dataCriacao': {
 					'$lt': new Date,
 					'$gt': data
 				}
@@ -109,7 +112,10 @@ class Verificador {
 		}
 		// coloca em ordem numérica os sequenciais.
 		let ordenado = sequencial.sort((a, b) => (a - b));
-		return ordenado
+		// console.log(ordenado);
+		// this.verificaSequencia(ordenado)
+		
+		return this.verificaSequencia(ordenado)
 	}
 
 

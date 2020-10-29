@@ -13,11 +13,12 @@ const rabbit = new GerenciadorFila();
   while (true){
     fila = await Fila.getFila()
     status = fila.find(element => element.nome == "ReprocessamentoJTE");
-
+    
     if (status) {
       console.log(status);
       if (status.qtd < 100) {
         console.log("Entrou na busca");
+        // await Filas()
         await rabbit.enfileirarLoteTRT("ReprocessamentoJTE", await Filas());
         await sleep(15000);
       }

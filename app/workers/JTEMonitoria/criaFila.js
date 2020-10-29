@@ -19,7 +19,7 @@ module.exports.Filas = async function Filas() {
       comarca = parseInt(comarcas[i].comarca)
       console.log(" iniciando comarca.: ", tribunal, comarca);
 
-      await Verificador.buscaProcessos(tribunal, comarca, 7)
+      await Verificador.buscaProcessos(tribunal, comarca, 2)
         .then(res => {
           for (let ii = 0; ii < res.length; ii++) {
             console.log("Criando mensagem.:" + ii);
@@ -27,14 +27,15 @@ module.exports.Filas = async function Filas() {
           }
           console.log(" Mensagesn.: ", tribunal, comarca, "Criadas...");
         })
-        // if (i == 2) {
-        //   break
-        // }
+      // if (i == 2) {
+      //   break
+      // }
     }
     await Verificador.offDB()
+    console.log(resultado);
     return resultado
 
-  } catch (e) { 
+  } catch (e) {
     Filas
   }
 }

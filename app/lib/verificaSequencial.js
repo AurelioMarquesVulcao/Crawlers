@@ -61,6 +61,7 @@ class Verificador {
 	static async buscaTodasComarcas() {
 		let busca = await statusEstadosJTE.aggregate([{
 			$match: {
+				"comarca" : {"$not":/unde/},
 			}
 		},
 		{
@@ -70,6 +71,7 @@ class Verificador {
 				"_id": 0
 			}
 		},])
+		console.log(busca.length);
 		return busca
 	}
 

@@ -25,6 +25,19 @@ console.log(variaveis);
 
 class VariaveisRobos {
 
+  static async catch(busca){
+    try {
+      let resultado = await AplicacaoVar.findOne(busca)
+      console.log("Dados salvos com sucesso!");
+    } catch (e) {
+      console.log("Erro ao atualizar os dados");
+    }
+    await sleep(1000);
+    // Desliga Banco de dados
+    // await mongoose.connection.close()
+    return resultado
+  }
+
   static async insert(variaveis) {
     try {
       await new AplicacaoVar(variaveis).save()
@@ -35,7 +48,7 @@ class VariaveisRobos {
     }
     await sleep(1000);
     // Desliga Banco de dados
-    await mongoose.connection.close()
+    // await mongoose.connection.close()
   }
 
   /**
@@ -51,7 +64,7 @@ class VariaveisRobos {
     }
     await sleep(1000);
     // Desliga Banco de dados
-    await mongoose.connection.close()
+    // await mongoose.connection.close()
   }
 
 }

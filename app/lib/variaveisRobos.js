@@ -19,22 +19,36 @@ const variaveis = {
   "aplicacao": "Calendario",
   "codigo": "000002",
   "origem": "controller",
-  "variaveis": []
+  "variaveis": banco
 };
-console.log(variaveis);
+// console.log(variaveis);
 
-class VariaveisRobos {
-
-  static async catch(busca){
+class Variaveis {
+  /**
+   * Pega as variaveis no banco de dados
+   * @param {obect} busca  Ex.: => {"aplicacao": "criaFilaJte", "codigo": "000001"}
+   */
+  static async catch(busca) {
+    let resultado;
     try {
-      let resultado = await AplicacaoVar.findOne(busca)
-      console.log("Dados salvos com sucesso!");
+      // liga ao banco de dados
+      mongoose.connect(enums.mongo.connString, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      mongoose.connection.on('error', (e) => {
+        console.log(e);
+      });
+
+      resultado = await AplicacaoVar.findOne(busca)
+      console.log("Dados obtidos com sucesso!");
     } catch (e) {
-      console.log("Erro ao atualizar os dados");
+      console.log("Erro ao obter os dados");
     }
     await sleep(1000);
     // Desliga Banco de dados
-    // await mongoose.connection.close()
+    await mongoose.connection.close()
+    // console.log(resultado);
     return resultado
   }
 
@@ -79,4 +93,7 @@ class VariaveisRobos {
 // };
 
 // VariaveisRobos.insert(variaveis)
-// VariaveisRobos.update({ "aplicacao": "criaFilaJte", "codigo": "000001" }, variaveis)
+Variaveis.update({ "codigo": "000002" }, variaveis)
+// VariaveisRobos.catch({ "codigo": "000002" });
+
+module.exports.Variaveis = Variaveis;

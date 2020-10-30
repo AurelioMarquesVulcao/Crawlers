@@ -4,6 +4,7 @@ const re = require('xregexp');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const comarcas = require('../../../assets/jte/comarcas');
+const {Variaveis} = require('../../../lib/variaveisRobos');
 const Estados = require('../../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
 const { Helper, Logger } = require('../../../lib/util');
@@ -16,11 +17,11 @@ const rabbit = new GerenciadorFila();
 var fila = ".1";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.1';
 var desligado = desligar.worker;
-var estados = [
-  // Estados.rj,Estados.pr,
-  // Estados.sp2,
-  Estados.rj, Estados.sp2,
-];
+// var estados = [
+//   // Estados.rj,Estados.pr,
+//   // Estados.sp2,
+//   Estados.rj, Estados.sp2,
+// ];
 
 
 (async () => {
@@ -31,6 +32,14 @@ var estados = [
   let timer;    // tempo entre o envio de cada teste, isso marca o ritmo de envio de processos
   let contador = 0;
   let start = 0;  // cria uma condição que permite que a aplicação inicie ao ligar o worker.
+  // const variaveis = await Variaveis.catch({ "codigo": "000001" })
+  // const Estados = variaveis.variaveis
+  console.log(Estados);
+  var estados = [
+    // Estados.rj,Estados.pr,
+    // Estados.sp2,
+    Estados.rj, Estados.sp2,
+  ];
 
   embaralha(estados)
 

@@ -3,6 +3,7 @@ const shell = require('shelljs');
 const sleep = require('await-sleep');
 const axios = require('axios');
 
+const { MonitoriaLogs } = require('../../models/schemas/monitoria');
 const { Processo } = require('../../models/schemas/processo');
 const { statusEstadosJTE } = require('../../models/schemas/jte');
 const { enums } = require('../../configs/enums');
@@ -15,18 +16,38 @@ class Sequencial {
     let detalhes;
     let email = [];
     const desatualizados = await this.teste();
+    // console.log(desatualizados);
     for (let i = 0; i < desatualizados.length; i++) {
       detalhes = await this.buscaDetalhes(desatualizados[i].numeroProcesso);
       email.push({
-              numero:desatualizados[i].numeroProcesso,
-              dataDistribuicao:desatualizados[i].dataDistribuicao,
-              estado:detalhes.estado,
-              comarca:detalhes.comarca,
-              status:detalhes.status,
-              dataUltimaVerificacao:detalhes.dataUltimaVerificacao
+        numero: desatualizados[i].numeroProcesso,
+        dataDistribuicao: desatualizados[i].dataDistribuicao,
+        estado: detalhes.estado,
+        comarca: detalhes.comarca,
+        status: detalhes.status,
+        dataUltimaVerificacao: detalhes.dataUltimaVerificacao
       })
     }
+    this.saveLogs(email);
+    // console.log(email);
     return email
+  }
+
+  static async saveLogs(logs) {
+    let date = new Date
+    let log = {
+      aplicacao: "comarcas7dias",
+      codigo: "00001",
+      origem: "JTE",
+      dataCriacao: Helper.data(`${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} 00:00`),
+      log: logs,
+    }
+    try {
+      await new MonitoriaLogs(log).save()
+      console.log("salvo com sucesso");
+    } catch (e) {
+      console.log("falhou a salvar");
+    }
   }
 
   static async buscaDetalhes(numero) {
@@ -38,14 +59,15 @@ class Sequencial {
       // console.log(busca);
       // console.log(busca.dataBusca);
       // Verifico se existe ano no resultado da buca
-      if (busca != null){
+      if (busca != null) {
+        // console.log("entrei");
         if (("ano" in busca.dataBusca)) {
           ano = busca.dataBusca.ano
         } else {
           ano = 2020
         }
         // data = Helper.data(`12/09/2020 00:00`);
-        data = Helper.data(`${busca.dataBusca.dia}/${busca.dataBusca.mes+1}/${ano} 00:00`);
+        data = Helper.data(`${busca.dataBusca.dia}/${busca.dataBusca.mes + 1}/${ano} 00:00`);
         // console.log(`${busca.dataBusca.dia}/${busca.dataBusca.mes}/${ano} 00:00`);
         return {
           estado: busca.estadoNumero,
@@ -54,7 +76,7 @@ class Sequencial {
           dataUltimaVerificacao: data
         }
       }
-      
+
     } catch (e) {
       console.log(e);
       console.log(" Erro Busca de Detalhes Falhou");
@@ -157,8 +179,6 @@ class Sequencial {
   static async offDB() {
     await mongoose.connection.close()
   }
-
-
 
 }
 module.exports.Sequencial = Sequencial;

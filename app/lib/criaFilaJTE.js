@@ -197,9 +197,9 @@ class CriaFilaJTE {
 				let a = sequencial + 1 + i
 				if ((obj.zero + a).length > 7) {
 					zeros = obj.zero.substr(1)
-					processo = `${zeros}${a}4720205${tribunal}${origem}`
+					processo = `${zeros}${a}0020205${tribunal}${origem}`
 				} else {
-					processo = `${obj.zero}${a}4720205${tribunal}${origem}`
+					processo = `${obj.zero}${a}0020205${tribunal}${origem}`
 				}
 				mensagens.push(criaPost(processo));
 				// await this.enviaFila([{

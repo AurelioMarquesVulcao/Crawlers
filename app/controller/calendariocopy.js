@@ -2,17 +2,24 @@ const shell = require('shelljs');
 const sleep = require('await-sleep');
 const { Util } = require('./lib/util');
 const util = new Util();
-const Calendario = require('./lib/banco.json');
+// const Calendario = require('./lib/banco.json');
+
+const {Variaveis} = require('../lib/variaveisRobos');
 
 
+
+// console.log(Calendario);
 
 class CalendarioServicos {
     // constructor(Calendario) {
-    //     this.Calendario = Calendario
+    //     this.Calendario = await Variaveis.catch({ "codigo": "000002" }).variaveis;
     // };
     async work() {
-        let start = 1
+        let start = 1;
         let horaAntiga;
+        let Calendario = await Variaveis.catch({ "codigo": "000002" });
+        Calendario =Calendario.variaveis; 
+        // console.log(Calendario);
         setInterval(async function () {
             let time = util.timerNow();
             let { hora, min, seg, semana } = time
@@ -26,9 +33,9 @@ class CalendarioServicos {
 
 
 
-                calServ.ligaServicos(time);
-                calServ.desligaServicos(time);
-                calServ.escalaServico(time);
+                calServ.ligaServicos(time, Calendario);
+                calServ.desligaServicos(time, Calendario);
+                calServ.escalaServico(time, Calendario);
 
 
 
@@ -39,7 +46,7 @@ class CalendarioServicos {
         }, 1000);
     }
 
-    async ligaServicos(time) {
+    async ligaServicos(time, Calendario) {
         let { hora, min, seg, semana } = time
         // console.log(hora, semana);
         for (let i = 0; i < Calendario.length; i++) {
@@ -54,7 +61,7 @@ class CalendarioServicos {
         }
 
     }
-    async desligaServicos(time) {
+    async desligaServicos(time, Calendario) {
         let { hora, min, seg, semana } = time
         for (let i = 0; i < Calendario.length; i++) {
             let { nome, peso, [semana]: { liga, desliga, escalar, prioridade } } = Calendario[i];
@@ -65,7 +72,7 @@ class CalendarioServicos {
             }
         }
     }
-    async escalaServico(time) {
+    async escalaServico(time, Calendario) {
         let { hora, min, seg, semana } = time
         for (let i = 0; i < Calendario.length; i++) {
             let { nome, peso, [semana]: { liga, desliga, escalar, prioridade } } = Calendario[i];

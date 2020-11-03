@@ -13,6 +13,13 @@
             "processo.JTE.extracao.novos.4"
         ]
     },
+    "Comarcas": {
+        "destinatarios": [
+            "amarques@impacta.adv.br"
+
+        ],
+        "titulo": "Comarcas sem atualizacao a mais de 7 dias"
+    },
     "pje": {
         "titulo": "Status das filas PJE"
     },

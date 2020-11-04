@@ -5,7 +5,7 @@ const { enums } = require('../configs/enums');
 const comarcas = require('../assets/jte/comarcascopy.json');
 const banco = require('../controller/lib/banco.json');
 
-// liga ao banco de dados
+// // liga ao banco de dados
 mongoose.connect(enums.mongo.connString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -16,10 +16,10 @@ mongoose.connection.on('error', (e) => {
 
 
 const variaveis = {
-  "aplicacao": "Calendario",
-  "codigo": "000002",
-  "origem": "controller",
-  "variaveis": banco
+  "aplicacao": "criaFilaJte",
+  "codigo": "000001",
+  "origem": "JTE",
+  "variaveis": [comarcas]
 };
 // console.log(variaveis);
 
@@ -47,8 +47,9 @@ class Variaveis {
     }
     await sleep(1000);
     // Desliga Banco de dados
-    await mongoose.connection.close()
+    // await mongoose.connection.close()
     // console.log(resultado);
+    resultado=resultado.toJSON()
     return resultado
   }
 
@@ -92,8 +93,14 @@ class Variaveis {
 //   ]
 // };
 
-// VariaveisRobos.insert(variaveis)
-Variaveis.update({ "codigo": "000002" }, variaveis)
+
+
+
 // VariaveisRobos.catch({ "codigo": "000002" });
 
 module.exports.Variaveis = Variaveis;
+(async()=>{
+  await Variaveis.insert(variaveis)
+// await Variaveis.update({ "codigo": "000001" }, variaveis)
+console.log("foi");
+})()

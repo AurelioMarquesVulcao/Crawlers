@@ -75,7 +75,7 @@ class TJBAPortalParser extends BaseParser {
   }
 
   extrairAdvogado(advogado) {
-    let oab = /\d+\w{2}/.exec(advogado);
+    let oab = /[0-9]+[A-Z]{2}/.exec(advogado);
     advogado = advogado.replace(/\s.\d+\w{2}.$/, '');
     if (oab) {
       advogado = `(${oab[0]}) ${advogado}`;

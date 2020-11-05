@@ -9,7 +9,7 @@ const { enums } = require('../configs/enums');
 
 const ajustes = new JTEParser();
 
-var timerSleep = 200;
+var timerSleep = 300;
 
 class RoboPuppeteer3 {
   constructor() {
@@ -23,7 +23,7 @@ class RoboPuppeteer3 {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
       headless: true,
-      slowMo: 1,
+      slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']

@@ -111,7 +111,7 @@ async function worker() {
         heartBeat++;
         //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
         if (logadoParaIniciais == false) {
-          if (heartBeat > 300) {
+          if (heartBeat > 400) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -123,7 +123,7 @@ async function worker() {
             // process.exit();
           }
         } else {
-          if (heartBeat > 300) {
+          if (heartBeat > 400) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );

@@ -380,6 +380,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/JTEMonitoria/comcarcas7dias.js --no-daemon 
     logging:
       driver: "json-file"

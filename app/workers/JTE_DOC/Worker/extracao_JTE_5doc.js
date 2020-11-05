@@ -69,6 +69,8 @@ async function worker() {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
+        new GerenciadorFila().enviar(nomeFila, message);
+        ch.ack(msg);
         process.exit();
       }
     } else {
@@ -76,6 +78,8 @@ async function worker() {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
+        new GerenciadorFila().enviar(nomeFila, message);
+        ch.ack(msg);
         process.exit();
       }
     }
@@ -362,7 +366,10 @@ async function worker() {
       if (catchError > 4) {
         //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close();
+        new GerenciadorFila().enviar(nomeFila, message);
+        ch.ack(msg);
         shell.exec('pkill chrome');
+
         process.exit();
       }
 

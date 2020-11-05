@@ -15,6 +15,12 @@ mongoose.connection.on('error', (e) => {
 });
 
 
+// const variaveis = {
+//   "aplicacao": "criaFilaJte",
+//   "codigo": "000001",
+//   "origem": "JTE",
+//   "variaveis": [comarcas]
+// };
 const variaveis = {
   "aplicacao": "criaFilaJte",
   "codigo": "000001",

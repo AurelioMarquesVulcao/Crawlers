@@ -97,6 +97,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     mem_limit: 1000M
     mem_reservation: 1000M
     command: pm2 start workers/TJBAPortal/processDocker01.yml --no-daemon

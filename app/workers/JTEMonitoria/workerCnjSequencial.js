@@ -27,10 +27,6 @@ const rabbit = new GerenciadorFila();
 
 
     console.log("A fila não consumiu...");
-  }//, 1000);
+  }
 
 })()
-
-
-// Filas()
-// await rabbit.enfileirarLoteTRT("ReprocessamentoJTE", resultado);

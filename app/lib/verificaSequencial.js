@@ -96,7 +96,11 @@ class Verificador {
 				"detalhes.orgao": 5,
 				"detalhes.tribunal": tribunal,
 				"detalhes.origem": comarca,
-				'dataCriacao': {
+				"capa.dataDistribuicao": {
+					'$lt': new Date,
+					'$gt': data
+				},
+				"dataCriacao": {
 					'$lt': new Date,
 					'$gt': data
 				}
@@ -107,7 +111,7 @@ class Verificador {
 				"detalhes.numeroProcesso": 1,
 				"_id": 0
 			}
-		},])
+		},]) 
 		// Extrai apenas os sequenciais dos numeros de prcesso.
 		for (let i = 0; i < busca.length; i++) {
 			sequencial.push(parseInt(busca[i].detalhes.numeroProcesso.slice(0, 7)));

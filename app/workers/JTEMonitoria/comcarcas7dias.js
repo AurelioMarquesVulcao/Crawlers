@@ -6,11 +6,14 @@ const { Verificador } = require("../../lib/verificaSequencial");
 
 
 (async () => {
+	// await Sequencial.onDB();
 	try {
-		await verificador()
+		await verificador();
+		// await Sequencial.geraEmail();
 	} catch (e) {
 		console.log("Travei em algum ponto da verificação");
 		await verificador()
+		// await Sequencial.geraEmail();
 	}
 })()
 
@@ -26,9 +29,9 @@ async function verificador() {
 		while (true) {
 			data = new Date();
 			console.log(data.getHours(), data.getMinutes());
-			if (data.getHours() == 11) { teste = true }
+			if (data.getHours() == 15) { teste = true }
 			console.log(teste);
-			if (data.getHours() == 12 && teste == true) {
+			if (data.getHours() == 16 && teste == true) {
 				await Sequencial.onDB();
 				// console.log(await Sequencial.geraEmail());
 				comarcas = await Sequencial.geraEmail();
@@ -39,7 +42,7 @@ async function verificador() {
 				console.log(ultimo.length);
 				resumo = `Possuimos ${comarcas.length} comarcas desatualizadas a mais de 7 dias,
 				e destas comarcas ${ultimo.length}, sao ultimo processo e ${atualizando} estao atualizando. 
-				Detalhes no link: http://172.16.16.39:15676/#/queues`
+				Detalhes no link: http://172.16.16.38:3305/01`
 				texto = JSON.stringify(comarcas)
 				if (comarcas.length > 0) {
 					await Email.send(mensagens.Comarcas.destinatarios, mensagens.Comarcas.titulo, resumo);

@@ -60,26 +60,25 @@ var start = 0; // server de marcador para as funções que devem carregar na ini
 })();
 
 async function worker() {
+  // try {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
   setInterval(function () {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 300) {
+      if (heartBeat > 400) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
-        new GerenciadorFila().enviar(nomeFila, message);
-        ch.ack(msg);
+        // throw "erro de time"
         process.exit();
       }
     } else {
-      if (heartBeat > 300) {
+      if (heartBeat > 400) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
-        new GerenciadorFila().enviar(nomeFila, message);
-        ch.ack(msg);
+        // throw "erro de time"
         process.exit();
       }
     }
@@ -105,6 +104,41 @@ async function worker() {
   // tudo que está abaixo é acionado para cada consumer na fila.
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     try {
+
+
+      // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
+      setInterval(function () {
+        heartBeat++;
+        //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
+        if (logadoParaIniciais == false) {
+          if (heartBeat > 300) {
+            console.log(
+              '----------------- Fechando o processo por inatividade -------------------'
+            );
+            new GerenciadorFila().enviar(nomeFila, message)
+            ch.ack(msg);
+            const error = new Error('Tempo espirou');
+            error.code = 'Time error';
+            throw error;
+            // process.exit();
+          }
+        } else {
+          if (heartBeat > 300) {
+            console.log(
+              '----------------- Fechando o processo por inatividade -------------------'
+            );
+            new GerenciadorFila().enviar(nomeFila, message)
+            ch.ack(msg);
+            const error = new Error('Tempo espirou');
+            error.code = 'Time error';
+            throw error;
+            // process.exit();
+          }
+        }
+      }, 1000);
+
+
+
       contadorErros++;
       heartBeat = 0; // Zera o Contador indicando que a aplicação esta consumindo a fila.
       let dataInicio = new Date();
@@ -156,8 +190,14 @@ async function worker() {
         // if (message.NovosProcessos == true && contador != 0 && logadoParaIniciais == false) {
         //console.log('vou deslogar a aplicação ----01');
         await mongoose.connection.close();
-        process.exit();
+
+        const error = new Error('Erro variado');
+        error.code = 'erro qualquer';
+        throw error;
+
+
       }
+
 
       estadoAnterior = estadoDaFila;
       logger.info('O Estado do consumer é o numero: ' + estadoAnterior);
@@ -310,9 +350,9 @@ async function worker() {
         if (!!dadosProcesso)
           await console.log(
             '\033[0;32m' +
-              'Resultado da extração ' +
-              '\033[0;34m' +
-              !!resultadoExtracao
+            'Resultado da extração ' +
+            '\033[0;34m' +
+            !!resultadoExtracao
           );
 
         logger.logs = [...logger.logs, ...resultadoExtracao.logs];
@@ -332,8 +372,8 @@ async function worker() {
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
       console.log(
         '\033[1;35m  ------------ Tempo de para baixar o processo é de ' +
-          heartBeat +
-          ' segundos -------------'
+        heartBeat +
+        ' segundos -------------'
       );
 
       ch.ack(msg);
@@ -343,20 +383,20 @@ async function worker() {
     } catch (e) {
       catchError++;
       console.log(e);
-      if (e == 'ultimo processo') {
-        catchError--;
-        // salvando status
-        let numeroAtualProcesso = numeroProcesso;
-        let dataAtualProcesso = '';
-        let cnj = util.processoSlice(numeroProcesso);
-        let buscaProcesso = { estadoNumero: cnj.estado, comarca: cnj.comarca };
-        await fila.salvaStatusComarca(
-          numeroAtualProcesso,
-          dataAtualProcesso,
-          true,
-          buscaProcesso
-        );
-      }
+      // if (e == 'ultimo processo') {
+      //   catchError--;
+      //   // salvando status
+      //   let numeroAtualProcesso = numeroProcesso;
+      //   let dataAtualProcesso = '';
+      //   let cnj = util.processoSlice(numeroProcesso);
+      //   let buscaProcesso = { estadoNumero: cnj.estado, comarca: cnj.comarca };
+      //   await fila.salvaStatusComarca(
+      //     numeroAtualProcesso,
+      //     dataAtualProcesso,
+      //     true,
+      //     buscaProcesso
+      //   );
+      // }
       // Salva meus erros nos logs
       logger.log('info', numeroProcesso + ' ' + e);
       console.log(
@@ -367,6 +407,7 @@ async function worker() {
         //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close();
         new GerenciadorFila().enviar(nomeFila, message);
+        console.log("guardei a mensagem");
         ch.ack(msg);
         shell.exec('pkill chrome');
 

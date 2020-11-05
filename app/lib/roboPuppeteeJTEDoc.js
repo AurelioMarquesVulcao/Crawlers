@@ -29,7 +29,7 @@ class RoboPuppeteer3 {
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      args: ['--ignore-certificate-errors']
+      args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
     });
     this.page = await this.browser.newPage();
@@ -103,7 +103,7 @@ class RoboPuppeteer3 {
     await this.page.click(
       'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
     );
-    await sleep(2500);
+    await sleep(6500);
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual');
     await sleep(timerSleep);
@@ -368,6 +368,7 @@ class RoboPuppeteer3 {
         while (buttonRun != 'Lista de documentos') {
           console.log(buttonRun);
           console.log('tentando click');
+          await sleep(1000);
           await this.page.click(
             `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
           );
@@ -451,7 +452,9 @@ class RoboPuppeteer3 {
           console.log('Capturei Link');
           // codigo que fecha a ultima aba do puppeteer.
           // com esse codigo consigo fechar os popup
+          await sleep(1000);
           let pages = await this.browser.pages();
+          await sleep(1000);
           let quebraLoop = 0;
           while (pages.length == 2) {
             console.log("entrei no loop de identificação de pagina");

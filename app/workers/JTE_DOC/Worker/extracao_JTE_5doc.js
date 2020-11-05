@@ -66,7 +66,7 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 400) {
+      if (heartBeat > 500) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -74,7 +74,7 @@ async function worker() {
         process.exit();
       }
     } else {
-      if (heartBeat > 400) {
+      if (heartBeat > 500) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -111,7 +111,7 @@ async function worker() {
         heartBeat++;
         //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
         if (logadoParaIniciais == false) {
-          if (heartBeat > 400) {
+          if (heartBeat > 500) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -123,7 +123,7 @@ async function worker() {
             // process.exit();
           }
         } else {
-          if (heartBeat > 400) {
+          if (heartBeat > 500) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );

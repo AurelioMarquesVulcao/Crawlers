@@ -4,6 +4,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: "node server.js"
     ports:
       - ${API_PORT}:3300
@@ -41,6 +44,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: node workers/enfileirador.js
  
   # worker-tjsc-oab:

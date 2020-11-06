@@ -9,7 +9,7 @@ const { enums } = require('../configs/enums');
 
 const ajustes = new JTEParser();
 
-var timerSleep = 200;
+var timerSleep = 300;
 
 class RoboPuppeteer3 {
   constructor() {
@@ -23,19 +23,20 @@ class RoboPuppeteer3 {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
       headless: true,
-      slowMo: 1,
+      slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      //args: [process.env.ARGS_PUPPETTER_CONECTION]
-      args: [
-        '--ignore-certificate-errors',
-        '--proxy-server=http://proxy-proadv.7lan.net:8181',
-      ],
+      args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
     });
     this.page = await this.browser.newPage();
+    await this.page.authenticate({
+      username: 'proadvproxy',
+      password: 'C4fMSSjzKR5v9dzg',
+    });
     // await this.acessar('https://www.meuip.com.br/');
     // await sleep(30000)
     console.log('O Puppeteer foi Iniciado corretamente');
@@ -46,7 +47,7 @@ class RoboPuppeteer3 {
     try {
       await this.page.goto(url, {
         waitUntil: 'load',
-        timeout: 20000,
+        timeout: 40000,
         // waitUntil: 'networkidle2'
       });
       // isso me da o url completo
@@ -102,7 +103,7 @@ class RoboPuppeteer3 {
     await this.page.click(
       'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
     );
-    await sleep(2500);
+    await sleep(6500);
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual');
     await sleep(timerSleep);
@@ -367,6 +368,7 @@ class RoboPuppeteer3 {
         while (buttonRun != 'Lista de documentos') {
           console.log(buttonRun);
           console.log('tentando click');
+          await sleep(1000);
           await this.page.click(
             `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
           );
@@ -450,7 +452,9 @@ class RoboPuppeteer3 {
           console.log('Capturei Link');
           // codigo que fecha a ultima aba do puppeteer.
           // com esse codigo consigo fechar os popup
+          await sleep(1000);
           let pages = await this.browser.pages();
+          await sleep(1000);
           let quebraLoop = 0;
           while (pages.length == 2) {
             console.log("entrei no loop de identificação de pagina");
@@ -577,7 +581,7 @@ class RoboPuppeteer3 {
     return numeros;
   }
 
-  async pegaDespacho() {}
+  async pegaDespacho() { }
 
   processaNumero(numero) {
     let numeroProcesso = numero.trim().slice(0, 7);

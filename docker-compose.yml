@@ -97,6 +97,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     mem_limit: 1000M
     mem_reservation: 1000M
     command: pm2 start workers/TJBAPortal/processDocker01.yml --no-daemon
@@ -106,18 +109,27 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: node workers/TJSP/extracao.js
 
   worker-tjsp-processo:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: node workers/TJSP/extracaoProcesso.js
 
   worker-tjsp-peticao:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: node workers/TJSP/extracaoPeticao.js
 
   # worker-tjsc-oab:
@@ -136,6 +148,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/JTE/criaFila01.yml --no-daemon
     logging:
       driver: "json-file"
@@ -147,6 +162,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/JTE/criaFila02.yml --no-daemon
     logging:
       driver: "json-file"
@@ -158,6 +176,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/JTE/criaFila03.yml --no-daemon
     logging:
       driver: "json-file"
@@ -169,6 +190,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/JTE/criaFila04.yml --no-daemon
     logging:
       driver: "json-file"
@@ -191,6 +215,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/PJE/criaFilaTRT_PJE.js --no-daemon
     logging:
       driver: "json-file"
@@ -215,6 +242,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker01.yml --no-daemon
@@ -228,6 +258,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
@@ -241,6 +274,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker03.yml --no-daemon
@@ -254,6 +290,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker04.yml --no-daemon 
@@ -267,6 +306,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/reprocessamento.yml --no-daemon 
@@ -280,9 +322,12 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDockerDoc.yml --no-daemon 
+    command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon 
     logging:
       driver: "json-file"
       options:
@@ -293,6 +338,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/PJE/processDocker01.yml --no-daemon 
     logging:
       driver: "json-file"
@@ -304,6 +352,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/JTEMonitoria/verificaUltimoProcesso.js --no-daemon 
     logging:
       driver: "json-file"
@@ -315,7 +366,24 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: pm2 start workers/JTEMonitoria/workerCnjSequencial.js --no-daemon 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  monitoria-jte-1:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: pm2 start workers/JTEMonitoria/comcarcas7dias.js --no-daemon 
     logging:
       driver: "json-file"
       options:
@@ -326,6 +394,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     restart: always
     command: pm2 start controller/limpaCoreDocker.js --no-daemon 
     logging:

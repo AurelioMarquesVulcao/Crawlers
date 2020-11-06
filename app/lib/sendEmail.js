@@ -19,9 +19,7 @@ class Email {
             <tem:Remetente>noreply.bigdata@impacta.adv.br</tem:Remetente>
              <tem:Destinatario>${destinatario}</tem:Destinatario>
             <tem:Titulo>${titulo}</tem:Titulo>
-            <tem:Mensagem>						
-             ${conteudo}
-            </tem:Mensagem>
+            <tem:Mensagem>${conteudo}</tem:Mensagem>
           <tem:Anexos></tem:Anexos>
         </tem:EnviarEmail>
       </soapenv:Body>

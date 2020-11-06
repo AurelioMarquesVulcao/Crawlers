@@ -25,7 +25,7 @@ const ultimoSchema = new mongoose.Schema({
 	dataCadastro: String,
 	origem: Number,
 	tribunal: Number,
-	data: { dia: Number, mes: Number },
+	data: { dia: Number, mes: Number},
 })
 const ultimoProcesso = mongoose.model('UltimosProcessos', ultimoSchema, 'ultimosProcessos');
 

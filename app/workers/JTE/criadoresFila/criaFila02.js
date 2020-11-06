@@ -4,22 +4,24 @@ const re = require('xregexp');
 const sleep = require('await-sleep');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const comarcas = require('../../../assets/jte/comarcas');
-const Estados = require('../../../assets/jte/comarcascopy.json');
+const { Variaveis } = require('../../../lib/variaveisRobos');
+// const Estados = require('../../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
 const { Helper, Logger } = require('../../../lib/util');
-const { GerenciadorFila } = require("../../../lib/filaHandler");
 const desligar = require('../../../assets/jte/horarioRoboJTE.json');
+const { GerenciadorFila } = require("../../../lib/filaHandler");
 
 
 const Fila = new CriaFilaJTE();
 const rabbit = new GerenciadorFila();
-var fila = ".2"; // string de escolha de fila
+var fila = ".2";  // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.2';
-// var desligado = [];
-var desligado = desligar.worker
-var estados = [
-  Estados.sp15, Estados.mg, Estados.ba,
-];
+var desligado = desligar.worker;
+// var estados = [
+//   // Estados.rj,Estados.pr,
+//   // Estados.sp2,
+//   Estados.rj, Estados.sp2,
+// ];
 
 
 (async () => {
@@ -30,6 +32,12 @@ var estados = [
   let timer;    // tempo entre o envio de cada teste, isso marca o ritmo de envio de processos
   let contador = 0;
   let start = 0;  // cria uma condição que permite que a aplicação inicie ao ligar o worker.
+  const variaveis = await Variaveis.catch({ "codigo": "000001" })
+  const Estados = variaveis.variaveis
+  console.log(Estados);
+  var estados = [
+    Estados[0].sp15, Estados[0].mg, Estados[0].ba,
+  ];
 
   embaralha(estados)
 
@@ -39,26 +47,34 @@ var estados = [
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-  try{
+  try {
     for (let w = 0; w < 1;) {
       let relogio = Fila.relogio();
       // console.log(estados[contador].estado);
       let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
+      console.log(statusFila);
       await sleep(100);
+      // console.log("testei a fila");
       // esse if mantem o enfilerador desligado na hora desejada
       if (!desligado.find(element => element == relogio.hora)) {
-  
+        // console.log("entrei");
+        // console.log(start);
+
         // if (start == 0 || !statusFila) {
         if (start == 0 || !statusFila) {
           // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
           start = 1
+          // console.log("entrei no if");
+          // console.log(estados);
           // if (!statusFila) {
           origens = estados[contador].comarcas;
           tribunal = parseInt(estados[contador].codigo);
           codigo = estados[contador].codigo;
           max = estados[contador].comarcas.length;
           timer = estados[contador].tempo;
+          console.log("teste");
           await criador(origens, tribunal, codigo, max, timer, fila)
+          console.log("criador ok");
           contador++
           // }
         }
@@ -66,7 +82,7 @@ var estados = [
         if (contador == estados.length) { contador = 0 }
       }
     }
-  }catch(e){
+  } catch (e) {
     await sleep(120000);
     process.exit()
   }
@@ -103,11 +119,9 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
           console.log("Código do Estado.: " + codigo);
           console.log("status comarca " + statusComarca);
 
-
-
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              let arrayMensages = await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }
@@ -119,7 +133,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
             }
           } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              let arrayMensages = await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }
@@ -132,7 +146,7 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
             }
           } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              let arrayMensages = await Fila.procura10(numeroSequencial, comarca, 4, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }

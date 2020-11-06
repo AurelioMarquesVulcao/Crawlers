@@ -18,7 +18,7 @@ class Helper {
     // O GMT-0000 mantem a hora que você inseriu sem alterar fuso -3
     // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
     //GMT-0300
-    let regex = data.replace(/([0-9]{2})\W([0-9]{2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2})/gi, '$3-$2-$1 $4 GMT-0000');
+    let regex = data.replace(/([0-9]{1,2})\W([0-9]{1,2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2})/i, '$3-$2-$1 $4 GMT-0000');
     return new Date(regex);
   }
 

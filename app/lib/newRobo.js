@@ -20,17 +20,18 @@ class Requisicao {
             objResponse.code = 'HTTP_200';
             objResponse.status = res.status;
             objResponse.headers = res.headers;
-            objResponse.message = `${objResponse.code}_${objResponse.status}`;
+            objResponse.message = `${objResponse.code}`;
             objResponse.responseContent = res;
             objResponse.responseBody = res.data ? res.data : true;
             cookies = this.tratarCookie(res.headers['set-cookie']);
           } else {
             objResponse.code = 'HTTP_STATUS_NOT_200';
             objResponse.status = res.status;
-            objResponse.message = `${objResponse.code}_${objResponse.status}`;
+            objResponse.message = `${objResponse.code}`;
             objResponse.responseContent = res;
             objResponse.responseBody = res.data ? res.data : true;
             objResponse.headers = res.headers;
+            cookies = this.tratarCookie(res.headers['set-cookie']);
           }
         } else {
           objResponse.code = 'HTTP_RESPONSE_FAIL';
@@ -86,7 +87,9 @@ class Requisicao {
         dictCookies[pair[0]] = pair.splice(1).join('=');
       });
 
-    return dictCookies;
+    delete dictCookies[""]
+
+      return dictCookies;
   }
 }
 
@@ -138,23 +141,21 @@ class Robo {
       url: url,
       method: method,
       responseEncoding: encoding,
+      headers: {}
     };
 
     if(responseType) options.responseType = responseType;
 
     if (Object.keys(queryString).length > 0) {
       options.url = url + this.converterQueryString(queryString);
-    } else {
-      if (Object.keys(formData).length > 0) {
+    } else if (Object.keys(formData).length > 0) {
         let fd = this.converterFormData(formData);
         this.setHeader(fd.header);
         options.data = fd.data;
-      } else {
-        // json
+    } else if (Object.keys(json).length > 0) {
         this.setHeader({ 'Content-Type': 'application/json' });
         options.data = JSON.stringify(json);
       }
-    }
 
     if (proxy) {
       options.httpsAgent = new HttpsProxyAgent(
@@ -162,12 +163,13 @@ class Robo {
       );
     }
 
-    this.setHeader(headers, this.convertStrCookie());
+    this.setHeader(headers);
 
     options.timeout = timeout;
+    options.headers.Cookie = this.convertStrCookie();
 
     let resposta = await this.requisicao.enviarRequest(options);
-
+    console.log(options.url, '| Atual', this.cookies, '| set-cookie', resposta.cookies);
     this.cookies = { ...this.cookies, ...resposta.cookies };
 
     // console.log('cookies', this.cookies);
@@ -183,7 +185,7 @@ class Robo {
   }
 
   setCookies(cookies = {}) {
-    this.cookies = { ...this.headers.Cookie, ...cookies };
+    this.headers.Cookies = { ...this.headers.Cookies, ...cookies };
   }
 
   setHeader(headers = {}, cookies = {}) {
@@ -204,7 +206,7 @@ class Robo {
     for (let c in this.cookies) {
       strCookie.push(`${c}=${this.cookies[c]}`);
     }
-    return strCookie.join(';');
+    return strCookie.join('; ');
   }
 }
 

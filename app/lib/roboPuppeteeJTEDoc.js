@@ -1,15 +1,22 @@
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const sleep = require('await-sleep');
-require('dotenv/config');
-const { JTEParser } = require('../parsers/JTEParser');
 const shell = require('shelljs');
+require('dotenv/config');
+
+const { JTEParser } = require('../parsers/JTEParser');
 const { Logger } = require('./util');
 const { enums } = require('../configs/enums');
 
 const ajustes = new JTEParser();
 
 var timerSleep = 300;
+var timerSleep1 = 1000;
+var timerSleep2 = 2000;
+var timerSleep3 = 3000;
+var timerSleep9 = 9000;
+var timerSleep5 = 5000;
+var timeOut = 40000;
 
 class RoboPuppeteer3 {
   constructor() {
@@ -61,32 +68,12 @@ class RoboPuppeteer3 {
   }
 
   async mudaTribunal(estado) {
-    let timerSleep2 = 1000;
     console.log('iniciando troca de estado');
-    // //await this.iniciar()
-    // //this.browser.close();
-    // //await this.acessar("https://jte.csjt.jus.br/")
-    // const pages = await this.browser.pages();
-    // await sleep(timerSleep2)
-    // console.log("------------------------------------------" + pages.length)
-
-    // const popup = pages[pages.length - 1];
-    // console.log(popup)
-    // await sleep(timerSleep2)
-    // await popup.close();
-    // await sleep(timerSleep2)
-    // // this.page = await this.browser.newPage();
-
-    // await sleep(timerSleep2)
-
     await shell.exec('pkill chrome');
-    //this.finalizar()
     process.exit();
   }
 
   async preencheTribunal(numero) {
-    // await console.log(`foi escolhido o estado numero ${escolheEstado(numero)}`);
-    //await console.log(`info: JTE - CNJ: ${numero} - Puppeteer carregou a url => https://jte.csjt.jus.br/`);
     // para esperar carregar o elemento onde fica o tribunal
     await sleep(timerSleep);
     await this.page.waitFor('mat-form-field');
@@ -99,11 +86,12 @@ class RoboPuppeteer3 {
     await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper');
     await sleep(timerSleep);
     await this.page.click(`#mat-option-${escolheEstado(numero)}`);
-    await sleep(700);
+    await sleep(timerSleep1);
     await this.page.click(
       'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
     );
-    await sleep(6500);
+    await sleep(timerSleep5);
+    await sleep(timerSleep2);
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual');
     await sleep(timerSleep);
@@ -144,7 +132,6 @@ class RoboPuppeteer3 {
       );
       await sleep(timerSleep);
       // await this.page.click('#consulta > ion-row > ion-col:nth-child(1) > mat-card > div > form > ion-button')
-      //console.log(`Processo ${numero} foi preenchido com sucesso, obtendo dados.`);
     } catch (e) {
       console.log(
         '----- Este é o ultimo processo dessa comarca até o momento. -----'
@@ -178,7 +165,7 @@ class RoboPuppeteer3 {
     await sleep(timerSleep);
     await this.page.click(`mat-expansion-panel`);
     await sleep(timerSleep);
-    await sleep(1000);
+    await sleep(timerSleep1);
     await sleep(timerSleep);
     let html1 = await this.page.evaluate(async () => {
       await new Promise(function (resolve) {
@@ -239,10 +226,7 @@ class RoboPuppeteer3 {
       await this.page.type('#senha > input', senha);
       console.log('digitando senha');
     } catch (e) {
-      // await this.page.type("#email > input", email)
-      // await sleep(2500)
-      // await this.page.type("#confirmaEmail > input", email)
-      // await sleep(2500)
+      // Devo salvar no banco um contador de falhas e parar a aplicação.
     }
 
     await sleep(3500);
@@ -251,10 +235,6 @@ class RoboPuppeteer3 {
     await sleep(9000);
     await this.page.click('#consultaProcessual > ion-card');
     console.log('clicado no botão de busca');
-
-    //     document.querySelector("#email > input")
-    // <input class=​"native-input sc-ion-input-md" aria-labelledby=​"ion-input-1-lbl" autocapitalize=​"off" autocomplete=​"off" autocorrect=​"off" maxlength=​"40" name=​"email" placeholder=​"Informe um email ativo" type=​"text">​
-    // document.querySelector("#confirmaEmail > input")
   }
 
   /**
@@ -616,20 +596,7 @@ class RoboPuppeteer3 {
 }
 
 function escolheEstado(numero) {
-  let resultado;
   numero = numero.slice(numero.length - 6, numero.length - 4);
-  // if (numero == 01) resultado = 2     // Rio de Janeiro
-  // if (numero == 02) resultado = 03    // São Paulo
-  // if (numero == 03) resultado = 4    // Minas Gerais
-  // if (numero == 04) resultado = 5    // Bahia
-  // if (numero == 05) resultado = 6    //
-  // if (numero == 06) resultado = 7
-  // if (numero == 09) resultado = 10
-
-  // if (numero == 15) resultado = 16    // São Paulo
-  // if (numero == 21) resultado = 22    // Rio Grande do Norte
-
-  // substitui o código acima
   return parseInt(numero) + 1;
 }
 function processaNumero(numero) {
@@ -642,21 +609,5 @@ function processaNumero(numero) {
     vara: vara,
   };
 }
-// (async () => {
-//   let puppet = new RoboPuppeteer3()
-
-//   await puppet.iniciar()
-
-//   await sleep(1000)
-//   await puppet.acessar("https://jte.csjt.jus.br/")
-//   await sleep(1000)
-//   await puppet.preencheTribunal('00002954820205050462')
-//   await sleep(2000)
-//   await puppet.loga()
-//   await sleep(1000)
-//   await puppet.preencheProcesso("00002954820205050462", 0)
-//   await sleep(1000)
-//   await puppet.pegaInicial()
-// })()
 
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

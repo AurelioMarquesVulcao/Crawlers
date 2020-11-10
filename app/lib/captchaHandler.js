@@ -14,11 +14,7 @@ const {
   AntiCaptchaResponseException,
 } = require('../models/exception/exception');
 
-const antiCaptchaHandler = async (
-  website,
-  websiteKey,
-  pageAction,
-) => {
+const antiCaptchaHandler = async (website, websiteKey, pageAction) => {
   return new Promise((resolve, reject) => {
     Anticaptcha.setWebsiteURL(website);
     Anticaptcha.setWebsiteKey(websiteKey);
@@ -133,7 +129,7 @@ class AntiCaptchaHandler {
             sucesso: true,
             captchaId: captchaId,
             gResponse: objResponse.responseBody.solution.gRecaptchaResponse,
-            body: objResponse.responseBody
+            body: objResponse.responseBody,
           };
         }
       } while (tentativa < 5);
@@ -550,11 +546,9 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     let resultado = {
       sucesso: false,
       detalhes: [],
-      body: {}
+      body: {},
     };
     let captcha = await tipoCaptcha.resolverV2(website, websiteKey, pageAction);
-
-
 
     if (captcha.sucesso) {
       // data padrão vindo de 1970
@@ -572,23 +566,35 @@ module.exports.CaptchaHandler = class CaptchaHandler {
   }
 };
 
-module.exports.antiCaptchaHandler = antiCaptchaHandler;
-
-module.exports.audioCaptchaHandler = async (b64String) => {
-
-  const data = JSON.stringify({"audio": b64String});
-
-  var config = {
-    method: 'post',
-    url: 'http://172.16.16.8:5000/api/solve',
-    headers: {
-      'Accept-Encoding': 'utf8',
-      'Content-Type': 'application/json'
+module.exports.antiCaptchaImage = async (captchaB64) => {
+  let body = {
+    clientKey: ANTICAPTCHA_KEY,
+    task: {
+      type: 'ImageToTextTask',
+      body: captchaB64,
     },
-    data : data
   };
 
-  let response = await axios(config);
+  let response = await axios.post(
+    'https://api.anti-captcha.com/createTask',
+    body
+  );
+  console.log(response.data);
+  const taskId = response.data.taskId;
+  let tentativa = 0
+  do {
+    tentativa++;
+    response = await axios.post('https://api.anti-captcha.com/getTaskResult', {
+      clientKey: ANTICAPTCHA_KEY,
+      taskId: taskId,
+    });
 
-  return response.data;
-}
+    if (response.data.status == 'ready') return { sucesso: true, resposta: response.data.solution.text };
+
+    await sleep(3000);
+  } while (tentativa < 5);
+
+  return {sucesso: false}
+};
+
+module.exports.antiCaptchaHandler = antiCaptchaHandler;

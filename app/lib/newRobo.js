@@ -113,6 +113,7 @@ class Robo {
    * @param {Object} options.headers variavel que contem os headers.
    * @param {boolean} options.randomUserAgent opção para habilitar o userAgent aleatorio.
    * @param {number} options.timeout tempo de espera.
+   * @param {string} option.responseType tipo de resposta esperada.
    * @returns {Promise<{Object}>}
    */
   async acessar({
@@ -126,6 +127,7 @@ class Robo {
     headers = {},
     randomUserAgent = false,
     timeout = 6000,
+    responseType=''
   } = {}) {
     if (!url || url === '') throw new Error('URL Vazia');
 
@@ -137,6 +139,8 @@ class Robo {
       method: method,
       responseEncoding: encoding,
     };
+
+    if(responseType) options.responseType = responseType;
 
     if (Object.keys(queryString).length > 0) {
       options.url = url + this.converterQueryString(queryString);
@@ -166,7 +170,7 @@ class Robo {
 
     this.cookies = { ...this.cookies, ...resposta.cookies };
 
-    console.log('cookies', this.cookies);
+    // console.log('cookies', this.cookies);
     return resposta.objResponse;
   }
 

@@ -250,6 +250,7 @@ services:
       service: base_node
     build:
       context: ./
+      shm_size: '2gb'
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
@@ -266,6 +267,7 @@ services:
       service: base_node
     build:
       context: ./
+      shm_size: '2gb'
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
@@ -282,6 +284,7 @@ services:
       service: base_node
     build:
       context: ./
+      shm_size: '2gb'
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}

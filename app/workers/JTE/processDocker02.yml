@@ -7,3 +7,7 @@ apps:
     name     : 'worker-03'
   - script   : ./workers/JTE/PM2_Reset.js
     name     : 'reset'
+  - script   : ./controller/limpaCore.js
+    name     : 'limpa1'
+  - script   : ./controller/limpaCoreDocker.js
+    name     : 'limpa2'

@@ -4,17 +4,15 @@ const { Robo } = require('../lib/newRobo');
 const { LogExecucao } = require('../lib/logExecucao');
 
 const { ExtratorBase } = require('./extratores');
-const { TJRSParser } = require('../parsers/TJRSParser');
 
 module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
-    this.parser = new TJRSParser();
     // this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
     this.robo = new Robo();
   }
 
-  async extrair(numeroOab, cadastroConsultaId, instancia=1) {
+  async extrair(numeroOab, cadastroConsultaId, instancia = 1) {
     this.numeroOab = numeroOab.replace(/[A-Z]/g, '');
     this.ufOab = numeroOab.replace(/[0-9]/g, '');
     this.resposta = {};
@@ -66,23 +64,20 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
 
   async fazerPrimeiroAcesso() {
     await this.robo.acessar({ url: this.url });
-    return this.robo.acessar({url: "https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index"})
+    return this.robo.acessar({
+      url: 'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index',
+    });
   }
 
   async pegaCaptcha() {
     let objResponse;
     let expire = new Date();
     let time = new Date().getTime();
-    expire.setTime(time + 365 * 3600000 * 24)
+    expire.setTime(time + 365 * 3600000 * 24);
     let url = `https://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php?${time}`;
 
-    objResponse = await this.robo.acessar({url, responseType: 'arraybuffer'});
+    objResponse = await this.robo.acessar({ url, responseType: 'arraybuffer' });
     return Buffer.from(objResponse.responseBody).toString('base64');
-
-    // return await Helper.downloadImage(
-    //   url,
-    //   this.robo.headers
-    // );
   }
 
   async resolveCaptcha(captchaString) {
@@ -136,9 +131,9 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     let $ = cheerio.load(body);
     let texto = $('#conteudo > table:nth-child(6) > tbody').text();
 
-    processos = texto.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/gm)
+    processos = texto.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/gm);
 
-    return processos
+    return processos;
   }
 
   async enfileirarProcessos(processos) {
@@ -148,10 +143,11 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     for (let p of processos) {
       cadastroConsulta['NumeroProcesso'] = p;
 
-      let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
+      let logExec = await LogExecucao.cadastrarConsultaPendente(
+        cadastroConsulta
+      );
 
-      if (logExec.enviado)
-        resultados.push( p );
+      if (logExec.enviado) resultados.push(p);
     }
 
     return resultados;

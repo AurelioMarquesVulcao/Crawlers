@@ -3,6 +3,9 @@ const { antiCaptchaImage } = require('../lib/captchaHandler');
 let cheerio = require('cheerio');
 const re = require('xregexp');
 const { Robo } = require('../lib/newRobo');
+const { GerenciadorFila } = require('../lib/filaHandler')
+const processosTeste = require('../assets/tjrs_processos.json');
+const { LogExecucao } = require('../lib/logExecucao');
 
 const { ExtratorBase } = require('./extratores');
 const { TJRSParser } = require('../parsers/TJRSParser');
@@ -15,10 +18,18 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     this.robo = new Robo();
   }
 
-  async extrair(numeroOab) {
+  async extrair(numeroOab, cadastroConsultaId, instancia=1) {
     this.numeroOab = numeroOab.replace(/[A-Z]/g, '');
     this.ufOab = numeroOab.replace(/[0-9]/g, '');
     this.resposta;
+    this.cadastroConsulta = {
+      SeccionalOab: 'RS',
+      TipoConsulta: 'processo',
+      NumeroOab: numeroOab,
+      Instancia: instancia,
+      NomeRobo: 'TJRS',
+      _id: cadastroConsultaId,
+    };
 
     try {
       let objResponse;
@@ -26,30 +37,33 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       let nProcessos;
       let captchaResposta;
 
-      console.log('Fazendo primeiro acesso');
-      await this.fazerPrimeiroAcesso();
+      // console.log('Fazendo primeiro acesso');
+      // await this.fazerPrimeiroAcesso();
+      //
+      // console.log('Pegando imagem de captcha');
+      // captchaString = await this.pegaCaptcha();
+      //
+      // console.log('Resolvendo captcha');
+      // captchaResposta = await this.resolveCaptcha(captchaString);
+      //
+      // console.log('Validando captcha');
+      // objResponse = await this.validaCaptcha(captchaResposta);
+      //
+      // console.log('Iniciando tratamento de processos');
+      // nProcessos = await this.tratarProcessos(objResponse.responseBody);
 
-      console.log('Pegando imagem de captcha');
-      captchaString = await this.pegaCaptcha();
-
-      console.log('Resolvendo captcha');
-      captchaResposta = await this.resolveCaptcha(captchaString);
-
-      console.log('Validando captcha');
-      objResponse = await this.validaCaptcha(captchaResposta);
-
-      console.log('Iniciando tratamento de processos');
-      nProcessos = await this.tratarProcessos(objResponse.responseBody);
+      nProcessos = processosTeste; //TODO apagar
 
       console.log('Enfileirando processos');
-      await this.enfileirarProcessos(nProcessos);
+      let resultados = await this.enfileirarProcessos(nProcessos);
 
       console.log('Retornando');
       this.resposta = {
         sucesso: true,
-        nProcessos: nProcessos,
+        nProcessos: resultados,
       };
     } catch (e) {
+      console.log(e);
       this.resposta = { sucesso: false, detalhes: e.message };
     } finally {
       return this.resposta;
@@ -164,5 +178,19 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     return processos
   }
 
-  async enfileirarProcessos(processos) {}
+  async enfileirarProcessos(processos) {
+    // let processosObj = processos.map(p => ({cnj: p}));
+    let cadastroConsulta = this.cadastroConsulta;
+    let resultados = [];
+    for (let p of processos) {
+      cadastroConsulta['NumeroProcesso'] = p;
+
+      let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
+
+      if (logExec.enviado)
+        resultados.push( p );
+    }
+
+    return resultados;
+  }
 };

@@ -1,9 +1,6 @@
-const { Helper } = require('../lib/util');
 const { antiCaptchaImage } = require('../lib/captchaHandler');
 let cheerio = require('cheerio');
-const re = require('xregexp');
 const { Robo } = require('../lib/newRobo');
-const { GerenciadorFila } = require('../lib/filaHandler')
 const { LogExecucao } = require('../lib/logExecucao');
 
 const { ExtratorBase } = require('./extratores');
@@ -20,7 +17,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   async extrair(numeroOab, cadastroConsultaId, instancia=1) {
     this.numeroOab = numeroOab.replace(/[A-Z]/g, '');
     this.ufOab = numeroOab.replace(/[0-9]/g, '');
-    this.resposta;
+    this.resposta = {};
     this.cadastroConsulta = {
       SeccionalOab: 'RS',
       TipoConsulta: 'processo',
@@ -134,43 +131,12 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     return this.robo.acessar({ url, queryString });
   }
 
-  async acessarProcessos() {
-    const url = 'https://www.tjrs.jus.br/site_php/consulta/consulta_oab.php';
-    let queryString = {
-      nome_comarca: 'Tribunal+de+Justi%E7a',
-      versao: '',
-      versao_fonetica: 1,
-      tipo: 2,
-      id_coma1rca: 700,
-      intervalo_movimentacao: 0,
-      N1_var2: 1,
-      id_comarca1: 700,
-      num_processo_mask: '',
-      num_processo: '',
-      numCNJ: 'N',
-      id_comarca2: 700,
-      uf_oab: this.ufOab,
-      num_oab: this.numeroOab,
-      foro: 0,
-      N1_var2_1: 1,
-      intervalo_movimentacao_1: 0,
-      ordem_consulta: 1,
-      N1_var: '',
-      id_comarca3: 'todas',
-      nome_parte: '',
-      N1_var2_2: 1,
-      intervalo_movimentacao_2: 0,
-    };
-
-    return await this.robo.acessar({ url, queryString });
-  }
-
   async tratarProcessos(body) {
-    let processos = [];
+    let processos;
     let $ = cheerio.load(body);
     let texto = $('#conteudo > table:nth-child(6) > tbody').text();
 
-    processos = texto.match(/\d{7}-\d{2}\.\d{4}\.\d{1}\.\d{2}\.\d{4}/gm)
+    processos = texto.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/gm)
 
     return processos
   }

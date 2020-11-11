@@ -1,0 +1,337 @@
+@import "reset.css";
+
+/* General */
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #000000; /*#8a836f;*/
+	line-height:18px;
+}
+a:link {
+	color: #000000; /*#8a836f;*/
+	text-decoration: underline;
+}
+a:visited {
+	color: #000000; /*#8a836f;*/
+}
+a:active {
+	color: #000000; /*#8a836f;*/
+}
+a:hover {
+	color: #8a836f;
+	text-decoration: underline;
+}
+select {
+	border: 1px solid #8a836f;
+	font-size: 11px;
+	margin: 0 5px;
+	padding: 2px;
+}
+input {
+	border: 1px solid #8a836f;
+	margin: 0 5px;
+	padding: 3px;
+}
+table, tr, td {
+    border: 0px;
+	width: auto;
+	font-size:inherit;
+}
+.texto_branco{
+	color: #fff;
+	text-decoration: #fff;
+	text-decoration-color: #fff;
+}
+#conteudo table
+{
+	width: 100%;
+}
+
+#conteudo table tr td
+{
+	vertical-align: top;
+}
+
+table tr td
+{
+	padding: 2px 0;
+	vertical-align: middle;
+}
+/* Classes */
+
+.texto_geral {
+	font-size: 12px;
+	line-height: 1.45em;
+
+}
+table.publicacao{
+	width : 100%;
+	border : 1;
+	border-color : #FFE9A4;	
+}
+
+
+table.texto_geral
+{
+	margin: 12px 0;
+}
+.flai_label {
+	text-align: right;
+	float: left;
+	display: inline-block !important;
+}
+.texto_vermelho{
+	color: #FF0000;
+}
+
+.texto_geral_negrito, .texto_geral_imp_negrito, .titulos_Institucional, .titulos_Processos, .titulos_Jurisprud, .titulos_Legisla, .titulos_Servicos, .titulos_Noticias, .titulos_Licit, .titulos_Concursos, .Subtitulos, .titulos_Orienta {
+	font-weight: bold;
+}
+.texto_geral_tam1 {
+	color: #000;
+	font-size: 10px;
+}
+.texto_simples_tam1 {
+	font-size: 10px;
+	border-width: 0;
+}
+.Botao_geral, .Botao_login {
+	background-color: #8a836f;
+	color: #fff;
+	font-size: 11px;
+	text-transform: uppercase;
+}
+.lista_institu {
+	list-style-image: url(/imagens/bullet_institu.gif);
+}
+.lista_proc {
+	list-style-image: url(/imagens/bullet_proc.gif);
+}
+.lista_juripru {
+	list-style-image: url(/imagens/bullet_jurispru.gif);
+}
+.lista_legisla {
+	list-style-image: url(/imagens/bullet_legisla.gif);
+}
+.lista_servicos {
+	list-style-image: url(/imagens/bullet_servicos.gif);
+}
+.lista_noticias {
+	list-style-image: url(/imagens/bullet_noticias.gif);
+}
+.lista_licita {
+	list-style-image: url(/imagens/bullet_licita.gif);
+}
+.lista_conc {
+	list-style-image: url(/imagens/bullet_conc.gif);
+}
+.Hit {
+	font-weight: bold;
+	background-color: #8a836f;
+}
+.hit_pesquisa {
+	background-color: #FFFF00; /*#8a836f;*/
+}
+
+/* Noticias */
+
+
+.noticias {
+	margin:5px 0 0;
+	border-top:1px dotted #C9C9C9;
+	width:100%;
+}
+
+.data {
+	font-size:14px;
+	font-weight:bold;
+	margin:30px 0 0;
+}
+
+.timestamp {
+	background: url(http://www.tjrs.jus.br/export/system/modules/com.br.workroom.tjrs/resources/images/date-bg.png) no-repeat 0 4px;
+	color:#595959;
+	font-size:12px;
+	font-weight:bold;
+	padding-left:17px;
+	font-family: Tahoma;
+}
+
+
+
+ul .texto_geral {
+	border-top:1px dotted #C9C9C9;
+	width:100%;
+	padding:8px 0;
+}
+
+.acessos {
+	font-size:10px;
+}
+
+.texto_geral_peq {
+	margin:20px 0;
+	display:block;
+	clear:both;
+	line-height:18px;
+	width:600px;
+}
+
+.title-paginas {display:block; margin:10px 0; font-weight:bold; font-size:14px;}
+
+.texto_geral_peq a,
+.texto_geral_peq b {
+	padding: 0 3px 0 0px;
+	float:left;
+	display:block;
+	width:25px;
+}
+
+.item-midia {
+	margin:1px 4px 0;
+}
+
+.MtriaTJttulo {
+	font-weight:bold;
+	display:block;
+	margin-bottom:20px;
+}
+
+.MatriaTJtexto, 
+#conteudo .texto_geral p {
+	margin-bottom:20px;
+}
+
+.contato-comarca {
+	display:block;
+	margin:10px 0;
+}
+
+.tb-licit {
+	font-family: Tahoma;
+	color:#8a836f;
+	border-right:1px solid;
+	border-bottom:1px solid;
+	border-color:#cecbc1;
+}
+
+.tb-licit th {
+	font-weight:bold;
+	padding:5px;
+	color:#8a836f;
+	font-family: Tahoma;
+	font-size:12px;
+	vertical-align:top;
+	text-align:center;
+	border:1px solid;
+	border-right:none;
+	border-bottom:none;
+	border-color:#cecbc1;
+}
+
+.tb-licit td {
+	padding:5px;
+	font-size:12px;
+	color:#8a836f;
+	vertical-align:top;
+	border:1px solid;
+	border-right:none;
+	border-bottom:none;
+	border-color:#cecbc1;
+}
+
+.texto_geral_tam1 {font-family:tahoma; color:#8a836f;}
+
+.top-login td {
+	padding:5px;
+	padding-right:15px;
+}
+
+.texto_capa {padding:20px 0;}
+
+.texto_capa p a {
+	display:block;
+	float:left;
+	margin-right:12px;
+}
+
+
+.acoes-coletivas {
+	line-height:18px;
+}
+
+
+.acoes-coletivas p,
+.acoes-coletivas li {margin:12px 0;}
+
+.texto_capa td {
+	border-top:1px dotted #8a836f;
+	padding:5px 0;
+}
+
+.sem-editais {
+	font-weight:bold;
+}
+
+.registro-precos {
+	font-family: Tahoma;
+	color:#8a836f;
+	border-right:1px solid;
+	border-bottom:1px solid;
+	border-color:#cecbc1;
+}
+
+.registro-precos th {
+	font-weight:bold;
+	padding:5px;
+	color:#8a836f;
+	font-family: Tahoma;
+	font-size:12px;
+	vertical-align:top;
+	text-align:center;
+	border:1px solid;
+	border-right:none;
+	border-bottom:none;
+	border-color:#cecbc1;
+}
+
+.registro-precos td {
+	padding:5px;
+	font-size:12px;
+	color:#8a836f;
+	vertical-align:top;
+	border:1px solid;
+	border-right:none;
+	border-bottom:none;
+	border-color:#cecbc1;
+}
+
+.Subtitulos {
+	font-size:12px !important;
+	font-family: Tahoma;
+}
+
+
+
+#listaDespesas {
+	line-height:18px;
+	margin-left:50px;
+}
+
+#listaDespesas ul {
+	padding-left:18px;
+}
+
+#listaDespesas ul ul {
+	padding-left:48px;
+}
+
+.table-guia {
+	margin:0 0 5px !important;
+}
+
+.table-guia td {
+	vertical-align:top;
+	padding: 3px 3px 3px;
+}

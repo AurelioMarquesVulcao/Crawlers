@@ -4,7 +4,6 @@ let cheerio = require('cheerio');
 const re = require('xregexp');
 const { Robo } = require('../lib/newRobo');
 const { GerenciadorFila } = require('../lib/filaHandler')
-const processosTeste = require('../assets/tjrs_processos.json');
 const { LogExecucao } = require('../lib/logExecucao');
 
 const { ExtratorBase } = require('./extratores');
@@ -37,22 +36,20 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       let nProcessos;
       let captchaResposta;
 
-      // console.log('Fazendo primeiro acesso');
-      // await this.fazerPrimeiroAcesso();
-      //
-      // console.log('Pegando imagem de captcha');
-      // captchaString = await this.pegaCaptcha();
-      //
-      // console.log('Resolvendo captcha');
-      // captchaResposta = await this.resolveCaptcha(captchaString);
-      //
-      // console.log('Validando captcha');
-      // objResponse = await this.validaCaptcha(captchaResposta);
-      //
-      // console.log('Iniciando tratamento de processos');
-      // nProcessos = await this.tratarProcessos(objResponse.responseBody);
+      console.log('Fazendo primeiro acesso');
+      await this.fazerPrimeiroAcesso();
 
-      nProcessos = processosTeste; //TODO apagar
+      console.log('Pegando imagem de captcha');
+      captchaString = await this.pegaCaptcha();
+
+      console.log('Resolvendo captcha');
+      captchaResposta = await this.resolveCaptcha(captchaString);
+
+      console.log('Validando captcha');
+      objResponse = await this.validaCaptcha(captchaResposta);
+
+      console.log('Iniciando tratamento de processos');
+      nProcessos = await this.tratarProcessos(objResponse.responseBody);
 
       console.log('Enfileirando processos');
       let resultados = await this.enfileirarProcessos(nProcessos);

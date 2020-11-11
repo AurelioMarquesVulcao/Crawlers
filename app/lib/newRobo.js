@@ -169,7 +169,6 @@ class Robo {
     options.headers.Cookie = this.convertStrCookie();
 
     let resposta = await this.requisicao.enviarRequest(options);
-    console.log(options.url, '| Atual', this.cookies, '| set-cookie', resposta.cookies);
     this.cookies = { ...this.cookies, ...resposta.cookies };
 
     // console.log('cookies', this.cookies);
@@ -181,7 +180,7 @@ class Robo {
     for (let e in queryString) {
       qs.push(`${e}=${queryString[e]}`);
     }
-    return `?${qs.join('&')}`;
+    return encodeURI(`?${qs.join('&')}`);
   }
 
   setCookies(cookies = {}) {

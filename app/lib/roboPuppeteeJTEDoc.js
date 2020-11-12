@@ -405,6 +405,7 @@ class RoboPuppeteer3 {
           await this.page.click(
             `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
           );
+          
           console.log('Abri documento');
           await sleep(1200);
           let link = await this.page.evaluate(

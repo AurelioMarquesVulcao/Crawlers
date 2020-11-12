@@ -85,13 +85,22 @@ class TJRSParser extends BaseParser {
   extrairVara($) {
     let selector = '#conteudo > table:nth-child(4) > tbody > tr:nth-child(2) > td.texto_geral';
     let varaString = $(selector).text();
-    let regex = re("(?<vara>\\d{0,2}?[º]?\\sVara.+)\\sd[a,e]\\sComarca\\sd[a,e]\\s(?<comarca>.+)", "gm");
+    let regex = re("(?<vara>\\d{0,2}?([º]\\s)?Vara.+)\\sd[a,e]\\sComarca\\sd[a,e]\\s(?<comarca>.+)", "gm");
 
     let match = re.exec(varaString, regex);
     if (match)
-      return vara.vara;
+      return match.vara;
 
     return varaString;
+  }
+
+  extrairDetalhes($) {
+    let selector = "#conteudo > table:nth-child(2) > tbody > tr > td:nth-child(3)";
+
+    let numeroString = $(selector).text();
+    let numero = numeroString.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
+    if (numero)
+      return Processo.identificarDetalhes(numero[0])
   }
 }
 

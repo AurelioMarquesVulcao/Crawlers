@@ -12,6 +12,7 @@ let mapaEstadoRobo = {
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {
+  static nomeFila;
 
   static async salvar(execucao) {
     const log = { 
@@ -35,8 +36,9 @@ module.exports.LogExecucao = class LogExecucao {
     );
   }
 
-  static async cadastrarConsultaPendente(consultaPendente) {
+  static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
     let resposta;
+
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
 
     let mensagem = {
@@ -50,7 +52,7 @@ module.exports.LogExecucao = class LogExecucao {
     const consultasCadastradas = await ExecucaoConsulta.countDocuments({"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, "Mensagem.Instancia": mensagem.Instancia, DataTermino: null});
 
     if (nomeRobo && !consultasCadastradas) {
-      const nomeFila = `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
+      nomeFila = nomeFila ? nomeFila : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
       
       const execucao = {
         ConsultaCadastradaId: consultaPendente._id,

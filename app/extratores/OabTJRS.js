@@ -1,7 +1,10 @@
-const { antiCaptchaImage } = require('../lib/captchaHandler');
 let cheerio = require('cheerio');
+const async = require('async');
+const { antiCaptchaImage } = require('../lib/captchaHandler');
 const { Robo } = require('../lib/newRobo');
 const { LogExecucao } = require('../lib/logExecucao');
+const { ExecucaoConsulta } = require("../models/schemas/execucao_consulta");
+const { Logger } = require('../lib/util');
 
 const { ExtratorBase } = require('./extratores');
 
@@ -10,9 +13,14 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     super(url, isDebug);
     // this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
     this.robo = new Robo();
+    this.resultado = [];
   }
 
   async extrair(numeroOab, cadastroConsultaId, instancia = 1) {
+    this.logger = new Logger('info', `logs/OabTJRS/OabTJRSInfo.log`, {
+      nomeRobo: 'oab.TJRS',
+      NumeroOab: numeroOab,
+    });
     this.numeroOab = numeroOab.replace(/[A-Z]/g, '');
     this.ufOab = numeroOab.replace(/[0-9]/g, '');
     this.resposta = {};
@@ -31,34 +39,43 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       let nProcessos;
       let captchaResposta;
 
-      console.log('Fazendo primeiro acesso');
+      this.logger.info('Fazendo primeiro acesso');
       await this.fazerPrimeiroAcesso();
 
-      console.log('Pegando imagem de captcha');
+      this.logger.info('Pegando imagem de captcha');
       captchaString = await this.pegaCaptcha();
 
-      console.log('Resolvendo captcha');
+      this.logger.info('Resolvendo captcha');
       captchaResposta = await this.resolveCaptcha(captchaString);
 
-      console.log('Validando captcha');
+      this.logger.info('Validando captcha');
       objResponse = await this.validaCaptcha(captchaResposta);
 
-      console.log('Iniciando tratamento de processos');
+      this.logger.info('Iniciando tratamento de processos');
       nProcessos = await this.tratarProcessos(objResponse.responseBody);
 
-      console.log('Enfileirando processos');
-      let resultados = await this.enfileirarProcessos(nProcessos);
+      this.logger.info('Processos a serem enviados para fila:', nProcessos.length)
 
-      console.log('Retornando');
+      // nProcessos = ["0226688-20.2014.8.21.7000", "0523312-55.2011.8.21.7000"]
+      this.logger.info('Enfileirando processos');
+      this.resultado = await this.enfileirarProcessos(nProcessos);
+
+      this.logger.info('Retornando');
       this.resposta = {
         sucesso: true,
-        nProcessos: resultados,
+        nProcessos: this.resultado,
       };
+
     } catch (e) {
-      console.log(e);
+      this.logger.info(e);
       this.resposta = { sucesso: false, detalhes: e.message };
     } finally {
-      return this.resposta;
+      return {
+        resultado: this.resultado,
+        sucesso: true,
+        detalhes: '',
+        logs: this.logger.logs,
+      };
     }
   }
 
@@ -140,12 +157,43 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     // let processosObj = processos.map(p => ({cnj: p}));
     let cadastroConsulta = this.cadastroConsulta;
     let resultados = [];
-    for (let p of processos) {
+
+    let consultasCadastradas = await ExecucaoConsulta.find(
+      {
+        'Mensagem.NumeroProcesso': {$in: processos},
+        'Mensagem.Instancia': 1,
+        DataTermino: null,
+      },
+      {},
+      {
+        limit: 1,
+        sort: {
+          'Mensagem.NumeroProcesso': -1,
+        },
+      },
+    );
+
+    consultasCadastradas = consultasCadastradas.filter(e => processos.indexOf(e.Mensagem.NumeroProcesso) === -1);
+
+    console.log({processos: consultasCadastradas.length})
+
+    // resultados = await async.mapLimit(processos, 30, async p => {
+    //   cadastroConsulta['NumeroProcesso'] = p;
+    //
+    //   let logExec = await LogExecucao.cadastrarConsultaPendente(
+    //     cadastroConsulta
+    //   );
+    //
+    //   if (logExec.enviado) resultados.push(p);
+    // }
+
+    for(let p of processos){
       cadastroConsulta['NumeroProcesso'] = p;
 
       let logExec = await LogExecucao.cadastrarConsultaPendente(
-        cadastroConsulta
-      );
+        cadastroConsulta,
+        'processo.TJRS.extracao.novos',
+      )
 
       if (logExec.enviado) resultados.push(p);
     }

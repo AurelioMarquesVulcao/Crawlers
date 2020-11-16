@@ -29,9 +29,9 @@ async function verificador() {
 		while (true) {
 			data = new Date();
 			console.log(data.getHours(), data.getMinutes());
-			if (data.getHours() == 15) { teste = true }
+			if (data.getHours() == 16) { teste = true }
 			console.log(teste);
-			if (data.getHours() == 16 && teste == true) {
+			if (data.getHours() == 17 && teste == true) {
 				await Sequencial.onDB();
 				// console.log(await Sequencial.geraEmail());
 				comarcas = await Sequencial.geraEmail();

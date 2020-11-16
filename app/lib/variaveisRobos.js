@@ -105,8 +105,9 @@ class Variaveis {
 // VariaveisRobos.catch({ "codigo": "000002" });
 
 module.exports.Variaveis = Variaveis;
-(async()=>{
-  await Variaveis.insert(variaveis)
-// await Variaveis.update({ "codigo": "000001" }, variaveis)
-console.log("foi");
-})()
+
+// (async()=>{
+//   await Variaveis.insert(variaveis)
+// // await Variaveis.update({ "codigo": "000001" }, variaveis)
+// console.log("foi");
+// })()

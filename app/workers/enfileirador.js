@@ -8,12 +8,12 @@ const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila;
 const moment = require('moment');
 const enums = require('../configs/enums').enums;
 const cron = require('node-cron');
+const sleep = require('await-sleep');
 
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
-  SC: enums.nomesRobos.TJSC,
-  JTE: enums.nomesRobos.JTE
+  SC: enums.nomesRobos.TJSC
 };
 
 let gf = new GerenciadorFila();
@@ -68,8 +68,8 @@ class Enfileirador {
         NumeroOab: consultaPendente.NumeroOab,
         SeccionalOab: consultaPendente.SeccionalOab,
       };
-      gf.enviar(nomeFila, mensagem);
-      console.log(`${mensagem} -> ${nomeFila}`);
+      // gf.enviar(nomeFila, mensagem);
+      return { nomeFila, mensagem }
     }
   }
 
@@ -77,6 +77,9 @@ class Enfileirador {
    * Realiza a query das consultas pendentes de execução.
    */
   static async executar() {
+    let listaFilas = [];
+    let mensagens;
+    let lote;
     try {
       let cadastros = [];
       const dataCorte = new moment().subtract(7, 'days');
@@ -88,15 +91,38 @@ class Enfileirador {
       };
 
       const lista = await ConsultasCadastradas.find(busca);
-
+      console.log(lista.length);
+      console.log(lista.length);
       for (let i = 0, si = lista.length; i < si; i++) {
-        cadastros.push(Enfileirador.cadastrarConsultaPendente(lista[i]));
+        cadastros.push(await Enfileirador.cadastrarConsultaPendente(lista[i]));
       }
+      // separa as filas a serem executadas
+      for (let ii = 0; ii < cadastros.length; ii++) {
+        if (cadastros[ii] !== undefined) {
+          if (listaFilas.indexOf(`${cadastros[ii].nomeFila}`) < 0) {
+            listaFilas.push(cadastros[ii].nomeFila)
+          }
+        }
 
-      Promise.all(cadastros).then(res => {
-        console.log('consultas cadastradas');
-        mongoose.connection.close();
-      });
+      }
+      for (let iii = 0; iii < listaFilas.length; iii++) {
+        mensagens = [];
+        lote = [];
+        mensagens = cadastros.filter(res => {
+          if (res !== undefined) {
+            return res.nomeFila == listaFilas[iii]
+          }
+        })
+        lote = mensagens.map((mens => { return mens.mensagem }))
+        await gf.enfileirarLote(listaFilas[iii], lote)
+        await sleep(15000)
+      }
+      console.log('consultas cadastradas');
+      mongoose.connection.close();
+      // Promise.all(cadastros).then(res => {
+      //   console.log('consultas cadastradas');
+      //   mongoose.connection.close();
+      // });
 
     } catch (e) {
       console.log(e);

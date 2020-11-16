@@ -306,7 +306,7 @@ async function worker() {
       if (catchError > 4) {
         //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close()
-        shell.exec('pkill chrome');
+        shell.exec('/usr/bin/pkill chrome');
         process.exit();
       }
 

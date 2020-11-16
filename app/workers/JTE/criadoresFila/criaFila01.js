@@ -123,37 +123,37 @@ async function criador(origens, tribunal, codigo, max, tempo, fila) {
 
           if (sequencial.data.dia == relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }
             } else {
-              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }
             }
           } else if (sequencial.data.dia <= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }
 
             } else {
-              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }
             }
           } else if (sequencial.data.dia >= relogio.dia && sequencial.data.mes <= relogio.mes) {
             if (sequencial.data.mes < relogio.mes - 1) {
-              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }
             } else {
-              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 2, codigo, fila)
+              let arrayMensages = await Fila.procura(numeroSequencial, comarca, 4, codigo, fila)
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }

@@ -294,6 +294,15 @@ async function worker() {
         if (message.inicial == true) {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
+          if (!link){
+            ch.ack(msg);
+            // new GerenciadorFila().enviar(nomeFila, message);
+            // ch.ack(msg);
+            await sleep(2000);
+            await new GerenciadorFila().enviar(nomeFila, message);
+            await sleep(2000);
+            process.exit();
+          }
           let listaArquivo = [];
           for (let w = 0; w < link.length - 1; w++) {
             await new CriaFilaJTE().salvaDocumentoLink(link[w]);

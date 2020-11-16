@@ -29,7 +29,7 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
@@ -37,7 +37,7 @@ class RoboPuppeteer3 {
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
       args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
-      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
     });
     this.page = await this.browser.newPage();
     await this.page.authenticate({
@@ -248,6 +248,179 @@ class RoboPuppeteer3 {
       console.log('Arquivos simples ' + iniciaisArray);
       console.log('Arquivos paginados ' + iniciaisMultiplas);
 
+
+
+
+
+      this.logger.info(`Iniciando captura de documentos Multiplos`);
+      // entra na terceira forma de apresentação de documentos.
+      // documentos multiplus.
+      for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
+        // this.logger.info(`Cliquei no documento numero ${iniciaisArray[j]}`);
+        await sleep(1500);
+        let dataEProcesso = await this.page.evaluate(
+          async (j, iniciaisMultiplas) => {
+            return {
+              data: document.querySelector(
+                `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-label > ion-text > h4`
+              ).innerText,
+              numeroProcesso: document.querySelector(
+                '#numeroProcessoFormatado > div'
+              ).innerText,
+            };
+          },
+          j,
+          iniciaisMultiplas
+        );
+        await sleep(500);
+        // entra no documento multiplo
+
+        let buttonRun = null;
+        while (buttonRun != 'Lista de documentos') {
+          console.log(buttonRun);
+          console.log('tentando click');
+          await sleep(2000);
+
+          await this.page.evaluate((j, iniciaisMultiplas) => {
+            document.querySelector(
+              `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`).click();
+            console.log("estou tentando abrir o elemento");
+          }, j, iniciaisMultiplas);
+
+          // await this.page.click(
+          //   `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
+          // );
+          // await sleep(2000);
+          // await this.page.click(
+          //   `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
+          // );
+
+          this.logger.info(
+            `Cliquei no documento numero ${iniciaisMultiplas[j]}`
+          );
+
+          console.log('tentei');
+
+          buttonRun = await this.page.evaluate(async () => {
+            await new Promise(function (resolve) {
+              setTimeout(resolve, 2000);
+            });
+            if (
+              document.querySelector(
+                '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title'
+              )
+            ) {
+              return document.querySelector(
+                '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title'
+              ).innerText;
+            } else {
+              return null;
+            }
+          });
+
+          console.log(buttonRun);
+          console.log('tentei novamente');
+          await sleep(1000);
+        }
+
+        console.log('Sai do while ');
+
+        // await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+
+        await sleep(500);
+
+        // conta quantos documentos devo raspar
+        let quantidadeDocumentos = await this.page.evaluate(async () => {
+          return document.querySelectorAll(
+            '#popover-marcador-filtro > ion-item'
+          ).length;
+        });
+        for (let k = 1; k < quantidadeDocumentos + 1; k++) {
+          // this.logger.info(
+          //   `Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`
+          // );
+          console.log(`Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`);
+          await sleep(1500);
+          // abro o popup e abro o link do documento
+          await this.page.click(
+            `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
+          );
+
+          console.log('Abri documento');
+          await sleep(1200);
+          let link = await this.page.evaluate(
+            async (k, dataEProcesso) => {
+              await new Promise(function (resolve) {
+                setTimeout(resolve, 1500);
+              });
+
+              let link = document.querySelector('#linkPDF').href;
+              let movimentacao = document
+                .querySelector(
+                  `#popover-marcador-filtro > ion-item:nth-child(${k}) > span`
+                )
+                .innerText.replace('\n', ' ');
+              let data = dataEProcesso.data;
+              let numeroProcesso = dataEProcesso.numeroProcesso;
+              let tipo = 'PDF';
+              // console.log({ numeroProcesso, data, movimentacao, link, tipo })
+              return { numeroProcesso, data, movimentacao, link, tipo };
+              // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
+            },
+            k,
+            dataEProcesso
+          );
+          console.log('Capturei Link');
+          // codigo que fecha a ultima aba do puppeteer.
+          // com esse codigo consigo fechar os popup
+          await sleep(2000);
+          let pages = await this.browser.pages();
+          await sleep(2000);
+          let quebraLoop = 0;
+          // loop de tentativas de marcar a aba a ser desativada
+          while (pages.length == 2) {
+            console.log("entrei no loop de identificação de pagina");
+            quebraLoop++;
+            await sleep(2000);
+            // await console.log(pages.length)
+            // await console.log("Aguarde mais um pouco")
+            pages = await this.browser.pages();
+            console.log('Identificando popup');
+            if (quebraLoop > 10) {
+              
+              console.log("Deu erro !!!");
+              // break
+              const error = new Error('Tempo de tentativa de resolução esgotado');
+              error.code = 'Resolver esse processo!';
+              throw error;
+              process.exit();
+            }
+          }
+          // console.log(pages.length)
+          const popup = pages[pages.length - 1];
+          console.log('Fechando popup');
+          await popup.close();
+          await sleep(timerSleep);
+          links.push(link);
+        }
+        // volta a pagina principal de busca de processos
+        await sleep(timerSleep);
+        await sleep(timerSleep);
+        await sleep(timerSleep);
+        await sleep(3000);
+        await this.page.click(
+          '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button'
+        );
+        await sleep(timerSleep);
+      }
+      this.logger.info(`Finalizado captura de documentos Multiplos`);
+
+
+
+
+
+
+
       this.logger.info(`Iniciando captura de documentos Simples`);
       for (let i = 0; i < (await iniciaisArray).length; i++) {
         await sleep(timerSleep);
@@ -321,152 +494,14 @@ class RoboPuppeteer3 {
       }
       this.logger.info(`Finalizado captura de documentos Simples`);
 
-      this.logger.info(`Iniciando captura de documentos Multiplos`);
-      // entra na terceira forma de apresentação de documentos.
-      // documentos multiplus.
-      for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
-        // this.logger.info(`Cliquei no documento numero ${iniciaisArray[j]}`);
-        await sleep(500);
-        let dataEProcesso = await this.page.evaluate(
-          async (j, iniciaisMultiplas) => {
-            return {
-              data: document.querySelector(
-                `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-label > ion-text > h4`
-              ).innerText,
-              numeroProcesso: document.querySelector(
-                '#numeroProcessoFormatado > div'
-              ).innerText,
-            };
-          },
-          j,
-          iniciaisMultiplas
-        );
-        await sleep(500);
-        // entra no documento multiplo
 
-        let buttonRun = null;
-        while (buttonRun != 'Lista de documentos') {
-          console.log(buttonRun);
-          console.log('tentando click');
-          await sleep(1000);
-          await this.page.click(
-            `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
-          );
-          await this.page.click(
-            `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
-          );
 
-          this.logger.info(
-            `Cliquei no documento numero ${iniciaisMultiplas[j]}`
-          );
 
-          console.log('tentei');
 
-          buttonRun = await this.page.evaluate(async () => {
-            await new Promise(function (resolve) {
-              setTimeout(resolve, 1000);
-            });
-            if (
-              document.querySelector(
-                '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title'
-              )
-            ) {
-              return document.querySelector(
-                '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title'
-              ).innerText;
-            } else {
-              return null;
-            }
-          });
 
-          console.log(buttonRun);
-          console.log('tentei novamente');
-          await sleep(1000);
-        }
 
-        console.log('Sai do while ');
 
-        // await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
 
-        await sleep(500);
-
-        // conta quantos documentos devo raspar
-        let quantidadeDocumentos = await this.page.evaluate(async () => {
-          return document.querySelectorAll(
-            '#popover-marcador-filtro > ion-item'
-          ).length;
-        });
-        for (let k = 1; k < quantidadeDocumentos + 1; k++) {
-          this.logger.info(
-            `Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`
-          );
-          await sleep(1500);
-          // abro o popup e abro o link do documento
-          await this.page.click(
-            `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
-          );
-          
-          console.log('Abri documento');
-          await sleep(1200);
-          let link = await this.page.evaluate(
-            async (k, dataEProcesso) => {
-              await new Promise(function (resolve) {
-                setTimeout(resolve, 1500);
-              });
-
-              let link = document.querySelector('#linkPDF').href;
-              let movimentacao = document
-                .querySelector(
-                  `#popover-marcador-filtro > ion-item:nth-child(${k}) > span`
-                )
-                .innerText.replace('\n', ' ');
-              let data = dataEProcesso.data;
-              let numeroProcesso = dataEProcesso.numeroProcesso;
-              let tipo = 'PDF';
-              // console.log({ numeroProcesso, data, movimentacao, link, tipo })
-              return { numeroProcesso, data, movimentacao, link, tipo };
-              // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
-            },
-            k,
-            dataEProcesso
-          );
-          console.log('Capturei Link');
-          // codigo que fecha a ultima aba do puppeteer.
-          // com esse codigo consigo fechar os popup
-          await sleep(1000);
-          let pages = await this.browser.pages();
-          await sleep(1000);
-          let quebraLoop = 0;
-          while (pages.length == 2) {
-            console.log("entrei no loop de identificação de pagina");
-            quebraLoop++;
-            await sleep(1000);
-            // await console.log(pages.length)
-            // await console.log("Aguarde mais um pouco")
-            pages = await this.browser.pages();
-            console.log('Identificando popup');
-            if (quebraLoop > 5) {
-              process.exit();
-            }
-          }
-          // console.log(pages.length)
-          const popup = pages[pages.length - 1];
-          console.log('Fechando popup');
-          await popup.close();
-          await sleep(timerSleep);
-          links.push(link);
-        }
-        // volta a pagina principal de busca de processos
-        await sleep(timerSleep);
-        await sleep(timerSleep);
-        await sleep(timerSleep);
-        await sleep(3000);
-        await this.page.click(
-          '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button'
-        );
-        await sleep(timerSleep);
-      }
-      this.logger.info(`Finalizado captura de documentos Multiplos`);
       // console.log(links);
       return links;
     } catch (e) {

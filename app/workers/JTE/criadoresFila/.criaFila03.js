@@ -18,8 +18,9 @@ var nomeFila = 'processo.JTE.extracao.novos.3';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
-  Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
-  Estados.pi, Estados.mt, Estados.rn, Estados.ms, Estados.pr
+  Estados.mt,
+  // Estados.ma, Estados.es, Estados.go, Estados.al, Estados.se,
+  // Estados.pi, Estados.mt, Estados.rn, Estados.ms, Estados.pr
 ];
 
 (async () => {

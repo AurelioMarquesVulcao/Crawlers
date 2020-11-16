@@ -591,8 +591,8 @@ module.exports.antiCaptchaImage = async (captchaB64) => {
 
     if (response.data.status == 'ready') return { sucesso: true, resposta: response.data.solution.text };
 
-    await sleep(3000);
-  } while (tentativa < 5);
+    await sleep(10000);
+  } while (tentativa < 6);
 
   return {sucesso: false}
 };

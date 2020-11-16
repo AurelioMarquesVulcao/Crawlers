@@ -41,7 +41,7 @@ class Requisicao {
         return { objResponse: objResponse, cookies: cookies };
       })
       .catch((err) => {
-        console.log('Erro ao acessar');
+        console.log(err);
         let objResponse = {};
         objResponse.code = err.code;
         objResponse.status = err.response.status;
@@ -129,7 +129,7 @@ class Robo {
     json = {},
     headers = {},
     randomUserAgent = false,
-    timeout = 6000,
+    timeout = 60000,
     responseType=''
   } = {}) {
     if (!url || url === '') throw new Error('URL Vazia');

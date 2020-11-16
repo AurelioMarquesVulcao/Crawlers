@@ -4,6 +4,10 @@ const { LogExecucao } = require('../lib/logExecucao');
 const { TJRSParser } = require('../parsers/TJRSParser');
 const { Robo } = require('../lib/newRobo');
 const { ExtratorBase } = require('./extratores');
+const { GerenciadorFila } = require('../lib/filaHandler');
+const { Logger } = require('../lib/util');
+const { Andamento } = require('../models/schemas/andamento')
+
 
 module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   constructor(url, isDebug) {
@@ -13,11 +17,25 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     // this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
   }
 
-  async extrair(numeroOab, numeroProcesso, cadastroConsultaId, instancia = 1) {
+  /**
+   *
+   * @param numeroProcesso
+   * @param numeroOab
+   * @param instancia
+   * @param message
+   * @returns {Promise<*>}
+   */
+  async extrair(numeroProcesso, numeroOab, instancia = 1, mensagem) {
     this.resposta = {};
     this.numeroProcesso = numeroProcesso;
     this.numeroOab = numeroOab.replace(/[A-Z]/g, '');
     this.ufOab = numeroOab.replace(/[0-9]/g, '');
+    this.mensagem = mensagem
+    this.logger = new Logger('info', 'logs/ProcessoTJRS/atualizacao.log', {
+      nomeRobo: `processo.TJRS`,
+      NumeroDoProcesso: numeroProcesso
+    });
+
 
     try {
       let objResponse;
@@ -25,29 +43,65 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       let captchaResposta;
       let processoOriginarioLink = false;
       let extracao;
+      let resultado;
 
-      console.log('Fazendo primeiro acesso');
+      this.logger.info('Fazendo primeiro acesso');
       await this.fazerPrimeiroAcesso();
 
+      this.logger.info('Recupera imagem do captcha');
       captchaString = await this.pegaCaptcha();
 
+      this.logger.info('Resolvendo imagem do captcha');
       captchaResposta = await this.resolveCaptcha(captchaString);
 
+      this.logger.info('Validando resolução do captcha');
       objResponse = await this.validaCaptcha(captchaResposta);
 
+      this.logger.info('Verificando se existe algum processo originário');
       processoOriginarioLink = await this.verificaProcessoOriginario(
         objResponse.responseBody
       );
 
-      if (processoOriginarioLink)
+      if (processoOriginarioLink) {
+        this.logger.info('Extraindo processo originario');
         extracao = await this.resgatarProcessoOriginario(
-          processoOriginarioLink
+          processoOriginarioLink,
         );
-      else extracao = await this.converterProcesso(objResponse.responseBody); //entra na pagina inicial do processo, e nas 2 outras paginas de todas partes e todos andamentos
+      } else {
+        this.logger.info('Extraindo pagina atual de processos');
+        extracao = await this.converterProcesso(objResponse.responseBody); //entra na pagina inicial do processo, e nas 2 outras paginas de todas partes e todos andamentos
+      }
 
-      return Promise.all([extracao]).then((extracao) => extracao);
+      this.logger.info('Extracao de HTML finalizado');
+      this.logger.info('Iniciando processo de parseamento');
+
+      extracao = this.parser.parse(extracao.capa, extracao.partes, extracao.movimentacoes);
+
+      this.logger.info('Processo de extração concluído.');
+      this.logger.info('Iniciando salvamento de Andamento');
+      // await Andamento.salvarAndamentos(extracao.andamentos);
+      this.logger.info('Andamentos salvos');
+
+      this.logger.info('Iniciando salvamento do Processo');
+      resultado = await extracao.processo.salvar();
+      this.logger.info(
+        `Processo: ${this.numeroProcesso} salvo | Quantidade de andamentos: ${extracao.andamentos.length}`
+      );
+
+      return {
+        sucesso: true,
+        numeroDoProcesso: this.numeroProcesso,
+        resultado: resultado,
+        detalhes: '',
+        logs: this.logger.logs,
+      };
+
+
     } catch (e) {
+      const gf = new GerenciadorFila();
+      gf.enviar('processo.TJRS.reprocessamento', this.mensagem);
       console.log(e);
+
     }
   }
 
@@ -85,9 +139,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   async validaCaptcha(captcha) {
     const url = 'https://www.tjrs.jus.br/site_php/consulta/verifica_codigo.php';
 
-    let comarca = comarcasCode[this.numeroProcesso.substr(22)];
-    if (!comarca)
-      comarca = comarcasCode["700"];
+    let comarca = this.captarComarca();
 
     let id_comarca = comarca.id;
     let nomeComarca = comarca.nome;
@@ -122,6 +174,13 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     return await this.robo.acessar({ url, queryString });
   }
 
+  captarComarca() {
+    let comarca = comarcasCode[this.numeroProcesso.substr(22)];
+    if (!comarca)
+      comarca = comarcasCode["700"];
+    return comarca;
+  }
+
   async verificaProcessoOriginario(body) {
     const $ = cheerio.load(body);
 
@@ -133,8 +192,6 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       '#conteudo > table:nth-child(2) > tbody > tr:nth-child(2) > td:nth-child(5) > a'
     );
 
-
-
     processoOriginario =
       linkOriginario && linkOriginario[0]
         ? linkOriginario[0].attribs.href
@@ -144,13 +201,28 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   }
 
   async converterProcesso(body) {
+    let objResponse;
     let movimentacoes;
     let movimentacoesLink;
     let partes;
     let partesLink;
-    let capa = body;
 
-    const $ = cheerio.load(body);
+    let $ = cheerio.load(body);
+
+    if (/está\sem\stramitação\sem\smais\sde\suma\sinstância\./.test($("#selecao > table > tbody > tr:nth-child(1) > td > span").text())) {
+      this.logger.info('Pagina de detecção de maisuma instancia encontrada');
+      let options = {
+        url: "https://www.tjrs.jus.br/site_php/consulta/consulta_processo.php",
+        queryString: {
+          num_processo: this.numeroProcesso.replace(/\D/g, ''),
+          id_comarca: this.captarComarca().id,
+          pesquisar: 'Pesquisar'
+        }
+      }
+      this.logger.info('Selecionando primeira instancia');
+      objResponse = await this.robo.acessar(options);
+      $ = cheerio.load(objResponse.responseBody);
+    }
 
     partesLink = $(
       '#conteudo > table:nth-child(6) > tbody > tr > td.texto_geral > a'
@@ -162,7 +234,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     partes = await this.extrairPartes(partesLink);
     movimentacoes = await this.extrairMovimentacoes(movimentacoesLink);
 
-    return Promise.resolve([capa, partes, movimentacoes]);
+    return Promise.resolve({capa: objResponse.responseBody, partes, movimentacoes});
   }
 
   async extrairPartes(link) {
@@ -355,11 +427,5 @@ const comarcasCode = {
   "076": {nome: "Tupanciretã", id:"tupancireta"},
   "037": {nome: "Uruguaiana", id:"uruguaiana"},
   "038": {nome: "Vacaria", id:"vacaria"},
-  "077": {nome: "Venâncio Aires", id:"venancio_aires"},
-  "160": {nome: "Vera Cruz", id:"vera_cruz"},
-  "078": {nome: "Veranópolis", id:"veranopolis"},
-  "039": {nome: "Viamão", id:"viamao"},
-  "160": {nome: "Vera Cruz", id:"vera_cruz"},
-  "078": {nome: "Veranópolis", id:"veranopolis"},
-  "039": {nome: "Viamão", id:"viamao"},
+  "077": {nome: "Venâncio Aires", id:"venancio_aires"}
 }

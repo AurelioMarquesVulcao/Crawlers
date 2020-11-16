@@ -43,7 +43,7 @@ class TJRSParser extends BaseParser {
       envolvidos,
       oabs,
       qtdAndamentos: andamentos.length,
-      origemExtracao: 'ProcessoTJSP',
+      origemExtracao: 'ProcessoTJRS',
       status,
       isBaixa
     });

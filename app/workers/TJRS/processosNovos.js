@@ -28,7 +28,7 @@ const logarExecucao = async (execucao) => {
     let message = JSON.parse(msg.content.toString());
     let logger = new Logger('info', 'logs/ProcessoTJRS/atualizacao.log', {
       nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJRS}`,
-      NumeroOab: message.NumeroProcesso,
+      NumeroDoProcesso: message.NumeroProcesso,
     });
     console.table(message);
     try {
@@ -39,7 +39,8 @@ const logarExecucao = async (execucao) => {
       const resultadoExtracao = await extrator.extrair(
         message.NumeroProcesso,
         message.NumeroOab,
-        message.Instancia
+        message.Instancia,
+        message
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
@@ -50,17 +51,17 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      logger.info('Enviando resposta ao BigData');
-      await Helper.enviarFeedback(
-        extracao.prepararEnvio()
-      ).catch((err) => {
-        console.log(err);
-        throw new Error(
-          `ProcessoTJRS - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-        );
-      });
-      logger.info('Resposta enviada ao BigData');
-      console.log('\n\n');
+      // logger.info('Enviando resposta ao BigData');
+      // await Helper.enviarFeedback(
+      //   extracao.prepararEnvio()
+      // ).catch((err) => {
+      //   console.log(err);
+      //   throw new Error(
+      //     `ProcessoTJRS - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+      //   );
+      // });
+      // logger.info('Resposta enviada ao BigData');
+      // console.log('\n\n');
       await logarExecucao({
         Mensagem: message,
         DataInicio: dataInicio,

@@ -49,7 +49,12 @@ module.exports.LogExecucao = class LogExecucao {
       Instancia: consultaPendente.Instancia
     };
     // verifica se tem processos cadastrados com aquele cnj e não processados (DataTermino nula)
-    const consultasCadastradas = await ExecucaoConsulta.countDocuments({"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, "Mensagem.Instancia": mensagem.Instancia, DataTermino: null});
+    const consultasCadastradas = await ExecucaoConsulta.find(
+        {"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, "Mensagem.Instancia": mensagem.Instancia, DataTermino: null}
+      )
+      .sort({
+      "Mensagem.NumeroProcesso": 1,
+    }).countDocuments();
 
     if (nomeRobo && !consultasCadastradas) {
       nomeFila = nomeFila ? nomeFila : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;

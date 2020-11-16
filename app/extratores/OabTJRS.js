@@ -55,7 +55,9 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       this.logger.info('Iniciando tratamento de processos');
       nProcessos = await this.tratarProcessos(objResponse.responseBody);
 
-      this.logger.info(`Processos a serem enviados para fila: ${nProcessos.length}`)
+      this.logger.info(
+        `Processos a serem enviados para fila: ${nProcessos.length}`
+      );
 
       // nProcessos = ["0226688-20.2014.8.21.7000", "0523312-55.2011.8.21.7000"]
       this.logger.info('Enfileirando processos');
@@ -66,7 +68,6 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
         sucesso: true,
         nProcessos: this.resultados,
       };
-
     } catch (e) {
       console.log(e);
       this.logger.info(e);
@@ -160,25 +161,26 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     let cadastroConsulta = this.cadastroConsulta;
     let resultados = [];
 
-    let existentes = await Processo.find({ 'detalhes.numeroProcessoMascara': {$in : processos}})
-    existentes = existentes.map(e => e.detalhes.numeroProcessoMascara);
+    let existentes = await Processo.find({
+      'detalhes.numeroProcessoMascara': { $in: processos },
+    });
+    existentes = existentes.map((e) => e.detalhes.numeroProcessoMascara);
 
-    const fila = "processo.TJRS.extracao.novos";
-    for(let p of processos){
+    const fila = 'processo.TJRS.extracao.novos';
+    for (let p of processos) {
       cadastroConsulta['NumeroProcesso'] = p;
 
       if (existentes.indexOf(p) === -1) {
         let logExec = await LogExecucao.cadastrarConsultaPendente(
           cadastroConsulta,
           fila
-        )
+        );
 
         if (logExec.enviado && logExec.sucesso) {
           this.logger.info(`Processo: ${p} ==> ${fila}`);
           resultados.push(p);
         }
       }
-
     }
 
     return resultados;

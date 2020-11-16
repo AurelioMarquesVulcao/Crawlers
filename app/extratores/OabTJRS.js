@@ -1,11 +1,10 @@
 let cheerio = require('cheerio');
-const async = require('async');
 const { antiCaptchaImage } = require('../lib/captchaHandler');
 const { Robo } = require('../lib/newRobo');
 const { LogExecucao } = require('../lib/logExecucao');
-const { ExecucaoConsulta } = require("../models/schemas/execucao_consulta");
 const { Logger } = require('../lib/util');
 
+const { Processo } = require('../models/schemas/processo');
 const { ExtratorBase } = require('./extratores');
 
 module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
@@ -13,7 +12,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     super(url, isDebug);
     // this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
     this.robo = new Robo();
-    this.resultado = [];
+    this.resultados = [];
   }
 
   async extrair(numeroOab, cadastroConsultaId, instancia = 1) {
@@ -49,24 +48,27 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       captchaResposta = await this.resolveCaptcha(captchaString);
 
       this.logger.info('Validando captcha');
+      console.time('tempoCaptcha');
       objResponse = await this.validaCaptcha(captchaResposta);
+      console.timeEnd('tempoCaptcha');
 
       this.logger.info('Iniciando tratamento de processos');
       nProcessos = await this.tratarProcessos(objResponse.responseBody);
 
-      this.logger.info('Processos a serem enviados para fila:', nProcessos.length)
+      this.logger.info(`Processos a serem enviados para fila: ${nProcessos.length}`)
 
       // nProcessos = ["0226688-20.2014.8.21.7000", "0523312-55.2011.8.21.7000"]
       this.logger.info('Enfileirando processos');
-      this.resultado = await this.enfileirarProcessos(nProcessos);
+      this.resultados = await this.enfileirarProcessos(nProcessos);
 
       this.logger.info('Retornando');
       this.resposta = {
         sucesso: true,
-        nProcessos: this.resultado,
+        nProcessos: this.resultados,
       };
 
     } catch (e) {
+      console.log(e);
       this.logger.info(e);
       this.resposta = { sucesso: false, detalhes: e.message };
     } finally {
@@ -158,44 +160,25 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     let cadastroConsulta = this.cadastroConsulta;
     let resultados = [];
 
-    let consultasCadastradas = await ExecucaoConsulta.find(
-      {
-        'Mensagem.NumeroProcesso': {$in: processos},
-        'Mensagem.Instancia': 1,
-        DataTermino: null,
-      },
-      {},
-      {
-        limit: 1,
-        sort: {
-          'Mensagem.NumeroProcesso': -1,
-        },
-      },
-    );
+    let existentes = await Processo.find({ 'detalhes.numeroProcessoMascara': {$in : processos}})
+    existentes = existentes.map(e => e.detalhes.numeroProcessoMascara);
 
-    consultasCadastradas = consultasCadastradas.filter(e => processos.indexOf(e.Mensagem.NumeroProcesso) === -1);
-
-    console.log({processos: consultasCadastradas.length})
-
-    // resultados = await async.mapLimit(processos, 30, async p => {
-    //   cadastroConsulta['NumeroProcesso'] = p;
-    //
-    //   let logExec = await LogExecucao.cadastrarConsultaPendente(
-    //     cadastroConsulta
-    //   );
-    //
-    //   if (logExec.enviado) resultados.push(p);
-    // }
-
+    const fila = "processo.TJRS.extracao.novos";
     for(let p of processos){
       cadastroConsulta['NumeroProcesso'] = p;
 
-      let logExec = await LogExecucao.cadastrarConsultaPendente(
-        cadastroConsulta,
-        'processo.TJRS.extracao.novos',
-      )
+      if (existentes.indexOf(p) === -1) {
+        let logExec = await LogExecucao.cadastrarConsultaPendente(
+          cadastroConsulta,
+          fila
+        )
 
-      if (logExec.enviado) resultados.push(p);
+        if (logExec.enviado && logExec.sucesso) {
+          this.logger.info(`Processo: ${p} ==> ${fila}`);
+          resultados.push(p);
+        }
+      }
+
     }
 
     return resultados;

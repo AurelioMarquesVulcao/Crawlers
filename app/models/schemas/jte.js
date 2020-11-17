@@ -63,7 +63,8 @@ const logDownloadDocumentos = new mongoose.Schema({
 	numeroProcesso: String,
 	dataDownload: Date,
 	statusDownload: Boolean,
-	message:{}
+	message:{},
+	quantidadeTentativas: Number
 	
 })
 

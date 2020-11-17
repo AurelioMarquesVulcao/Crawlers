@@ -86,8 +86,8 @@ class CriaFilaJTE {
 	}
 
 	async salvaUltimo(ultimo) {
-		let veirifica = await ultimoProcesso.find({ "numeroProcesso": ultimo.numeroProcesso })
-		if (!veirifica[0]) {
+		let verifica = await ultimoProcesso.find({ "numeroProcesso": ultimo.numeroProcesso })
+		if (!verifica[0]) {
 			return await new ultimoProcesso(ultimo).save()
 		}
 

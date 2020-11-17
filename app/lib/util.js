@@ -354,7 +354,11 @@ class Logger {
 }
 
 class Cnj {
-  processoSlice(numero) {
+  /**
+   * Separa a string do processo com cada uma das suas infomações
+   * @param {string} numero String com o numero do processo sem mascara
+   */
+  static processoSlice(numero) {
     let sequencial = numero.slice(0, 7);
     let dois = numero.slice(7, 9);
     let ano = numero.slice(9, 13);

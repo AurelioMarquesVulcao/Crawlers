@@ -7,6 +7,7 @@ const { enums } = require('../../../configs/enums');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
 // const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../../models/schemas/extracao');
+const { LogDownload } = require('../../../models/schemas/jte');
 const { Logger, Cnj, Helper } = require('../../../lib/util');
 const { LogExecucao } = require('../../../lib/logExecucao');
 const { Andamento } = require('../../../models/schemas/andamento');
@@ -30,7 +31,7 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `peticao.JTE.extracao`;
+// const nomeFila = `peticao.JTE.extracao`;
 const reConsumo = `peticao.JTE.extracao`;
 
 var estadoAnterior; // Recebe o estado atual que está sendo baixado
@@ -52,14 +53,16 @@ var start = 0; // server de marcador para as funções que devem carregar na ini
     if (start == 0) {
       // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
-      await worker();
+      await worker(`peticao.JTE.extracao.${process.argv[2]}`);
     } else {
       //console.log("aguardando para ligar");
     }
   }, 6000);
 })();
 
-async function worker() {
+async function worker(nomeFila) {
+  
+
   // try {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
   setInterval(function () {
@@ -295,11 +298,21 @@ async function worker() {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
           if (!link){
-            ch.ack(msg);
+            // ch.ack(msg);
             // new GerenciadorFila().enviar(nomeFila, message);
             // ch.ack(msg);
-            await sleep(2000);
-            await new GerenciadorFila().enviar(nomeFila, message);
+            await sleep(1000);
+            let messagemDownload = {
+              numeroProcesso: numeroProcesso,
+              dataDownload: new Date,
+              statusDownload: false,
+              message:message
+            }
+            await new LogDownload(messagemDownload).save()
+            console.log("Salvei no Banco");
+            await sleep(1000);
+            ch.ack(msg);
+            // await new GerenciadorFila().enviar(nomeFila, message);
             await sleep(2000);
             process.exit();
           }

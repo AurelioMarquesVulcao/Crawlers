@@ -28,8 +28,6 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   async extrair(numeroProcesso, numeroOab, instancia = 1, mensagem) {
     this.resposta = {};
     this.numeroProcesso = numeroProcesso;
-    this.numeroOab = numeroOab.replace(/[A-Z]/g, '');
-    this.ufOab = numeroOab.replace(/[0-9]/g, '');
     this.mensagem = mensagem
     this.logger = new Logger('info', 'logs/ProcessoTJRS/atualizacao.log', {
       nomeRobo: `processo.TJRS`,
@@ -161,7 +159,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       num_processo: this.numeroProcesso.replace(/\D/g, ''),
       numCNJ: 'S',
       id_comarca2: 700,
-      uf_oab: this.ufOab,
+      uf_oab: 'RS',
       num_oab: '',
       foro: 0,
       N1_var2_1: 1,

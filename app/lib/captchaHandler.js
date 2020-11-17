@@ -584,7 +584,7 @@ module.exports.antiCaptchaImage = async (captchaB64) => {
   console.log(`Captcha TaskId [${taskId}] - Iniciando Captcha`)
   do {
     tentativa++;
-    await sleep(10000);
+    await sleep(5000);
     console.log(`Captcha TaskId [${taskId}] - Tentativa: ${tentativa} - Aguardando 10 segundos.`)
     response = await axios.post('https://api.anti-captcha.com/getTaskResult', {
       clientKey: ANTICAPTCHA_KEY,

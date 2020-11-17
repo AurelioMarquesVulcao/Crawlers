@@ -21,7 +21,7 @@ const logarExecucao = async (execucao) => {
     console.log(e);
   });
 
-  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJRS}.extracao.novos`;
+  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJRS}.reprocessamento`;
 
   new GerenciadorFila(null, 5).consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
@@ -50,7 +50,7 @@ const logarExecucao = async (execucao) => {
         message.SeccionalOab
       );
       logger.info('Resultado da extracao salva');
-      
+
       await logarExecucao({
         Mensagem: message,
         DataInicio: dataInicio,

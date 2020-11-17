@@ -8,16 +8,16 @@ services:
     ports:
       - ${API_PORT}:3300
     restart: always
-  mongodb:
-    image: mongo
-    ports:
-      - ${MONGO_PORT}:27017
-    restart: always
-    environment:
-     - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+  #  mongodb:
+  #    image: mongo
+  #    ports:
+  #      - ${MONGO_PORT}:27017
+  #    restart: always
+  #    environment:
+  #     - MONGO_DATA_DIR=/data/db
+  #      - MONGO_LOG_DIR=/dev/null
+  #      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+  #      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
   # rabbitmq:
   #   image: rabbitmq:3.8.0-management
   #   hostname: crawlers-rabbitmq

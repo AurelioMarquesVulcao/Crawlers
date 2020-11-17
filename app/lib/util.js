@@ -70,19 +70,16 @@ class Helper {
 
   static async resgatarNovoToken() {
     const robo = new Robo();
-    return robo.acessar({
-      url: enums.bigdataUrls.login,
-      method: 'POST',
+    const data = '{\n	"Login":"extratificador_bigdata@impacta.adv.br",\n	"Senha":"extratificador2019"\n}';
+    const config = {
+      method: 'post',
+      url: 'http://172.16.16.3:8083/login/',
       headers: {
-        'User-Agent': 'client',
-        'Content-Type': 'application/json',
+        'Content-Type': 'text/plain'
       },
-      usaJson: true,
-      params: {
-        Login: 'extratificador_bigdata@impacta.adv.br',
-        Senha: 'extratificador2019',
-      },
-    });
+      data : data
+    };
+    return axios(options)
   }
 
   static async enviarFeedback(msg) {
@@ -302,6 +299,15 @@ class CnjValidator {
   }
 }
 
+/**
+ *
+ * @param {string} logLevel
+ * @param {string} nomeArquivo
+ * @param {object} options
+ * @param {string} options.nomeRobo
+ * @param {string} options.NumeroDoProcesso
+ * @param {string} options.NumeroOab
+ */
 class Logger {
   constructor(
     logLevel = 'info',

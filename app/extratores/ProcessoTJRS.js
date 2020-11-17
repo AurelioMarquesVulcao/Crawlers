@@ -35,6 +35,9 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       nomeRobo: `processo.TJRS`,
       NumeroDoProcesso: numeroProcesso
     });
+    this.resposta = {
+      numeroDoProcesso: this.numeroProcesso,
+    };;
 
 
     try {
@@ -44,6 +47,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       let processoOriginarioLink = false;
       let extracao;
       let resultado;
+
 
       this.logger.info('Fazendo primeiro acesso');
       await this.fazerPrimeiroAcesso();
@@ -76,32 +80,32 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       this.logger.info('Iniciando processo de parseamento');
 
       extracao = this.parser.parse(extracao.capa, extracao.partes, extracao.movimentacoes);
-
+      this.logger.NumeroDoProcesso = extracao.processo.detalhes.numeroProcessoMascara;
       this.logger.info('Processo de extração concluído.');
       this.logger.info('Iniciando salvamento de Andamento');
-      // await Andamento.salvarAndamentos(extracao.andamentos);
+      await Andamento.salvarAndamentos(extracao.andamentos);
       this.logger.info('Andamentos salvos');
 
       this.logger.info('Iniciando salvamento do Processo');
       resultado = await extracao.processo.salvar();
       this.logger.info(
-        `Processo: ${this.numeroProcesso} salvo | Quantidade de andamentos: ${extracao.andamentos.length}`
+        `Processo: ${extracao.processo.detalhes.numeroProcessoMascara} salvo | Quantidade de andamentos: ${extracao.andamentos.length}`
       );
 
-      return {
-        sucesso: true,
-        numeroDoProcesso: this.numeroProcesso,
-        resultado: resultado,
-        detalhes: '',
-        logs: this.logger.logs,
-      };
-
-
+      this.resposta.resultado = resultado;
+      this.resposta.sucesso = true;
+      this.resposta.logs = this.logger.logs;
     } catch (e) {
+      this.logger.log('error', `${e}`);
+      this.logger.info('Enviando processo a fila de reprocessamento');
       const gf = new GerenciadorFila();
       gf.enviar('processo.TJRS.reprocessamento', this.mensagem);
-      console.log(e);
-
+      this.resposta.sucesso = false;
+      this.resposta.logs = this.logger.logs;
+      this.detalhes = e.message;
+    }
+    finally {
+      return this.resposta;
     }
   }
 
@@ -182,15 +186,26 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   }
 
   async verificaProcessoOriginario(body) {
+    const tituloSelector = '#conteudo > table:nth-child(2) > tbody > tr > td:nth-child(4)';
+    const infoSelector = '#conteudo > table:nth-child(2) > tbody > tr > td:nth-child(5)';
+    let links = [];
+    let processoOriginario;
     const $ = cheerio.load(body);
 
-    let processoOriginario = $('#conteudo > table:nth-child(2) > tbody > tr:nth-child(2) > td:nth-child(4)').text();
+    // let processoOriginario = $('#conteudo > table:nth-child(2) > tbody > tr:nth-child(2) > td:nth-child(4)').text();
 
-    if(!(/Processo\sOriginário/.test(processoOriginario))) return false;
+    $(tituloSelector).map((index, element) => {
+      if (/(Processo\sde\s1º\sGrau)|(Processo\sOriginário)|(Processo\sPrincipal)/.test($(element).text()) && /\d+/.test($($(infoSelector)[index]).text())) {
+        links.push($(infoSelector)[index])
+      }
+    })
 
-    let linkOriginario = $(
-      '#conteudo > table:nth-child(2) > tbody > tr:nth-child(2) > td:nth-child(5) > a'
-    );
+    links = links.filter(e => e);
+
+    if(!links.length) return false;
+
+    let linkOriginario = $(links[0]).find('a');
+
 
     processoOriginario =
       linkOriginario && linkOriginario[0]
@@ -234,13 +249,14 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     partes = await this.extrairPartes(partesLink);
     movimentacoes = await this.extrairMovimentacoes(movimentacoesLink);
 
-    return Promise.resolve({capa: objResponse.responseBody, partes, movimentacoes});
+    let capa = objResponse ? objResponse.responseBody : body;
+    return Promise.resolve({capa: capa, partes, movimentacoes});
   }
 
   async extrairPartes(link) {
     let objResponse;
     let url = `https://www.tjrs.jus.br/site_php/consulta/${link}`;
-    console.log('Extraindo partes');
+    this.logger.info('Extraindo partes');;
     objResponse = await this.robo.acessar({ url: url });
     return objResponse.responseBody;
   }
@@ -248,7 +264,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   async extrairMovimentacoes(link) {
     let objResponse;
     let url = `https://www.tjrs.jus.br/site_php/consulta/${link}`;
-    console.log('Extraindo movimentações');
+    this.logger.info('Extraindo movimentações');
     objResponse = await this.robo.acessar({ url: url });
     return objResponse.responseBody;
   }
@@ -258,13 +274,12 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     let url = `https://www.tjrs.jus.br/site_php/consulta/${link}`;
 
     objResponse = await this.robo.acessar({ url });
-    console.log('aaaaaaaa');
     return this.converterProcesso(objResponse.responseBody);
   }
 };
 
 const comarcasCode = {
-  "700": {nome: "Tribunal de Justiça", id:"tribunal_de_justica"},
+  "700": {nome: "Tribunal de Justiça", id:"700"},
   "710": {nome: "Turmas Recursais", id:"turmas_recursais"},
   "001": {nome: "Porto Alegre", id:"porto_alegre"},
   "154": {nome: "Agudo", id:"agudo"},

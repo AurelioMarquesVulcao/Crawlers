@@ -156,6 +156,7 @@ class TJRSParser extends BaseParser {
   extrairAndamentos($, dataAtual, numeroProcesso) {
     let tableAndamentos = $('#conteudo > table:nth-child(3) > tbody > tr');
     let andamentos = [];
+    let andamentosHash = [];
 
     tableAndamentos.each((i, tr) => {
       let data = $(tableAndamentos[i]).find('td:nth-child(2)').text().trim();
@@ -166,7 +167,16 @@ class TJRSParser extends BaseParser {
         dataInclusao: dataAtual,
         descricao: descricao.trim(),
       };
+
+      let hash = Andamento.criarHash(andamento);
+
+      if (andamentosHash.indexOf(hash) !== -1) {
+        let count = andamentosHash.filter((element) => element === hash).length;
+        andamento.descricao = `${andamento.descricao} [${count + 1}]`;
+      }
       andamentos.push(new Andamento(andamento));
+      andamentosHash.push(hash);
+
     });
 
     return andamentos;

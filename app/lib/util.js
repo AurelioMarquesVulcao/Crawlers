@@ -392,7 +392,6 @@ class Cnj {
     let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true}`;
     return post
   }
-
   /**
    * Cria um numero CNJ para consumo.
    * @param {number} ultimoSequencial Ultimo numero sequencial obtido no BigData V2.

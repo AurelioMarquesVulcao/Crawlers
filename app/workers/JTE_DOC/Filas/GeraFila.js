@@ -17,6 +17,7 @@ const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const { downloadFiles } = require('../../../lib/downloadFiles');
 const { Log } = require('../../../models/schemas/logsEnvioAWS');
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
+const { Processo } = require('../../../models/schemas/processo');
 
 
 /**
@@ -24,6 +25,7 @@ const desligado = require('../../../assets/jte/horarioRoboJTE.json');
  */
 
 const nomeFila = `peticao.JTE.extracao`;
+const nomeFilaPJE = `processo.PJE.extracao.novos.1`;
 const Estados = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", '21', "22", "23", "24"];
 var Processos = [];
 (async () => {
@@ -34,14 +36,14 @@ var Processos = [];
 
 async function worker() {
 
-  // // liga ao banco de dados
-  // mongoose.connect(enums.mongo.connString, {
-  //   useNewUrlParser: true,
-  //   useUnifiedTopology: true,
-  // });
-  // mongoose.connection.on('error', (e) => {
-  //   console.log(e);
-  // });
+  // liga ao banco de dados
+  mongoose.connect(enums.mongo.connString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  mongoose.connection.on('error', (e) => {
+    console.log(e);
+  });
 
 
   // tudo que está abaixo é acionado para cada consumer na fila.
@@ -60,16 +62,20 @@ async function worker() {
       let estadoProcesso = Cnj.processoSlice(numeroProcesso).estado
       // console.log(Cnj.processoSlice(numeroProcesso));
       // console.log(estadoProcesso);
-      new GerenciadorFila().enviar(`peticao.JTE.extracao.${estadoProcesso}`, message);
+      // new GerenciadorFila().enviar(`peticao.JTE.extracao.${estadoProcesso}`, message);
+
+      let message2 = await geraPje(message)
+
+      new GerenciadorFila().enviar(nomeFilaPJE, message2);
       console.log("envio para fila ok");
       // console.log(message);
 
 
       await sleep(20000);
-      // process.exit();
+      process.exit();
 
 
-      ch.ack(msg);
+      // ch.ack(msg);
     } catch (e) {
 
       console.log(e);
@@ -77,8 +83,17 @@ async function worker() {
 
       new GerenciadorFila().enviar(nomeFila, message);
 
-      ch.ack(msg);
+      // ch.ack(msg);
     }
   });
-  
+
+}
+
+async function geraPje(message) {
+  let processo = await Processo.findOne({ "detalhes.numeroProcesso": message.NumeroProcesso });
+  let id = processo._id;
+  let message2 = {
+    "NumeroProcesso" : message.NumeroProcesso,"NovosProcessos" : true, "_id" : id
+  }
+  return message2
 }

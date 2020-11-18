@@ -58,8 +58,9 @@ var reset = '\u001b[0m';
     // Variaveis de Robô
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
+    // console.log(message.NumeroProcesso);
     const numeroEstado = parseInt(
-      new Cnj().processoSlice(message.NumeroProcesso).estado
+      Cnj.processoSlice(message.NumeroProcesso).estado
     );
     let busca = { _id: message._id };
     let logger = new Logger('info', 'logs/ProcessoTRTPJE/ProcessoTRTPJEInfo', {
@@ -119,7 +120,7 @@ var reset = '\u001b[0m';
             `---------------------- Tempo de extração é de ${heartBeat} ----------------------` +
             reset
         );
-        await dadosProcesso.processo.save();
+        // await dadosProcesso.processo.save();
         logger.info('Finalizado salvamento de capa de processo');
       } else if (extracao.segredoJustica === true) {
         logger.info('Atualizando Jte com os 3 campos adicionais.');

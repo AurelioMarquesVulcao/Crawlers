@@ -209,8 +209,10 @@ class RoboPuppeteer3 {
   }
 
   async loga() {
-    let login = '10389051764';
-    let senha = 'Senh@JTE123';
+    let login = '11270311719';
+    let senha = 'Impact@2020';
+    // let login = '10389051764';
+    // let senha = 'Senh@JTE123';
     // let email = "karine_mrm@hotmail.com";
     console.log('Login iniciado');
     await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(5)');

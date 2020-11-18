@@ -61,7 +61,7 @@ var start = 0; // server de marcador para as funções que devem carregar na ini
 })();
 
 async function worker(nomeFila) {
-  
+
 
   // try {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
@@ -69,7 +69,7 @@ async function worker(nomeFila) {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 600) {
+      if (heartBeat > 1000) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -77,7 +77,7 @@ async function worker(nomeFila) {
         process.exit();
       }
     } else {
-      if (heartBeat > 600) {
+      if (heartBeat > 1000) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -114,7 +114,7 @@ async function worker(nomeFila) {
         heartBeat++;
         //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
         if (logadoParaIniciais == false) {
-          if (heartBeat > 600) {
+          if (heartBeat > 1000) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -126,7 +126,7 @@ async function worker(nomeFila) {
             // process.exit();
           }
         } else {
-          if (heartBeat > 600) {
+          if (heartBeat > 1000) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -297,14 +297,14 @@ async function worker(nomeFila) {
         if (message.inicial == true) {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
-          if (!link){
+          if (!link) {
             // ch.ack(msg);
             // new GerenciadorFila().enviar(nomeFila, message);
             // ch.ack(msg);
             await sleep(1000);
 
             // salva no banco os dados do erro.
-            await logInciniais(numeroProcesso, message);
+            await logInciniais(numeroProcesso, message, false);
 
 
             console.log("Salvei no Banco");
@@ -313,6 +313,9 @@ async function worker(nomeFila) {
             // await new GerenciadorFila().enviar(nomeFila, message);
             await sleep(2000);
             process.exit();
+          }
+          else{
+            await logInciniais(numeroProcesso, message, true);
           }
           let listaArquivo = [];
           for (let w = 0; w < link.length - 1; w++) {
@@ -325,7 +328,8 @@ async function worker(nomeFila) {
             // let local = '/app/downloads';
 
             let tipo = link[w].tipo;
-            if (tipo == 'pdf') {
+            // if (tipo == 'pdf'|tipo == 'PDF') {
+              if (tipo != 'HTML') {
               await new downloadFiles().download(cnj, linkDocumento, local);
               listaArquivo.push({
                 url: linkDocumento,
@@ -470,19 +474,21 @@ function desligaAgendado() {
   }
 }
 
-async function logInciniais(numeroProcesso, message) {
+async function logInciniais(numeroProcesso, message, status) {
   let tentativa = 0;
   let verifica = await LogDownload.findOne({ "numeroProcesso": numeroProcesso });
   if (verifica) {
     tentativa = verifica.quantidadeTentativas + 1
-
+    if(verifica.statusDownload){
+      status = true
+    }
   }
   console.log(verifica);
 
   let update = {
     numeroProcesso: numeroProcesso,
     dataDownload: new Date,
-    statusDownload: false,
+    statusDownload: status,
     message: message,
     quantidadeTentativas: tentativa
   };

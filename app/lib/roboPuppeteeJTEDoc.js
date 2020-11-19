@@ -29,7 +29,7 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
@@ -337,17 +337,25 @@ class RoboPuppeteer3 {
             '#popover-marcador-filtro > ion-item'
           ).length;
         });
+
+        console.log(quantidadeDocumentos);
+        // let testeK = document.querySelector('#linkPDF').href;
+
+        // for (let k = 1; k < quantidadeDocumentos + 1; k++) {
         for (let k = 1; k < quantidadeDocumentos + 1; k++) {
           // this.logger.info(
           //   `Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`
           // );
-          console.log(`Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`);
+          console.log(`Cliquei no documento numero ${iniciaisArray[j]}-${k}`);
           await sleep(1500);
           // abro o popup e abro o link do documento
+          
           await this.page.click(
             `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
           );
+          // testeK = document.querySelector('#linkPDF').href;
 
+          // await sleep(60000000);
           console.log('Abri documento');
           await sleep(1200);
           let link = await this.page.evaluate(
@@ -375,30 +383,34 @@ class RoboPuppeteer3 {
           console.log('Capturei Link');
           // codigo que fecha a ultima aba do puppeteer.
           // com esse codigo consigo fechar os popup
-          await sleep(2000);
+          await sleep(1000);
+          console.log(" vou rodar o fechador de link");
           let pages = await this.browser.pages();
-          await sleep(2000);
+          console.log("cravei page como page");
+          await sleep(1000);
           let quebraLoop = 0;
+          console.log("abaixo desse codigo é que da errro");
           // loop de tentativas de marcar a aba a ser desativada
-          while (pages.length == 2) {
-            console.log("entrei no loop de identificação de pagina");
-            quebraLoop++;
-            await sleep(2000);
-            // await console.log(pages.length)
-            // await console.log("Aguarde mais um pouco")
-            pages = await this.browser.pages();
-            console.log('Identificando popup');
-            if (quebraLoop > 10) {
-              
-              console.log("Deu erro !!!");
-              // break
-              const error = new Error('Tempo de tentativa de resolução esgotado');
-              error.code = 'Resolver esse processo!';
-              throw error;
-              process.exit();
-            }
-          }
-          // console.log(pages.length)
+          // while (pages.length == 2) {
+          //   console.log("entrei no loop de identificação de pagina");
+          //   quebraLoop++;
+          //   await sleep(2000);
+          //   // await console.log(pages.length)
+          //   // await console.log("Aguarde mais um pouco")
+          //   pages = await this.browser.pages();
+          //   console.log('Identificando popup');
+          //   if (quebraLoop > 10) {
+
+          //     console.log("Deu erro !!!");
+          //     // break
+          //     const error = new Error('Tempo de tentativa de resolução esgotado');
+          //     error.code = 'Resolver esse processo!';
+          //     throw error;
+          //     process.exit();
+          //   }
+          // }
+          console.log("vou fechar a pagina");
+          console.log(pages.length)
           const popup = pages[pages.length - 1];
           console.log('Fechando popup');
           await popup.close();
@@ -529,7 +541,7 @@ class RoboPuppeteer3 {
 
     let buttonRun = await this.page.evaluate(async () => {
       await new Promise(function (resolve) {
-        setTimeout(resolve, 200);
+        setTimeout(resolve, 400);
       });
       let teste = document.querySelector(
         '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button'

@@ -53,16 +53,11 @@ async function worker() {
       let message = JSON.parse(msg.content.toString());
       let numeroProcesso = message.NumeroProcesso;
 
-      // if (estadoDaFila != estadoAnterior) {
-      //   await mongoose.connection.close();
-      //   await puppet.mudaTribunal(estadoDaFila);
-      //   await sleep(1000);
-      //   contador = 0;
-      // }
+      
+      // função de processamento PJE
       let estadoProcesso = Cnj.processoSlice(numeroProcesso).estado
-      // console.log(Cnj.processoSlice(numeroProcesso));
-      // console.log(estadoProcesso);
-      // new GerenciadorFila().enviar(`peticao.JTE.extracao.${estadoProcesso}`, message);
+      // função de divisão de filas
+      new GerenciadorFila().enviar(`peticao.JTE.extracao.${estadoProcesso}`, message);
 
       let message2 = await geraPje(message)
 
@@ -70,12 +65,12 @@ async function worker() {
       console.log("envio para fila ok");
       // console.log(message);
 
-
+      ch.ack(msg);
       await sleep(20000);
       process.exit();
 
 
-      // ch.ack(msg);
+      
     } catch (e) {
 
       console.log(e);

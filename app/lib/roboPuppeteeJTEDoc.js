@@ -9,6 +9,7 @@ const { Logger } = require('./util');
 const { enums } = require('../configs/enums');
 
 const ajustes = new JTEParser();
+var valorLinkTeste = "";
 
 var timerSleep = 300;
 var timerSleep1 = 1000;
@@ -29,7 +30,7 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
@@ -349,71 +350,16 @@ class RoboPuppeteer3 {
           console.log(`Cliquei no documento numero ${iniciaisArray[j]}-${k}`);
           await sleep(1500);
           // abro o popup e abro o link do documento
-          
-          await this.page.click(
-            `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
-          );
-          // testeK = document.querySelector('#linkPDF').href;
 
-          // await sleep(60000000);
-          console.log('Abri documento');
-          await sleep(1200);
-          let link = await this.page.evaluate(
-            async (k, dataEProcesso) => {
-              await new Promise(function (resolve) {
-                setTimeout(resolve, 1500);
-              });
+          let link = await this.baixaLink(k, dataEProcesso);
 
-              let link = document.querySelector('#linkPDF').href;
-              let movimentacao = document
-                .querySelector(
-                  `#popover-marcador-filtro > ion-item:nth-child(${k}) > span`
-                )
-                .innerText.replace('\n', ' ');
-              let data = dataEProcesso.data;
-              let numeroProcesso = dataEProcesso.numeroProcesso;
-              let tipo = 'PDF';
-              // console.log({ numeroProcesso, data, movimentacao, link, tipo })
-              return { numeroProcesso, data, movimentacao, link, tipo };
-              // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
-            },
-            k,
-            dataEProcesso
-          );
-          console.log('Capturei Link');
-          // codigo que fecha a ultima aba do puppeteer.
-          // com esse codigo consigo fechar os popup
-          await sleep(1000);
-          console.log(" vou rodar o fechador de link");
-          let pages = await this.browser.pages();
-          console.log("cravei page como page");
-          await sleep(1000);
-          let quebraLoop = 0;
-          console.log("abaixo desse codigo é que da errro");
-          // loop de tentativas de marcar a aba a ser desativada
-          // while (pages.length == 2) {
-          //   console.log("entrei no loop de identificação de pagina");
-          //   quebraLoop++;
-          //   await sleep(2000);
-          //   // await console.log(pages.length)
-          //   // await console.log("Aguarde mais um pouco")
-          //   pages = await this.browser.pages();
-          //   console.log('Identificando popup');
-          //   if (quebraLoop > 10) {
 
-          //     console.log("Deu erro !!!");
-          //     // break
-          //     const error = new Error('Tempo de tentativa de resolução esgotado');
-          //     error.code = 'Resolver esse processo!';
-          //     throw error;
-          //     process.exit();
-          //   }
-          // }
-          console.log("vou fechar a pagina");
-          console.log(pages.length)
-          const popup = pages[pages.length - 1];
-          console.log('Fechando popup');
-          await popup.close();
+
+
+
+
+
+
           await sleep(timerSleep);
           links.push(link);
         }
@@ -523,6 +469,111 @@ class RoboPuppeteer3 {
       console.log(e);
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  async baixaLink(k, dataEProcesso) {
+    // while (1==2) {
+    console.log("Entrei no while do click do documento da inicial");
+    await this.page.click(
+      `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
+    );
+
+    // }
+
+    // testeK = document.querySelector('#linkPDF').href;
+
+    // await sleep(60000000);
+    console.log('Abri documento');
+    await sleep(1200);
+    let link = await this.page.evaluate(
+      async (k, dataEProcesso) => {
+        await new Promise(function (resolve) {
+          setTimeout(resolve, 1500);
+        });
+
+        let link = document.querySelector('#linkPDF').href;
+        let movimentacao = document
+          .querySelector(
+            `#popover-marcador-filtro > ion-item:nth-child(${k}) > span`
+          )
+          .innerText.replace('\n', ' ');
+        let data = dataEProcesso.data;
+        let numeroProcesso = dataEProcesso.numeroProcesso;
+        let tipo = 'PDF';
+        // console.log({ numeroProcesso, data, movimentacao, link, tipo })
+        return { numeroProcesso, data, movimentacao, link, tipo };
+        // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
+      },
+      k,
+      dataEProcesso
+    );
+    // console.log(link.link);
+
+    console.log('Capturei Link');
+    // codigo que fecha a ultima aba do puppeteer.
+    // com esse codigo consigo fechar os popup
+    await sleep(1000);
+    console.log(" vou rodar o fechador de link");
+    let pages = await this.browser.pages();
+    console.log("cravei page como page");
+    await sleep(1000);
+    let quebraLoop = 0;
+    console.log("abaixo desse codigo é que da errro");
+    // loop de tentativas de marcar a aba a ser desativada
+    // while (pages.length == 2) {
+    //   console.log("entrei no loop de identificação de pagina");
+    //   quebraLoop++;
+    //   await sleep(2000);
+    //   // await console.log(pages.length)
+    //   // await console.log("Aguarde mais um pouco")
+    //   pages = await this.browser.pages();
+    //   console.log('Identificando popup');
+    //   if (quebraLoop > 10) {
+
+    //     console.log("Deu erro !!!");
+    //     // break
+    //     const error = new Error('Tempo de tentativa de resolução esgotado');
+    //     error.code = 'Resolver esse processo!';
+    //     throw error;
+    //     process.exit();
+    //   }
+    // }
+
+
+
+    console.log("vou fechar a pagina");
+    console.log(pages.length)
+    if (pages.length != 2) {
+      const popup = pages[pages.length - 1];
+      console.log('Fechando popup');
+      await popup.close();
+    } 
+    // console.log(valorLinkTeste);
+    if (valorLinkTeste != link.link) {
+      valorLinkTeste = link.link
+      return link
+    } else {
+      console.log("vou repetir o processo");
+      await this.baixaLink(k, dataEProcesso);
+    }
+    return link
+  }
+
+
+
 
   /**
    * Tenta entrar nos documentos multiplos para baixar seus links

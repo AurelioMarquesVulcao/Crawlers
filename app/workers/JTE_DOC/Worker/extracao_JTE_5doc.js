@@ -69,7 +69,7 @@ async function worker(nomeFila) {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 1000) {
+      if (heartBeat > 2000) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -77,7 +77,7 @@ async function worker(nomeFila) {
         process.exit();
       }
     } else {
-      if (heartBeat > 1000) {
+      if (heartBeat > 2000) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -114,7 +114,7 @@ async function worker(nomeFila) {
         heartBeat++;
         //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
         if (logadoParaIniciais == false) {
-          if (heartBeat > 1000) {
+          if (heartBeat > 2000) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -126,7 +126,7 @@ async function worker(nomeFila) {
             // process.exit();
           }
         } else {
-          if (heartBeat > 1000) {
+          if (heartBeat > 2000) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );

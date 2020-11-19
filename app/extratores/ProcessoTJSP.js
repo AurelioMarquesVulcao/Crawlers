@@ -132,7 +132,7 @@ class ProcessoTJSP extends ExtratorBase {
         console.log(url);
         console.log(cookies);
 
-        this.logger.info(`Acessando o site. [Tentativa: ${tentativas + 1}]`);
+        this.logger.info(`Acessando o site. [Tentativa: ${tentativas++}]`);
         objResponse = await this.robo.acessar({
           url: url,
           method: 'GET',
@@ -165,10 +165,9 @@ class ProcessoTJSP extends ExtratorBase {
               tentativas + 1
             }]`
           );
-          tentativas = tentativas++;
         } else {
           this.logger.info(
-            `Pagina capturada com sucesso. [Tentativas: ${tentativas + 1}]`
+            `Pagina capturada com sucesso. [Tentativas: ${tentativas++}]`
           );
           this.logger.info('Iniciando processo de extração.');
           extracao = await this.parser.parse(

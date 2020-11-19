@@ -4,6 +4,7 @@ const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
 const { Robo } = require('../lib/robo');
+const { GerenciadorFila } = require('../lib/filaHandler');
 
 const {
   AntiCaptchaResponseException,
@@ -28,7 +29,6 @@ class ProcessoTJSP extends ExtratorBase {
     this.url = INSTANCIAS_URLS[instancia - 1];
     console.log('instancia:', instancia, '/// url:', this.url);
   }
-
 
   /**
    *
@@ -72,6 +72,7 @@ class ProcessoTJSP extends ExtratorBase {
     let tentativas = 0;
     let extracao;
     let limite = 5;
+    this.resposta = {};
 
     console.log(headers);
 
@@ -141,9 +142,16 @@ class ProcessoTJSP extends ExtratorBase {
         });
         const $ = cheerio.load(objResponse.responseBody);
         // Verifica se input é valido
-        console.log('TEXTO DE MENSAGEM RETORNO', $('#mensagemRetorno').text().strip());
-        if(/Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test($('#mensagemRetorno').text())) {
-          this.logger.info('Não existem informações disponíveis para o processo informado.')
+        const selector = '#mensagemRetorno';
+        console.log('TEXTO DE MENSAGEM RETORNO', $(selector).text().strip());
+        if (
+          /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(
+            $(selector).text()
+          )
+        ) {
+          this.logger.info(
+            'Não existem informações disponíveis para o processo informado.'
+          );
           return {
             sucesso: false,
             numeroDoProcesso: this.numeroDoProcesso,
@@ -188,7 +196,7 @@ class ProcessoTJSP extends ExtratorBase {
         }
       } while (tentativas < limite);
       this.logger.info(`Tentativas de conexão excederam ${limite} tentativas.`);
-      return {
+      this.resposta = {
         sucesso: false,
         numeroDoProcesso: this.numeroDoProcesso,
         logs: this.logger.logs,
@@ -196,6 +204,10 @@ class ProcessoTJSP extends ExtratorBase {
     } catch (err) {
       console.log(err);
       this.logger.log('error', err);
+      this.logger.info('Enviando processo a fila de reprocessamento');
+      const gf = new GerenciadorFila();
+      gf.enviar('processo.TJRS.reprocessamento', this.mensagem);
+
       return {
         sucesso: false,
         numeroDoProcesso: this.numeroDoProcesso,

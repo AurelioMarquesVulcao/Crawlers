@@ -36,7 +36,7 @@ class TJSPParser extends BaseParser {
 
     comarca = $('td:contains("Origem:")').next('td').text().strip();
     comarca = removerAcentos(comarca);
-    comarca = comarca.replace(/(Comarca\sde\s|Foro\sde\s)(\w+)\s\/\s(.*)/, '$1$2');
+    comarca = comarca.replace(/(Comarca\sde\s|Foro\s(de\s?))(\w+)\s\/\s(.*)/, '$1$2');
 
     if (/Comarca|Foro/.test(comarca) === false){
       comarca = $('tr:contains("Distribuição:")').next('tr').text().strip();
@@ -46,7 +46,7 @@ class TJSPParser extends BaseParser {
 
 
     comarca = COMARCAS.filter(c => c.test(comarca))
-    comarca = comarca[0].source;
+    comarca = (comarca && comarca[0] && comarca[0].source) ? comarca[0].source : 'Não identificada';
     return removerAcentos(comarca);
   }
 

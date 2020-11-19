@@ -1,7 +1,6 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 const { Helper } = require('../lib/util');
-const { antiCaptchaHandler } = require('../lib/captchaHandler');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const re = require('xregexp');

@@ -42,7 +42,7 @@ const logarExecucao = async (execucao) => {
         message.Instancia
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
-      logger.info('Processo extraido');
+      logger.info('Oab extraida');
       let extracao = await ExtracaoOab.criarExtracao(
         message,
         resultadoExtracao,

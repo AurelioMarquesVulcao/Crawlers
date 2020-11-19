@@ -55,15 +55,22 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       this.logger.info('Iniciando tratamento de processos');
       nProcessos = await this.tratarProcessos(objResponse.responseBody);
 
-      this.logger.info(
-        `Processos a serem enviados para fila: ${nProcessos.length}`
-      );
+      if (nProcessos) {
 
-      // nProcessos = ["0226688-20.2014.8.21.7000", "0523312-55.2011.8.21.7000"]
-      this.logger.info('Enfileirando processos');
-      this.resultados = await this.enfileirarProcessos(nProcessos);
+        this.logger.info(
+          `Processos a serem enviados para fila: ${nProcessos.length}`
+        );
 
-      this.logger.info('Retornando');
+        // nProcessos = ["0226688-20.2014.8.21.7000", "0523312-55.2011.8.21.7000"]
+        this.logger.info('Enfileirando processos');
+        this.resultados = await this.enfileirarProcessos(nProcessos);
+
+        this.logger.info('Retornando');
+      } else {
+        this.logger.info('Não foi encontrado nenhum processo para a OAB');
+        this.resultados = 0;
+      }
+
       this.resposta = {
         sucesso: true,
         nProcessos: this.resultados,

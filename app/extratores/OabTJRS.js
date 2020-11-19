@@ -56,7 +56,6 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       nProcessos = await this.tratarProcessos(objResponse.responseBody);
 
       if (nProcessos) {
-
         this.logger.info(
           `Processos a serem enviados para fila: ${nProcessos.length}`
         );

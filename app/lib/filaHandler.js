@@ -36,7 +36,8 @@ class GerenciadorFila {
    */
   enviar(fila, mensagem) {
     if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
-
+    // console.log(mensagem);
+    // console.log(mensagem.length);
     amqpCA.connect(this.host, (err, conn) => {
       if (err) throw new Error(err);
 
@@ -48,7 +49,7 @@ class GerenciadorFila {
           noAck: false,
           maxPriority: 9,
         });
-
+        
         this.enviarMensagem(ch, fila, mensagem);
       });
     });
@@ -97,6 +98,7 @@ class GerenciadorFila {
       });
   
       for (let i = 0, si = lote.length; i < si; i++) {
+        // console.log(lote[i]);
         channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
 
         }));

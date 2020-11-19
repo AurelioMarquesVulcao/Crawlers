@@ -4,6 +4,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: "node server.js"
     ports:
       - ${API_PORT}:3300
@@ -41,6 +44,9 @@ services:
     extends:
       file: common-services.yml
       service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
     command: node workers/enfileirador.js
  
   # worker-tjsc-oab:
@@ -280,6 +286,7 @@ services:
       service: base_node
     build:
       context: ./
+      shm_size: '2gb'
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
@@ -296,6 +303,7 @@ services:
       service: base_node
     build:
       context: ./
+      shm_size: '2gb'
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
@@ -312,6 +320,7 @@ services:
       service: base_node
     build:
       context: ./
+      shm_size: '2gb'
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}

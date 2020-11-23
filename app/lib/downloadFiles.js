@@ -118,6 +118,7 @@ class downloadFiles {
         });
     } catch (error) {
       console.log(error);
+      await this.enviarAWS(cnj, lista)
     }
     return resultado;
   }

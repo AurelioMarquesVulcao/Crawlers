@@ -69,7 +69,7 @@ async function worker(nomeFila) {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 2000) {
+      if (heartBeat > 4000) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -77,7 +77,7 @@ async function worker(nomeFila) {
         process.exit();
       }
     } else {
-      if (heartBeat > 2000) {
+      if (heartBeat > 4000) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -114,7 +114,7 @@ async function worker(nomeFila) {
         heartBeat++;
         //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
         if (logadoParaIniciais == false) {
-          if (heartBeat > 2000) {
+          if (heartBeat > 4000) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -126,7 +126,7 @@ async function worker(nomeFila) {
             // process.exit();
           }
         } else {
-          if (heartBeat > 2000) {
+          if (heartBeat > 4000) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -352,12 +352,12 @@ async function worker(nomeFila) {
             cnj,
             listaArquivo
           );
-          // await new downloadFiles().saveLog(
-          //   "crawler.JTE",
-          //   envioAWS.status,
-          //   envioAWS.resposta,
+          await new downloadFiles().saveLog(
+            "crawler.JTE",
+            envioAWS.status,
+            envioAWS.resposta,
 
-          // )
+          )
           // console.log(envioAWS);
         }
 

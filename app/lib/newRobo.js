@@ -146,9 +146,10 @@ class Robo {
 
     if(responseType) options.responseType = responseType;
 
-    if (Object.keys(queryString).length > 0) {
+    if (Object.keys(queryString).length > 0)
       options.url = url + this.converterQueryString(queryString);
-    } else if (Object.keys(formData).length > 0) {
+
+    if (Object.keys(formData).length > 0) {
         let fd = this.converterFormData(formData);
         this.setHeader(fd.header);
         options.data = fd.data;

@@ -32,7 +32,7 @@ class PeticaoTJRS1 extends ExtratorBase {
 
       objResponse = await this.acessaPaginaConsulta(objResponse.responseBody)
 
-      hash = await this.preConsulta();
+      hash = await this.preConsulta(objResponse.responseBody);
 
       objResponse = await this.consultarProcesso(hash);
 
@@ -51,6 +51,10 @@ class PeticaoTJRS1 extends ExtratorBase {
     return this.robo.acessar(options)
   }
 
+  /**
+   * Acessa o site, tenta fazer login com as credenciais disponiveis no banco
+   * @returns {Promise<{Object}>}
+   */
   async login() {
     let objResponse
     do {
@@ -104,6 +108,11 @@ class PeticaoTJRS1 extends ExtratorBase {
     return regex.test(body);
   }
 
+  /**
+   * Resgata a hash da pagina e acessa a pagina de consulta de processos
+   * @param {string} body
+   * @returns {Promise<{Object}>}
+   */
   async acessaPaginaConsulta(body) {
     let hash = await this.buscarHash(body);
 
@@ -125,8 +134,13 @@ class PeticaoTJRS1 extends ExtratorBase {
     return link.match(/hash=(\w+)\W?/)
   }
 
+  /**
+   * Faz um acesso ao endpoint para pegar o hash mutavel da consulta do processo
+   * @param {string} body
+   * @returns {Promise<string>}
+   */
   async preConsulta(body) {
-    let hash = this.buscarFormHash(body);
+    let hash = this.buscarFormHash(body); // TODO criar essa funcao
     let objResponse;
 
     const formData = {
@@ -155,9 +169,14 @@ class PeticaoTJRS1 extends ExtratorBase {
   async resgataNovoHash(body) {
     let context = JSON.stringify(body);
 
-    return context.match(/hash=(\w+)\W?/)
+    return context.match(/hash=(\w+)\W?/).groups[0]
   }
 
+  /**
+   * Faz a consulta do processo no site
+   * @param {string} hash
+   * @returns {Promise<{Object}>}
+   */
   async consultarProcesso(hash) {
     let queryString = {
       acao: 'processo_selecionar',

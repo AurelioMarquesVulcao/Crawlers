@@ -1,4 +1,5 @@
 require('../bootstrap');
+const cheerio = require('cheerio');
 const fs = require('fs');
 const sleep = require('await-sleep');
 const { ExtratorBase } = require('./extratores');
@@ -21,9 +22,10 @@ class PeticaoTJRS1 extends ExtratorBase {
     this.credenciais = {};
   }
 
-  async extrair() {
+  async extrair(numeroProcesso) {
     let objResponse;
     let hash;
+    this.numeroProcesso = numeroProcesso;
 
     try {
       await this.primeiraConexao();
@@ -36,7 +38,10 @@ class PeticaoTJRS1 extends ExtratorBase {
 
       objResponse = await this.consultarProcesso(hash);
 
+      return true;
+
     } catch (e) {
+      console.log(e);
       console.log('deu erro')
     }finally {
       console.log('terminou')
@@ -63,6 +68,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       objResponse = await this.fazerLogin(this.credenciais.login, this.credenciais.senha)
 
       if (this.isLogado(this.credenciais.nome, objResponse.responseBody)) {
+        console.log(`Logado como ${this.credenciais.nome}`);
         break;
       }
     } while (true)
@@ -75,9 +81,9 @@ class PeticaoTJRS1 extends ExtratorBase {
       estado,
       this.idsUsadas
     );
-    this.idsUsadas.push(credenciais.id);
+    this.idsUsadas.push(credenciais._doc._id);
 
-    return credenciais;
+    return credenciais._doc;
   }
 
   /**
@@ -88,10 +94,10 @@ class PeticaoTJRS1 extends ExtratorBase {
    */
   async fazerLogin(usuario, senha) {
     const formData = {
-      txtUsuario: usuario,
-      pwdSenha: senha,
-      hdnAcao: 'login',
-      hdhDebug: ''
+      'txtUsuario': usuario.replace(/\D/g, ''),
+      'pwdSenha': senha,
+      'hdnAcao': 'login',
+      'hdnDebug': '',
     }
 
     const options = {
@@ -100,11 +106,11 @@ class PeticaoTJRS1 extends ExtratorBase {
       formData: formData
     }
 
-    return this.robo.acessar(options);
+    return await this.robo.acessar(options);
   }
 
   isLogado(nome, body) {
-    let regex = new RegExp(nome.split(',')[0], 'gmi')
+    let regex = new RegExp(nome.split(' ')[0], 'gmi')
     return regex.test(body);
   }
 
@@ -117,7 +123,7 @@ class PeticaoTJRS1 extends ExtratorBase {
     let hash = await this.buscarHash(body);
 
     const options = {
-      url: `${this.url}/controlador.php?acao=processo_consultar&acao_origem=consultar&hash=${hash}`
+      url: `${this.url}/controlador.php?acao=processo_consultar&acao_origem=consultar&hash=${hash}`,
       method: 'GET'
     }
 
@@ -129,9 +135,9 @@ class PeticaoTJRS1 extends ExtratorBase {
     const $ = cheerio.load(body);
     let selector = '#menu-ul-3 > li > a';
 
-    let link = $(selector).attr.href;
+    let link = $(selector)[0].attribs.href;
 
-    return link.match(/hash=(\w+)\W?/)
+    return link.match(/hash=(\w+)\W?/)[1]
   }
 
   /**
@@ -156,7 +162,7 @@ class PeticaoTJRS1 extends ExtratorBase {
     }
 
     const options = {
-      url: `${this.url}/controlador_ajax.php?acao_ajax=processos_consulta_por_numprocesso&hash=${hash}`
+      url: `${this.url}/controlador_ajax.php?acao_ajax=processos_consulta_por_numprocesso&hash=${hash}`,
       method: 'POST',
       formData: formData
     }
@@ -164,6 +170,15 @@ class PeticaoTJRS1 extends ExtratorBase {
     objResponse = await this.robo.acessar(options);
 
     return this.resgataNovoHash(objResponse.responseBody);
+  }
+
+  buscarFormHash(body) {
+    const selector = '#divNumNrProcesso';
+    const $ = cheerio.load(body);
+
+    let link = $(selector)[0].attribs['data-acaoassinada']
+
+    return link.match(/hash=(\w+)\W?/)[1];
   }
 
   async resgataNovoHash(body) {
@@ -195,3 +210,5 @@ class PeticaoTJRS1 extends ExtratorBase {
     return this.robo.acessar(options);
   }
 }
+
+module.exports.PeticaoTJRS1 = PeticaoTJRS1;

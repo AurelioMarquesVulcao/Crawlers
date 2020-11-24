@@ -164,9 +164,11 @@ class Robo {
       );
     }
 
-    this.setHeader(headers);
+    if(Object.keys(headers).length > 0)
+      this.setHeader(headers);
 
     options.timeout = timeout;
+    options.headers = this.headers;
     options.headers.Cookie = this.convertStrCookie();
 
     let resposta = await this.requisicao.enviarRequest(options);
@@ -198,7 +200,7 @@ class Robo {
     for (let key in formData) {
       fd.append(key, formData[key]);
     }
-    return { header: fd.getHeaders(), data: fd.getBuffer() };
+    return { header: fd.getHeaders(), data: fd };
   }
 
   convertStrCookie() {

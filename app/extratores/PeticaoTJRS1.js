@@ -38,6 +38,10 @@ class PeticaoTJRS1 extends ExtratorBase {
 
       objResponse = await this.consultarProcesso(hash);
 
+      objResponse = await this.habilitarAndamentosCompletos(objResponse.responseBody);
+
+      processosLinks = await this.recuperarLinkDocumentos(objResponse.responseBody);
+
       return true;
 
     } catch (e) {
@@ -182,9 +186,9 @@ class PeticaoTJRS1 extends ExtratorBase {
   }
 
   async resgataNovoHash(body) {
-    let context = JSON.stringify(body);
+    let context = body.resultados[0].linkProcessoAssinado
 
-    return context.match(/hash=(\w+)\W?/).groups[0]
+    return context.match(/hash=(\w+)\W?/)[1]
   }
 
   /**
@@ -197,7 +201,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       acao: 'processo_selecionar',
       acao_origem: 'processo_consultar',
       acao_retorno: 'processo_consultar',
-      num_processo: this.numeroProcesso,
+      num_processo: this.numeroProcesso.replace(/\D/g, ''),
       hash: hash
     }
 
@@ -208,6 +212,36 @@ class PeticaoTJRS1 extends ExtratorBase {
     }
 
     return this.robo.acessar(options);
+  }
+
+  async habilitarAndamentosCompletos(body) {
+    const $ = cheerio.load(body);
+    let link = $('#fldAcoes > center > a')[0].attribs.href;
+    let hash = link.match(/hash=(\w+)\W?/)[1];
+
+    const options = {
+      url: `${this.url}/controlador.php`,
+      queryString:{
+        acao: "processo_vista_sem_procuracao",
+        txtNumProcesso: this.numeroProcesso.replace(/\D/g, ''),
+        hash: hash
+      }
+    }
+
+    return await this.robo.acessar(options);
+  }
+
+  async recuperarLinkDocumentos(body) {
+    const $ = cheerio.load(body);
+    const selector = '#trEvento1 > td:nth-child(5) > a';
+    let nodes = $(selector);
+    let links = [];
+
+    nodes.map((index, node) => {
+      links.push($(node)[0].attribs.href);
+    })
+
+    return links;
   }
 }
 

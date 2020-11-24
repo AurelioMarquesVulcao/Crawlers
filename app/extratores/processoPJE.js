@@ -1,6 +1,7 @@
 const { Robo } = require('../lib/robo');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
+const sleep = require('await-sleep');
 var heartBeat = 0;
 
 var red = '\u001b[31m';
@@ -275,12 +276,15 @@ class ExtratorTrtPje {
 
         // removendo caracteres especiais da solução do captcha
         const texto = captchaSolved.texto.replace(/[^a-z0-9]/g, '');
-
-        if (texto.lenth < 6) {
+        console.log(texto);
+        console.log(texto.length);
+        if (texto.length < 6) {
           logger.info(
             'Não foi possivél resolver o Captcha corretamente, reiniciando o processo!'
-          );
+          ); 
+          process.exit()
           throw 'A resolução do captcha está errada!';
+          
         }
 
         // const texto = captchaSolved.texto.replace(/[a-z0-9]/g, ""); // cria erro para testes
@@ -308,10 +312,12 @@ class ExtratorTrtPje {
 
         logger.info('Dados do processo obtidos com sucesso.');
         return detalheProcesso.responseBody;
+
       } else {
         logger.info('Não foi possível resolver o captcha');
       }
     } catch (e) {
+      // await sleep(5000);
       await this.captura(header, cnj, numeroEstado);
     }
   }

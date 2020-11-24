@@ -65,7 +65,7 @@ async function worker() {
       console.log("envio para fila ok");
       // console.log(message);
 
-      ch.ack(msg);
+      // ch.ack(msg);
       await sleep(20000);
       process.exit();
 

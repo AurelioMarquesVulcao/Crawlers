@@ -13,15 +13,15 @@ const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 
 const Fila = new CriaFilaJTE();
 const rabbit = new GerenciadorFila();
-var fila = ".4";  // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos.4';
+var fila = ".1"; // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos.1';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
-  Estados.rs
-  // Estados.rs, Estados.pe, Estados.ce, Estados.pa,
-  // Estados.to, Estados.am, Estados.sc, Estados.ac, Estados.pb,
+  // Estados.sp15, Estados.mg, Estados.ba,
+  Estados.sp2
 ];
+
 
 (async () => {
   let origens;  // Comarcas de origens para serem inseridas.
@@ -40,7 +40,7 @@ var estados = [
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-  try {
+  try{
     for (let w = 0; w < 1;) {
       let relogio = Fila.relogio();
       // console.log(estados[contador].estado);
@@ -48,7 +48,7 @@ var estados = [
       await sleep(100);
       // esse if mantem o enfilerador desligado na hora desejada
       if (!desligado.find(element => element == relogio.hora)) {
-
+  
         // if (start == 0 || !statusFila) {
         if (start == 0 || !statusFila) {
           // se mudar start para zero não terá pausa de 10 minudos entre os tribunais.
@@ -67,7 +67,7 @@ var estados = [
         if (contador == estados.length) { contador = 0 }
       }
     }
-  } catch (e) {
+  }catch(e){
     await sleep(120000);
     process.exit()
   }

@@ -58,3 +58,16 @@ const comarcaSchema = new mongoose.Schema({
 const statusEstadosJTE = mongoose.model('comarcasJTE', comarcaSchema, 'comarcasJTE');
 
 module.exports.statusEstadosJTE = statusEstadosJTE;
+
+const logDownloadDocumentos = new mongoose.Schema({
+	numeroProcesso: String,
+	dataDownload: Date,
+	statusDownload: Boolean,
+	message:{},
+	quantidadeTentativas: Number
+	
+})
+
+const LogDownload = mongoose.model('logIniciais', logDownloadDocumentos, 'logIniciais');
+
+module.exports.LogDownload = LogDownload;

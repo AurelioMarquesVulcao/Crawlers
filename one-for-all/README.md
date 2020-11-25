@@ -2,6 +2,8 @@
 
 ## Ligando PM2:
 
+* rode a aplicação apartir da pasta raiz da sua aplicação
+
 * pegue o caminho relativo do seu arquivo: EX.: "app/worker/helloWorld.js"
 * envie no corpo da requisição para pm2 com variaveis:
   

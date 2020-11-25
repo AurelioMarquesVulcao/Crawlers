@@ -2,6 +2,7 @@ const express = require("express");
 const routes = express.Router();
 const { CPU } = require("./lib/getCpu");
 const {PostComandos} = require('./services/postComandos');
+const {GetPm2} = require('./services/getPM2');
 
 routes.get("/", function (req, res) {
   return res.send("Você esta no serviço One for All");
@@ -30,6 +31,9 @@ routes.post("/escaleContainer", PostComandos.escaleContainer);
 
 
 routes.get("/cpu", CPU.cpuStatus);
+
+routes.get("/pm2List", GetPm2.get);
+
 
 
 module.exports = routes;

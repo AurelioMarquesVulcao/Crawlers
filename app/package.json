@@ -32,6 +32,7 @@
     "moment": "^2.24.0",
     "mongoose": "^5.9.6",
     "node-cron": "^2.0.3",
+    "pdf-merger-js": "^3.0.5",
     "pm2": "^4.4.0",
     "prettier": "^2.0.5",
     "puppeteer": "^5.0.0",

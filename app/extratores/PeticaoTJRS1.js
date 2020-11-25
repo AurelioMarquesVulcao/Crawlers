@@ -1,11 +1,14 @@
 require('../bootstrap');
 const cheerio = require('cheerio');
+const Path = require('path');
 const fs = require('fs');
 const sleep = require('await-sleep');
 const { ExtratorBase } = require('./extratores');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 const { Robo } = require('../lib/newRobo');
+const PDFMerger = require('pdf-merger-js');
+
 const {
   CredenciaisAdvogados,
 } = require('../models/schemas/credenciaisAdvogados');
@@ -25,22 +28,43 @@ class PeticaoTJRS1 extends ExtratorBase {
   async extrair(numeroProcesso) {
     let objResponse;
     let hash;
+    let processosLinks = [];
     this.numeroProcesso = numeroProcesso;
 
     try {
+      console.log('Fazendo primeira conexão ao site')
       await this.primeiraConexao();
+      await sleep(100);
 
+      console.log('Fazendo tentativa de login')
       objResponse = await this.login()
+      await sleep(100);
 
+      console.log('Acessando pagina de consulta')
       objResponse = await this.acessaPaginaConsulta(objResponse.responseBody)
+      await sleep(100);
 
+      console.log('Capturando hash de request da pre-consulta')
       hash = await this.preConsulta(objResponse.responseBody);
+      await sleep(100);
 
+      console.log('Consultando andamento')
       objResponse = await this.consultarProcesso(hash);
+      await sleep(100);
 
+      console.log('Habilitando pagina completa de andamentos')
       objResponse = await this.habilitarAndamentosCompletos(objResponse.responseBody);
+      await sleep(100);
 
+      console.log('Capturando link de download dos documentos')
       processosLinks = await this.recuperarLinkDocumentos(objResponse.responseBody);
+
+      console.log('Fazendo download dos documentos');
+      let arquivos = await this.downloadArquivos(processosLinks);
+
+      console.log('Fazendo merge dos arquivos');
+      await this.fazerMergeArquivos(arquivos);
+      await sleep(100);
 
       return true;
 
@@ -242,6 +266,69 @@ class PeticaoTJRS1 extends ExtratorBase {
     })
 
     return links;
+  }
+
+  async downloadArquivos(links) {
+    let arquivos = []
+    let objResponse;
+    let options;
+    let $;
+    let downloads = [];
+
+    let path;
+    let writer;
+
+    for (let i = 0, tam=links.length; i < tam; i++) {
+      options = {
+        url: `${this.url}/${links[i]}`,
+        method: 'GET',
+      }
+      objResponse = await this.robo.acessar(options)
+      $ = cheerio.load(objResponse.responseBody);
+
+      let pagina = $('#conteudoIframe')[0].attribs.src;
+      path = Path.resolve(__dirname, '../downloads', `${this.numeroProcesso.replace(/\D/g, '')}_${i}.pdf`)
+      writer = fs.createWriteStream(path)
+
+      objResponse = await this.robo.acessar({
+        url: `${this.url}/${pagina}`,
+        method: 'GET',
+        responseType: 'stream',
+      })
+      objResponse.responseBody.pipe(writer);
+      await new Promise((resolve, reject) => {
+        writer.on('close', () => {
+          console.log(`Download do arquivo ${this.numeroProcesso.replace(/\D/g, '')}_${i}.pdf concluido`);
+          resolve();
+          arquivos.push(path);
+        });
+        writer.on('error', (err) => {
+          reject(err);
+          console.log(`Download do arquivo ${this.numeroProcesso.replace(/\D/g, '')}_${i}.pdf falhou`);
+        });
+      })
+
+    }
+
+    // await Promise.all(downloads).then(res => console.log(res.length, 'Downloads concluidos'));
+    return arquivos;
+  }
+
+  async fazerMergeArquivos(arquivos) {
+    let merger = new PDFMerger();
+
+    let path = Path.resolve(__dirname, '../downloads', `${this.numeroProcesso.replace(/\D/g, '')}.pdf`)
+
+    console.log(`Juntando ${arquivos.length} arquivos`);
+    arquivos.map(element => {
+      merger.add(element);
+    })
+
+    console.log(`Excluindo ${arquivos.length} arquivos`);
+    arquivos.map(element => fs.unlinkSync(element))
+
+    console.log('Juntando arquivos');
+    return merger.save(path);
   }
 }
 

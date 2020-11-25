@@ -299,20 +299,21 @@ class CnjValidator {
   }
 }
 
-/**
- *
- * @param {string} logLevel
- * @param {string} nomeArquivo
- * @param {object} options
- * @param {string} options.nomeRobo
- * @param {string} options.NumeroDoProcesso
- * @param {string} options.NumeroOab
- */
+
 class Logger {
+  /**
+   * Logger
+   * @param {string} logLevel
+   * @param {string} nomeArquivo
+   * @param {object} options
+   * @param {string} options.nomeRobo
+   * @param {null|string} options.NumeroDoProcesso
+   * @param {null|string} options.NumeroOab
+   */
   constructor(
     logLevel = 'info',
     nomeArquivo = '',
-    { nomeRobo, NumeroDoProcesso = null, NumeroOab = null } = {}
+    { nomeRobo, NumeroDoProcesso, NumeroOab} = {}
   ) {
     this.nomeRobo = nomeRobo;
     this.NumeroProcesso = NumeroDoProcesso;

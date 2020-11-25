@@ -5,7 +5,7 @@ const fs = require('fs');
 const sleep = require('await-sleep');
 const { ExtratorBase } = require('./extratores');
 const { Logger } = require('../lib/util');
-const { enums } = require('../configs/enums');
+// const { enums } = require('../configs/enums');
 const { Robo } = require('../lib/newRobo');
 const PDFMerger = require('pdf-merger-js');
 
@@ -48,6 +48,9 @@ class PeticaoTJRS1 extends ExtratorBase {
       objResponse = await this.acessaPaginaConsulta(objResponse.responseBody);
       await sleep(100);
 
+      if (!this.isLogado(this.credenciais.nome, objResponse.responseBody))
+        throw new Error('Pagina apresentou algum tipo de erro ao tentar acessar a pagina de consulta');
+
       this.logger.info('Capturando hash de request da pre-consulta');
       hash = await this.preConsulta(objResponse.responseBody);
       await sleep(100);
@@ -56,11 +59,17 @@ class PeticaoTJRS1 extends ExtratorBase {
       objResponse = await this.consultarProcesso(hash);
       await sleep(100);
 
+      if (!this.isLogado(this.credenciais.nome, objResponse.responseBody))
+        throw new Error('Pagina apresentou algum tipo de erro ao tentar consultar o processo');
+
       this.logger.info('Habilitando pagina completa de andamentos');
       objResponse = await this.habilitarAndamentosCompletos(
         objResponse.responseBody
       );
       await sleep(100);
+
+      if (!this.isLogado(this.credenciais.nome, objResponse.responseBody))
+        throw new Error('Pagina apresentou algum tipo de erro ao tentar habilitar os andamentos completos');
 
       this.logger.info('Capturando link de download dos documentos');
       processosLinks = await this.recuperarLinkDocumentos(
@@ -80,6 +89,7 @@ class PeticaoTJRS1 extends ExtratorBase {
 
       return true;
     } catch (e) {
+      console.log(e);
       this.logger.log('error', e);
     } finally {
       this.logger.info('Extração finalizada');

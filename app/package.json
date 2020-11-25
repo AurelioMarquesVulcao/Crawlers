@@ -10,8 +10,8 @@
   "author": "Vitor Nascimento (IMPACTA)",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "^0.5.5",
-    "async": "^3.2.0",
+    "amqplib": "0.5.5",
+    "async": "3.2.0",
     "await-sleep": "0.0.1",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
@@ -42,8 +42,8 @@
     "xregexp": "^4.3.0"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "nodemon": "^2.0.2",
-    "prettier": "^2.0.5"
+    "eslint": "6.8.0",
+    "nodemon": "2.0.2",
+    "prettier": "2.0.5"
   }
 }

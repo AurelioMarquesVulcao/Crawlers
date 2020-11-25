@@ -6,7 +6,7 @@ const logDocumentosAWS = new mongoose.Schema({
 	dataCriacao: Date,
 	modulo: String,
 	statusCode:Number,
-	conteudo:Object,
+	conteudo:{},
 	// url:String,
 	// log:Object,
 	

@@ -7,6 +7,7 @@ const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Cnj, Logger } = require('../../lib/util');
 const { ExtratorTrtPje } = require('../../extratores/processoPJE');
 const { Processo } = require('../../models/schemas/processo');
+const { ProcessoTRT } = require('../../models/schemas/pje');
 const { TRTParser } = require('../../parsers/PJEParser');
 
 const parse = new TRTParser();
@@ -58,8 +59,9 @@ var reset = '\u001b[0m';
     // Variaveis de Robô
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
+    // console.log(message.NumeroProcesso);
     const numeroEstado = parseInt(
-      new Cnj().processoSlice(message.NumeroProcesso).estado
+      Cnj.processoSlice(message.NumeroProcesso).estado
     );
     let busca = { _id: message._id };
     let logger = new Logger('info', 'logs/ProcessoTRTPJE/ProcessoTRTPJEInfo', {
@@ -119,8 +121,11 @@ var reset = '\u001b[0m';
             `---------------------- Tempo de extração é de ${heartBeat} ----------------------` +
             reset
         );
-        await dadosProcesso.processo.save();
-        logger.info('Finalizado salvamento de capa de processo');
+        let teste = await ProcessoTRT.findOne({ "detalhes.numeroProcesso": message.NumeroProcesso })
+        if (!teste){
+          await dadosProcesso.processo.save();
+        }
+                logger.info('Finalizado salvamento de capa de processo');
       } else if (extracao.segredoJustica === true) {
         logger.info('Atualizando Jte com os 3 campos adicionais.');
         resultado = {
@@ -151,14 +156,18 @@ var reset = '\u001b[0m';
       heartBeat = 0;
     } catch (e) {
       // console.log(e);
+      
       logger.info('Encontrado erro durante a execução');
       logger.info(red + `Error: ${e.message}` + reset);
       heartBeat = 0;
       // Estou reprocessando automaticamente no fim da fila.
-
+      await new GerenciadorFila().enviar(nomeFila, message);
+      await sleep(1000);
       // await new GerenciadorFila().enviar(nomeFila, message);
       // await new GerenciadorFila().enviar(reConsumo, message);
     } finally {
+      
+      await sleep(1000);
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');

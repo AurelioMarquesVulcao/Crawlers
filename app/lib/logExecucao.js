@@ -1,7 +1,7 @@
 require('../bootstrap');
-const ExecucaoConsulta = require("../models/schemas/execucao_consulta")
+const ExecucaoConsulta = require('../models/schemas/execucao_consulta')
   .ExecucaoConsulta;
-const GerenciadorFila = require("../lib/filaHandler").GerenciadorFila;
+const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila;
 const { enums } = require('../configs/enums');
 
 let mapaEstadoRobo = {
@@ -15,24 +15,24 @@ module.exports.LogExecucao = class LogExecucao {
   static nomeFila;
 
   static async salvar(execucao) {
-    const log = { 
+    const log = {
       status: execucao.status,
       error: execucao.error,
-      logs: execucao.logs
+      logs: execucao.logs,
     };
 
     delete execucao['status'];
     delete execucao['error'];
     delete execucao['logs'];
     await ExecucaoConsulta.updateOne(
-      {_id: execucao.Mensagem.ExecucaoConsultaId},
+      { _id: execucao.Mensagem.ExecucaoConsultaId },
       {
         ...execucao,
         Log: log,
-        DataEnfileiramento: execucao.Mensagem.DataEnfileiramento
+        DataEnfileiramento: execucao.Mensagem.DataEnfileiramento,
       },
       // upsert true, caso precise de um jeito de criar a consulta na hora
-      { upsert: true } 
+      { upsert: true }
     );
   }
 
@@ -46,7 +46,7 @@ module.exports.LogExecucao = class LogExecucao {
       NumeroProcesso: consultaPendente.NumeroProcesso,
       NumeroOab: consultaPendente.NumeroOab,
       SeccionalOab: consultaPendente.SeccionalOab,
-      Instancia: consultaPendente.Instancia
+      Instancia: consultaPendente.Instancia,
     };
     // verifica se tem processos cadastrados com aquele cnj e não processados (DataTermino nula)
     const consultasCadastradas = await ExecucaoConsulta.find(
@@ -83,9 +83,10 @@ module.exports.LogExecucao = class LogExecucao {
       return { sucesso: false, mensagem: 'Nome do robo inválido.' };
     }
 
-    if (consultasCadastradas) {
-      return { sucesso: true, enviado: false, mensagem: `Processo ${mensagem.NumeroProcesso} já consta na fila.` };
-    }
+    return {
+      sucesso: true,
+      enviado: true,
+      mensagem: `${mensagem.NumeroProcesso} => ${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`,
+    };
   }
-  
-}
+};

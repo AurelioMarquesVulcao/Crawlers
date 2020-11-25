@@ -94,7 +94,7 @@ var reset = '\u001b[0m';
         throw error;
       } else if (await !extracao) {
         logger.info('Não recebi extracao');
-        process.exit();
+        // process.exit();
       } else if (extracao) {
         logger.info('Processo completo. Vamos processar todas as alterações');
         resultado = {

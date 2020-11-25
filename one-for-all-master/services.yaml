@@ -1,0 +1,5 @@
+apps:
+  - script   : ./controller/server.js
+    name     : 'Server'
+  # - script   : ./controller/service/calendario.js
+  #   name     : 'Calendario'

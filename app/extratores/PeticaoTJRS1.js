@@ -16,8 +16,8 @@ const {
 const estado = 'RS';
 
 class PeticaoTJRS1 extends ExtratorBase {
-  constructor() {
-    super('https://eproc1g.tjrs.jus.br/eproc', false);
+  constructor(isDebug) {
+    super('https://eproc1g.tjrs.jus.br/eproc', isDebug);
     this.robo = new Robo();
     this.idsUsadas = [];
     this.resultados = [];
@@ -29,6 +29,7 @@ class PeticaoTJRS1 extends ExtratorBase {
     let hash;
     let processosLinks = [];
     this.numeroProcesso = numeroProcesso;
+    this.resposta = { numeroProcesso: numeroProcesso };
 
     this.logger = new Logger('info', `logs/PeticaoTJRS/PeticaoTJRSInfo.log`, {
       nomeRobo: 'peticao.TJRS',
@@ -87,12 +88,20 @@ class PeticaoTJRS1 extends ExtratorBase {
       await this.deletaArquivosTemporarios(arquivos);
       await sleep(100);
 
-      return true;
+      this.resposta.sucesso = true;
+      this.logger.log(
+        'info',
+        `Finalizado processo de extração de documentos ${this.numeroProcesso}`
+      );
     } catch (e) {
       console.log(e);
       this.logger.log('error', e);
+      this.resposta.sucesso = false;
+      this.resposta.detalhes = e.message;
     } finally {
       this.logger.info('Extração finalizada');
+      this.resposta.logs = this.logger.logs;
+      return this.resposta;
     }
   }
 

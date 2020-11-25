@@ -136,7 +136,7 @@ mongodb/*
 *.pdf
 
 # comarcas JTE
-comarcascopy.json
+# comarcascopy.json
 
 # Indice da execução das tarefas.
-banco.json
+# banco.json

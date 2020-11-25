@@ -12,7 +12,6 @@ let mapaEstadoRobo = {
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {
-  static nomeFila;
 
   static async salvar(execucao) {
     const log = {

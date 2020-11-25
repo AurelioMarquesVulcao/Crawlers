@@ -71,8 +71,8 @@ const logarExecucao = async (execucao) => {
           Documentos: [
             {
               DocumentoBody: data,
-              UrlOrigem: resultadoExtracao.urlOrigem,
-              NomeOrigem: `${message.NumeroProcesso}.pdf`,
+              UrlOrigem: '',
+              NomeOrigem: `${message.NumeroProcesso.replace(/\D/g, '')}.pdf`,
             },
           ],
         };

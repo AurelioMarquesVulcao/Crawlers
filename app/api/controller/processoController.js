@@ -5,14 +5,6 @@ const { Processo } = require('../../models/schemas/processo');
 const { Andamento } = require('../../models/schemas/andamento');
 const { Helper, CnjValidator } = require('../../lib/util');
 
-// const context = {
-//   LogConsultaId: '5e5d7b8b09219b50a2edae31',
-//   NumeroDoProcesso: null,
-//   NumeroOab: 54768,
-//   Tribunal: 'TJBA',
-//   DataEnfileiramento: '2020-03-02T18:32:59.417685',
-// };
-
 const identificarTribunal = (cnj) => {
   let tribunal;
   let idTribunalMatch = cnj.match(/\.([0-9]\.[0-9]{2})\./);
@@ -129,9 +121,10 @@ class Tradutor {
       Classe: capa.classe,
       Comarca: capa.comarca,
       Metadados: {},
-      JusticaGratuita: false,
-      SegredoDeJustica: false,
-      ValorDaCausa: 0,
+      JusticaGratuita: capa.justicaGratuita,
+      SegredoDeJustica: capa.segredoJustica,
+      ValorDaCausa: capa.valor,
+      Audiencias: capa.audiencias,
       Instancia: processo.detalhes.instancia,
       DataDistribuicao: processo.capa.dataDistribuicao,
       Vara: processo.capa.vara,

@@ -473,7 +473,7 @@ class CaptchaIOHandler {
   }
 }
 
-module.exports.CaptchaHandler = class CaptchaHandler {
+module.exports = class CaptchaHandler {
   /**
    *
    * @param {Number} tentativas numero de repetições antes de desistir do captcha

@@ -331,9 +331,6 @@ services:
     extends:
       file: common-services.yml
       service: base_node
-    build:
-      context: ./
-      dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon 

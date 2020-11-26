@@ -1,0 +1,26 @@
+version: "2.4"
+services:
+  base_node:
+    build: .
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    extra_hosts:
+      - "bigrj01mon01:10.21.0.86"
+      - "bigrj01mon02:10.21.0.139"
+      - "bigrj01mon03:10.21.0.146"
+    environment:
+      - TZ=America/Cuiaba
+      - API_PORT=${API_PORT}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - RABBITMQ_ADDRESS=${RABBITMQ_ADDRESS}
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - MONGO_ADDRESS=${MONGO_ADDRESS}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - RABBITMQ_CONNECTION_STRING=${RABBITMQ_CONNECTION_STRING}
+      - MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING}
+      - BIG_DATA_ADDRESS=${BIG_DATA_ADDRESS}
+      - PROXY_ADDRESS=${PROXY_ADDRESS}

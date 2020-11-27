@@ -1,74 +1,9 @@
 const sleep = require('await-sleep');
-const { enums } = require('../configs/enums');
 const axios = require('axios');
-let Anticaptcha = require('../bin/js/anticaptcha')(
-  '4b93beb6fe87d3bf3cfd92966ec841a6'
-);
-const CAPTCHAIO_KEY = '405d27c9-5ef38c01c76b79.16080721';
 const ANTICAPTCHA_KEY = '49e40ab829a227a307ad542c7d003c7d';
 
 const { Robo } = require('../lib/robo');
 const { LogCaptcha } = require('../models/schemas/logCaptcha');
-
-const {
-  AntiCaptchaResponseException,
-} = require('../models/exception/exception');
-
-const antiCaptchaHandler = async (
-  website,
-  websiteKey,
-  pageAction,
-) => {
-  return new Promise((resolve, reject) => {
-    Anticaptcha.setWebsiteURL(website);
-    Anticaptcha.setWebsiteKey(websiteKey);
-    Anticaptcha.setMinScore(0.3);
-    Anticaptcha.setPageAction(pageAction);
-
-    Anticaptcha.setUserAgent(
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 ' +
-        '(KHTML, like Gecko) Chrome/52.0.2743.116'
-    );
-    Anticaptcha.getBalance((err, balance) => {
-      if (err) {
-        return reject(
-          new AntiCaptchaResponseException('NOT_AVALIABLE', err.message)
-        );
-      }
-      // console.log('balance', balance);
-      if (balance > 0) {
-        Anticaptcha.createTaskProxyless((err, taskId) => {
-          if (err) {
-            return reject(
-              new AntiCaptchaResponseException(
-                'CREATE_PROXYLESS_TASK',
-                err.message
-              )
-            );
-          }
-          Anticaptcha.getTaskSolution(taskId, (err, gResponse) => {
-            if (err) {
-              return reject(
-                new AntiCaptchaResponseException(
-                  'GET_CAPTCHA_SOLUTION',
-                  err.message
-                )
-              );
-            }
-            return resolve({ sucesso: true, gResponse: gResponse });
-          });
-        });
-      } else {
-        return reject(
-          new AntiCaptchaResponseException(
-            'NO_FOUNDS',
-            'Not enough founds to start the operation.'
-          )
-        );
-      }
-    });
-  });
-};
 
 class AntiCaptchaHandler {
   static async resolverV2(website, websiteKey, pageAction) {
@@ -128,14 +63,20 @@ class AntiCaptchaHandler {
           break;
         }
 
-        if (objResponse.responseBody.status == 'ready') {
+        if (objResponse.responseBody.status === 'ready') {
           return {
             sucesso: true,
             captchaId: captchaId,
             gResponse: objResponse.responseBody.solution.gRecaptchaResponse,
-            body: objResponse.responseBody
+            body: objResponse.responseBody,
           };
         }
+
+        console.log(
+          '\t',
+          'AntiCaptcha - ReCaptchaV2 -',
+          objResponse.responseBody.status
+        );
       } while (tentativa < 5);
     }
 
@@ -333,153 +274,13 @@ class AntiCaptchaHandler {
   }
 }
 
-class CaptchaIOHandler {
-  constructor() {}
-
-  static async resolverV2(website, websiteKey, pageAction) {
-    const robo = new Robo();
-    let objResponse;
-    let captchaId;
-    let url;
-    let tentativas = 0;
-    let espera = 20000; // 20 segundos
-    let data;
-
-    // Realiza o pedido a api do captchas.io
-    objResponse = await robo.acessar({
-      url: 'https://api.captchas.io/in.php',
-      method: 'post',
-      params: {
-        method: 'userrecaptcha',
-        key: CAPTCHAIO_KEY,
-        googlekey: websiteKey,
-        pageurl: website,
-        json: 1,
-      },
-    });
-    console.log(objResponse.responseBody);
-    console.log(this.testaErro(objResponse.responseBody.request));
-    if (this.testaErro(objResponse.responseBody.request).valido) {
-      captchaId = objResponse.responseBody.request;
-      url = `?key=${CAPTCHAIO_KEY}&action=get&id=${captchaId}&json=1`;
-      console.log('\tID: ', captchaId);
-      do {
-        await sleep(espera);
-        objResponse = await robo.acessar({
-          url: 'https://api.captchas.io/res.php' + url,
-          method: 'get',
-        });
-        //TODO remover console
-        data = new Date();
-        console.log(
-          '\tResponse',
-          objResponse.responseBody,
-          `${data.getHours()}:${data.getMinutes()}:${data.getSeconds()}`
-        );
-
-        if (!this.testaErro(objResponse.responseBody.request).valido) {
-          break;
-        }
-
-        if (
-          objResponse.responseBody &
-          (objResponse.responseBody.request != 'CAPCHA_NOT_READY')
-        ) {
-          return {
-            sucesso: true,
-            gResponse: objResponse.responseBody.request,
-          };
-        }
-        tentativas++;
-      } while (tentativas < 5);
-    }
-
-    console.log(
-      `[VALIDO] ${
-        objResponse.responseBody.request &
-        this.testaErro(objResponse.responseBody.request).valido &
-        (objResponse.responseBody.request != 'CAPCHA_NOT_READY')
-      }`
-    );
-    console.log(`[BODY] ${objResponse.responseBody.request} \n\n`);
-
-    if (
-      objResponse.responseBody.request &
-      this.testaErro(objResponse.responseBody.request).valido &
-      (objResponse.responseBody.request != 'CAPCHA_NOT_READY')
-    ) {
-      return {
-        sucesso: true,
-        detalhes: objResponse.responseBody,
-      };
-    } else {
-      return {
-        sucesso: false,
-        detalhes: objResponse.responseBody,
-      };
-    }
-  }
-
-  /**
-   *
-   * @param {Any} body
-   * @returns {{valido: boolean}}
-   */
-  static testaErro(body) {
-    let resposta = {
-      valido: true,
-    };
-
-    if (/ERROR_PROXY_BANNED/.test(body)) {
-      (resposta.detalhes = 'ERROR_PROXY_BANNED'), (resposta.valido = false);
-    }
-
-    if (/ERROR_DAILY_SOLVES_LIMIT_REACHED/.test(body)) {
-      resposta.detalhes = 'ERROR_DAILY_SOLVES_LIMIT_REACHED';
-      resposta.valido = false;
-    }
-
-    if (/ERROR_NO_AVAILABLE_THREADS/.test(body)) {
-      resposta.detalhes = 'ERROR_NO_AVAILABLE_THREADS';
-      resposta.valido = false;
-    }
-
-    if (/ERROR_CAPTCHA_UNSOLVABLE/.test(body)) {
-      resposta.detalhes = 'ERROR_CAPTCHA_UNSOLVABLE';
-      resposta.valido = false;
-    }
-
-    if (/ERROR_API_KEY_NOT_FOUND/.test(body)) {
-      resposta.detalhes = 'ERROR_API_KEY_NOT_FOUND';
-      resposta.valido = false;
-    }
-
-    if (/ERROR_ACCESS_DENIED/.test(body)) {
-      resposta.detalhes = 'ERROR_ACCESS_DENIED';
-      resposta.valido = false;
-    }
-
-    // if (/CAPCHA_NOT_READY/.test(body)) {
-    //   resposta.detalhes = 'CAPCHA_NOT_READY';
-    //   resposta.valido = false;
-    // }
-
-    if (/ERROR_RECAPTCHA_TIMEOUT/.test(body)) {
-      resposta.detalhes = 'ERROR_RECAPTCHA_TIMEOUT';
-      resposta.valido = false;
-    }
-
-    return resposta;
-  }
-}
-
-module.exports = class CaptchaHandler {
+module.exports.CaptchaHandler = class CaptchaHandler {
   /**
    *
    * @param {Number} tentativas numero de repetições antes de desistir do captcha
    * @param {Number} espera tempo de espera entre uma chamada de captcha e outra
    * @param {String} robo nome do robo
-   * @param {{numeroDoProcesso: String, numeroDaOab: String}} identificador
+   * @param {{numeroDoProcesso: string}|{numeroDaOab: string}} identificador
    */
   constructor(tentativas = 5, espera = 5000, robo, identificador) {
     this.tentativas = tentativas;
@@ -490,7 +291,7 @@ module.exports = class CaptchaHandler {
 
   async resolveRecaptchaV2(website, websiteKey, pageAction, userAgent) {
     let tentativas = 0;
-    let maxTentativas = 5;
+    let maxTentativas = 6;
     let resultado = {
       sucesso: false,
       detalhes: [],
@@ -525,6 +326,7 @@ module.exports = class CaptchaHandler {
       console.log(
         `\tAntiCaptcha - ReCaptchaV2 - [TENTATIVA: ${tentativas + 1}]`
       );
+      await sleep(10000);
       resultado = await this.getCaptcha(
         website,
         websiteKey,
@@ -535,13 +337,14 @@ module.exports = class CaptchaHandler {
         logCaptcha.Servico = 'AntiCaptcha';
         logCaptcha.CaptchaBody = resultado.body;
         new LogCaptcha(logCaptcha).save();
+        console.log('\tAntiCaptcha - ReCaptchaV2 - Resolvido');
         return resultado;
       }
+      console.log('\tAntiCaptcha - ReCaptchaV2 - Realizando nova tentativa');
       tentativas++;
       console.log(`\t\t${resultado.detalhes[0].errorCode}`);
-      await sleep(100);
-      // } while (tentativas < maxTentativas);
-    } while (true);
+    } while (tentativas < maxTentativas);
+    // } while (true);
     // console.log('1', resultado);
     return resultado;
   }
@@ -550,11 +353,9 @@ module.exports = class CaptchaHandler {
     let resultado = {
       sucesso: false,
       detalhes: [],
-      body: {}
+      body: {},
     };
     let captcha = await tipoCaptcha.resolverV2(website, websiteKey, pageAction);
-
-
 
     if (captcha.sucesso) {
       // data padrão vindo de 1970
@@ -572,23 +373,20 @@ module.exports = class CaptchaHandler {
   }
 };
 
-module.exports.antiCaptchaHandler = antiCaptchaHandler;
-
 module.exports.audioCaptchaHandler = async (b64String) => {
+  const data = JSON.stringify({ audio: b64String });
 
-  const data = JSON.stringify({"audio": b64String});
-
-  var config = {
+  let config = {
     method: 'post',
     url: 'http://172.16.16.8:5000/api/solve',
     headers: {
       'Accept-Encoding': 'utf8',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    data : data
+    data: data,
   };
 
   let response = await axios(config);
 
   return response.data;
-}
+};

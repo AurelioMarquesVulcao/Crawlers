@@ -3,7 +3,7 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
-const { Helper, Logger } = require('../../lib/util');
+const { Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 const sleep = require('await-sleep');
 
@@ -39,7 +39,8 @@ const logarExecucao = async (execucao) => {
       const resultadoExtracao = await extrator.extrair(
         message.NumeroProcesso,
         message.NumeroOab,
-        message.Instancia
+        message.Instancia,
+        message
       );
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
@@ -50,16 +51,16 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      logger.info('Enviando resposta ao BigData');
-      await Helper.enviarFeedback(
-        extracao.prepararEnvio()
-      ).catch((err) => {
-        console.log(err);
-        throw new Error(
-          `ProcessoTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-        );
-      });
-      logger.info('Resposta enviada ao BigData');
+      // logger.info('Enviando resposta ao BigData');
+      // await Helper.enviarFeedback(
+      //   extracao.prepararEnvio()
+      // ).catch((err) => {
+      //   console.log(err);
+      //   throw new Error(
+      //     `ProcessoTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+      //   );
+      // });
+      // logger.info('Resposta enviada ao BigData');
       console.log('\n\n');
       await logarExecucao({
         Mensagem: message,
@@ -92,7 +93,6 @@ const logarExecucao = async (execucao) => {
       logger.info('Finalizando proceso');
       console.log('\n\n\n\n');
       await sleep(2000);
-
     }
   });
 })();

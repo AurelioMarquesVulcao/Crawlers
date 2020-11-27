@@ -120,6 +120,15 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSP/extracao.js
 
+  comarcas-tjrs:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJRS/extracaoComarcas.js
+
   worker-tjsp-processo:
     extends:
       file: common-services.yml

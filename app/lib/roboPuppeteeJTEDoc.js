@@ -121,6 +121,7 @@ class RoboPuppeteer3 {
     await this.page.click('#campoNumeroProcesso', { clickCount: 3 });
     await this.page.type('#campoNumeroProcesso', `${entrada.numeroprocesso}`);
 
+    
     const input2 = await this.page.$('#campoAno');
     await input2.click({ clickCount: 3 });
 

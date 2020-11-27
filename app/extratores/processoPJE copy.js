@@ -289,8 +289,8 @@ class ExtratorTrtPje {
 
       // obtem a imagem em base64 do captcha
       let objResponseCaptcha = await this.robo.acessar({
-        // url: `${url_1}/api/processos/${info.id}`,
-        url: `https://pje.trt15.jus.br/captcha/login_post.php`,
+        url: `${url_1}/api/processos/${info.id}`,
+        // url: `https://pje.trt15.jus.br/captcha/login_post.php`,
         method: 'POST',
         encoding: 'latin1',
         httpsAgent: proxy,

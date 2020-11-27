@@ -329,11 +329,13 @@ services:
 
   worker-jte-doc:
     extends:
-      file: common-services.yml
+      file: common-servicesDoc.yml
       service: base_node
+    build:
+      dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon 
+    command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 02
     logging:
       driver: "json-file"
       options:

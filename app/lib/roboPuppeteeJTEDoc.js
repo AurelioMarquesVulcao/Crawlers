@@ -37,8 +37,8 @@ class RoboPuppeteer3 {
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
-      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
+      // args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
+      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
     });
     this.page = await this.browser.newPage();
     await this.page.authenticate({

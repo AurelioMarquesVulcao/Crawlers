@@ -340,8 +340,8 @@ async function worker(nomeFila) {
               link[w].numeroProcesso.replace(/[-.]/g, '') + '-' + w + '.pdf';
             let linkDocumento = link[w].link;
 
-            let local = '/home/aurelio/crawlers-bigdata/downloads';
-            // let local = '/app/downloads';
+            // let local = '/home/aurelio/crawlers-bigdata/downloads';
+            let local = '/app/downloads';
 
             let tipo = link[w].tipo;
             // if (tipo == 'pdf'|tipo == 'PDF') {

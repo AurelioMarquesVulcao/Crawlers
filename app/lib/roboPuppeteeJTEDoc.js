@@ -14,6 +14,11 @@ const senha = 'Impact@2020';
 // const senha = 'Senh@JTE123';
 // let email = "karine_mrm@hotmail.com";
 
+// Variavel para controle da quantidade de arquivos a serem baixados
+var numeroDocumentosTotal = 0;
+// Variavel para controlar 
+var controlaLink = 0;
+
 
 
 const ajustes = new JTEParser();
@@ -38,15 +43,16 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: false,
+      // headless: false,
+      headless: true,
       slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      // args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
+      args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
     });
     this.page = await this.browser.newPage();
     await this.page.authenticate({
@@ -121,7 +127,7 @@ class RoboPuppeteer3 {
     await this.page.click('#campoNumeroProcesso', { clickCount: 3 });
     await this.page.type('#campoNumeroProcesso', `${entrada.numeroprocesso}`);
 
-    
+
     const input2 = await this.page.$('#campoAno');
     await input2.click({ clickCount: 3 });
 
@@ -254,6 +260,7 @@ class RoboPuppeteer3 {
       let iniciaisArray = await (await this.numerosIniciaisLaco()).numero2;
       let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
       console.log('Arquivos simples ' + iniciaisArray);
+      numeroDocumentosTotal + iniciaisArray.length;
       console.log('Arquivos paginados ' + iniciaisMultiplas);
 
 
@@ -345,6 +352,7 @@ class RoboPuppeteer3 {
         });
 
         console.log(quantidadeDocumentos);
+        numeroDocumentosTotal + quantidadeDocumentos;
         // let testeK = document.querySelector('#linkPDF').href;
 
         // for (let k = 1; k < quantidadeDocumentos + 1; k++) {

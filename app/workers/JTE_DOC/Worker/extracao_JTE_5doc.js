@@ -254,15 +254,28 @@ async function worker(nomeFila) {
         // Atuliza dados de capa para salvar data de audiência.
         let audiencia = dadosProcesso.processo.capa.audiencias[0]
         console.log(audiencia);
-        await Processo.findOneAndUpdate(
-          {
-            "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
-          }, {
-          "capa.audiencias": [{
-            data: audiencia.data,
-            tipo: audiencia.tipo
-          }]
-        });
+        if (!audiencia) {
+          await Processo.findOneAndUpdate(
+            {
+              "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+            }, {
+            "capa.audiencias": [{
+              data: "",
+              tipo: ""
+            }]
+          });
+        } else {
+          await Processo.findOneAndUpdate(
+            {
+              "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+            }, {
+            "capa.audiencias": [{
+              data: audiencia.data,
+              tipo: audiencia.tipo
+            }]
+          });
+        }
+
         // process.exit()
         if (message.inicial != true) {
           // condicional provisório para testes1
@@ -334,14 +347,16 @@ async function worker(nomeFila) {
             await logInciniais(numeroProcesso, message, true);
           }
           let listaArquivo = [];
-          for (let w = 0; w < link.length - 1; w++) {
+          // correção de não realizar download da inicial
+          // for (let w = 0; w < link.length - 1; w++) {
+          for (let w = 0; w < link.length; w++) {
             await new CriaFilaJTE().salvaDocumentoLink(link[w]);
             let cnj =
               link[w].numeroProcesso.replace(/[-.]/g, '') + '-' + w + '.pdf';
             let linkDocumento = link[w].link;
 
-            // let local = '/home/aurelio/crawlers-bigdata/downloads';
-            let local = '/app/downloads';
+            let local = '/home/aurelio/crawlers-bigdata/downloads';
+            // let local = '/app/downloads';
 
             let tipo = link[w].tipo;
             // if (tipo == 'pdf'|tipo == 'PDF') {
@@ -368,15 +383,18 @@ async function worker(nomeFila) {
             cnj,
             listaArquivo
           );
-          await new downloadFiles().saveLog(
-            "crawler.JTE",
-            // envioAWS.status,
-            200,
-            envioAWS.resposta,
+          if (envioAWS) {
+            await new downloadFiles().saveLog(
+              "crawler.JTE",
+              // envioAWS.status,
+              200,
+              envioAWS.resposta,
 
-          )
-          // console.log(envioAWS);
+            )
+            console.log(envioAWS);
+          }
         }
+
 
         logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {

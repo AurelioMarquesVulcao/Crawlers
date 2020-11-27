@@ -97,8 +97,10 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     } catch (e) {
       this.logger.log('error', `${e}`);
       this.logger.info('Enviando processo a fila de reprocessamento');
-      const gf = new GerenciadorFila();
-      gf.enviar('processo.TJRS.reprocessamento', this.mensagem);
+      if (this.message) {
+        const gf = new GerenciadorFila();
+        gf.enviar('processo.TJRS.reprocessamento', this.mensagem);
+      }
       this.resposta.sucesso = false;
       this.resposta.logs = this.logger.logs;
       this.detalhes = e.message;

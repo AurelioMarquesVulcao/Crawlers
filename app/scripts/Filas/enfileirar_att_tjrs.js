@@ -1,7 +1,7 @@
 const moment = require('moment');
-const { paginar } = require('../lib/paginar')
-const { Processo } = require("../models/schemas/processo");
-const { LogExecucao } = require('../lib/logExecucao');
+const { paginar } = require('../../lib/paginar')
+const { Processo } = require("../../models/schemas/processo");
+const { LogExecucao } = require('../../lib/logExecucao');
 
 let tribunalOption = 'TJRS'
 

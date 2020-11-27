@@ -239,6 +239,14 @@ class Helper {
 }
 
 class CnjValidator {
+  /**
+   * No CNJ NNNNNNN-xx.AAAA.J.TR.OOOO
+   * @param NNNNNNN numero sequencial
+   * @param AAAA ano
+   * @param JTR orgao e tribunal
+   * @param OOOO origem (codigo comarca)
+   * @returns {string|*}
+   */
   static calcula_mod97(NNNNNNN, AAAA, JTR, OOOO) {
     let valor1 = '';
     let resto1 = 0;

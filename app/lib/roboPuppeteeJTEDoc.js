@@ -8,6 +8,14 @@ const { JTEParser } = require('../parsers/JTEParser');
 const { Logger } = require('./util');
 const { enums } = require('../configs/enums');
 
+const login = '11270311719';
+const senha = 'Impact@2020';
+// const login = '10389051764';
+// const senha = 'Senh@JTE123';
+// let email = "karine_mrm@hotmail.com";
+
+
+
 const ajustes = new JTEParser();
 var valorLinkTeste = "";
 
@@ -30,15 +38,15 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      // args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
+      args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
     });
     this.page = await this.browser.newPage();
     await this.page.authenticate({
@@ -210,11 +218,7 @@ class RoboPuppeteer3 {
   }
 
   async loga() {
-    let login = '11270311719';
-    let senha = 'Impact@2020';
-    // let login = '10389051764';
-    // let senha = 'Senh@JTE123';
-    // let email = "karine_mrm@hotmail.com";
+
     console.log('Login iniciado');
     await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(5)');
     console.log('clicado no item de login');
@@ -384,6 +388,9 @@ class RoboPuppeteer3 {
       this.logger.info(`Iniciando captura de documentos Simples`);
       for (let i = 0; i < (await iniciaisArray).length; i++) {
         await sleep(timerSleep);
+        await this.page.click(
+          `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`
+        );
         await this.page.click(
           `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`
         );
@@ -560,7 +567,7 @@ class RoboPuppeteer3 {
       const popup = pages[pages.length - 1];
       console.log('Fechando popup');
       await popup.close();
-    } 
+    }
     // console.log(valorLinkTeste);
     if (valorLinkTeste != link.link) {
       valorLinkTeste = link.link

@@ -230,6 +230,8 @@ class PeticaoTJRS1 extends ExtratorBase {
 
     objResponse = await this.robo.acessar(options);
 
+    if(/Processo\snão\sencontrado/.test(objResponse.responseBody))
+      throw new Error('Processo não encontrado');
     return this.resgataNovoHash(objResponse.responseBody);
   }
 

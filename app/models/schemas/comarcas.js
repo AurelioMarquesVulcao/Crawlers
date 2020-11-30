@@ -38,7 +38,7 @@ ComarcaSchema.methods.salvar = async function salvar() {
 }
 
 ComarcaSchema.statics.retornaComarcas = async function retornaComarcas(estado) {
-  return await Comarca.find({Estado: estado});
+  return await Comarca.find({Estado: estado, Status: {$nin: ['Inválida']}});
 }
 
 /**

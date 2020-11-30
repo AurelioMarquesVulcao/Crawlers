@@ -59,6 +59,8 @@ const logarExecucao = async (execucao) => {
         '../../downloads',
         `${message.NumeroProcesso.replace(/\D/g, '')}.pdf`
       );
+      if (!resultadoExtracao.sucesso)
+        throw new Error(resultadoExtracao.detalhes);
       let data = fs.readFileSync(arquivoPath).toString('base64');
       logger.info('Arquivo preparado');
 

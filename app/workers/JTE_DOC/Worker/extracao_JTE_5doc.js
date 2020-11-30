@@ -237,7 +237,7 @@ async function worker(nomeFila) {
 
         // aqui verifico se o processo existe.
         // caso exista eu obtenho o html da capa e dos andamentos como resposta.
-        let objResponse = await puppet.preencheProcesso(
+        let objResponse = await puppet.extrair(
           numeroProcesso,
           contador
         );
@@ -379,6 +379,7 @@ async function worker(nomeFila) {
           let numeroAtualProcesso =
             dadosProcesso.processo.detalhes.numeroProcesso;
           let cnj = numeroAtualProcesso;
+          console.log(listaArquivo);
           const envioAWS = await new downloadFiles().enviarAWS(
             cnj,
             listaArquivo

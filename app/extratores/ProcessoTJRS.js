@@ -112,8 +112,29 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   async fazerPrimeiroAcesso() {
     const url =
       'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index';
-    await this.robo.acessar({ url: this.url });
-    return this.robo.acessar({ url });
+    let objResponse = await this.robo.acessar({ url: this.url });
+
+
+
+    if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
+      console.log('===============Pagina com erro com o banco===============');
+      process.exit(0)
+    }
+
+    objResponse = await this.robo.acessar({ url });
+
+    if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
+      console.log('===============Pagina com erro com o banco===============');
+      process.exit(0)
+    }
+
+    if(objResponse.status === 500) {
+      console.log('===============Pagina com status 500===============');
+      console.log(objResponse.responseBody);
+      process.exit(0);
+    }
+
+    return objResponse
   }
 
   async pegaCaptcha() {

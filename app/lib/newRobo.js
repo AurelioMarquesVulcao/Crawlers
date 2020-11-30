@@ -6,7 +6,7 @@ const moment = require('moment');
 class Requisicao {
   constructor() {}
 
-  async enviarRequest(options) {
+  async enviarRequest(options, debug) {
     if (!options) {
       throw new Error('Options vazio');
     }
@@ -41,7 +41,8 @@ class Requisicao {
         return { objResponse: objResponse, cookies: cookies };
       })
       .catch((err) => {
-        console.log(err);
+        if(debug)
+          console.log(err);
         let objResponse = {};
         objResponse.code = err.code;
         objResponse.status = err.response.status;
@@ -116,7 +117,8 @@ class Robo {
    * @param {Object} options.headers variavel que contem os headers.
    * @param {boolean} options.randomUserAgent opção para habilitar o userAgent aleatorio.
    * @param {number} options.timeout tempo de espera.
-   * @param {string} option.responseType tipo de resposta esperada.
+   * @param {string} options.responseType tipo de resposta esperada.
+   * @param {boolean} debug modo de debug com consoles.log
    * @returns {Promise<{Object}>}
    */
   async acessar({
@@ -130,8 +132,9 @@ class Robo {
     headers = {},
     randomUserAgent = false,
     timeout = 60000,
-    responseType=''
-  } = {}) {
+    responseType='',
+  } = {},     debug = false
+  ) {
     if (!url || url === '') throw new Error('URL Vazia');
 
     if (randomUserAgent)
@@ -171,10 +174,10 @@ class Robo {
     options.headers = this.headers;
     options.headers.Cookie = this.convertStrCookie();
 
-    let resposta = await this.requisicao.enviarRequest(options);
+    let resposta = await this.requisicao.enviarRequest(options, debug);
     this.cookies = { ...this.cookies, ...resposta.cookies };
-
-    // console.log('cookies', this.cookies);
+    if (debug)
+      console.log('cookies', this.cookies);
     return resposta.objResponse;
   }
 

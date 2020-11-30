@@ -78,14 +78,15 @@ const moment = require('moment');
 async function extrairNumeros(message, ultimo) {
   console.log({ ultimo });
   let ultimoNumero = ultimo ? ultimo : message.UltimoProcesso;
-  ultimoNumero = ultimoNumero.split(/\D/g);
-
+  let anterior = ultimoNumero;
   let count = 1;
   let sequencial;
   let numero;
   let erroEncontrado = false;
   let extracao;
-  let anterior = ultimo;
+
+  ultimoNumero = ultimoNumero.split(/\D/g);
+
   do {
     let extrator = new ProcessoTJRS(
       'https://www.tjrs.jus.br/site_php/consulta/index.php',

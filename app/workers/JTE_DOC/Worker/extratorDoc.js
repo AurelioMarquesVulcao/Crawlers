@@ -27,7 +27,7 @@ var listaArquivo = [];
 
 
 // Filas a serem usadas
-const nomeFila = `Fila.axios.JTE`;
+const nomeFila = `Fila.axios.JTE2`;
 const reConsumo = `Fila.axios.JTE`;
 const filaAxios = "Fila.axios.JTE"
 
@@ -89,7 +89,7 @@ async function worker(nomeFila) {
 
 
   // tudo que está abaixo é acionado para cada consumer na fila.
-  await new GerenciadorFila(false, 5).consumir(nomeFila, async (ch, msg) => {
+  await new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
     try {
 
       let message = JSON.parse(msg.content.toString());
@@ -159,6 +159,7 @@ async function worker(nomeFila) {
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
       desligaAgendado();
+      await sleep(5000);
     } catch (e) {
       catchError++;
       console.log(e);

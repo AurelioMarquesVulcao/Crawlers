@@ -34,6 +34,7 @@ const util = new Cnj();
 // Filas a serem usadas
 // const nomeFila = `peticao.JTE.extracao`;
 const reConsumo = `peticao.JTE.extracao`;
+const filaAxios = "Fila.axios.JTE"
 
 var estadoAnterior; // Recebe o estado atual que está sendo baixado
 var estadoDaFila; // Recebe o estado da fila
@@ -265,15 +266,28 @@ async function worker(nomeFila) {
             }]
           });
         } else {
-          await Processo.findOneAndUpdate(
-            {
-              "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
-            }, {
-            "capa.audiencias": [{
-              data: audiencia.data,
-              tipo: audiencia.tipo
-            }]
-          });
+          if (audiencia.data == 0) {
+            await Processo.findOneAndUpdate(
+              {
+                "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+              }, {
+              "capa.audiencias": [{
+                data: "",
+                tipo: ""
+              }]
+            });
+
+          } else {
+            await Processo.findOneAndUpdate(
+              {
+                "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+              }, {
+              "capa.audiencias": [{
+                data: audiencia.data,
+                tipo: audiencia.tipo
+              }]
+            });
+          }
         }
 
         // process.exit()
@@ -323,78 +337,98 @@ async function worker(nomeFila) {
           // }
         }
 
+
+
+
         if (message.inicial == true) {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
-          if (!link) {
-            // ch.ack(msg);
-            // new GerenciadorFila().enviar(nomeFila, message);
-            // ch.ack(msg);
-            await sleep(1000);
-
-            // salva no banco os dados do erro.
-            await logInciniais(numeroProcesso, message, false);
-
-
-            console.log("Salvei no Banco");
-            await sleep(1000);
-            ch.ack(msg);
-            // await new GerenciadorFila().enviar(nomeFila, message);
-            await sleep(2000);
-            process.exit();
-          }
-          else {
-            await logInciniais(numeroProcesso, message, true);
-          }
-          let listaArquivo = [];
-          // correção de não realizar download da inicial
-          // for (let w = 0; w < link.length - 1; w++) {
           for (let w = 0; w < link.length; w++) {
-            await new CriaFilaJTE().salvaDocumentoLink(link[w]);
-            let cnj =
-              link[w].numeroProcesso.replace(/[-.]/g, '') + '-' + w + '.pdf';
-            let linkDocumento = link[w].link;
-
-            let local = '/home/aurelio/crawlers-bigdata/downloads';
-            // let local = '/app/downloads';
-
-            let tipo = link[w].tipo;
-            // if (tipo == 'pdf'|tipo == 'PDF') {
-            if (tipo != 'HTML') {
-              await new downloadFiles().download(cnj, linkDocumento, local);
-              listaArquivo.push({
-                url: linkDocumento,
-                path: `${local}/${cnj}`,
-              });
-            } else if (tipo == 'HTML') {
-              // await new downloadFiles().covertePDF(nome, local, linkDocumento)
-              // listaArquivo.push({
-              //   url: linkDocumento,
-              //   path: `${local}/${nome}`
-              // })
-            }
-          }
-          logger.info('Iniciando envio para AWS');
-          // enviar para AWS
-          let numeroAtualProcesso =
-            dadosProcesso.processo.detalhes.numeroProcesso;
-          let cnj = numeroAtualProcesso;
-          console.log(listaArquivo);
-          const envioAWS = await new downloadFiles().enviarAWS(
-            cnj,
-            listaArquivo
-          );
-          if (envioAWS) {
-            await new downloadFiles().saveLog(
-              "crawler.JTE",
-              // envioAWS.status,
-              200,
-              envioAWS.resposta,
-
-            )
-            console.log(envioAWS);
+            // Criando fila para Download de documentos
+            await new GerenciadorFila().enviar(filaAxios, link[w])
           }
         }
+
+
+
+
+        // if (message.inicial == true) {
+        //   console.log('---------- Vou baixar link das iniciais-------');
+        //   let link = await puppet.pegaInicial();
+        //   if (!link) {
+        //     // ch.ack(msg);
+        //     new GerenciadorFila().enviar(nomeFila, message);
+        //     // ch.ack(msg);
+        //     await sleep(1000);
+
+        //     // salva no banco os dados do erro.
+        //     await logInciniais(numeroProcesso, message, false);
+
+
+        //     console.log("Salvei no Banco");
+        //     await sleep(1000);
+        //     ch.ack(msg);
+        //     // await new GerenciadorFila().enviar(nomeFila, message);
+        //     await sleep(2000);
+        //     process.exit();
+        //   }
+        //   else {
+        //     await logInciniais(numeroProcesso, message, true);
+
+        //     // new GerenciadorFila().enviar(filaAxios, message);
+        //   }
+        //   let listaArquivo = [];
+        //   // correção de não realizar download da inicial
+        //   // for (let w = 0; w < link.length - 1; w++) {
+        //   for (let w = 0; w < link.length; w++) {
+        //     // Criando fila para Download de documentos
+        //     await new GerenciadorFila().enviar(filaAxios, link[w])
+        //     // Salvando log de Donwnload
+        //     await new CriaFilaJTE().salvaDocumentoLink(link[w]);
+        //     let cnj =
+        //       link[w].numeroProcesso.replace(/[-.]/g, '') + '-' + w + '.pdf';
+        //     let linkDocumento = link[w].link;
+
+        //     let local = '/home/aurelio/crawlers-bigdata/downloads';
+        //     // let local = '/app/downloads';
+
+        //     let tipo = link[w].tipo;
+        //     // if (tipo == 'pdf'|tipo == 'PDF') {
+        //     if (tipo != 'HTML') {
+        //       await new downloadFiles().download(cnj, linkDocumento, local);
+        //       listaArquivo.push({
+        //         url: linkDocumento,
+        //         path: `${local}/${cnj}`,
+        //       });
+        //     } else if (tipo == 'HTML') {
+        //       // await new downloadFiles().covertePDF(nome, local, linkDocumento)
+        //       // listaArquivo.push({
+        //       //   url: linkDocumento,
+        //       //   path: `${local}/${nome}`
+        //       // })
+        //     }
+        //   }
+        //   logger.info('Iniciando envio para AWS');
+        //   // enviar para AWS
+        //   let numeroAtualProcesso =
+        //     dadosProcesso.processo.detalhes.numeroProcesso;
+        //   let cnj = numeroAtualProcesso;
+        //   // console.log(listaArquivo);
+        //   const envioAWS = await new downloadFiles().enviarAWS(
+        //     cnj,
+        //     listaArquivo
+        //   );
+        //   if (envioAWS) {
+        //     await new downloadFiles().saveLog(
+        //       "crawler.JTE",
+        //       // envioAWS.status,
+        //       200,
+        //       envioAWS.resposta,
+
+        //     )
+        //     console.log(envioAWS);
+        //   }
+        // }
 
 
         logger.info('Processo extraidos com sucesso');

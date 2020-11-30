@@ -12,6 +12,7 @@ const { enums } = require('../configs/enums');
 const red = '\u001b[31m';
 const blue = '\u001b[34m';
 const reset = '\u001b[0m';
+var error = 0;
 
 class downloadFiles {
   /**
@@ -117,8 +118,12 @@ class downloadFiles {
           throw err;
         });
     } catch (error) {
+      error++
+      if (error < 4) {
+        await this.enviarAWS(cnj, lista)
+      }
       console.log(error);
-      await this.enviarAWS(cnj, lista)
+
     }
     return resultado;
   }

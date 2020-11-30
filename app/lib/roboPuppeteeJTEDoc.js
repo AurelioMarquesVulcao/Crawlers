@@ -50,7 +50,7 @@ class RoboPuppeteer3 {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
       // headless: false,
-      headless: false,
+      headless: true,
       slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
@@ -265,7 +265,6 @@ class RoboPuppeteer3 {
  */
   async pegaInicial() {
     try {
-      
       let iniciaisArray = await (await this.numerosIniciaisLaco()).numero2;
       let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
       console.log('Arquivos simples ' + iniciaisArray);
@@ -275,114 +274,114 @@ class RoboPuppeteer3 {
       this.logger.info(`Iniciando captura de documentos Multiplos`);
       // entra na terceira forma de apresentação de documentos.
       // documentos multiplus.
-      // for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
-      //   // this.logger.info(`Cliquei no documento numero ${iniciaisArray[j]}`);
-      //   await sleep(1500);
-      //   let dataEProcesso = await this.page.evaluate(
-      //     async (j, iniciaisMultiplas) => {
-      //       return {
-      //         data: document.querySelector(
-      //           `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-label > ion-text > h4`
-      //         ).innerText,
-      //         numeroProcesso: document.querySelector(
-      //           '#numeroProcessoFormatado > div'
-      //         ).innerText,
-      //       };
-      //     },
-      //     j,
-      //     iniciaisMultiplas
-      //   );
-      //   await sleep(500);
-      //   // entra no documento multiplo
+      for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
+        // this.logger.info(`Cliquei no documento numero ${iniciaisArray[j]}`);
+        await sleep(1500);
+        let dataEProcesso = await this.page.evaluate(
+          async (j, iniciaisMultiplas) => {
+            return {
+              data: document.querySelector(
+                `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-label > ion-text > h4`
+              ).innerText,
+              numeroProcesso: document.querySelector(
+                '#numeroProcessoFormatado > div'
+              ).innerText,
+            };
+          },
+          j,
+          iniciaisMultiplas
+        );
+        await sleep(500);
+        // entra no documento multiplo
 
-      //   let buttonRun = null;
-      //   while (buttonRun != 'Lista de documentos') {
-      //     console.log(buttonRun);
-      //     console.log('tentando click');
-      //     await sleep(2000);
+        let buttonRun = null;
+        while (buttonRun != 'Lista de documentos') {
+          console.log(buttonRun);
+          console.log('tentando click');
+          await sleep(2000);
 
-      //     await this.page.evaluate((j, iniciaisMultiplas) => {
-      //       document.querySelector(
-      //         `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`).click();
-      //       console.log("estou tentando abrir o elemento");
-      //     }, j, iniciaisMultiplas);
+          await this.page.evaluate((j, iniciaisMultiplas) => {
+            document.querySelector(
+              `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`).click();
+            console.log("estou tentando abrir o elemento");
+          }, j, iniciaisMultiplas);
 
-      //     // await this.page.click(
-      //     //   `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
-      //     // );
-      //     // await sleep(2000);
-      //     // await this.page.click(
-      //     //   `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
-      //     // );
+          // await this.page.click(
+          //   `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
+          // );
+          // await sleep(2000);
+          // await this.page.click(
+          //   `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
+          // );
 
-      //     this.logger.info(
-      //       `Cliquei no documento numero ${iniciaisMultiplas[j]}`
-      //     );
+          this.logger.info(
+            `Cliquei no documento numero ${iniciaisMultiplas[j]}`
+          );
 
-      //     console.log('tentei');
+          console.log('tentei');
 
-      //     buttonRun = await this.page.evaluate(async () => {
-      //       await new Promise(function (resolve) {
-      //         setTimeout(resolve, 2000);
-      //       });
-      //       if (
-      //         document.querySelector(
-      //           '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title'
-      //         )
-      //       ) {
-      //         return document.querySelector(
-      //           '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title'
-      //         ).innerText;
-      //       } else {
-      //         return null;
-      //       }
-      //     });
+          buttonRun = await this.page.evaluate(async () => {
+            await new Promise(function (resolve) {
+              setTimeout(resolve, 2000);
+            });
+            if (
+              document.querySelector(
+                '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title'
+              )
+            ) {
+              return document.querySelector(
+                '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-title'
+              ).innerText;
+            } else {
+              return null;
+            }
+          });
 
-      //     console.log(buttonRun);
-      //     console.log('tentei novamente');
-      //     await sleep(1000);
-      //   }
+          console.log(buttonRun);
+          console.log('tentei novamente');
+          await sleep(1000);
+        }
 
-      //   console.log('Sai do while ');
+        console.log('Sai do while ');
 
-      //   // await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
+        // await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
 
-      //   await sleep(500);
+        await sleep(500);
 
-      //   // conta quantos documentos devo raspar
-      //   let quantidadeDocumentos = await this.page.evaluate(async () => {
-      //     return document.querySelectorAll(
-      //       '#popover-marcador-filtro > ion-item'
-      //     ).length;
-      //   });
+        // conta quantos documentos devo raspar
+        let quantidadeDocumentos = await this.page.evaluate(async () => {
+          return document.querySelectorAll(
+            '#popover-marcador-filtro > ion-item'
+          ).length;
+        });
 
-      //   console.log(quantidadeDocumentos);
-      //   numeroDocumentosTotal + quantidadeDocumentos;
-      //   // let testeK = document.querySelector('#linkPDF').href;
+        console.log(quantidadeDocumentos);
+        numeroDocumentosTotal + quantidadeDocumentos;
+        // let testeK = document.querySelector('#linkPDF').href;
 
-      //   // for (let k = 1; k < quantidadeDocumentos + 1; k++) {
-      //   for (let k = 1; k < quantidadeDocumentos + 1; k++) {
-      //     // this.logger.info(
-      //     //   `Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`
-      //     // );
-      //     console.log(`Cliquei no documento numero ${iniciaisArray[j]}-${k}`);
-      //     await sleep(1500);
-      //     // abro o popup e abro o link do documento
+        // for (let k = 1; k < quantidadeDocumentos + 1; k++) {
+        for (let k = 1; k < quantidadeDocumentos + 1; k++) {
+          // this.logger.info(
+          //   `Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`
+          // );
+          console.log(`Cliquei no documento numero ${iniciaisArray[j]}-${k}`);
+          await sleep(1500);
+          // abro o popup e abro o link do documento
 
-      //     let link = await this.baixaLink(k, dataEProcesso);
-      //     await sleep(timerSleep);
-      //     links.push(link);
-      //   }
-      //   // volta a pagina principal de busca de processos
-      //   await sleep(timerSleep);
-      //   await sleep(timerSleep);
-      //   await sleep(timerSleep);
-      //   await sleep(3000);
-      //   await this.page.click(
-      //     '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button'
-      //   );
-      //   await sleep(timerSleep);
-      // }
+          let link = await this.baixaLink(k, dataEProcesso);
+          await sleep(timerSleep);
+          links.push(link);
+        }
+        // volta a pagina principal de busca de processos
+        await sleep(timerSleep);
+        await sleep(timerSleep);
+        await sleep(timerSleep);
+        await sleep(3000);
+        await this.page.click(
+          '#menu-content > ng-component:nth-child(3) > app-toolbar > ion-header > ion-toolbar > ion-buttons:nth-child(1) > ion-back-button'
+        );
+        await sleep(timerSleep);
+      }
 
       this.logger.info(`Finalizado captura de documentos Multiplos`);
 
@@ -395,7 +394,7 @@ class RoboPuppeteer3 {
       this.logger.info(`Iniciando captura de documentos Simples`);
 
       for (let i = 0; i < (await iniciaisArray).length; i++) {
-        await this.baixaLinkSimples(i,iniciaisArray)
+        await this.baixaLinkSimples(i, iniciaisArray)
       }
       this.logger.info(`Finalizado captura de documentos Simples`);
 
@@ -419,6 +418,7 @@ class RoboPuppeteer3 {
   async baixaLink(k, dataEProcesso) {
     // while (1==2) {
     console.log("Entrei no while do click do documento da inicial");
+    console.log("erro");
     await this.page.click(
       `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
     );
@@ -427,7 +427,7 @@ class RoboPuppeteer3 {
     let link = await this.page.evaluate(
       async (k, dataEProcesso) => {
         await new Promise(function (resolve) {
-          setTimeout(resolve, 400);
+          setTimeout(resolve, 600);
         });
 
         let link = document.querySelector('#linkPDF').href;
@@ -439,6 +439,7 @@ class RoboPuppeteer3 {
         let data = dataEProcesso.data;
         let numeroProcesso = dataEProcesso.numeroProcesso;
         let tipo = 'PDF';
+        let numero = numeroProcesso.replace(/\-|\./gmi,"");
         // console.log({ numeroProcesso, data, movimentacao, link, tipo })
         return { numeroProcesso, data, movimentacao, link, tipo };
         // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
@@ -488,22 +489,22 @@ class RoboPuppeteer3 {
     // teste validade link;
     try {
       if (link.link) {
-        console.log("O numero de links capturados é...",controlaLink.length);
+        console.log("O numero de links capturados é...", controlaLink.length);
         console.log(" O Link é válido e foi capturado");
         if (controlaLink.length == 0) {
           console.log("primeiro link capturado com sucesso");
           controlaLink.push(link.link);
           return link
         } else if (controlaLink.length > 0) {
-            console.log("Estou verificando demais links");
+          console.log("Estou verificando demais links");
           if (controlaLink.indexOf(link.link) < 0) {
             console.log(" ------------------- O link é único, verificação concluida ------------------- ");
             controlaLink.push(link.link);
             return link
-          } else{
+          } else {
             console.log("já peguei esse documento, vou repetir o processo.");
             throw "O Link do Documento é repetido"
-            
+
           }
         }
 
@@ -515,79 +516,111 @@ class RoboPuppeteer3 {
     // return link
   }
 
-  async baixaLinkSimples(i,iniciaisArray){
+  async baixaLinkSimples(i, iniciaisArray) {
     await sleep(timerSleep);
-        await this.page.click(
-          `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`
-        );
-        await this.page.click(
-          `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`
-        );
-        this.logger.info(`Cliquei no documento numero ${iniciaisArray[i]}`);
-        await sleep(timerSleep);
-        // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
-        let link = await this.page.evaluate(
-          async (i, iniciaisArray) => {
-            // sleep para poder dar tempo de fazer o if
-            await new Promise(function (resolve) {
-              setTimeout(resolve, 1200);
-            });
-            // ser for um documento com link pegue o link
-            if (
-              !!document.querySelector(
-                '#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe'
-              )
-            ) {
-              let link = document.querySelector(
-                '#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe'
-              ).src;
-              let movimentacao = document.querySelector(
-                `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`
-              ).innerText;
-              let data = document.querySelector(
-                `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`
-              ).innerText;
-              let numeroProcesso = document.querySelector(
-                '#numeroProcessoFormatado > div'
-              ).innerText;
-              // if (!! document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > pdf-viewer")){ "pdf"};
-              let tipo = 'pdf';
-              // console.log({ numeroProcesso, data, movimentacao, link, tipo })
-              return { numeroProcesso, data, movimentacao, link, tipo };
-            } // se for um documento de texto
-            else {
-              // esse await new promise, vai criar um sleep manual no pupputeer, assim não gero problemas para capturar o documento.
-              await new Promise(function (resolve) {
-                setTimeout(resolve, 1200);
-              });
-              // let link = document.querySelector("#documentoEmbutido").innerHTML;
-              let link = document.querySelector(
-                '#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div'
-              ).innerHTML;
-              let movimentacao = document.querySelector(
-                `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`
-              ).innerText;
-              let data = document.querySelector(
-                `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`
-              ).innerText;
-              let numeroProcesso = document.querySelector(
-                '#numeroProcessoFormatado > div'
-              ).innerText;
-              let tipo = 'HTML';
-              // console.log({ numeroProcesso, data, movimentacao, link, tipo })
-              return { numeroProcesso, data, movimentacao, link, tipo };
-            }
+    await this.page.click(
+      `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`
+    );
+    await this.page.click(
+      `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-icon`
+    );
+    this.logger.info(`Cliquei no documento numero ${iniciaisArray[i]}`);
+    await sleep(timerSleep);
+    // Apos clicar no icone, entro no console do navegador e opero os seguintes codigos
+    let link = await this.page.evaluate(
+      async (i, iniciaisArray) => {
+        // sleep para poder dar tempo de fazer o if
+        await new Promise(function (resolve) {
+          setTimeout(resolve, 500);
+        });
+        // ser for um documento com link pegue o link
+        if (
+          !!document.querySelector(
+            '#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe'
+          )
+        ) {
+          let link = document.querySelector(
+            '#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > iframe'
+          ).src;
+          let movimentacao = document.querySelector(
+            `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`
+          ).innerText;
+          let data = document.querySelector(
+            `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`
+          ).innerText;
+          let numeroProcesso = document.querySelector(
+            '#numeroProcessoFormatado > div'
+          ).innerText;
+          // if (!! document.querySelector("#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div > pdf-viewer")){ "pdf"};
+          let tipo = 'pdf';
+          // console.log({ numeroProcesso, data, movimentacao, link, tipo })
 
-            // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
-          },
-          i,
-          iniciaisArray
-        );
-        this.logger.info(`Peguei o documento numero ${iniciaisArray[i]}`);
-        //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
-        console.log(link);
-        links.push(link);
-        await sleep(1000);
+          // let numero = numeroProcesso.replace(/\-|\./gmi,"");
+
+          return { numeroProcesso, data, movimentacao, link, tipo };
+        } // se for um documento de texto
+        else {
+          // esse await new promise, vai criar um sleep manual no pupputeer, assim não gero problemas para capturar o documento.
+          await new Promise(function (resolve) {
+            setTimeout(resolve, 1200);
+          });
+          // let link = document.querySelector("#documentoEmbutido").innerHTML;
+          let link = document.querySelector(
+            '#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-documento.ng-star-inserted.md.hydrated > div'
+          ).innerHTML;
+          let movimentacao = document.querySelector(
+            `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > div > p`
+          ).innerText;
+          let data = document.querySelector(
+            `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisArray[i]}) > ion-label > ion-text > h4`
+          ).innerText;
+          let numeroProcesso = document.querySelector(
+            '#numeroProcessoFormatado > div'
+          ).innerText;
+          let tipo = 'HTML';
+          // console.log({ numeroProcesso, data, movimentacao, link, tipo })
+          // let numero = numeroProcesso.replace(/\-|\./gmi,"");
+          return { numeroProcesso, data, movimentacao, link, tipo };
+        }
+
+        // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
+      },
+      i,
+      iniciaisArray
+    );
+
+    // teste validade link;
+    try {
+      if (link.link) {
+        console.log("O numero de links capturados é...", controlaLink.length);
+        console.log(" O Link é válido e foi capturado");
+        if (controlaLink.length == 0) {
+          console.log("primeiro link capturado com sucesso");
+          controlaLink.push(link.link);
+          return link
+        } else if (controlaLink.length > 0) {
+          console.log("Estou verificando demais links");
+          if (controlaLink.indexOf(link.link) < 0) {
+            console.log(" ------------------- O link é único, verificação concluida ------------------- ");
+            controlaLink.push(link.link);
+            links.push(link);
+          } else {
+            console.log("já peguei esse documento, vou repetir o processo.");
+            throw "O Link do Documento é repetido"
+
+          }
+        }
+
+      }
+    } catch (e) {
+      await this.baixaLinkSimples(i, iniciaisArray);
+    }
+
+    this.logger.info(`Peguei o documento numero ${iniciaisArray[i]}`);
+    //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
+    // console.log(link);
+    
+    await sleep(1000);
   }
 
 

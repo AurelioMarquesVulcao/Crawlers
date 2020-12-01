@@ -278,15 +278,28 @@ async function worker(nomeFila) {
             });
 
           } else {
-            await Processo.findOneAndUpdate(
-              {
-                "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
-              }, {
-              "capa.audiencias": [{
-                data: audiencia.data,
-                tipo: audiencia.tipo
-              }]
-            });
+            if (audiencia.data >= new Date()) {
+              await Processo.findOneAndUpdate(
+                {
+                  "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+                }, {
+                "capa.audiencias": [{
+                  data: audiencia.data,
+                  tipo: audiencia.tipo
+                }]
+              });
+            } else {
+              await Processo.findOneAndUpdate(
+                {
+                  "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+                }, {
+                "capa.audiencias": [{
+                  data: "",
+                  tipo: ""
+                }]
+              });
+            }
+
           }
         }
 
@@ -345,11 +358,14 @@ async function worker(nomeFila) {
           let link = await puppet.pegaInicial();
           // console.log("Vou imprimir os links", link);
           for (let w = 0; w < link.length; w++) {
-            if (link[w].tipo != 'HTML') {
-              // Criando fila para Download de documentos
-              await new GerenciadorFila().enviar(filaAxios, JSON.stringify(link[w]));
-              console.log("valor do laço é", w, JSON.stringify(link[w]));
+            if (link[w]) {
+              if (link[w].tipo != 'HTML') {
+                // Criando fila para Download de documentos
+                await new GerenciadorFila().enviar(filaAxios, JSON.stringify(link[w]));
+                console.log("valor do laço é", w, JSON.stringify(link[w]));
+              }
             }
+
 
             await sleep(300);
           }

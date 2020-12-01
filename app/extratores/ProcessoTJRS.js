@@ -114,25 +114,33 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index';
     let objResponse = await this.robo.acessar({ url: this.url, proxy: true });
 
-    if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
+    if (
+      /Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(
+        objResponse.responseBody
+      )
+    ) {
       console.log('===============Pagina com erro com o banco===============');
-      process.exit(0)
+      process.exit(0);
     }
 
     objResponse = await this.robo.acessar({ url, proxy: true });
 
-    if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
+    if (
+      /Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(
+        objResponse.responseBody
+      )
+    ) {
       console.log('===============Pagina com erro com o banco===============');
-      process.exit(0)
+      process.exit(0);
     }
 
-    if(objResponse.status === 500) {
+    if (objResponse.status === 500) {
       console.log('===============Pagina com status 500===============');
       console.log(objResponse.responseBody);
       process.exit(0);
     }
 
-    return objResponse
+    return objResponse;
   }
 
   async pegaCaptcha() {
@@ -142,14 +150,20 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     expire.setTime(time + 365 * 3600000 * 24);
     let url = `https://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php?${time}`;
 
-    objResponse = await this.robo.acessar({ url, responseType: 'arraybuffer', proxy: true });
+    objResponse = await this.robo.acessar({
+      url,
+      responseType: 'arraybuffer',
+      proxy: true,
+    });
     return Buffer.from(objResponse.responseBody).toString('base64');
   }
 
   async resolveCaptcha(captchaString) {
     let resposta;
     let tentativa = 0;
-    let ch = new CaptchaHandler(6, 10000, 'OabTJRS', {numeroDaOab: this.numeroOab})
+    let ch = new CaptchaHandler(6, 10000, 'OabTJRS', {
+      numeroDaOab: this.numeroOab,
+    });
     do {
       this.logger.info(`Tentativa ${tentativa + 1} de resolucao do captcha`);
       tentativa++;
@@ -263,7 +277,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
           id_comarca: this.captarComarca().id,
           pesquisar: 'Pesquisar',
         },
-        proxy: true
+        proxy: true,
       };
       this.logger.info('Selecionando primeira instancia');
       objResponse = await this.robo.acessar(options);

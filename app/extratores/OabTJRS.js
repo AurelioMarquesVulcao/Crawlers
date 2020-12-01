@@ -1,12 +1,12 @@
 let cheerio = require('cheerio');
 // const { antiCaptchaImage } = require('../lib/captchaHandler');
-const { CaptchaHandler } = require('../lib/captchaHandler')
+const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Robo } = require('../lib/newRobo');
 const { LogExecucao } = require('../lib/logExecucao');
 const { Logger } = require('../lib/util');
 
 const { Processo } = require('../models/schemas/processo');
-const Comarca = require('../models/schemas/comarcas')
+const Comarca = require('../models/schemas/comarcas');
 const { ExtratorBase } = require('./extratores');
 
 module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
@@ -40,39 +40,59 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       let nProcessos = [];
       let captchaResposta;
 
-      this.logger.info("Fazendo primeiro acesso");
+      this.logger.info('Fazendo primeiro acesso');
       await this.fazerPrimeiroAcesso();
 
-      let comarcas = await Comarca.find({ Estado: 'RS' }).sort({Comarca: 1});
+      let comarcas = await Comarca.find({ Estado: 'RS' }).sort({ Comarca: 1 });
 
       const tam = comarcas.length;
       this.logger.info('Verificando comarcas');
-      console.time('Processo')
-      for (let i=0; i<tam; i++) {
+      console.time('Processo');
+      for (let i = 0; i < tam; i++) {
         let qtdProcessos = nProcessos.length;
-        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Verificando comarca ${comarcas[i].Nome}`);
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Verificando comarca ${
+            comarcas[i].Nome
+          }`
+        );
 
-        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Pegando imagem de captcha`);
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Pegando imagem de captcha`
+        );
         captchaString = await this.pegaCaptcha();
 
-        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Resolvendo captcha`);
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Resolvendo captcha`
+        );
         captchaResposta = await this.resolveCaptcha(captchaString);
-        if(!captchaResposta) {
+        if (!captchaResposta) {
           this.logger.info('Aconteceu algum problema ao processar o captcha');
           break;
         }
 
-        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Validando captcha`);
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Validando captcha`
+        );
         console.time('tempoCaptcha');
         objResponse = await this.validaCaptcha(captchaResposta, comarcas[i]);
         console.timeEnd('tempoCaptcha');
 
-        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Iniciando tratamento de processos`);
-        let extracaoComarca = await this.tratarProcessos(objResponse.responseBody);
+        this.logger.info(
+          `${
+            i + 1
+          }/${tam} - [${qtdProcessos}] - Iniciando tratamento de processos`
+        );
+        let extracaoComarca = await this.tratarProcessos(
+          objResponse.responseBody
+        );
         if (extracaoComarca.length)
           nProcessos = [...nProcessos, ...extracaoComarca];
 
-        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Comarca ${comarcas[i].Nome} possui ${extracaoComarca.length} processos.`)
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Comarca ${
+            comarcas[i].Nome
+          } possui ${extracaoComarca.length} processos.`
+        );
       }
 
       if (nProcessos) {
@@ -99,7 +119,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       this.logger.info(e);
       this.resposta = { sucesso: false, detalhes: e.message };
     } finally {
-      console.timeEnd('Processo')
+      console.timeEnd('Processo');
 
       return {
         resultado: this.resultado,
@@ -113,28 +133,36 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   async fazerPrimeiroAcesso() {
     let objResponse = await this.robo.acessar({ url: this.url, proxy: true });
 
-    if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
+    if (
+      /Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(
+        objResponse.responseBody
+      )
+    ) {
       console.log('===============Pagina com erro com o banco===============');
-      process.exit(0)
+      process.exit(0);
     }
 
     objResponse = this.robo.acessar({
       url: 'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index',
-      proxy: true
+      proxy: true,
     });
 
-    if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
+    if (
+      /Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(
+        objResponse.responseBody
+      )
+    ) {
       console.log('===============Pagina com erro com o banco===============');
-      process.exit(0)
+      process.exit(0);
     }
 
-    if(objResponse.status === 500) {
+    if (objResponse.status === 500) {
       console.log('===============Pagina com status 500===============');
       console.log(objResponse.responseBody);
       process.exit(0);
     }
 
-    return objResponse
+    return objResponse;
   }
 
   async pegaCaptcha() {
@@ -144,14 +172,20 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     expire.setTime(time + 365 * 3600000 * 24);
     let url = `https://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php?${time}`;
 
-    objResponse = await this.robo.acessar({ url, responseType: 'arraybuffer', proxy: true });
+    objResponse = await this.robo.acessar({
+      url,
+      responseType: 'arraybuffer',
+      proxy: true,
+    });
     return Buffer.from(objResponse.responseBody).toString('base64');
   }
 
   async resolveCaptcha(captchaString) {
     let resposta;
     let tentativa = 0;
-    let ch = new CaptchaHandler(6, 10000, 'OabTJRS', {numeroDaOab: this.numeroOab})
+    let ch = new CaptchaHandler(6, 10000, 'OabTJRS', {
+      numeroDaOab: this.numeroOab,
+    });
     do {
       this.logger.info(`Tentativa ${tentativa + 1} de resolucao do captcha`);
       tentativa++;
@@ -164,8 +198,6 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   }
 
   async validaCaptcha(captcha, comarca) {
-
-
     const url =
       'https://www.tjrs.jus.br/site_php/consulta/verifica_codigo_novo.php';
     let queryString = {

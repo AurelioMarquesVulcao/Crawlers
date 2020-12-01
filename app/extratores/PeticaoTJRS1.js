@@ -50,7 +50,9 @@ class PeticaoTJRS1 extends ExtratorBase {
       await sleep(100);
 
       if (!this.isLogado(this.credenciais.nome, objResponse.responseBody))
-        throw new Error('Pagina apresentou algum tipo de erro ao tentar acessar a pagina de consulta');
+        throw new Error(
+          'Pagina apresentou algum tipo de erro ao tentar acessar a pagina de consulta'
+        );
 
       this.logger.info('Capturando hash de request da pre-consulta');
       hash = await this.preConsulta(objResponse.responseBody);
@@ -61,7 +63,9 @@ class PeticaoTJRS1 extends ExtratorBase {
       await sleep(100);
 
       if (!this.isLogado(this.credenciais.nome, objResponse.responseBody))
-        throw new Error('Pagina apresentou algum tipo de erro ao tentar consultar o processo');
+        throw new Error(
+          'Pagina apresentou algum tipo de erro ao tentar consultar o processo'
+        );
 
       this.logger.info('Habilitando pagina completa de andamentos');
       objResponse = await this.habilitarAndamentosCompletos(
@@ -70,7 +74,9 @@ class PeticaoTJRS1 extends ExtratorBase {
       await sleep(100);
 
       if (!this.isLogado(this.credenciais.nome, objResponse.responseBody))
-        throw new Error('Pagina apresentou algum tipo de erro ao tentar habilitar os andamentos completos');
+        throw new Error(
+          'Pagina apresentou algum tipo de erro ao tentar habilitar os andamentos completos'
+        );
 
       this.logger.info('Capturando link de download dos documentos');
       processosLinks = await this.recuperarLinkDocumentos(
@@ -109,7 +115,7 @@ class PeticaoTJRS1 extends ExtratorBase {
     const options = {
       url: this.url,
       method: 'GET',
-      proxy: true
+      proxy: true,
     };
     return this.robo.acessar(options);
   }
@@ -167,7 +173,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       url: `${this.url}/index.php`,
       method: 'POST',
       formData: formData,
-      proxy: true
+      proxy: true,
     };
 
     return await this.robo.acessar(options);
@@ -189,7 +195,7 @@ class PeticaoTJRS1 extends ExtratorBase {
     const options = {
       url: `${this.url}/controlador.php?acao=processo_consultar&acao_origem=consultar&hash=${hash}`,
       method: 'GET',
-      proxy: true
+      proxy: true,
     };
 
     return this.robo.acessar(options);
@@ -229,12 +235,12 @@ class PeticaoTJRS1 extends ExtratorBase {
       url: `${this.url}/controlador_ajax.php?acao_ajax=processos_consulta_por_numprocesso&hash=${hash}`,
       method: 'POST',
       formData: formData,
-      proxy: true
+      proxy: true,
     };
 
     objResponse = await this.robo.acessar(options);
 
-    if(/Processo\snão\sencontrado/.test(objResponse.responseBody))
+    if (/Processo\snão\sencontrado/.test(objResponse.responseBody))
       throw new Error('Processo não encontrado');
     return this.resgataNovoHash(objResponse.responseBody);
   }
@@ -272,7 +278,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       url: `${this.url}/controlador.php`,
       method: 'GET',
       queryString: queryString,
-      proxy: true
+      proxy: true,
     };
 
     return this.robo.acessar(options);
@@ -295,7 +301,7 @@ class PeticaoTJRS1 extends ExtratorBase {
         txtNumProcesso: this.numeroProcesso.replace(/\D/g, ''),
         hash: hash,
       },
-      proxy: true
+      proxy: true,
     };
 
     return await this.robo.acessar(options);
@@ -337,7 +343,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       options = {
         url: `${this.url}/${links[i]}`,
         method: 'GET',
-        proxy: true
+        proxy: true,
       };
       objResponse = await this.robo.acessar(options);
       $ = cheerio.load(objResponse.responseBody);
@@ -354,7 +360,7 @@ class PeticaoTJRS1 extends ExtratorBase {
         url: `${this.url}/${pagina}`,
         method: 'GET',
         responseType: 'stream',
-        proxy: true
+        proxy: true,
       });
       objResponse.responseBody.pipe(writer);
       await new Promise((resolve, reject) => {

@@ -400,16 +400,14 @@ class RoboPuppeteer3 {
       this.logger.info(`Finalizado captura de documentos Simples`);
 
 
-
-
-
-
-
-
-
       // console.log(links);
-      return links;
+      let resultado = links;
+      links = [];
+      controlaLink = [];
+      return resultado;
     } catch (e) {
+      links = [];
+      controlaLink = [];
       console.log('Não pegou os Documentos');
       console.log(e);
     }
@@ -495,12 +493,14 @@ class RoboPuppeteer3 {
         if (controlaLink.length == 0) {
           console.log("primeiro link capturado com sucesso");
           controlaLink.push(link.link);
+          console.log(link);
           return link
         } else if (controlaLink.length > 0) {
           console.log("Estou verificando demais links");
           if (controlaLink.indexOf(link.link) < 0) {
             console.log(" ------------------- O link é único, verificação concluida ------------------- ");
             controlaLink.push(link.link);
+            console.log(link);
             return link
           } else {
             console.log("já peguei esse documento, vou repetir o processo.");
@@ -598,12 +598,15 @@ class RoboPuppeteer3 {
         if (controlaLink.length == 0) {
           console.log("primeiro link capturado com sucesso");
           controlaLink.push(link.link);
+          console.log(link);
+          links.push(link);
           return link
         } else if (controlaLink.length > 0) {
           console.log("Estou verificando demais links");
           if (controlaLink.indexOf(link.link) < 0) {
             console.log(" ------------------- O link é único, verificação concluida ------------------- ");
             controlaLink.push(link.link);
+            console.log(link);
             links.push(link);
           } else {
             console.log("já peguei esse documento, vou repetir o processo.");

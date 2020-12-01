@@ -34,7 +34,7 @@ const util = new Cnj();
 // Filas a serem usadas
 // const nomeFila = `peticao.JTE.extracao`;
 const reConsumo = `peticao.JTE.extracao`;
-const filaAxios = "Fila.axios.JTE2"
+const filaAxios = "Fila.axios.JTE"
 
 var estadoAnterior; // Recebe o estado atual que está sendo baixado
 var estadoDaFila; // Recebe o estado da fila
@@ -112,35 +112,35 @@ async function worker(nomeFila) {
 
 
       // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
-      setInterval(function () {
-        heartBeat++;
-        //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
-        if (logadoParaIniciais == false) {
-          if (heartBeat > 10000) {
-            console.log(
-              '----------------- Fechando o processo por inatividade -------------------'
-            );
-            new GerenciadorFila().enviar(nomeFila, message)
-            ch.ack(msg);
-            const error = new Error('Tempo espirou');
-            error.code = 'Time error';
-            throw error;
-            // process.exit();
-          }
-        } else {
-          if (heartBeat > 10000) {
-            console.log(
-              '----------------- Fechando o processo por inatividade -------------------'
-            );
-            new GerenciadorFila().enviar(nomeFila, message)
-            ch.ack(msg);
-            const error = new Error('Tempo espirou');
-            error.code = 'Time error';
-            throw error;
-            // process.exit();
-          }
-        }
-      }, 1000);
+      // setInterval(function () {
+      // heartBeat++;
+      //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
+      //   if (logadoParaIniciais == false) {
+      //     if (heartBeat > 10000) {
+      //       console.log(
+      //         '----------------- Fechando o processo por inatividade -------------------'
+      //       );
+      //       new GerenciadorFila().enviar(nomeFila, message)
+      //       ch.ack(msg);
+      //       const error = new Error('Tempo espirou');
+      //       error.code = 'Time error';
+      //       throw error;
+      //       // process.exit();
+      //     }
+      //   } else {
+      //     if (heartBeat > 10000) {
+      //       console.log(
+      //         '----------------- Fechando o processo por inatividade -------------------'
+      //       );
+      //       new GerenciadorFila().enviar(nomeFila, message)
+      //       ch.ack(msg);
+      //       const error = new Error('Tempo espirou');
+      //       error.code = 'Time error';
+      //       throw error;
+      //       // process.exit();
+      //     }
+      //   }
+      // }, 1000);
 
 
 
@@ -343,9 +343,15 @@ async function worker(nomeFila) {
         if (message.inicial == true) {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
+          // console.log("Vou imprimir os links", link);
           for (let w = 0; w < link.length; w++) {
-            // Criando fila para Download de documentos
-            await new GerenciadorFila().enviar(filaAxios, link[w])
+            if (link[w].tipo != 'HTML') {
+              // Criando fila para Download de documentos
+              await new GerenciadorFila().enviar(filaAxios, JSON.stringify(link[w]));
+              console.log("valor do laço é", w, JSON.stringify(link[w]));
+            }
+
+            await sleep(300);
           }
         }
 

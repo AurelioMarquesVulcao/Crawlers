@@ -63,8 +63,12 @@ var reset = '\u001b[0m';
     const numeroEstado = parseInt(
       Cnj.processoSlice(message.NumeroProcesso).estado
     );
+    // console.log("---------------------------",numeroEstado,"-------------------------------------");
     if (numeroEstado == 15) {
       ch.ack(msg);
+      await mongoose.connection.close();
+      await sleep(2000);
+      process.exit()
     } else {
 
 

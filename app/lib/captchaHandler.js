@@ -564,38 +564,57 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     // console.log('2', resultado);
     return resultado;
   }
-};
 
-module.exports.antiCaptchaImage = async (captchaB64) => {
-  let body = {
-    clientKey: ANTICAPTCHA_KEY,
-    task: {
-      type: 'ImageToTextTask',
-      body: captchaB64,
-    },
-  };
+  async antiCaptchaImage(captchaB64, website) {
+    let logCaptcha = {
+      Tipo: 'ImageToTextTask',
+      Website: website,
+      Robo: this.robo,
+      NumeroProcesso: this.identificador.numeroDoProcesso,
+      NumeroOab: this.identificador.numeroDaOab,
+    };
 
-  let response = await axios.post(
-    'https://api.anti-captcha.com/createTask',
-    body
-  );
-  const taskId = response.data.taskId;
-  let tentativa = 0
-  console.log(`Captcha TaskId [${taskId}] - Iniciando Captcha`)
-  do {
-    tentativa++;
-    await sleep(5000);
-    console.log(`Captcha TaskId [${taskId}] - Tentativa: ${tentativa} - Aguardando 10 segundos.`)
-    response = await axios.post('https://api.anti-captcha.com/getTaskResult', {
+    let body = {
       clientKey: ANTICAPTCHA_KEY,
-      taskId: taskId,
-    });
+      task: {
+        type: 'ImageToTextTask',
+        body: captchaB64,
+      },
+    };
 
-    if (response.data.status == 'ready') return { sucesso: true, resposta: response.data.solution.text };
+    let response = await axios.post(
+      'https://api.anti-captcha.com/createTask',
+      body
+    );
+    const taskId = response.data.taskId;
 
-  } while (tentativa < 6);
+    if(!taskId) {
+      console.log('Não foi possivel recuperar a TaskId');
+      return { sucesso: false };
+    }
 
-  return {sucesso: false}
+    let tentativa = 0
+    console.log(`Captcha TaskId [${taskId}] - Iniciando Captcha`)
+    do {
+      tentativa++;
+      await sleep(5000);
+      console.log(`Captcha TaskId [${taskId}] - Tentativa: ${tentativa} - Aguardando 10 segundos.`)
+      response = await axios.post('https://api.anti-captcha.com/getTaskResult', {
+        clientKey: ANTICAPTCHA_KEY,
+        taskId: taskId,
+      });
+
+      if (response.data.status === 'ready') {
+        logCaptcha.Servico = 'AntiCaptcha';
+        logCaptcha.CaptchaBody = response.data;
+        new LogCaptcha(logCaptcha).save();
+        return { sucesso: true, resposta: response.data.solution.text };
+      }
+
+    } while (tentativa < 6);
+
+    return {sucesso: false}
+  }
 };
 
 module.exports.antiCaptchaHandler = antiCaptchaHandler;

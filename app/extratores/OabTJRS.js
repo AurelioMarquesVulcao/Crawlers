@@ -1,10 +1,12 @@
 let cheerio = require('cheerio');
-const { antiCaptchaImage } = require('../lib/captchaHandler');
+// const { antiCaptchaImage } = require('../lib/captchaHandler');
+const { CaptchaHandler } = require('../lib/captchaHandler')
 const { Robo } = require('../lib/newRobo');
 const { LogExecucao } = require('../lib/logExecucao');
 const { Logger } = require('../lib/util');
 
 const { Processo } = require('../models/schemas/processo');
+const Comarca = require('../models/schemas/comarcas')
 const { ExtratorBase } = require('./extratores');
 
 module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
@@ -35,25 +37,43 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     try {
       let objResponse;
       let captchaString;
-      let nProcessos;
+      let nProcessos = [];
       let captchaResposta;
 
-      this.logger.info('Fazendo primeiro acesso');
+      this.logger.info("Fazendo primeiro acesso");
       await this.fazerPrimeiroAcesso();
 
-      this.logger.info('Pegando imagem de captcha');
-      captchaString = await this.pegaCaptcha();
+      let comarcas = await Comarca.find({ Estado: 'RS' }).sort({Comarca: 1});
 
-      this.logger.info('Resolvendo captcha');
-      captchaResposta = await this.resolveCaptcha(captchaString);
+      const tam = comarcas.length;
+      this.logger.info('Verificando comarcas');
+      console.time('Processo')
+      for (let i=0; i<tam; i++) {
+        let qtdProcessos = nProcessos.length;
+        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Verificando comarca ${comarcas[i].Nome}`);
 
-      this.logger.info('Validando captcha');
-      console.time('tempoCaptcha');
-      objResponse = await this.validaCaptcha(captchaResposta);
-      console.timeEnd('tempoCaptcha');
+        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Pegando imagem de captcha`);
+        captchaString = await this.pegaCaptcha();
 
-      this.logger.info('Iniciando tratamento de processos');
-      nProcessos = await this.tratarProcessos(objResponse.responseBody);
+        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Resolvendo captcha`);
+        captchaResposta = await this.resolveCaptcha(captchaString);
+        if(!captchaResposta) {
+          this.logger.info('Aconteceu algum problema ao processar o captcha');
+          break;
+        }
+
+        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Validando captcha`);
+        console.time('tempoCaptcha');
+        objResponse = await this.validaCaptcha(captchaResposta, comarcas[i]);
+        console.timeEnd('tempoCaptcha');
+
+        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Iniciando tratamento de processos`);
+        let extracaoComarca = await this.tratarProcessos(objResponse.responseBody);
+        if (extracaoComarca.length)
+          nProcessos = [...nProcessos, ...extracaoComarca];
+
+        this.logger.info(`${i+1}/${tam} - [${qtdProcessos}] - Comarca ${comarcas[i].Nome} possui ${extracaoComarca.length} processos.`)
+      }
 
       if (nProcessos) {
         this.logger.info(
@@ -79,6 +99,8 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       this.logger.info(e);
       this.resposta = { sucesso: false, detalhes: e.message };
     } finally {
+      console.timeEnd('Processo')
+
       return {
         resultado: this.resultado,
         sucesso: true,
@@ -89,10 +111,29 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   }
 
   async fazerPrimeiroAcesso() {
-    await this.robo.acessar({ url: this.url });
-    return this.robo.acessar({
+    let objResponse = await this.robo.acessar({ url: this.url });
+
+    if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
+      console.log('===============Pagina com erro com o banco===============');
+      process.exit(0)
+    }
+
+    objResponse = this.robo.acessar({
       url: 'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index',
     });
+
+    if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
+      console.log('===============Pagina com erro com o banco===============');
+      process.exit(0)
+    }
+
+    if(objResponse.status === 500) {
+      console.log('===============Pagina com status 500===============');
+      console.log(objResponse.responseBody);
+      process.exit(0);
+    }
+
+    return objResponse
   }
 
   async pegaCaptcha() {
@@ -109,9 +150,11 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   async resolveCaptcha(captchaString) {
     let resposta;
     let tentativa = 0;
+    let ch = new CaptchaHandler(6, 10000, 'OabTJRS', {numeroDaOab: this.numeroOab})
     do {
+      this.logger.info(`Tentativa ${tentativa + 1} de resolucao do captcha`);
       tentativa++;
-      resposta = await antiCaptchaImage(captchaString);
+      resposta = await ch.antiCaptchaImage(captchaString, this.url);
 
       if (resposta.sucesso) return resposta.resposta;
 
@@ -119,22 +162,24 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     } while (tentativa < 5);
   }
 
-  async validaCaptcha(captcha) {
+  async validaCaptcha(captcha, comarca) {
+
+
     const url =
       'https://www.tjrs.jus.br/site_php/consulta/verifica_codigo_novo.php';
     let queryString = {
-      nome_comarca: 'Tribunal+de+Justi%E7a',
+      nome_comarca: comarca.Nome, //Nome da comarca
       versao: '',
       versao_fonetica: 1,
       tipo: 2,
-      id_comarca: 700,
+      id_comarca: comarca.Metadados.tjrs_select_id, //value do select
       intervalo_movimentacao: 0,
       N1_var2: 1,
-      id_comarca1: 700,
+      id_comarca1: 'porto_alegre', //value do select
       num_processo_mask: '',
       num_processo: '',
       numCNJ: 'N',
-      id_comarca2: 700,
+      id_comarca2: comarca.Metadados.tjrs_select_id, //value do select
       uf_oab: this.ufOab,
       num_oab: this.numeroOab,
       foro: 0,
@@ -142,7 +187,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       intervalo_movimentacao_1: 0,
       ordem_consulta: 1,
       N1_var: '',
-      id_comarca3: 'todas',
+      id_comarca3: 'todas', //sempre todas
       nome_parte: '',
       N1_var2_2: 1,
       intervalo_movimentacao_2: 0,
@@ -159,7 +204,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
 
     processos = texto.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/gm);
 
-    return processos;
+    return processos ? processos : [];
   }
 
   async enfileirarProcessos(processos) {

@@ -35,6 +35,12 @@ module.exports.LogExecucao = class LogExecucao {
     );
   }
 
+  /**
+   *
+   * @param consultaPendente
+   * @param nomeFila
+   * @returns {Promise<{mensagem: string, sucesso: boolean}|{mensagem: string, enviado: boolean, sucesso: boolean}>}
+   */
   static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
     let resposta;
 

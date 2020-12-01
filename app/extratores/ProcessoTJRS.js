@@ -1,5 +1,5 @@
 let cheerio = require('cheerio');
-const { antiCaptchaImage } = require('../lib/captchaHandler');
+const { CaptchaHandler } = require('../lib/captchaHandler');
 const { TJRSParser } = require('../parsers/TJRSParser');
 const { Robo } = require('../lib/newRobo');
 const { ExtratorBase } = require('./extratores');
@@ -114,8 +114,6 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index';
     let objResponse = await this.robo.acessar({ url: this.url });
 
-
-
     if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
       console.log('===============Pagina com erro com o banco===============');
       process.exit(0)
@@ -151,9 +149,11 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   async resolveCaptcha(captchaString) {
     let resposta;
     let tentativa = 0;
+    let ch = new CaptchaHandler(6, 10000, 'OabTJRS', {numeroDaOab: this.numeroOab})
     do {
+      this.logger.info(`Tentativa ${tentativa + 1} de resolucao do captcha`);
       tentativa++;
-      resposta = await antiCaptchaImage(captchaString);
+      resposta = await ch.antiCaptchaImage(captchaString, this.url);
 
       if (resposta.sucesso) return resposta.resposta;
 

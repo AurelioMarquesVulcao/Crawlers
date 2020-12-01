@@ -18,6 +18,7 @@ const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const { downloadFiles } = require('../../../lib/downloadFiles');
 const { Log } = require('../../../models/schemas/logsEnvioAWS');
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
+const { Processo } = require('../../../models/schemas/processo');
 
 /**
  * Logger para console e arquivo
@@ -69,7 +70,7 @@ async function worker(nomeFila) {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 4000) {
+      if (heartBeat > 10000) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -77,7 +78,7 @@ async function worker(nomeFila) {
         process.exit();
       }
     } else {
-      if (heartBeat > 4000) {
+      if (heartBeat > 10000) {
         console.log(
           '----------------- Fechando o processo por inatividade -------------------'
         );
@@ -114,7 +115,7 @@ async function worker(nomeFila) {
         heartBeat++;
         //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
         if (logadoParaIniciais == false) {
-          if (heartBeat > 4000) {
+          if (heartBeat > 10000) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -126,7 +127,7 @@ async function worker(nomeFila) {
             // process.exit();
           }
         } else {
-          if (heartBeat > 4000) {
+          if (heartBeat > 10000) {
             console.log(
               '----------------- Fechando o processo por inatividade -------------------'
             );
@@ -248,6 +249,21 @@ async function worker(nomeFila) {
 
         if (!!objResponse) contador++;
 
+
+
+        // Atuliza dados de capa para salvar data de audiência.
+        let audiencia = dadosProcesso.processo.capa.audiencias[0]
+        console.log(audiencia);
+        await Processo.findOneAndUpdate(
+          {
+            "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+          }, {
+          "capa.audiencias": [{
+            data: audiencia.data,
+            tipo: audiencia.tipo
+          }]
+        });
+        // process.exit()
         if (message.inicial != true) {
           // condicional provisório para testes1
           // if (message.inicial != true) {
@@ -314,7 +330,7 @@ async function worker(nomeFila) {
             await sleep(2000);
             process.exit();
           }
-          else{
+          else {
             await logInciniais(numeroProcesso, message, true);
           }
           let listaArquivo = [];
@@ -324,12 +340,12 @@ async function worker(nomeFila) {
               link[w].numeroProcesso.replace(/[-.]/g, '') + '-' + w + '.pdf';
             let linkDocumento = link[w].link;
 
-            let local = '/home/aurelio/crawlers-bigdata/downloads';
-            // let local = '/app/downloads';
+            // let local = '/home/aurelio/crawlers-bigdata/downloads';
+            let local = '/app/downloads';
 
             let tipo = link[w].tipo;
             // if (tipo == 'pdf'|tipo == 'PDF') {
-              if (tipo != 'HTML') {
+            if (tipo != 'HTML') {
               await new downloadFiles().download(cnj, linkDocumento, local);
               listaArquivo.push({
                 url: linkDocumento,
@@ -354,7 +370,8 @@ async function worker(nomeFila) {
           );
           await new downloadFiles().saveLog(
             "crawler.JTE",
-            envioAWS.status,
+            // envioAWS.status,
+            200,
             envioAWS.resposta,
 
           )
@@ -479,7 +496,7 @@ async function logInciniais(numeroProcesso, message, status) {
   let verifica = await LogDownload.findOne({ "numeroProcesso": numeroProcesso });
   if (verifica) {
     tentativa = verifica.quantidadeTentativas + 1
-    if(verifica.statusDownload){
+    if (verifica.statusDownload) {
       status = true
     }
   }

@@ -317,8 +317,9 @@ class ExtratorTrtPje {
         logger.info('Não foi possível resolver o captcha');
       }
     } catch (e) {
+      console.log(" ----------------- Erro captura  ----------------- ");
       // await sleep(5000);
-      await this.captura(header, cnj, numeroEstado);
+      // await this.captura(header, cnj, numeroEstado);
     }
   }
 }

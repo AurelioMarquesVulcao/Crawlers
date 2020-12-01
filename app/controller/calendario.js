@@ -2,68 +2,101 @@ const shell = require('shelljs');
 const sleep = require('await-sleep');
 const { Util } = require('./lib/util');
 const util = new Util();
-const Calendario = require('./lib/banco.json');
+// const Calendario = require('./lib/banco.json');
+
+const {Variaveis} = require('../lib/variaveisRobos');
 
 
 
+// console.log(Calendario);
 
-// Em produção
+class CalendarioServicos {
+    // constructor(Calendario) {
+    //     this.Calendario = await Variaveis.catch({ "codigo": "000002" }).variaveis;
+    // };
+    async work() {
+        let start = 1;
+        let horaAntiga;
+        let Calendario = await Variaveis.catch({ "codigo": "000002" });
+        Calendario =Calendario.variaveis; 
+        // console.log(Calendario);
+        setInterval(async function () {
+            let time = util.timerNow();
+            let { hora, min, seg, semana } = time
+            let calServ = new CalendarioServicos();
+            // let time = util.timerNow();
+
+            if (horaAntiga != hora || start == 1) {
+                // if (horaAntiga < hora || start == 1 || horaAntiga > hora) {
+                start++
+                console.log("Ligou!!!");
+
+
+
+                calServ.ligaServicos(time, Calendario);
+                calServ.desligaServicos(time, Calendario);
+                calServ.escalaServico(time, Calendario);
+
+
+
+                horaAntiga = hora
+            }
+            // console.log("rodou fora", seg);
+
+        }, 1000);
+    }
+
+    async ligaServicos(time, Calendario) {
+        let { hora, min, seg, semana } = time
+        // console.log(hora, semana);
+        for (let i = 0; i < Calendario.length; i++) {
+            let { nome, peso, [semana]: { liga, desliga, escalar, prioridade } } = Calendario[i];
+            // console.log(liga.find(element => element == hora));  
+            if (liga.length > 0) {
+                if (liga.find(element => element == hora)) {
+                    util.dockerUp(nome)
+                }
+            }
+
+        }
+
+    }
+    async desligaServicos(time, Calendario) {
+        let { hora, min, seg, semana } = time
+        for (let i = 0; i < Calendario.length; i++) {
+            let { nome, peso, [semana]: { liga, desliga, escalar, prioridade } } = Calendario[i];
+            if (desliga.length > 0) {
+                if (desliga.find(element => element == hora)) {
+                    util.dockerStop(nome)
+                }
+            }
+        }
+    }
+    async escalaServico(time, Calendario) {
+        let { hora, min, seg, semana } = time
+        for (let i = 0; i < Calendario.length; i++) {
+            let { nome, peso, [semana]: { liga, desliga, escalar, prioridade } } = Calendario[i];
+            if (escalar.length > 0) {
+                for (let j = 0; j < escalar.length; j++) {
+                    let { horaScale, quantidade } = escalar[j];
+                    if (horaScale == hora) {
+                        // if (horaScale.find(element => element == hora)) {
+                        util.escaleContainer(nome, quantidade)
+                    }
+                }
+            }
+        }
+    }
+}
+
 (async () => {
-    setInterval(async function () {
-        let time = util.timerNow();
-        console.log(time);
-        // Inicio dos serviços JTE
-        if (time.hora == 21 && time.min == 00 && time.seg == 00) {
-            util.dockerStop("worker-jte-01 worker-jte-02");
-            util.dockerStop("worker-jte-03 worker-jte-04");
-            util.dockerStop("worker-jte-05 worker-jte-06");
-            util.dockerStop("novos-processos-jte-4 novos-processos-jte-3");
-            util.dockerStop("novos-processos-jte-1 novos-processos-jte-2");
-        }
-        if (time.hora == 23 && time.min == 00 && time.seg == 00) {
-            util.dockerUp("worker-jte-01");
-            util.dockerUp("worker-jte-03");
-            util.dockerUp("worker-jte-05");
-            util.dockerUp("novos-processos-jte-3");
-            util.dockerUp("novos-processos-jte-1 novos-processos-jte-2");
-        }
-        if (time.hora == 5 && time.min == 00 && time.seg == 00) {
-            util.dockerStop("worker-jte-01 worker-jte-02");
-            util.dockerStop("worker-jte-03 worker-jte-04");
-            util.dockerStop("worker-jte-05 worker-jte-06");
-            util.dockerStop("novos-processos-jte-4 novos-processos-jte-3");
-            util.dockerStop("novos-processos-jte-1 novos-processos-jte-2");
-        }
-        if (time.hora == 8 && time.min == 00 && time.seg == 00) {
-            util.dockerUp("worker-jte-01");
-            util.dockerUp("worker-jte-03");
-            util.dockerUp("worker-jte-05");
-            util.dockerUp("novos-processos-jte-3");
-            util.dockerUp("novos-processos-jte-1 novos-processos-jte-2");
-            util.escalaContainer("worker-trt-02", 8);
-        }
+    let ativador = new CalendarioServicos();
+    ativador.work()
 
-        // Fim dos serviços JTE
-
-        // Inicio dos serviços JPE
-        if (time.hora == 21 && time.min == 5 && time.seg == 00) {
-            util.escalaContainer("worker-trt-02", 8);
-            util.escalaContainer("worker-tjba-portal", 2);
-
-        }
-        if (time.hora == 22 && time.min == 55 && time.seg == 00) {
-            util.escalaContainer("worker-trt-02", 1);
-            util.escalaContainer("worker-tjba-portal", 1);
-        }
-        if (time.hora == 5 && time.min == 5 && time.seg == 00) {
-            util.escalaContainer("worker-trt-02", 8);
-            util.escalaContainer("worker-tjba-portal", 2);
-        }
-        if (time.hora == 7 && time.min == 55 && time.seg == 00) {
-            util.escalaContainer("worker-trt-02", 1);
-            util.escalaContainer("worker-tjba-portal", 1);
-        }
-        // Fim dos serviços PJE
-
-    }, 1000);
+    // process.exit();
 })();
+
+
+
+
+

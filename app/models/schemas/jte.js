@@ -71,3 +71,5 @@ const logDownloadDocumentos = new mongoose.Schema({
 const LogDownload = mongoose.model('logIniciais', logDownloadDocumentos, 'logIniciais');
 
 module.exports.LogDownload = LogDownload;
+
+

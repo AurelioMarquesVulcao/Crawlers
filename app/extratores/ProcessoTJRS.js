@@ -112,14 +112,14 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
   async fazerPrimeiroAcesso() {
     const url =
       'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index';
-    let objResponse = await this.robo.acessar({ url: this.url });
+    let objResponse = await this.robo.acessar({ url: this.url, proxy: true });
 
     if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
       console.log('===============Pagina com erro com o banco===============');
       process.exit(0)
     }
 
-    objResponse = await this.robo.acessar({ url });
+    objResponse = await this.robo.acessar({ url, proxy: true });
 
     if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
       console.log('===============Pagina com erro com o banco===============');
@@ -142,7 +142,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     expire.setTime(time + 365 * 3600000 * 24);
     let url = `https://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php?${time}`;
 
-    objResponse = await this.robo.acessar({ url, responseType: 'arraybuffer' });
+    objResponse = await this.robo.acessar({ url, responseType: 'arraybuffer', proxy: true });
     return Buffer.from(objResponse.responseBody).toString('base64');
   }
 
@@ -196,7 +196,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
       code: captcha,
     };
 
-    return await this.robo.acessar({ url, queryString });
+    return await this.robo.acessar({ url, queryString, proxy: true });
   }
 
   captarComarca() {
@@ -263,6 +263,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
           id_comarca: this.captarComarca().id,
           pesquisar: 'Pesquisar',
         },
+        proxy: true
       };
       this.logger.info('Selecionando primeira instancia');
       objResponse = await this.robo.acessar(options);
@@ -287,7 +288,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     let objResponse;
     let url = `https://www.tjrs.jus.br/site_php/consulta/${link}`;
     this.logger.info('Extraindo partes');
-    objResponse = await this.robo.acessar({ url: url });
+    objResponse = await this.robo.acessar({ url: url, proxy: true });
     return objResponse.responseBody;
   }
 
@@ -295,7 +296,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     let objResponse;
     let url = `https://www.tjrs.jus.br/site_php/consulta/${link}`;
     this.logger.info('Extraindo movimentações');
-    objResponse = await this.robo.acessar({ url: url });
+    objResponse = await this.robo.acessar({ url: url, proxy: true });
     return objResponse.responseBody;
   }
 
@@ -303,7 +304,7 @@ module.exports.ProcessoTJRS = class ProcessoTJRS extends ExtratorBase {
     let objResponse;
     let url = `https://www.tjrs.jus.br/site_php/consulta/${link}`;
 
-    objResponse = await this.robo.acessar({ url });
+    objResponse = await this.robo.acessar({ url, proxy: true });
     return this.converterProcesso(objResponse.responseBody);
   }
 };

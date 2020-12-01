@@ -163,7 +163,7 @@ class Robo {
 
     if (proxy) {
       options.httpsAgent = new HttpsProxyAgent(
-        'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8181'
+        'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182'
       );
     }
 

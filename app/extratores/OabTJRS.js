@@ -111,7 +111,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
   }
 
   async fazerPrimeiroAcesso() {
-    let objResponse = await this.robo.acessar({ url: this.url });
+    let objResponse = await this.robo.acessar({ url: this.url, proxy: true });
 
     if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
       console.log('===============Pagina com erro com o banco===============');
@@ -120,6 +120,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
 
     objResponse = this.robo.acessar({
       url: 'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index',
+      proxy: true
     });
 
     if (/Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(objResponse.responseBody)){
@@ -143,7 +144,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
     expire.setTime(time + 365 * 3600000 * 24);
     let url = `https://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php?${time}`;
 
-    objResponse = await this.robo.acessar({ url, responseType: 'arraybuffer' });
+    objResponse = await this.robo.acessar({ url, responseType: 'arraybuffer', proxy: true });
     return Buffer.from(objResponse.responseBody).toString('base64');
   }
 
@@ -194,7 +195,7 @@ module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
       code: captcha,
     };
 
-    return this.robo.acessar({ url, queryString });
+    return this.robo.acessar({ url, queryString, proxy: true });
   }
 
   async tratarProcessos(body) {

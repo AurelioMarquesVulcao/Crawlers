@@ -109,6 +109,7 @@ class PeticaoTJRS1 extends ExtratorBase {
     const options = {
       url: this.url,
       method: 'GET',
+      proxy: true
     };
     return this.robo.acessar(options);
   }
@@ -166,6 +167,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       url: `${this.url}/index.php`,
       method: 'POST',
       formData: formData,
+      proxy: true
     };
 
     return await this.robo.acessar(options);
@@ -187,6 +189,7 @@ class PeticaoTJRS1 extends ExtratorBase {
     const options = {
       url: `${this.url}/controlador.php?acao=processo_consultar&acao_origem=consultar&hash=${hash}`,
       method: 'GET',
+      proxy: true
     };
 
     return this.robo.acessar(options);
@@ -226,6 +229,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       url: `${this.url}/controlador_ajax.php?acao_ajax=processos_consulta_por_numprocesso&hash=${hash}`,
       method: 'POST',
       formData: formData,
+      proxy: true
     };
 
     objResponse = await this.robo.acessar(options);
@@ -268,6 +272,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       url: `${this.url}/controlador.php`,
       method: 'GET',
       queryString: queryString,
+      proxy: true
     };
 
     return this.robo.acessar(options);
@@ -290,6 +295,7 @@ class PeticaoTJRS1 extends ExtratorBase {
         txtNumProcesso: this.numeroProcesso.replace(/\D/g, ''),
         hash: hash,
       },
+      proxy: true
     };
 
     return await this.robo.acessar(options);
@@ -331,6 +337,7 @@ class PeticaoTJRS1 extends ExtratorBase {
       options = {
         url: `${this.url}/${links[i]}`,
         method: 'GET',
+        proxy: true
       };
       objResponse = await this.robo.acessar(options);
       $ = cheerio.load(objResponse.responseBody);
@@ -347,6 +354,7 @@ class PeticaoTJRS1 extends ExtratorBase {
         url: `${this.url}/${pagina}`,
         method: 'GET',
         responseType: 'stream',
+        proxy: true
       });
       objResponse.responseBody.pipe(writer);
       await new Promise((resolve, reject) => {

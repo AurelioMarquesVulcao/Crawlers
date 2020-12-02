@@ -15,6 +15,7 @@ const { JTEParser } = require('../../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
+const { Processo } = require('../../../models/schemas/processo');
 
 /**
  * Logger para console e arquivo
@@ -132,20 +133,6 @@ async function worker() {
         contador = 0;
       }
 
-      // // desliga o worker para parar de baixar as iniciais
-      // // if (message.inicial == true && logadoParaIniciais == true) {
-      // if (!message.NovosProcessos && logadoParaIniciais == true) {
-      //   logadoParaIniciais = false;
-      //   await mongoose.connection.close()
-      //   process.exit();
-      // }
-      // // reinicia o worker para baixarmos os processos iniciais.
-      // // if (message.inicial == true && contador != 0 && logadoParaIniciais == false) {
-      // if (message.NovosProcessos == true && contador != 0 && logadoParaIniciais == false) {
-      //   //console.log('vou deslogar a aplicação ----01');
-      //   await mongoose.connection.close()
-      //   process.exit();
-      // }
 
       estadoAnterior = estadoDaFila;
       logger.info('O Estado do consumer é o numero: ' + estadoAnterior);
@@ -164,15 +151,6 @@ async function worker() {
           await sleep(1000);
         }
 
-        // loga para pegar iniciais
-        // if (message.inicial == true  && logadoParaIniciais == false) {
-        // condicional provisório para testes
-        //console.log(logadoParaIniciais);
-        // logger.info("Logando para pegar documentos iniciais")
-        // if (message.NovosProcessos == true && logadoParaIniciais == false) {
-        //   await puppet.loga();
-        //   logadoParaIniciais = true;
-        // }
 
 
         // caregando as variaveis que receberam os dados do parser
@@ -196,26 +174,23 @@ async function worker() {
 
         if (message.inicial != true) {
           // condicional provisório para testes1
-          // if (message.inicial != true) {
-          // if (message.NovosProcessos != true) {
           logger.info("Enviando dados para o banco de dados.")
           await dadosProcesso.processo.salvar();
           //console.log(dadosProcesso.andamentos[0]);
           await Andamento.salvarAndamentos(dadosProcesso.andamentos);
           processo = await dadosProcesso.processo.salvar();
-          // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
           // após que todas as comarcas estiverem no mes corrente aplicar o código acima
           logger.info("Sucesso ao enviar para o banco de dados.")
 
           // salvando status
           let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
           let dataAtualProcesso = dadosProcesso.processo.capa.dataDistribuicao;
-          let cnj = util.processoSlice(numeroAtualProcesso);
+          let cnj = Cnj.processoSlice(numeroAtualProcesso);
+          // let buscaProcesso = verificaSalto(numeroAtualProcesso);
           let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
           await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso);
 
           // Enviando para Collection de controle *ultimosProcessos*
-          // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
           logger.info("Salvando na Collection ultimosProcessos")
 
           await new CriaFilaJTE().salvaUltimo({
@@ -230,22 +205,6 @@ async function worker() {
           });
           // }
         }
-
-        
-
-
-        // if (message.inicial == true) {
-        // condicional provisório para testes
-        // if (message.NovosProcessos == true) {
-        //   console.log('---------- Vou baixar link das iniciais-------');
-        //   let link = await puppet.pegaInicial();
-        //   await console.log(link.length);
-        //   for (let w = 0; w < link.length; w++) {
-        //     console.log('entrou no laço');
-        //     await new CriaFilaJTE().salvaDocumentoLink(link[w]);
-        //     await console.log('O link ' + w + ' Foi salvo');
-        //   }
-        // }
 
         logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {
@@ -311,10 +270,6 @@ async function worker() {
         process.exit();
       }
 
-      // envia a mensagem para a fila de reprocessamento
-      // if (!novosProcesso) {
-      //   new GerenciadorFila().enviar(reConsumo, message);
-      // }
 
       logger.info('Encontrado erro durante a execução');
       // trata erro especifico para falha na extração
@@ -345,6 +300,17 @@ function desligaAgendado() {
   }
 }
 
+async function verificaSalto(numeroAtualProcesso) {
+  let cnj = Cnj.processoSlice(numeroAtualProcesso);
+  await Processo.find({"comarcaOriginal":cnj.comarca});
+  
+  if (cnj.sequencial.length) {
 
+  };
+
+
+
+  let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
+}
 
 

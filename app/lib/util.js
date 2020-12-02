@@ -372,6 +372,7 @@ class Cnj {
   /**
    * Separa a string do processo com cada uma das suas infomações
    * @param {string} numero String com o numero do processo sem mascara
+   * @returns sequencial, dois, ano, tipo, estado, comarca
    */
   static processoSlice(numero) {
     let sequencial = numero.slice(0, 7);
@@ -419,7 +420,7 @@ class Cnj {
     let sequencial = this.completaNumero(ultimoSequencial, "ultimoSequencial");
     let tribunal = this.completaNumero(Tribunal, "Tribunal");
     let origem = this.completaNumero(unidadeOrigem, "unidadeOrigem");
-    return `${sequencial}0020205${tribunal}${origem}`
+    return `${sequencial}00${new Date().getFullYear}5${tribunal}${origem}`
   }
 
   /**

@@ -27,7 +27,7 @@ module.exports.buscar_sequencial = async (tribunalExplicito, ano) => {
 
         let comarcas = consultar(db)
           .then(res => {
-            console.log(res);
+            console.log(res.length);
             client.close();
             return res
           }).catch( err => {

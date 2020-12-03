@@ -3,23 +3,49 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
 const axios = require('axios');
 require('../../bootstrap');
 const { buscar_sequencial } = require('../../lib/busca_sequencial');
+const sleep = require('await-sleep');
+
 
 let args = process.argv;
 
-const resgata_comarcas_bd = async (orgao, tribunal, ano) => {
-  let config = {
-    method: 'get',
-    url: `http://172.16.16.3:8083/processos/obterUnidadesOrigemPorTribunal/?orgao=${orgao}&tribunal=${tribunal}&ano=${ano}`,
-    headers: {
-      'x-api-key': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw'
-    }
-  };
+const atualizar_comarcas = async (tribunal, comarcasBD) => {
+  let comarcas = await Comarca.find({ Estado: tribunal.substring(tribunal.length - 2) });
+  let tam = comarcas.length;
 
-  await axios(config).then(res => res.data);
+  let comarcasAEnviar = [];
 
+  for (let i = 0; i < tam; i++) {
+    let comarca = comarcas[i];
+    let comarcaBD = comarcasBD[comarca.Comarca];
+
+    if (!comarcaBD) continue;
+
+    comarca.UltimoProcesso = comarcaBD;
+    comarca = new Comarca(comarca);
+
+    await comarca.salvar()
+    let msg = comarca.toJSON();
+
+    comarcasAEnviar.push(msg);
+  }
+
+  return comarcasAEnviar
 }
 
-const atualizar_comarcas = async (orgao, tribunal) => {
+async function enviarComarcas(tribunal, comarcasAEnviar) {
+  let gf = new GerenciadorFila();
+  const tam = comarcasAEnviar.length;
+
+  for(let i=0; i < tam; i++) {
+    await new Comarca(comarcasAEnviar[i]).salvar();
+
+    gf.enviar(`comarcas.${tribunal}.extracao`, comarcasAEnviar[i]);
+
+    await sleep(200);
+    console.log(`${ comarcasAEnviar[i].Comarca } => comarcas.${tribunal}.extracao`)
+  }
+
+
 
 }
 
@@ -29,16 +55,17 @@ const enfileirar_comarcas = async () => {
 
   let comarcasBD = await buscar_sequencial(trib, ano);
 
-  comarcasBD = comarcasBD.map(comarca => {
+  let comarcasDict = {};
+  comarcasBD.map(comarca => {
     let numero = comarca.CNJ;
     numero = numero.replace(/(\d{7})(\d{2})(\d{4})(\d)(\d{2})(\d{4})/, '$1-$2.$3.$4.$5.$6');
 
-    return {
-      CNJ: numero,
-      UnidadeOrigem: comarca.UnidadeOrigem,
-      UltimoSequencial: comarca.UltimoSequencial
-    }
+    comarcasDict[String(comarca.UnidadeOrigem)] = numero;
   })
+
+  let comarcasAEnviar = await atualizar_comarcas(trib, comarcasDict)
+
+  await enviarComarcas(trib, comarcasAEnviar)
 
   console.log('oi')
 

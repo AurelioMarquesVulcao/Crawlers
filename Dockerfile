@@ -24,5 +24,6 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 RUN npm install && npm install -g pm2 nodemon
 RUN sed -i 's/DEFAULT\@SECLEVEL\=2/DEFAULT\@SECLEVEL\=1/' /etc/ssl/openssl.cnf
+RUN npm i
 CMD ["node", "server"]
 # CMD ["pm2-docker", "ecosystem.config.js"]

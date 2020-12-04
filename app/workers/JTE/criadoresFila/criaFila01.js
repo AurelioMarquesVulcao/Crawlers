@@ -32,8 +32,8 @@ var desligado = desligar.worker;
   let timer;    // tempo entre o envio de cada teste, isso marca o ritmo de envio de processos
   let contador = 0;
   let start = 0;  // cria uma condição que permite que a aplicação inicie ao ligar o worker.
-  const variaveis = await Variaveis.catch({ "codigo": "000001" })
-  const Estados = variaveis.variaveis
+  const variaveis = await Variaveis.catch({ "codigo": "000001" });
+  const Estados = variaveis.variaveis;
   console.log(Estados);
   var estados = [
     // Estados.rj,Estados.pr,

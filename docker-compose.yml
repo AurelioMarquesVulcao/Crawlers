@@ -230,7 +230,20 @@ services:
       options:
         max-size: "5m"
         max-file: "2"
-       
+
+  worker-doc-01:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: pm2 start workers/JTE_DOC/downloadDoc.yml --no-daemon
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"       
         
   # novos-processos-jte-all:
   #   extends:

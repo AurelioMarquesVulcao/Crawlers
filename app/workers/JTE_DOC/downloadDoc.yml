@@ -1,0 +1,11 @@
+apps:
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-01'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-02'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-03'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-04'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-05'

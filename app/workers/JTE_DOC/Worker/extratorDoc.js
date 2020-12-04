@@ -153,7 +153,9 @@ async function worker(nomeFila) {
         cnj,
         listaArquivo
       );
+      
       if (envioAWS) {
+        
         await new downloadFiles().saveLog(
           "crawler.JTE",
           // envioAWS.status,

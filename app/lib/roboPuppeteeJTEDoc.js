@@ -8,6 +8,21 @@ const { JTEParser } = require('../parsers/JTEParser');
 const { Logger } = require('./util');
 const { enums } = require('../configs/enums');
 
+var heartBeat = 0; // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
+setInterval(function () {
+  heartBeat++;
+  // if (logadoParaIniciais == false) {
+  if (heartBeat > 60000) {
+    console.log(
+      '----------------- Fechando o processo por inatividade -------------------'
+    );
+    // throw "erro de time"
+    process.exit();
+  }
+  // }
+  console.log(heartBeat);
+}, 1000);
+
 // Senhas de login no tribunal
 // const login = '11270311719';
 // const senha = 'Impact@2020';
@@ -44,6 +59,7 @@ class RoboPuppeteer3 {
     this.logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
       // NumeroDoProcesso: cnj,
+      // this.
     });
   }
 
@@ -69,10 +85,12 @@ class RoboPuppeteer3 {
     // await this.acessar('https://www.meuip.com.br/');
     // await sleep(30000)
     console.log('O Puppeteer foi Iniciado corretamente');
+    heartBeat = 0;
   }
 
   async extrair(numero, contador) {
-    await this.preencheProcesso(numero, contador);
+    await this.preencheProcesso(numero, contador)
+    heartBeat = 0;;
     return await this.pegaHtml(contador, numero);
   }
 
@@ -95,6 +113,7 @@ class RoboPuppeteer3 {
       process.exit();
     }
     console.log(`Tentando carregar a url => ${url}`);
+    heartBeat = 0;
     return content;
   }
 
@@ -121,6 +140,7 @@ class RoboPuppeteer3 {
     await this.page.click('#consultaProcessual');
     await sleep(timerSleep);
     //await console.log("Logado ao tribunal desejado");
+    heartBeat = 0;
   }
 
   async loga() {
@@ -148,6 +168,7 @@ class RoboPuppeteer3 {
     await sleep(9000);
     await this.page.click('#consultaProcessual > ion-card');
     console.log('clicado no botão de busca');
+    heartBeat = 0;
   }
 
   async preencheProcesso(numero, contador) {
@@ -396,6 +417,7 @@ class RoboPuppeteer3 {
 
       for (let i = 0; i < (await iniciaisArray).length; i++) {
         await this.baixaLinkSimples(i, iniciaisArray)
+        heartBeat = 0;
       }
       this.logger.info(`Finalizado captura de documentos Simples`);
 
@@ -404,6 +426,7 @@ class RoboPuppeteer3 {
       let resultado = links;
       links = [];
       controlaLink = [];
+      heartBeat = 0;
       return resultado;
     } catch (e) {
       links = [];
@@ -421,6 +444,12 @@ class RoboPuppeteer3 {
     await this.page.click(
       `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
     );
+
+    // await this.page.evaluate((k) => {
+    //   document.querySelector(
+    //     `#popover-marcador-filtro > ion-item:nth-child(${k})> span`).click();
+    // }, k);
+
     console.log('Abri documento');
     await sleep(200);
     let link = await this.page.evaluate(
@@ -438,7 +467,7 @@ class RoboPuppeteer3 {
         let data = dataEProcesso.data;
         let numeroProcesso = dataEProcesso.numeroProcesso;
         let tipo = 'PDF';
-        let numero = numeroProcesso.replace(/\-|\./gmi,"");
+        let numero = numeroProcesso.replace(/\-|\./gmi, "");
         // console.log({ numeroProcesso, data, movimentacao, link, tipo })
         return { numeroProcesso, data, movimentacao, link, tipo };
         // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
@@ -494,6 +523,7 @@ class RoboPuppeteer3 {
           console.log("primeiro link capturado com sucesso");
           controlaLink.push(link.link);
           console.log(link);
+          heartBeat = 0;
           return link
         } else if (controlaLink.length > 0) {
           console.log("Estou verificando demais links");
@@ -501,9 +531,11 @@ class RoboPuppeteer3 {
             console.log(" ------------------- O link é único, verificação concluida ------------------- ");
             controlaLink.push(link.link);
             console.log(link);
+            heartBeat = 0;
             return link
           } else {
             console.log("já peguei esse documento, vou repetir o processo.");
+
             throw "O Link do Documento é repetido"
 
           }
@@ -511,6 +543,7 @@ class RoboPuppeteer3 {
 
       }
     } catch (e) {
+      heartBeat = 0;
       await this.baixaLink(k, dataEProcesso);
     }
 
@@ -623,7 +656,7 @@ class RoboPuppeteer3 {
     this.logger.info(`Peguei o documento numero ${iniciaisArray[i]}`);
     //let linkAjustado = { numeroProcesso: ajustes.mascaraNumero(link.numeroProcesso), data: ajustes.ajustaData(link.data), movimentacao: link.movimentacao, link: link.link };
     // console.log(link);
-    
+
     await sleep(1000);
   }
 
@@ -723,6 +756,7 @@ class RoboPuppeteer3 {
     let vara = numero.trim().slice(numero.length - 4, numero.length);
     let estado = numero.trim().slice(numero.length - 6, numero.length - 4);
     estado = parseInt(estado);
+    heartBeat = 0;
     return { numeroProcesso, ano, vara, estado };
   }
 

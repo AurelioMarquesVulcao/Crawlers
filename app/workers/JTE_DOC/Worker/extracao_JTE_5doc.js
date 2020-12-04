@@ -33,7 +33,7 @@ const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
 // const nomeFila = `peticao.JTE.extracao`;
-const reConsumo = `peticao.JTE.extracao`;
+const reConsumo = `peticao.JTE.extracao.${process.argv[2]}`;
 const filaAxios = "Fila.axios.JTE"
 
 var estadoAnterior; // Recebe o estado atual que está sendo baixado
@@ -56,6 +56,7 @@ var start = 0; // server de marcador para as funções que devem carregar na ini
       // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
       await worker(`peticao.JTE.extracao.${process.argv[2]}`);
+      // await worker(`Fila.axios.JTE3`);
     } else {
       //console.log("aguardando para ligar");
     }
@@ -67,27 +68,27 @@ async function worker(nomeFila) {
 
   // try {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
-  setInterval(function () {
-    heartBeat++;
-    //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
-    if (logadoParaIniciais == false) {
-      if (heartBeat > 10000) {
-        console.log(
-          '----------------- Fechando o processo por inatividade -------------------'
-        );
-        // throw "erro de time"
-        process.exit();
-      }
-    } else {
-      if (heartBeat > 10000) {
-        console.log(
-          '----------------- Fechando o processo por inatividade -------------------'
-        );
-        // throw "erro de time"
-        process.exit();
-      }
-    }
-  }, 1000);
+  // setInterval(function () {
+  //   heartBeat++;
+  //   //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
+  //   if (logadoParaIniciais == false) {
+  //     if (heartBeat > 10000) {
+  //       console.log(
+  //         '----------------- Fechando o processo por inatividade -------------------'
+  //       );
+  //       // throw "erro de time"
+  //       process.exit();
+  //     }
+  //   } else {
+  //     if (heartBeat > 10000) {
+  //       console.log(
+  //         '----------------- Fechando o processo por inatividade -------------------'
+  //       );
+  //       // throw "erro de time"
+  //       process.exit();
+  //     }
+  //   }
+  // }, 1000);
 
   // liga ao banco de dados
   mongoose.connect(enums.mongo.connString, {
@@ -100,8 +101,10 @@ async function worker(nomeFila) {
 
   // Ligando o puppeteer.
   await puppet.iniciar();
+  console.log("INICIAR");
   await sleep(3000);
   await puppet.acessar('https://jte.csjt.jus.br/');
+  console.log("ACESSAR");
   await sleep(3000);
 
   contador = 0;

@@ -12,7 +12,7 @@ var heartBeat = 0; // Verifica se a aplicação esta consumindo a fila, caso nã
 setInterval(function () {
   heartBeat++;
   // if (logadoParaIniciais == false) {
-  if (heartBeat > 60000) {
+  if (heartBeat > 60) {
     console.log(
       '----------------- Fechando o processo por inatividade -------------------'
     );

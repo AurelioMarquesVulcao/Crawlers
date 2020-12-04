@@ -126,6 +126,7 @@ class downloadFiles {
       console.log(error);
 
     }
+    Fs.unlinkSync(lista[0].path)
     return resultado;
   }
 

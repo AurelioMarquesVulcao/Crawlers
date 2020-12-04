@@ -20,7 +20,7 @@ setInterval(function () {
     process.exit();
   }
   // }
-  console.log(heartBeat);
+  console.log(heartBeat,"teste");
 }, 1000);
 
 // Senhas de login no tribunal

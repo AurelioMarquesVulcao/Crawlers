@@ -1,6 +1,5 @@
 const Comarca = require('../../models/schemas/comarcas');
 const { GerenciadorFila } = require('../../lib/filaHandler');
-const axios = require('axios');
 require('../../bootstrap');
 const { buscar_sequencial } = require('../../lib/busca_sequencial');
 const sleep = require('await-sleep');

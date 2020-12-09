@@ -98,11 +98,15 @@ class Sequencial {
         }
       }
       for (let ii = 0; ii < processos.length; ii++) {
-        if (this.verificaData(new Date, processos[ii].dataDistribuicao))
-          desatualizados.push(processos[ii]);
+        if (processos[ii]) {
+          if (this.verificaData(new Date, processos[ii].dataDistribuicao))
+            desatualizados.push(processos[ii]);
+        }
+
       }
       return desatualizados
     } catch (e) {
+      console.log(e);
       console.log("Erro na verificacao");
     }
   }
@@ -148,17 +152,20 @@ class Sequencial {
     let sequencia = parseInt(numero.slice(0, 7));
     // if (sequencia > 0) {
     try {
-      let processo = await Processo.find({
+      let processo = await Processo.findOne({
         "detalhes.numeroProcesso": numero,
       });
-
-      return {
-        "numeroProcesso": numero,
-        "dataDistribuicao": processo[0].capa.dataDistribuicao
+      if (processo) {
+        return {
+          "numeroProcesso": numero,
+          "dataDistribuicao": processo.capa.dataDistribuicao
+        }
       }
+
+
     } catch (e) {
       console.log(numero);
-      // console.log(e);
+      console.log(e);
       console.log("Erro na busca de processo");
     }
     // }

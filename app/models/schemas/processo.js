@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const moment = require('moment');
 
 const capaSchema = new Schema(
   {
@@ -14,7 +15,7 @@ const capaSchema = new Schema(
     segredoJustica: Boolean,
     justicaGratuita: String,
     valor: String,
-    audiencias: [{ data: Date, tipo: String }]
+    audiencias: []
   },
   { _id: false, versionKey: false }
 );
@@ -87,10 +88,8 @@ processoSchema.methods.salvar = async function salvar() {
 
   // verificando a quantidade de andamentos dentro do banco
   let doc = await new Promise((resolve, reject) => {
-    processoObject.temAndamentosNovos = true;
-    if (pesquisa && this.qtdAndamentos === pesquisa.qtdAndamentos) {
-      processoObject.temAndamentosNovos = false;
-    }
+
+    processoObject.temAndamentosNovos = !(pesquisa && this.qtdAndamentos === pesquisa.qtdAndamentos);
     let doc = Processo.updateOne(
       { 'detalhes.numeroProcesso': this.detalhes.numeroProcesso },
       processoObject,
@@ -145,15 +144,20 @@ processoSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
   return detalhes;
 };
 
-processoSchema.statics.listarProcessos = async function listarProcessos(dias) {
+processoSchema.statics.listarProcessos = async function listarProcessos(dias, tribunal, orgao) {
   let numeroProcessos = [];
 
-  let docs = await Processo.find(
-    {
+  let query = {
       dataAtualizacao: {
         $gte: new Date(new Date().getTime() - dias * 24 * 3600 * 1000),
       },
-    },
+    }
+
+    if (tribunal) query['detalhes.tribunal'] = tribunal;
+    if (orgao) query['detalhes.orgao'] = orgao;
+
+  let docs = await Processo.find(
+    query,
     {
       'detalhes.numeroProcessoMascara': 1,
     }

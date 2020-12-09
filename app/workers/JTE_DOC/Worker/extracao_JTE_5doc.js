@@ -18,6 +18,7 @@ const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const { downloadFiles } = require('../../../lib/downloadFiles');
 const { Log } = require('../../../models/schemas/logsEnvioAWS');
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
+const { Processo } = require('../../../models/schemas/processo');
 
 /**
  * Logger para console e arquivo
@@ -32,7 +33,8 @@ const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
 // const nomeFila = `peticao.JTE.extracao`;
-const reConsumo = `peticao.JTE.extracao`;
+const reConsumo = `peticao.JTE.extracao.${process.argv[2]}`;
+const filaAxios = "Fila.axios.JTE"
 
 var estadoAnterior; // Recebe o estado atual que está sendo baixado
 var estadoDaFila; // Recebe o estado da fila
@@ -54,6 +56,7 @@ var start = 0; // server de marcador para as funções que devem carregar na ini
       // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
       await worker(`peticao.JTE.extracao.${process.argv[2]}`);
+      // await worker(`Fila.axios.JTE3`);
     } else {
       //console.log("aguardando para ligar");
     }
@@ -65,27 +68,27 @@ async function worker(nomeFila) {
 
   // try {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
-  setInterval(function () {
-    heartBeat++;
-    //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
-    if (logadoParaIniciais == false) {
-      if (heartBeat > 4000) {
-        console.log(
-          '----------------- Fechando o processo por inatividade -------------------'
-        );
-        // throw "erro de time"
-        process.exit();
-      }
-    } else {
-      if (heartBeat > 4000) {
-        console.log(
-          '----------------- Fechando o processo por inatividade -------------------'
-        );
-        // throw "erro de time"
-        process.exit();
-      }
-    }
-  }, 1000);
+  // setInterval(function () {
+  //   heartBeat++;
+  //   //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
+  //   if (logadoParaIniciais == false) {
+  //     if (heartBeat > 10000) {
+  //       console.log(
+  //         '----------------- Fechando o processo por inatividade -------------------'
+  //       );
+  //       // throw "erro de time"
+  //       process.exit();
+  //     }
+  //   } else {
+  //     if (heartBeat > 10000) {
+  //       console.log(
+  //         '----------------- Fechando o processo por inatividade -------------------'
+  //       );
+  //       // throw "erro de time"
+  //       process.exit();
+  //     }
+  //   }
+  // }, 1000);
 
   // liga ao banco de dados
   mongoose.connect(enums.mongo.connString, {
@@ -98,8 +101,10 @@ async function worker(nomeFila) {
 
   // Ligando o puppeteer.
   await puppet.iniciar();
+  console.log("INICIAR");
   await sleep(3000);
   await puppet.acessar('https://jte.csjt.jus.br/');
+  console.log("ACESSAR");
   await sleep(3000);
 
   contador = 0;
@@ -110,35 +115,35 @@ async function worker(nomeFila) {
 
 
       // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
-      setInterval(function () {
-        heartBeat++;
-        //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
-        if (logadoParaIniciais == false) {
-          if (heartBeat > 4000) {
-            console.log(
-              '----------------- Fechando o processo por inatividade -------------------'
-            );
-            new GerenciadorFila().enviar(nomeFila, message)
-            ch.ack(msg);
-            const error = new Error('Tempo espirou');
-            error.code = 'Time error';
-            throw error;
-            // process.exit();
-          }
-        } else {
-          if (heartBeat > 4000) {
-            console.log(
-              '----------------- Fechando o processo por inatividade -------------------'
-            );
-            new GerenciadorFila().enviar(nomeFila, message)
-            ch.ack(msg);
-            const error = new Error('Tempo espirou');
-            error.code = 'Time error';
-            throw error;
-            // process.exit();
-          }
-        }
-      }, 1000);
+      // setInterval(function () {
+      // heartBeat++;
+      //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
+      //   if (logadoParaIniciais == false) {
+      //     if (heartBeat > 10000) {
+      //       console.log(
+      //         '----------------- Fechando o processo por inatividade -------------------'
+      //       );
+      //       new GerenciadorFila().enviar(nomeFila, message)
+      //       ch.ack(msg);
+      //       const error = new Error('Tempo espirou');
+      //       error.code = 'Time error';
+      //       throw error;
+      //       // process.exit();
+      //     }
+      //   } else {
+      //     if (heartBeat > 10000) {
+      //       console.log(
+      //         '----------------- Fechando o processo por inatividade -------------------'
+      //       );
+      //       new GerenciadorFila().enviar(nomeFila, message)
+      //       ch.ack(msg);
+      //       const error = new Error('Tempo espirou');
+      //       error.code = 'Time error';
+      //       throw error;
+      //       // process.exit();
+      //     }
+      //   }
+      // }, 1000);
 
 
 
@@ -236,7 +241,7 @@ async function worker(nomeFila) {
 
         // aqui verifico se o processo existe.
         // caso exista eu obtenho o html da capa e dos andamentos como resposta.
-        let objResponse = await puppet.preencheProcesso(
+        let objResponse = await puppet.extrair(
           numeroProcesso,
           contador
         );
@@ -248,6 +253,60 @@ async function worker(nomeFila) {
 
         if (!!objResponse) contador++;
 
+
+
+        // Atuliza dados de capa para salvar data de audiência.
+        let audiencia = dadosProcesso.processo.capa.audiencias[0]
+        console.log(audiencia);
+        if (!audiencia) {
+          await Processo.findOneAndUpdate(
+            {
+              "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+            }, {
+            "capa.audiencias": [{
+              data: "",
+              tipo: ""
+            }]
+          });
+        } else {
+          if (audiencia.data == 0) {
+            await Processo.findOneAndUpdate(
+              {
+                "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+              }, {
+              "capa.audiencias": [{
+                data: "",
+                tipo: ""
+              }]
+            });
+
+          } else {
+            if (audiencia.data >= new Date()) {
+              await Processo.findOneAndUpdate(
+                {
+                  "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+                }, {
+                "capa.audiencias": [{
+                  data: audiencia.data,
+                  tipo: audiencia.tipo
+                }]
+              });
+            } else {
+              await Processo.findOneAndUpdate(
+                {
+                  "detalhes.numeroProcesso": dadosProcesso.processo.detalhes.numeroProcesso
+                }, {
+                "capa.audiencias": [{
+                  data: "",
+                  tipo: ""
+                }]
+              });
+            }
+
+          }
+        }
+
+        // process.exit()
         if (message.inicial != true) {
           // condicional provisório para testes1
           // if (message.inicial != true) {
@@ -294,72 +353,108 @@ async function worker(nomeFila) {
           // }
         }
 
+
+
+
         if (message.inicial == true) {
           console.log('---------- Vou baixar link das iniciais-------');
           let link = await puppet.pegaInicial();
-          if (!link) {
-            // ch.ack(msg);
-            // new GerenciadorFila().enviar(nomeFila, message);
-            // ch.ack(msg);
-            await sleep(1000);
-
-            // salva no banco os dados do erro.
-            await logInciniais(numeroProcesso, message, false);
-
-
-            console.log("Salvei no Banco");
-            await sleep(1000);
-            ch.ack(msg);
-            // await new GerenciadorFila().enviar(nomeFila, message);
-            await sleep(2000);
-            process.exit();
-          }
-          else{
-            await logInciniais(numeroProcesso, message, true);
-          }
-          let listaArquivo = [];
-          for (let w = 0; w < link.length - 1; w++) {
-            await new CriaFilaJTE().salvaDocumentoLink(link[w]);
-            let cnj =
-              link[w].numeroProcesso.replace(/[-.]/g, '') + '-' + w + '.pdf';
-            let linkDocumento = link[w].link;
-
-            let local = '/home/aurelio/crawlers-bigdata/downloads';
-            // let local = '/app/downloads';
-
-            let tipo = link[w].tipo;
-            // if (tipo == 'pdf'|tipo == 'PDF') {
-              if (tipo != 'HTML') {
-              await new downloadFiles().download(cnj, linkDocumento, local);
-              listaArquivo.push({
-                url: linkDocumento,
-                path: `${local}/${cnj}`,
-              });
-            } else if (tipo == 'HTML') {
-              // await new downloadFiles().covertePDF(nome, local, linkDocumento)
-              // listaArquivo.push({
-              //   url: linkDocumento,
-              //   path: `${local}/${nome}`
-              // })
+          // console.log("Vou imprimir os links", link);
+          for (let w = 0; w < link.length; w++) {
+            if (link[w]) {
+              if (link[w].tipo != 'HTML') {
+                // Criando fila para Download de documentos
+                await new GerenciadorFila().enviar(filaAxios, JSON.stringify(link[w]));
+                console.log("valor do laço é", w, JSON.stringify(link[w]));
+              }
             }
-          }
-          logger.info('Iniciando envio para AWS');
-          // enviar para AWS
-          let numeroAtualProcesso =
-            dadosProcesso.processo.detalhes.numeroProcesso;
-          let cnj = numeroAtualProcesso;
-          const envioAWS = await new downloadFiles().enviarAWS(
-            cnj,
-            listaArquivo
-          );
-          await new downloadFiles().saveLog(
-            "crawler.JTE",
-            envioAWS.status,
-            envioAWS.resposta,
 
-          )
-          // console.log(envioAWS);
+
+            await sleep(300);
+          }
         }
+
+
+
+
+        // if (message.inicial == true) {
+        //   console.log('---------- Vou baixar link das iniciais-------');
+        //   let link = await puppet.pegaInicial();
+        //   if (!link) {
+        //     // ch.ack(msg);
+        //     new GerenciadorFila().enviar(nomeFila, message);
+        //     // ch.ack(msg);
+        //     await sleep(1000);
+
+        //     // salva no banco os dados do erro.
+        //     await logInciniais(numeroProcesso, message, false);
+
+
+        //     console.log("Salvei no Banco");
+        //     await sleep(1000);
+        //     ch.ack(msg);
+        //     // await new GerenciadorFila().enviar(nomeFila, message);
+        //     await sleep(2000);
+        //     process.exit();
+        //   }
+        //   else {
+        //     await logInciniais(numeroProcesso, message, true);
+
+        //     // new GerenciadorFila().enviar(filaAxios, message);
+        //   }
+        //   let listaArquivo = [];
+        //   // correção de não realizar download da inicial
+        //   // for (let w = 0; w < link.length - 1; w++) {
+        //   for (let w = 0; w < link.length; w++) {
+        //     // Criando fila para Download de documentos
+        //     await new GerenciadorFila().enviar(filaAxios, link[w])
+        //     // Salvando log de Donwnload
+        //     await new CriaFilaJTE().salvaDocumentoLink(link[w]);
+        //     let cnj =
+        //       link[w].numeroProcesso.replace(/[-.]/g, '') + '-' + w + '.pdf';
+        //     let linkDocumento = link[w].link;
+
+        //     let local = '/home/aurelio/crawlers-bigdata/downloads';
+        //     // let local = '/app/downloads';
+
+        //     let tipo = link[w].tipo;
+        //     // if (tipo == 'pdf'|tipo == 'PDF') {
+        //     if (tipo != 'HTML') {
+        //       await new downloadFiles().download(cnj, linkDocumento, local);
+        //       listaArquivo.push({
+        //         url: linkDocumento,
+        //         path: `${local}/${cnj}`,
+        //       });
+        //     } else if (tipo == 'HTML') {
+        //       // await new downloadFiles().covertePDF(nome, local, linkDocumento)
+        //       // listaArquivo.push({
+        //       //   url: linkDocumento,
+        //       //   path: `${local}/${nome}`
+        //       // })
+        //     }
+        //   }
+        //   logger.info('Iniciando envio para AWS');
+        //   // enviar para AWS
+        //   let numeroAtualProcesso =
+        //     dadosProcesso.processo.detalhes.numeroProcesso;
+        //   let cnj = numeroAtualProcesso;
+        //   // console.log(listaArquivo);
+        //   const envioAWS = await new downloadFiles().enviarAWS(
+        //     cnj,
+        //     listaArquivo
+        //   );
+        //   if (envioAWS) {
+        //     await new downloadFiles().saveLog(
+        //       "crawler.JTE",
+        //       // envioAWS.status,
+        //       200,
+        //       envioAWS.resposta,
+
+        //     )
+        //     console.log(envioAWS);
+        //   }
+        // }
+
 
         logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {
@@ -479,7 +574,7 @@ async function logInciniais(numeroProcesso, message, status) {
   let verifica = await LogDownload.findOne({ "numeroProcesso": numeroProcesso });
   if (verifica) {
     tentativa = verifica.quantidadeTentativas + 1
-    if(verifica.statusDownload){
+    if (verifica.statusDownload) {
       status = true
     }
   }

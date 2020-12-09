@@ -12,6 +12,7 @@ const { enums } = require('../configs/enums');
 const red = '\u001b[31m';
 const blue = '\u001b[34m';
 const reset = '\u001b[0m';
+var error1 = 0;
 
 class downloadFiles {
   /**
@@ -82,9 +83,10 @@ class downloadFiles {
         NumeroCNJ: cnj,
         Documentos: [],
       };
+      // let base64;
       for (let i = 0, si = lista.length; i < si; i++) {
         logger.info(`Iniciando conversão para base64`);
-        const base64 = Fs.readFileSync(lista[i].path, 'base64');
+        let base64 = Fs.readFileSync(lista[i].path, { encoding: 'base64' });
         envioAWS.Documentos.push({
           DocumentoBody: base64,
           UrlOrigem: lista[i].url,
@@ -116,10 +118,20 @@ class downloadFiles {
           logger.info('Envio para AWS foi Falhou !!!');
           throw err;
         });
+      Fs.unlinkSync(lista[0].path)
     } catch (error) {
-      console.log(error);
-      await this.enviarAWS(cnj, lista)
+      error1++
+      if (error1 < 4) {
+        await new downloadFiles().enviarAWS(cnj, lista)
+      } else {
+        console.log(error);
+        throw "Não foi possível Baixar"
+      }
+
+
+
     }
+    // Fs.unlinkSync(lista[0].path)
     return resultado;
   }
 

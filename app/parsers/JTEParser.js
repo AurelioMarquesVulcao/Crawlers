@@ -29,10 +29,7 @@ class JTEParser extends BaseParser {
     let dadosAndamento = this.andamento($2, n);
     // extrai vara/ comarca/ e 1 distribuição
     let primeiraDistribuicao = this.extraiDadosDosAndametos(
-      $,
-      dadosAndamento,
-      contador
-    );
+      $, dadosAndamento, contador);
     // console.log(primeiraDistribuicao);
     let dadosProcesso = new Processo({
       capa: this.capa($, cnj, primeiraDistribuicao),
@@ -45,13 +42,8 @@ class JTEParser extends BaseParser {
       detalhes: this.detalhes(cnj),
     });
 
-    console.log(
-      'O processo possui ' + this.numeroDeAndamentos($2) + ' andamentos'
-    );
-    return {
-      processo: dadosProcesso,
-      andamentos: dadosAndamento,
-    };
+    console.log('O processo possui ' + this.numeroDeAndamentos($2) + ' andamentos');
+    return { processo: dadosProcesso, andamentos: dadosAndamento, };
   }
 
   /**
@@ -81,13 +73,20 @@ class JTEParser extends BaseParser {
     let resultado;
     try {
       let parse = this.removeVazios(
-        $(
-          '#mat-tab-content-1-0 > div > detalhes-aba-geral > div > div:nth-child(14)'
-        )
-          .text()
-          .split('\n')
-      );
-      resultado = [{ data: Helper.data(parse[1]), tipo: 'N/I' }];
+        $('#mat-tab-content-1-0 > div > detalhes-aba-geral > div > div:nth-child(14)').text().split('\n'));
+      if (parse.length < 1) {
+        parse = this.removeVazios(
+          $('#mat-tab-content-0-0 > div > detalhes-aba-geral > div > div:nth-child(14)').text().split('\n'));
+      }
+      console.log("----------------- estou aqui ----------------");
+      console.log(parse);
+      try{
+        resultado = [{ data: Helper.data2(parse[1]), tipo: 'N/I' }];
+      }catch(e){
+        resultado = [{ data: Helper.data2(parse[0]), tipo: 'N/I' }];  
+      }
+      
+      console.log(resultado);
     } catch (e) {
       resultado = [];
     }
@@ -164,7 +163,7 @@ class JTEParser extends BaseParser {
   }
 
   // funcao secundaria - organiza os dados dos andamentos
-  andamentos($) {}
+  andamentos($) { }
 
   extraiAssunto($) {
     let resultado = [];
@@ -407,7 +406,7 @@ class JTEParser extends BaseParser {
     };
   }
 
-  validaOAB() {}
+  validaOAB() { }
 
   // ----------------------------------------fim da raspagem dos dados do processo-----------------------------------------------
 

@@ -47,7 +47,7 @@ async function worker() {
 
 
   // tudo que está abaixo é acionado para cada consumer na fila.
-  await new GerenciadorFila(false, 1000).consumir(nomeFila, async (ch, msg) => {
+  await new GerenciadorFila(false, 10).consumir(nomeFila, async (ch, msg) => {
     try {
 
       let message = JSON.parse(msg.content.toString());
@@ -65,7 +65,7 @@ async function worker() {
       console.log("envio para fila ok");
       // console.log(message);
 
-      // ch.ack(msg);
+      ch.ack(msg);
       await sleep(20000);
       process.exit();
 

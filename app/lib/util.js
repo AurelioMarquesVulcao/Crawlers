@@ -19,6 +19,21 @@ class Helper {
     // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
     //GMT-0300
     let regex = data.replace(/([0-9]{1,2})\W([0-9]{1,2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2})/i, '$3-$2-$1 $4 GMT-0000');
+    console.log(regex);
+    return new Date(regex);
+  }
+
+  /**
+   * Converte data comum para formato Date. sem alterar o fuso horário
+   * @param {string} data Data comum. Ex.: 25/02/2020 09:40
+   * @returns {string} 2020-01-01T10:10.000Z
+   */
+  static data2(data){
+    // O GMT-0000 mantem a hora que você inseriu sem alterar fuso -3
+    // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
+    //GMT-0300
+    let regex = data.replace(/.+([0-9]{1,2})\W([0-9]{1,2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2}).+/i, '$3-$2-$1 $4 GMT-0000');
+    console.log(regex);
     return new Date(regex);
   }
 
@@ -357,6 +372,7 @@ class Cnj {
   /**
    * Separa a string do processo com cada uma das suas infomações
    * @param {string} numero String com o numero do processo sem mascara
+   * @returns sequencial, dois, ano, tipo, estado, comarca
    */
   static processoSlice(numero) {
     let sequencial = numero.slice(0, 7);
@@ -404,7 +420,7 @@ class Cnj {
     let sequencial = this.completaNumero(ultimoSequencial, "ultimoSequencial");
     let tribunal = this.completaNumero(Tribunal, "Tribunal");
     let origem = this.completaNumero(unidadeOrigem, "unidadeOrigem");
-    return `${sequencial}0020205${tribunal}${origem}`
+    return `${sequencial}00${new Date().getFullYear}5${tribunal}${origem}`
   }
 
   /**

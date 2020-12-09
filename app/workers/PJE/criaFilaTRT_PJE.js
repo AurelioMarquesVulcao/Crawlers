@@ -30,7 +30,7 @@ class CriaFilaPJE {
 
         let estado = [];
         console.log("Fila concluída. Iniciando criador de fila.");
-        for (let i = 1; i < 25; i++) {
+        for (let i = 1; i < 5; i++) {
             if (i != 15) {
                 estado = await this.atualizaProcessosFila(0, i, data)[0]
             }
@@ -97,7 +97,7 @@ class CriaFilaPJE {
                 }
             },
             { $sort: { _id: -1 } },
-            { $limit: 20 }
+            { $limit: 200 }
         ]).skip(pulo);
         for (let i = 0; i < agregar.length; i++) {
             busca = `${agregar[i]._id}`;

@@ -12,6 +12,7 @@ const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 const { GerenciadorFila } = require("../../../lib/filaHandler");
 const awaitSleep = require("await-sleep");
 const { Processo } = require('../../../models/schemas/processo');
+const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../../models/schemas/jte');
 
 
 const Fila = new CriaFilaJTE();
@@ -27,5 +28,5 @@ var desligado = desligar.worker;
   for (let i = 0; i < numeros.length; i++) {
     console.log(numeros[i]);
   }
-
+  // await statusEstadosJTE.deleteMany({"dataCriaçãoJTE" : null});
 })()

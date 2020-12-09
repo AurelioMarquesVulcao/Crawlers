@@ -221,7 +221,7 @@ class ProcessoTJSP extends ExtratorBase {
       return {sucesso: false, causa: 'Não encontrado', detalhes: 'Não existem informações disponíveis para o processo informado.'}
     }
 
-    if ($(senhaProcessoSelector).length) {
+    if ($(senhaProcessoSelector).length && $(tabelaMovimentacoesSelector).length === 0) {
       return {sucesso: false, causa: 'Senha necessaria', detalhes: 'Se for uma parte ou interessado, digite a senha do processo'}
     }
 
@@ -231,6 +231,70 @@ class ProcessoTJSP extends ExtratorBase {
 
     return {sucesso: true}
   }
+
+  async login() {
+    let tentativas = 1;
+    let credencial;
+    let credenciaisUsadas = []
+    let objRespose = await this.acessaPaginaLogin()
+    do {
+      credenciais = await this.pegaCredenciais(credenciais)
+      await this.fazLogin(credencial, objRespose.responseBody)
+      let login = this.validaLogin(credencial)
+      if (login.sucesso) {
+        return true
+      }
+
+      credenciaisUsadas.push(credenciais)
+
+    } while(tentativas < 5)
+
+    return false
+  }
+
+  async acessaPaginaLogin() {
+    let url = 'https://esaj.tjsp.jus.br/sajcas/login?service=https%3A%2F%2Fesaj.tjsp.jus.br%2Fesaj%2Fj_spring_cas_security_chec';
+
+    return await this.robo.acessar({url, method: 'GET'})
+  }
+  async pegaCredenciais(usadas) {
+      let ids_usadas = usadas.map(e => e._id)
+      const credenciais = await CredenciaisAdvogados.getCredenciais(
+        'SP',
+        ids_usadas
+      );
+      return credenciais;
+    }
+  async fazLogin(credencial, body) {
+    let url = 'https://esaj.tjsp.jus.br/sajcas/login?service=https%3A%2F%2Fesaj.tjsp.jus.br%2Fesaj%2Fj_spring_cas_security_chec'
+
+    let $ = cheerio.load(body)
+    let flowExecutionKeySelector = '#flowExecutionKey';
+
+    let flowExecution = $(flowExecutionKeySelector)[0].value();
+
+
+    let options = {
+      url,
+      method: 'POST',
+      formData: {
+        username: credencial.login,
+        password: credencial.senha,
+        it: '',
+        execution: flowExecution,
+        _eventId: 'submit',
+        pbEntrar: 'Entrar',
+        signature: '',
+        certificadoSelecionado: '',
+        certificado: ''
+      }
+    }
+
+    return this.robo.acessar(options);
+  }
+  validaLogin(credencial) {}
+
+
   //===================== Funções secundarias =====================
   setInstanciaUrl() {
     // this.url = INSTANCIAS_URLS[this.instancia - 1];

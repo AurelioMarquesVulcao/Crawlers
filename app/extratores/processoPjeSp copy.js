@@ -3,7 +3,7 @@ const { Robo } = require('../lib/robo');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 const sleep = require('await-sleep');
-const CaptchaHandler = require('../lib/captchaHandler');
+const {CaptchaHandler} = require('../lib/captchaHandler');
 const HttpsProxyAgent = require('https-proxy-agent');
 const proxy = new HttpsProxyAgent(
   'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182');
@@ -252,7 +252,7 @@ class ExtratorTrtPje {
    * @param {string} objResponseCaptcha Obtem a imagem em base64 do captcha
    */
   async captura(header, cnj, numeroEstado) {
-    
+
     let url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`;
 
     const logger = new Logger(
@@ -309,6 +309,7 @@ class ExtratorTrtPje {
       const $ = cheerio.load(desafio);
       // $("body > script")
       let filtro1 = $("body > script")[0].children[0].data;
+      console.log(filtro1);
       // let filtro1 = $("body > script")[0].children
       let name = filtro1.match(/document\.getElementById\("bid"\)\.name\s+=\s?"(\w+)"/)[1];
       let value = filtro1.match(/document\.getElementById\("bid"\)\.value\s+=\s?"(\w+)"/)[1];
@@ -352,7 +353,7 @@ class ExtratorTrtPje {
         throw "capcha falso"
       }
       console.log(desafio);
-      process.exit();
+      // process.exit();
       const captcha = {
         refinador: 'trt_1',
         imagem: `${desafio.imagem}`,
@@ -419,7 +420,9 @@ class ExtratorTrtPje {
         logger.info('Não foi possível resolver o captcha');
       }
     } catch (e) {
+
       console.log(" ----------------- Erro captura  ----------------- ");
+      console.log(e);
       await sleep(500);
       await this.captura(header, cnj, numeroEstado);
     }

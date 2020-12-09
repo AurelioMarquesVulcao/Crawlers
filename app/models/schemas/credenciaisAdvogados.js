@@ -21,7 +21,10 @@ credenciaisAdvogadosSchema.statics.getCredenciais = async function getCredenciai
     estado: estado,
     _id: { $nin: idsUsados },
   };
-  return CredenciaisAdvogados.findOne(query);
+
+  let encontrados = await CredenciaisAdvogados.find(query);
+  let random = Math.floor(Math.random() * encontrados.length);
+  return encontrados[random];
 };
 
 credenciaisAdvogadosSchema.statics.criarHash = async function criarHash(obj) {

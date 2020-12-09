@@ -1,258 +1,272 @@
-const cheerio = require('cheerio');
-const moment = require('moment');
-const { Helper } = require('../lib/util');
+let cheerio = require('cheerio');
+// const { antiCaptchaImage } = require('../lib/captchaHandler');
+const { CaptchaHandler } = require('../lib/captchaHandler');
+const { Robo } = require('../lib/newRobo');
+const { LogExecucao } = require('../lib/logExecucao');
+const { Logger } = require('../lib/util');
+
 const { Processo } = require('../models/schemas/processo');
-const { Andamento } = require('../models/schemas/andamento');
-const re = require('xregexp');
-const axios = require('axios');
-const fs = require('fs');
-
-const {
-  BaseException,
-  RequestException,
-  ExtracaoException,
-  AntiCaptchaResponseException,
-} = require('../models/exception/exception');
-
+const Comarca = require('../models/schemas/comarcas');
 const { ExtratorBase } = require('./extratores');
-const { TJRSParser } = require('../parsers/TJRSParser');
-
-const saveFileSync = (path, arquivo, encoding) => {
-  try {    
-    if(arquivo) {          
-      require("fs")
-        .writeFileSync(path, arquivo, encoding);
-    } else {
-      console.log('O arquivo não está vindo');
-    }
-  } catch (error) {
-    Helper.pred(error);
-  }
-}
 
 module.exports.OabTJRS = class OabTJRS extends ExtratorBase {
-
   constructor(url, isDebug) {
     super(url, isDebug);
-    this.parser = new TJRSParser();
     // this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
+    this.robo = new Robo();
+    this.resultados = [];
   }
 
-  async resolverCaptchaAudio(oab, url, cookies) {
-
-    cookies = cookies.replace(/\spath\=\/\;?/g,'');    
-    let audio;
-
-    const imagemResponse = await axios({
-      method: 'get',
-      url: `https://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php?${new Date('2020-07-06').getTime()}`,
-      headers: {
-        Cookie: cookies
-      },
-      responseType: 'arraybuffer'
+  async extrair(numeroOab, cadastroConsultaId, instancia = 1) {
+    this.logger = new Logger('info', `logs/OabTJRS/OabTJRSInfo.log`, {
+      nomeRobo: 'oab.TJRS',
+      NumeroOab: numeroOab,
     });
-    
-    const somResponse = await axios({
-      url,
-      method: "GET",      
-      responseType: "arraybuffer",
-      headers: {
-        Cookie: cookies.replace(/path\=\//)
-      }
-    }) 
-    
-    // const resQuebrarCaptcha = await this.robo.acessar({
-    //   // url: `http://172.16.16.8:5000/api/solve`,
-    //   url: `http://localhost:5000/api/solve`,
-    //   method: "post",
-    //   encoding: "utf8",
-    //   usaProxy: false,
-    //   usaJson: true,
-    //   params: captcha
-    // });    
-
-    audio = Buffer
-      .from(somResponse.data)
-      .toString('base64');    
-
-    console.log(url);
-    console.log();
-    console.log(`Cookie: ${cookies}`);
-    console.log();
-    console.log(audio);
-
-    // let audio = Buffer.from(captchaResponse.data)
-    //   .toString('base64');
-
-    // let audio2 = Buffer.from(fs.readFileSync('./assets/captcha/audiofile.wav')).toString('base64');
-
-    // console.log(audio2);
-
-    // Helper.pred('----');
-
-
-//     console.log('0 - GET', url, `cookie: ${cookies}`);
-//     console.log(1, audio.toString('base64'));
-//     fs.writeFileSync(`./assets/captcha/1.audio.captcha.${oab}.wav`, audio);    
-//     // Helper.pred('teste123');    
-
-//     // console.log('1', captchaResponse.data);
-//     // console.log('2', audio.toString('base64'));
-
-    saveFileSync(`./assets/captcha/audio.captcha.${oab}.wav`, audio, 'base64');
-
-    const captcha = {      
-      audio
+    this.numeroOab = numeroOab.replace(/[A-Z]/g, '');
+    this.ufOab = numeroOab.replace(/[0-9]/g, '');
+    this.resposta = {};
+    this.cadastroConsulta = {
+      SeccionalOab: 'RS',
+      TipoConsulta: 'processo',
+      NumeroOab: numeroOab,
+      Instancia: instancia,
+      NomeRobo: 'TJRS',
+      _id: cadastroConsultaId,
     };
 
-    console.log(2, captcha);    
-
-    // const resQuebrarCaptcha = await this.robo.acessar({
-    //   // url: `http://172.16.16.8:5000/api/solve`,
-    //   url: `http://localhost:5000/api/solve`,
-    //   method: "post",
-    //   encoding: "utf8",
-    //   usaProxy: false,
-    //   usaJson: true,
-    //   params: captcha
-    // });
-
-    const resQuebrarCaptcha = await axios({
-      // url: `http://172.16.16.8:5000/api/solve`,
-      url: `http://localhost:5000/api/solve`,
-      method: "POST",
-      encoding: "utf8",
-      data: captcha
-    });
-
-    console.log(3, resQuebrarCaptcha.data);
-    // Helper.pred('---');
-
-//     // return resQuebrarCaptcha.responseBody;
-
-    return {
-      texto: '0542',
-      sucesso: true
-    };
-  }
-
-  extrairLinkCaptcha(content) {
-    let url;
-    let $ = cheerio.load(content);
-
-    if ($('#humancheck > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)').length > 0) {
-      url = `https://www.tjrs.jus.br/site_php/consulta/${$('#humancheck > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)').attr('href')}`;
-    }
-
-    return url;
-  }
-
-  async extrair(numeroOab) {
     try {
-   
-      let responseCaptcha, objResponse, urlCaptcha;      
+      let objResponse;
+      let captchaString;
+      let nProcessos = [];
+      let captchaResposta;
 
-      objResponse = await this.robo.acessar({
-        url: this.url,
-        method: 'GET',
-        usaProxy: true,
-        encoding: 'latin1',
-      });
+      this.logger.info('Fazendo primeiro acesso');
+      await this.fazerPrimeiroAcesso();
 
-      urlCaptcha = this.extrairLinkCaptcha(objResponse.responseBody);
+      let comarcas = await Comarca.find({ Estado: 'RS' }).sort({ Comarca: 1 });
 
-      if (urlCaptcha) {
-        responseCaptcha = await this.resolverCaptchaAudio(numeroOab, urlCaptcha, objResponse.cookies.join(';'));
-      }
+      const tam = comarcas.length;
+      this.logger.info('Verificando comarcas');
+      console.time('Processo');
+      for (let i = 0; i < tam; i++) {
+        let qtdProcessos = nProcessos.length;
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Verificando comarca ${
+            comarcas[i].Nome
+          }`
+        );
 
-      if (responseCaptcha) {
-        console.log("teste", responseCaptcha);
-       
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Pegando imagem de captcha`
+        );
+        captchaString = await this.pegaCaptcha();
 
-        let post = {
-          "nome_comarca" : "Tribunal de Justiça",
-          "versao" : "",
-          "versao_fonetica" : "1",
-          "tipo" : "2",
-          "id_comarca" : "700",
-          "intervalo_movimentacao" : "15",
-          "N1_var2" : "1",
-          "id_comarca1" : "700",
-          "num_processo_mask" : "",
-          "num_processo" : "",
-          "numCNJ" : "N",
-          "id_comarca2" : "700",
-          "uf_oab" : "RS",
-          "num_oab" : "26629",
-          "foro" : "0",
-          "N1_var2_1" : "1",
-          "intervalo_movimentacao_1" : "15",
-          "ordem_consulta" : "1",
-          "N1_var" : "",
-          "id_comarca3" : "todas",
-          "nome_parte" : "",
-          "N1_var2_2" : "1",
-          "intervalo_movimentacao_2" : "0",
-          "code": responseCaptcha.texto
-        };      
-
-        if (responseCaptcha.sucesso) {
-          objResponse = await this.robo.acessar({
-            url: this.url,
-            method: 'GET',
-            usaProxy: true,
-            encoding: 'latin1',
-            params: post,
-            usaJson: true
-          });
-
-          console.log(objResponse.responseBody);
-          Helper.pred('tyeste');
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Resolvendo captcha`
+        );
+        captchaResposta = await this.resolveCaptcha(captchaString);
+        if (!captchaResposta) {
+          this.logger.info('Aconteceu algum problema ao processar o captcha');
+          break;
         }
+
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Validando captcha`
+        );
+        console.time('tempoCaptcha');
+        objResponse = await this.validaCaptcha(captchaResposta, comarcas[i]);
+        console.timeEnd('tempoCaptcha');
+
+        this.logger.info(
+          `${
+            i + 1
+          }/${tam} - [${qtdProcessos}] - Iniciando tratamento de processos`
+        );
+        let extracaoComarca = await this.tratarProcessos(
+          objResponse.responseBody
+        );
+        if (extracaoComarca.length)
+          nProcessos = [...nProcessos, ...extracaoComarca];
+
+        this.logger.info(
+          `${i + 1}/${tam} - [${qtdProcessos}] - Comarca ${
+            comarcas[i].Nome
+          } possui ${extracaoComarca.length} processos.`
+        );
       }
 
-      let resultados = [];
-      let preParse = {};
-      let uuidCaptcha = '';
-      let gResponse = '';
-      let cookies = {};
-      let listaProcessos = [];
+      if (nProcessos) {
+        this.logger.info(
+          `Processos a serem enviados para fila: ${nProcessos.length}`
+        );
 
-      /**
-       * Objeto cujo valor é o retorno do robo
-       */
-       // Objeto cujo valor é o retorno do robô
+        // nProcessos = ["0226688-20.2014.8.21.7000", "0523312-55.2011.8.21.7000"]
+        this.logger.info('Enfileirando processos');
+        this.resultados = await this.enfileirarProcessos(nProcessos);
 
-      // Primeira parte: para pegar cookies e uuidcaptcha
-      // TODO apagar codigo comentado abaixo caso nao funfe
-      // objResponse = await this.robo.acessar(
-      //   'https://esaj.tjsp.jus.br/cpopg/open.do',
-      //   'GET',
-      //   'latin1',
-      //   false,
-      //   false,
-      //   null
-      // );
-      // objResponse = await this.robo.acessar({
-      //   url: this.url,
-      //   method: 'GET',
-      //   usaProxy: false,
-      //   encoding: 'latin1',
-      // })
+        this.logger.info('Retornando');
+      } else {
+        this.logger.info('Não foi encontrado nenhum processo para a OAB');
+        this.resultados = 0;
+      }
 
-      // cookies = objResponse.cookies;
-      // cookies = cookies.map((element) => {
-      //   return element.replace(/\;.*/, '');
-      // });
-      // cookies = cookies.join('; ');
-
-      // preParse = await this.preParse(objResponse.responseBody, cookies);
-      // uuidCaptcha = preParse.captcha.uuidCaptcha;
-      // gResponse = await this.getCaptcha();      
-
+      this.resposta = {
+        sucesso: true,
+        nProcessos: this.resultados,
+      };
     } catch (e) {
       console.log(e);
-      throw e;
+      this.logger.info(e);
+      this.resposta = { sucesso: false, detalhes: e.message };
+    } finally {
+      console.timeEnd('Processo');
+
+      return {
+        resultado: this.resultado,
+        sucesso: true,
+        detalhes: '',
+        logs: this.logger.logs,
+      };
     }
-  };
-}
+  }
+
+  async fazerPrimeiroAcesso() {
+    let objResponse = await this.robo.acessar({ url: this.url, proxy: true });
+
+    if (
+      /Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(
+        objResponse.responseBody
+      )
+    ) {
+      console.log('===============Pagina com erro com o banco===============');
+      process.exit(0);
+    }
+
+    objResponse = this.robo.acessar({
+      url: 'https://www.tjrs.jus.br/novo/busca/?return=proc&client=wp_index',
+      proxy: true,
+    });
+
+    if (
+      /Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/.test(
+        objResponse.responseBody
+      )
+    ) {
+      console.log('===============Pagina com erro com o banco===============');
+      process.exit(0);
+    }
+
+    if (objResponse.status === 500) {
+      console.log('===============Pagina com status 500===============');
+      console.log(objResponse.responseBody);
+      process.exit(0);
+    }
+
+    return objResponse;
+  }
+
+  async pegaCaptcha() {
+    let objResponse;
+    let expire = new Date();
+    let time = new Date().getTime();
+    expire.setTime(time + 365 * 3600000 * 24);
+    let url = `https://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php?${time}`;
+
+    objResponse = await this.robo.acessar({
+      url,
+      responseType: 'arraybuffer',
+      proxy: true,
+    });
+    return Buffer.from(objResponse.responseBody).toString('base64');
+  }
+
+  async resolveCaptcha(captchaString) {
+    let resposta;
+    let tentativa = 0;
+    let ch = new CaptchaHandler(6, 10000, 'OabTJRS', {
+      numeroDaOab: this.numeroOab,
+    });
+    do {
+      this.logger.info(`Tentativa ${tentativa + 1} de resolucao do captcha`);
+      tentativa++;
+      resposta = await ch.antiCaptchaImage(captchaString, this.url);
+
+      if (resposta.sucesso) return resposta.resposta;
+
+      captchaString = await this.pegaCaptcha();
+    } while (tentativa < 5);
+  }
+
+  async validaCaptcha(captcha, comarca) {
+    const url =
+      'https://www.tjrs.jus.br/site_php/consulta/verifica_codigo_novo.php';
+    let queryString = {
+      nome_comarca: comarca.Nome, //Nome da comarca
+      versao: '',
+      versao_fonetica: 1,
+      tipo: 2,
+      id_comarca: comarca.Metadados.tjrs_select_id, //value do select
+      intervalo_movimentacao: 0,
+      N1_var2: 1,
+      id_comarca1: 'porto_alegre', //value do select
+      num_processo_mask: '',
+      num_processo: '',
+      numCNJ: 'N',
+      id_comarca2: comarca.Metadados.tjrs_select_id, //value do select
+      uf_oab: this.ufOab,
+      num_oab: this.numeroOab,
+      foro: 0,
+      N1_var2_1: 1,
+      intervalo_movimentacao_1: 0,
+      ordem_consulta: 1,
+      N1_var: '',
+      id_comarca3: 'todas', //sempre todas
+      nome_parte: '',
+      N1_var2_2: 1,
+      intervalo_movimentacao_2: 0,
+      code: captcha,
+    };
+
+    return this.robo.acessar({ url, queryString, proxy: true });
+  }
+
+  async tratarProcessos(body) {
+    let processos;
+    let $ = cheerio.load(body);
+    let texto = $('#conteudo > table:nth-child(6) > tbody').text();
+
+    processos = texto.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/gm);
+
+    return processos ? processos : [];
+  }
+
+  async enfileirarProcessos(processos) {
+    // let processosObj = processos.map(p => ({cnj: p}));
+    let cadastroConsulta = this.cadastroConsulta;
+    let resultados = [];
+
+    let existentes = await Processo.find({
+      'detalhes.numeroProcessoMascara': { $in: processos },
+    });
+    existentes = existentes.map((e) => e.detalhes.numeroProcessoMascara);
+
+    const fila = 'processo.TJRS.extracao.novos';
+    for (let p of processos) {
+      cadastroConsulta['NumeroProcesso'] = p;
+
+      if (existentes.indexOf(p) === -1) {
+        let logExec = await LogExecucao.cadastrarConsultaPendente(
+          cadastroConsulta,
+          fila
+        );
+
+        if (logExec.enviado && logExec.sucesso) {
+          this.logger.info(`Processo: ${p} ==> ${fila}`);
+          resultados.push(p);
+        }
+      }
+    }
+
+    return resultados;
+  }
+};

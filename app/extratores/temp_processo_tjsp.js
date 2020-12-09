@@ -4,6 +4,7 @@ const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
 const { Robo } = require('../lib/newRobo');
+const sleep = require('await-sleep')
 // const { GerenciadorFila } = require('../lib/filaHandler');
 
 const {
@@ -29,6 +30,8 @@ class ProcessoTJSP extends ExtratorBase {
   async extrair(numeroProcesso, numeroOab, instancia){
     const nomeRobo = 'ProcessoTJSP';
     let tentativa = 1;
+    let primeiroAcessoTentativas = 6
+    let primeiroAcessoWait = 10000
     let limite = 2;
     let gResponse;
     let paginaReturn;
@@ -49,9 +52,27 @@ class ProcessoTJSP extends ExtratorBase {
     try {
 
       this.logger.info('Realizando primeira conexao');
-      await this.realizaPrimeiraConexao();
+      do {
+        this.logger.info(`Tentando realizar a primeira conexão. [Tentativa: ${tentativa}]`);
+        objResponse = await this.realizaPrimeiraConexao().catch(err => err);
+        console.log({ tentativa, status: objResponse.status })
+        if (objResponse.status === 200) {
+          break;
+        }
+
+        this.logger.info(`Falha ao tentar conectar no site.`);
+        tentativa++;
+        await sleep(primeiroAcessoWait);
+      } while(tentativa <= primeiroAcessoTentativas)
+
+      if (!objResponse.status && tentativa >= primeiroAcessoTentativas) {
+        this.logger.log('error', 'Não foi possivel realizar a primeira conexão');
+        this.logger.info('Desligando robo para preservar fila');
+        process.exit(0)
+      }
 
       this.logger.info('Entrando na pagina de consulta');
+      tentativa = 1;
       objResponse = await this.acessarPaginaConsulta();
 
       this.logger.info('Consultando UUID do site');

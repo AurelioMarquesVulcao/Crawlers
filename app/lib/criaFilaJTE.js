@@ -13,8 +13,14 @@ const util = new Cnj();
 
 
 class CriaFilaJTE {
-	static async getEstado(codigo){
-		return await statusEstadosJTE.find({"estadoNumero" : codigo})
+	static async getEstado(codigo) {
+		return await statusEstadosJTE.find({ "estadoNumero": codigo })
+	}
+	static async updateEstado(id, update = { status: 'Atualizado' }) {
+		let find = { _id: id };
+		// let update = { status: 'Atualizado2' };
+		// let update = {status: 'Ultimo Processo'}
+		return await statusEstadosJTE.findOneAndUpdate(find, update)
 	}
 
 	async salvaStatusComarca(numero, data, raspagem, buscaProcesso) {
@@ -145,7 +151,7 @@ class CriaFilaJTE {
 	 */
 	procura(sequencial, origem, tentativas, tribunal, fila) {
 		// console.log(sequencial, origem, tentativas, tribunal);
-		let mensagens= [];
+		let mensagens = [];
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -181,7 +187,7 @@ class CriaFilaJTE {
 	 * @return {string} Retorna um numero CNJ para ser buscado
 	 */
 	async procura10(sequencial, origem, tentativas, tribunal, fila) {
-		let mensagens= [];
+		let mensagens = [];
 		try {
 			let obj = corrigeSequencial(sequencial)
 			let zeros = ""
@@ -209,14 +215,14 @@ class CriaFilaJTE {
 	}
 
 	/**
- 	* Cria um numero de processo para ser enviado para fila
- 	* @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
- 	* @param {string} origem comarca do esdo que será buscada
- 	* @param {number} tentativas numero de processos a serem testados
- 	* @param {string} tribunal referêncial numerico do estado a ser buscado
- 	* @param {string} fila fila que receberá a mensagem.
- 	* @return {string} Retorna um numero CNJ para ser buscado
- 	*/
+		* Cria um numero de processo para ser enviado para fila
+		* @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
+		* @param {string} origem comarca do esdo que será buscada
+		* @param {number} tentativas numero de processos a serem testados
+		* @param {string} tribunal referêncial numerico do estado a ser buscado
+		* @param {string} fila fila que receberá a mensagem.
+		* @return {string} Retorna um numero CNJ para ser buscado
+		*/
 	async procuraEspecial(sequencial, origem, tentativas, tribunal, fila) {
 		let mensagens = [];
 		try {

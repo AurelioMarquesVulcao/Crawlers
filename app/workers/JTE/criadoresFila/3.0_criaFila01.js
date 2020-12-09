@@ -10,6 +10,7 @@ const { getFilas } = require('./get_fila');
 const { Helper, Logger, Cnj } = require('../../../lib/util');
 const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 const { GerenciadorFila } = require("../../../lib/filaHandler");
+const awaitSleep = require("await-sleep");
 
 
 const Fila = new CriaFilaJTE();
@@ -27,7 +28,8 @@ var desligado = desligar.worker;
   const variaveis = await Variaveis.catch({ "codigo": "000001" });
   const Estados = variaveis.variaveis;
   var estados = [
-    Estados[0].rj, // Estados[0].sp2,
+    Estados[0].rj,
+    Estados[0].sp2,
   ];
 
   embaralha(estados)
@@ -38,33 +40,47 @@ var desligado = desligar.worker;
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
-
   try {
+    // fara com que as 18:00 reset todos as comarcas
+    setInterval(async function () {
+      let { hora, min } = Fila.relogio();
+      if (hora == 18 && min == 00) {
+        for (let y = 0; y < estados; y++) {
+          await CriaFilaJTE.getEstado(estados[y].codigo);
+        }
+        await sleep(60000);
+      }
+      console.log(min);
+    }, 60000);
     for (let w = 0; w < 1;) {
       let relogio = Fila.relogio();
-
       let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
       console.log(statusFila);
+      // faz com que todas as comarcas sejam colocadas para download todos os dias.
+      await atualizaStatusDownload(estados[contador].codigo, relogio);
+      // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);
-      // console.log(comarcas);
-      // console.log(extraiDados(comarcas));
+      let status = comarcas.filter(x => x.status == 'Atualizado');
+      // Pega apenas as comarcas que não são ultimo estado
       let processos = extraiDados(comarcas);
-
-      processos.map(x => {
-        let arrayMensages = Fila.procura(x.numero.sequencial, x.numero.comarca, 4, x.numero.estado)
-        console.log(arrayMensages);
-        for (let ii = 0; ii < arrayMensages.length; ii++) {
-          mensagens.push(arrayMensages[ii]);
-        }
-      })
-
-      console.log(mensagens);
-
-      await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
-
-
+      // console.log(comarcas);
+      console.log(processos.length);
+      // process.exit()
+      if (processos.length > 0) {
+        processos.map(x => {
+          let arrayMensages = Fila.procura(x.numero.sequencial, x.numero.comarca, 4, x.numero.estado)
+          console.log(arrayMensages);
+          for (let ii = 0; ii < arrayMensages.length; ii++) {
+            mensagens.push(arrayMensages[ii]);
+          }
+        })
+        await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
+        mensagens = [];
+      }
+      mensagens = [];
 
       console.log(relogio);
+      if (status.length == 0) { contador++ }
       if (contador == estados.length) { contador = 0 }
       await sleep(10000);
       // process.exit();
@@ -74,7 +90,19 @@ var desligado = desligar.worker;
   }
 })()
 
-
+async function atualizaStatusDownload(estado, relogio) {
+  let comarcas = await CriaFilaJTE.getEstado(estado);
+  let { dia, hora } = relogio;
+  console.log(dia);
+  let desatualizadas = comarcas.filter(x => x.dataBusca.dia != 9);
+  // console.log(desatualizadas);
+  if (desatualizadas.length != 0) {
+    for (let i = 0; i < desatualizadas.length; i++) {
+      let { _id } = desatualizadas[i];
+      await CriaFilaJTE.updateEstado(_id)
+    }
+  }
+}
 
 function extraiDados(comarcas) {
   return comarcas.map(x => {
@@ -89,10 +117,6 @@ function extraiDados(comarcas) {
   // console.log(dados);
 
 }
-
-
-
-
 
 // embaralhador de array, faz com que a ordem de consumo da fila mude 
 // para que não baixe apenas o mesmo estado toda vez que inicie a aplicação.
@@ -119,9 +143,6 @@ async function verificaFila(nomeFila) {
     }
   }
 }
-
-
-
 
 // aguarda a fila ficar limpa para inserir novos processos
 async function testeFila(nomeFila, contador) {

@@ -5,19 +5,18 @@ const { enums } = require('../configs/enums');
 const sleep = require('await-sleep');
 const { CaptchaHandler } = require('../lib/captchaHandler');
 const HttpsProxyAgent = require('https-proxy-agent');
-const awaitSleep = require('await-sleep');
-const proxy = new HttpsProxyAgent(
-  'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182');
+
+
 
 
 var heartBeat = 0;
 
 setInterval(async function () {
-  if (heartBeat == 60) {
+  if (heartBeat == 340) {
     process.exit()
   }
   heartBeat++
-  console.log(heartBeat);
+  // console.log(heartBeat);
 }, 1000);
 
 class ExtratorPje {
@@ -36,32 +35,39 @@ class ExtratorPje {
   async baseMethod() { try { } catch (e) { console.log(e); } }
 
   async extrair(cnj) {
-    const { sequencial, ano, estado, comarca } = Cnj.processoSlice(cnj);
-    let start = null;
-    // iniciando obtenção fornçada do formulario de inicio.
-    while (start==null){
-      start = await this.startPage(estado);
-      await sleep(100);
+    let { sequencial, ano, estado, comarca } = Cnj.processoSlice(cnj);
+    estado = parseInt(estado);
+
+    let id = null;
+    while (id == null) {
+      id = await this.getId(cnj, this.instancia1, estado);
     }
-    console.log(start);
-process.exit()
-    let recapcha = await this.desafioRecapcha(estado, start, cnj);
-    console.log(recapcha);
+    console.log(id);
 
-    let resposta = responseCapcha(start, recapcha, estado);
-    console.log(resposta);
+    if (estado == 15) {
+      // iniciando obtenção fornçada do formulario de inicio.
+      let start = null;
+      while (start == null) {
+        start = await this.startPage(estado);
+      };
+      // console.log(start);
+      let recapcha = await this.desafioRecapcha(estado, start, cnj);
+      // console.log(recapcha);
+      let resposta = await this.responseCapcha(start, recapcha, estado);
+      resposta
+      // console.log(resposta);
+    }
+    // obtendo a imagem base 64 do capcha
+    let captcha = await this.desafioCapcha(estado, id);
+    console.log(!!captcha);
 
+    let captchaSolve = await this.apiCapcha(captcha);
+    console.log(captchaSolve);
 
+    let processo = await this.processo(estado, id, captcha, captchaSolve);
+    console.log(processo);
 
-    // let id = await this.getId(cnj, this.instancia1, estado);
-    // console.log(id);
-    // let recapcha = await this.desafioRecapcha(estado, id)
-    // console.log(recapcha);
-    // let capcha = await this.desafioCapcha(estado, id);
-    // console.log(capcha);
-
-
-    return ""
+    return processo
   }
 
   async startPage(estado) {
@@ -78,7 +84,8 @@ process.exit()
       let FormData = {
         url: url,
         random: random,
-        [name]: value
+        name: name,
+        value: value
       }
       this.logT("Form Data");
       console.table(FormData);
@@ -96,8 +103,10 @@ process.exit()
 
   async desafioRecapcha(estado, start, cnj) {
     try {
-      let url = `https://pje.trt${estado}.jus.br/consultaprocessual/`;
-      return await new CaptchaHandler(5, 15000, `PJE-${estado}`, { numeroDoProcesso: cnj }).resolveRecaptchaV2(url, this.key, "/");
+      let { url } = start;
+      // let url = `https://pje.trt${estado}.jus.br/consultaprocessual/`;
+      let response = await new CaptchaHandler(5, 15000, `PJE-${estado}`, { numeroDoProcesso: cnj }).resolveRecaptchaV2(url, this.key, "/");
+      return response.gResponse
     } catch (e) {
       console.log(e);
     }
@@ -107,24 +116,34 @@ process.exit()
   async responseCapcha(start, recapcha, estado) {
     try {
       let { random, name, value } = start
-      let url = `https://pje.trt${estado}.jus.br/captcha/login_post.php`;
+      console.log(start);
+      // process.exit()
+      let url = `http://pje.trt${estado}.jus.br/captcha/login_post.php`;
       let request = {
         url,
         proxy: this.proxy,
         method: "POST",
+        debug: true,
         headers: {
-          origin: `https://pje.trt${estado}.jus.br`,
-          referer: `https://pje.trt${estado}.jus.br/consultaprocessual/`
+          origin: `http://pje.trt${estado}.jus.br`,
+          referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
+          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+          "accept-encoding": "gzip, deflate, br",
+          "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+          "cache-control": "max-age=0",
+          "content-length": 691,
+          "content-type": "application/x-www-form-urlencoded",
         },
         formData: {
           "g-recaptcha-response": recapcha,
-          referer: /consultaprocessual/,
+          referer: "/consultaprocessual/",
           random: random,
           [name]: value
         }
       };
       let post = await this.robo.acessar(request);
       console.log(post);
+      this.logT("post_PHP")
 
     } catch (e) {
       console.log(e);
@@ -155,21 +174,68 @@ process.exit()
   async desafioCapcha(estado, id) {
     try {
       let url = `http://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/${id}`;
-      let request = { url, proxy: this.proxy, method: "POST" };
-      let post = await this.robo.acessar(request);
-      console.log(post);
-      this.logT("base64_Image")
+      let request = { url, proxy: this.proxy, method: "GET",debut:true };
+      let get = await this.robo.acessar(request);
+      // console.log(get);
+      let resposta = [{
+        refinador: 'trt_1',
+        imagem: get.responseBody.imagem,
+      }, get.responseBody.tokenDesafio]
+      this.logT("base64_Image");
+      return resposta
     } catch (e) {
-      this.logE("base64_Image")
+      this.logE("base64_Image");
       console.log(e);
+      return null
     }
   }
 
+  async apiCapcha(captcha) {
+    console.log(captcha);
+    try {
+      let url = "http://172.16.16.8:8082/api/refinar/";
+      // url: `http://127.0.0.1:8082/api/refinar/`,
+      let request = {
+        url,
+        method: "POST",
+        json: captcha[0],
+      };
+      let post = await this.robo.acessar(request);
+      let texto = post.responseBody.texto.replace(/[^a-z0-9]/g, '');
+      // texto.length = 5
+      if (texto.length < 6) {
+        throw this.red + "Capcha solve is too short" + this.reset
+      }
+      // console.log(post);
+      this.logT("capchaSolve")
+      return texto
+    } catch (e) {
+      this.logE("capchaSolve")
+      console.log(e);
+      process.exit();
+    }
+  }
 
-
-
-
-
+  async processo(estado, id, captcha, captchaSolve) {
+    try {
+      let url = `https://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/${id}?tokenDesafio=${captcha[1]}&resposta=${captchaSolve}`;
+      let request = { url, proxy: this.proxy, method: "GET" };
+      let get = await this.robo.acessar(request);
+      let resultado = get.responseBody;
+      if (get.mensagem) {
+        throw 'Ocorreu um problema na solução do Captcha'
+      }
+      if (get.responseBody.mensagemErro) {
+        return 'Não é possível obter devido ao processo ser sigiliso'
+      }
+      this.logT("Processo");
+      return get.responseBody
+    } catch (e) {
+      this.logE("Processo");
+      console.log(e);
+      return null
+    }
+  }
 
   logT(name) {
     // const obj = [{
@@ -195,6 +261,9 @@ module.exports.ExtratorPje = ExtratorPje;
   // new ExtratorTrtPje().captura2({ 'X-Grau-Instancia': '1' }, "00114931020205150105", 15);
   // console.log(await new ExtratorPje().extrair("00114931020205150105"));
   await new ExtratorPje().extrair("00114931020205150105");
+  // await new ExtratorPje().extrair("10013797020205020003");
+  // await new ExtratorPje().extrair("00212492220205040211");
+  process.exit()
 })()
 
 

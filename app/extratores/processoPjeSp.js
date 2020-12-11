@@ -38,11 +38,11 @@ class ExtratorPje {
     let { sequencial, ano, estado, comarca } = Cnj.processoSlice(cnj);
     estado = parseInt(estado);
 
-    let id = null;
-    while (id == null) {
-      id = await this.getId(cnj, this.instancia1, estado);
-    }
-    console.log(id);
+    // let id = null;
+    // while (id == null) {
+    //   id = await this.getId(cnj, this.instancia1, estado);
+    // }
+    // console.log(id);
 
     if (estado == 15) {
       // iniciando obtenção fornçada do formulario de inicio.
@@ -57,6 +57,7 @@ class ExtratorPje {
       resposta
       // console.log(resposta);
     }
+    await this.extrair(cnj);
     // obtendo a imagem base 64 do capcha
     let captcha = await this.desafioCapcha(estado, id);
     console.log(!!captcha);
@@ -106,6 +107,10 @@ class ExtratorPje {
       let { url } = start;
       // let url = `https://pje.trt${estado}.jus.br/consultaprocessual/`;
       let response = await new CaptchaHandler(5, 15000, `PJE-${estado}`, { numeroDoProcesso: cnj }).resolveRecaptchaV2(url, this.key, "/");
+      console.log(this.robo.cookies);
+      console.log(this.robo.cookies);
+      console.log(response.gResponse);
+      process.exit();
       return response.gResponse
     } catch (e) {
       console.log(e);
@@ -115,76 +120,30 @@ class ExtratorPje {
 
   async responseCapcha(start, recapcha, estado) {
     try {
-      let { random, name, value } = start
-      console.log(start);
-      // process.exit()
-      let url = `http://pje.trt${estado}.jus.br/captcha/login_post.php`;
-      let request = {
-        url,
-        proxy: this.proxy,
-        method: "POST",
-        debug: true,
-        headers: {
-          origin: `http://pje.trt${estado}.jus.br`,
-          referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
-          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-          "accept-encoding": "gzip, deflate, br",
-          "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-          "cache-control": "max-age=0",
-          "content-length": 691,
-          "content-type": "application/x-www-form-urlencoded",
-        },
-        formData: {
-          "g-recaptcha-response": recapcha,
-          referer: "/consultaprocessual/",
-          random: random,
-          [name]: value
-        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      // let { random, name, value } = start
-      // console.log(start);
-      // // process.exit()
-      // let url = `http://pje.trt${estado}.jus.br/captcha/login_post.php`;
-      // let request = {
-      //   url,
-      //   proxy: this.proxy,
-      //   method: "POST",
-      //   debug: true,
-      //   headers: {
-      //     origin: `http://pje.trt${estado}.jus.br`,
-      //     referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
-      //     accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-      //     "accept-encoding": "gzip, deflate, br",
-      //     "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-      //     "cache-control": "max-age=0",
-      //     "content-length": 691,
-      //     "content-type": "application/x-www-form-urlencoded",
-      //   },
-      //   formData: {
-      //     "g-recaptcha-response": recapcha,
-      //     referer: "/consultaprocessual/",
-      //     random: random,
-      //     [name]: value
-      //   }
+    let { random, name, value } = start
+    console.log(start);
+    // process.exit()
+    let url = `https://pje.trt${estado}.jus.br/captcha/login_post.php`;
+    let request = {
+      url,
+      proxy: this.proxy,
+      method: "POST",
+      debug: true,
+      headers: {
+        origin: `http://pje.trt${estado}.jus.br`,
+        referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
+      },
+      formData: {
+        "g-recaptcha-response": recapcha,
+        referer: "/consultaprocessual/",
+        random: random,
+        [name]: value
+      }
     };
     let post = await this.robo.acessar(request);
     console.log(post);
+    console.log(this.robo.cookies);
     this.logT("post_PHP")
 
   } catch(e) {

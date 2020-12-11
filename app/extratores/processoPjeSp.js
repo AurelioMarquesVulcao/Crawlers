@@ -140,115 +140,157 @@ class ExtratorPje {
           random: random,
           [name]: value
         }
-      };
-      let post = await this.robo.acessar(request);
-      console.log(post);
-      this.logT("post_PHP")
 
-    } catch (e) {
-      console.log(e);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // let { random, name, value } = start
+      // console.log(start);
+      // // process.exit()
+      // let url = `http://pje.trt${estado}.jus.br/captcha/login_post.php`;
+      // let request = {
+      //   url,
+      //   proxy: this.proxy,
+      //   method: "POST",
+      //   debug: true,
+      //   headers: {
+      //     origin: `http://pje.trt${estado}.jus.br`,
+      //     referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
+      //     accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      //     "accept-encoding": "gzip, deflate, br",
+      //     "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+      //     "cache-control": "max-age=0",
+      //     "content-length": 691,
+      //     "content-type": "application/x-www-form-urlencoded",
+      //   },
+      //   formData: {
+      //     "g-recaptcha-response": recapcha,
+      //     referer: "/consultaprocessual/",
+      //     random: random,
+      //     [name]: value
+      //   }
+    };
+    let post = await this.robo.acessar(request);
+    console.log(post);
+    this.logT("post_PHP")
+
+  } catch(e) {
+    console.log(e);
+  }
+}
+
+/**
+ * 
+ * @param {string} cnj Cnj que se deseja consultar
+ * @param {object} headers Objeto que referência a intãncia
+ * @param {number} estado Numero do Estado que se deseja consultar
+ * @returns Se o processo possuir 2 intãncia sera retornado true, se for primeira instancia o id do processo.
+ */
+async getId(cnj, headers, estado) {
+  try {
+    let url = `http://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/dadosbasicos/${cnj}`;
+    let request = { url, headers, proxy: this.proxy };
+    let get = await this.robo.acessar(request);
+    this.logT("id")
+    return get.responseBody[0].id
+  } catch (e) {
+    // console.log(e);
+    this.logE("id")
+    return null
+  }
+}
+
+async desafioCapcha(estado, id) {
+  try {
+    let url = `http://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/${id}`;
+    let request = { url, proxy: this.proxy, method: "GET", debut: true };
+    let get = await this.robo.acessar(request);
+    // console.log(get);
+    let resposta = [{
+      refinador: 'trt_1',
+      imagem: get.responseBody.imagem,
+    }, get.responseBody.tokenDesafio]
+    this.logT("base64_Image");
+    return resposta
+  } catch (e) {
+    this.logE("base64_Image");
+    console.log(e);
+    return null
+  }
+}
+
+async apiCapcha(captcha) {
+  console.log(captcha);
+  try {
+    let url = "http://172.16.16.8:8082/api/refinar/";
+    // url: `http://127.0.0.1:8082/api/refinar/`,
+    let request = {
+      url,
+      method: "POST",
+      json: captcha[0],
+    };
+    let post = await this.robo.acessar(request);
+    let texto = post.responseBody.texto.replace(/[^a-z0-9]/g, '');
+    // texto.length = 5
+    if (texto.length < 6) {
+      throw this.red + "Capcha solve is too short" + this.reset
     }
+    // console.log(post);
+    this.logT("capchaSolve")
+    return texto
+  } catch (e) {
+    this.logE("capchaSolve")
+    console.log(e);
+    process.exit();
   }
+}
 
-  /**
-   * 
-   * @param {string} cnj Cnj que se deseja consultar
-   * @param {object} headers Objeto que referência a intãncia
-   * @param {number} estado Numero do Estado que se deseja consultar
-   * @returns Se o processo possuir 2 intãncia sera retornado true, se for primeira instancia o id do processo.
-   */
-  async getId(cnj, headers, estado) {
-    try {
-      let url = `http://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/dadosbasicos/${cnj}`;
-      let request = { url, headers, proxy: this.proxy };
-      let get = await this.robo.acessar(request);
-      this.logT("id")
-      return get.responseBody[0].id
-    } catch (e) {
-      // console.log(e);
-      this.logE("id")
-      return null
+async processo(estado, id, captcha, captchaSolve) {
+  try {
+    let url = `https://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/${id}?tokenDesafio=${captcha[1]}&resposta=${captchaSolve}`;
+    let request = { url, proxy: this.proxy, method: "GET" };
+    let get = await this.robo.acessar(request);
+    let resultado = get.responseBody;
+    if (get.mensagem) {
+      throw 'Ocorreu um problema na solução do Captcha'
     }
-  }
-
-  async desafioCapcha(estado, id) {
-    try {
-      let url = `http://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/${id}`;
-      let request = { url, proxy: this.proxy, method: "GET",debut:true };
-      let get = await this.robo.acessar(request);
-      // console.log(get);
-      let resposta = [{
-        refinador: 'trt_1',
-        imagem: get.responseBody.imagem,
-      }, get.responseBody.tokenDesafio]
-      this.logT("base64_Image");
-      return resposta
-    } catch (e) {
-      this.logE("base64_Image");
-      console.log(e);
-      return null
+    if (get.responseBody.mensagemErro) {
+      return 'Não é possível obter devido ao processo ser sigiliso'
     }
+    this.logT("Processo");
+    return get.responseBody
+  } catch (e) {
+    this.logE("Processo");
+    console.log(e);
+    return null
   }
+}
 
-  async apiCapcha(captcha) {
-    console.log(captcha);
-    try {
-      let url = "http://172.16.16.8:8082/api/refinar/";
-      // url: `http://127.0.0.1:8082/api/refinar/`,
-      let request = {
-        url,
-        method: "POST",
-        json: captcha[0],
-      };
-      let post = await this.robo.acessar(request);
-      let texto = post.responseBody.texto.replace(/[^a-z0-9]/g, '');
-      // texto.length = 5
-      if (texto.length < 6) {
-        throw this.red + "Capcha solve is too short" + this.reset
-      }
-      // console.log(post);
-      this.logT("capchaSolve")
-      return texto
-    } catch (e) {
-      this.logE("capchaSolve")
-      console.log(e);
-      process.exit();
-    }
-  }
-
-  async processo(estado, id, captcha, captchaSolve) {
-    try {
-      let url = `https://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/${id}?tokenDesafio=${captcha[1]}&resposta=${captchaSolve}`;
-      let request = { url, proxy: this.proxy, method: "GET" };
-      let get = await this.robo.acessar(request);
-      let resultado = get.responseBody;
-      if (get.mensagem) {
-        throw 'Ocorreu um problema na solução do Captcha'
-      }
-      if (get.responseBody.mensagemErro) {
-        return 'Não é possível obter devido ao processo ser sigiliso'
-      }
-      this.logT("Processo");
-      return get.responseBody
-    } catch (e) {
-      this.logE("Processo");
-      console.log(e);
-      return null
-    }
-  }
-
-  logT(name) {
-    // const obj = [{
-    //   Status: true,
-    //   [name]: objeto
-    // }];
-    // console.table(obj);
-    console.log(this.blue + `${name} => Obtido com sucesso!` + this.reset);
-  }
-  logE(name) {
-    const obj = this.red + `Não foi possivél obter o.: ${name}` + this.reset;
-    console.log(obj);
-  }
+logT(name) {
+  // const obj = [{
+  //   Status: true,
+  //   [name]: objeto
+  // }];
+  // console.table(obj);
+  console.log(this.blue + `${name} => Obtido com sucesso!` + this.reset);
+}
+logE(name) {
+  const obj = this.red + `Não foi possivél obter o.: ${name}` + this.reset;
+  console.log(obj);
+}
 
 }
 

@@ -118,15 +118,20 @@ class downloadFiles {
           logger.info('Envio para AWS foi Falhou !!!');
           throw err;
         });
+      Fs.unlinkSync(lista[0].path)
     } catch (error) {
       error1++
       if (error1 < 4) {
-        await this.enviarAWS(cnj, lista)
+        await new downloadFiles().enviarAWS(cnj, lista)
+      } else {
+        console.log(error);
+        throw "Não foi possível Baixar"
       }
-      console.log(error);
+
+
 
     }
-    Fs.unlinkSync(lista[0].path)
+    // Fs.unlinkSync(lista[0].path)
     return resultado;
   }
 

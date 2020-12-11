@@ -20,7 +20,7 @@ setInterval(function () {
     process.exit();
   }
   // }
-  console.log(heartBeat,"teste");
+  console.log(heartBeat,"Segundos");
 }, 1000);
 
 // Senhas de login no tribunal
@@ -66,16 +66,16 @@ class RoboPuppeteer3 {
   async iniciar() {
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      // headless: false,
-      headless: true,
+      headless: false,
+      // headless: true,
       slowMo: 50,
       ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      // args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
+      args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
+      // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
     });
     this.page = await this.browser.newPage();
     await this.page.authenticate({
@@ -522,7 +522,7 @@ class RoboPuppeteer3 {
         if (controlaLink.length == 0) {
           console.log("primeiro link capturado com sucesso");
           controlaLink.push(link.link);
-          console.log(link);
+          // console.log(link);
           heartBeat = 0;
           return link
         } else if (controlaLink.length > 0) {
@@ -530,7 +530,7 @@ class RoboPuppeteer3 {
           if (controlaLink.indexOf(link.link) < 0) {
             console.log(" ------------------- O link é único, verificação concluida ------------------- ");
             controlaLink.push(link.link);
-            console.log(link);
+            // console.log(link);
             heartBeat = 0;
             return link
           } else {
@@ -631,7 +631,7 @@ class RoboPuppeteer3 {
         if (controlaLink.length == 0) {
           console.log("primeiro link capturado com sucesso");
           controlaLink.push(link.link);
-          console.log(link);
+          // console.log(link);
           links.push(link);
           return link
         } else if (controlaLink.length > 0) {
@@ -639,7 +639,7 @@ class RoboPuppeteer3 {
           if (controlaLink.indexOf(link.link) < 0) {
             console.log(" ------------------- O link é único, verificação concluida ------------------- ");
             controlaLink.push(link.link);
-            console.log(link);
+            // console.log(link);
             links.push(link);
           } else {
             console.log("já peguei esse documento, vou repetir o processo.");

@@ -31,7 +31,7 @@ class ExtratorPje {
     this.robo = new Robo();
     this.instancia1 = { 'X-Grau-Instancia': '1' };
     this.instancia2 = { 'X-Grau-Instancia': '2' };
-    this.proxy = false
+    this.proxy = true;
     // this.urlBase = "http://pje.trt#.jus.br/pje-consulta-api";
     this.key = "6LfRfkIUAAAAAIXuT_GrTfak46Mm6TTvUWAaDYfQ";
 
@@ -42,11 +42,11 @@ class ExtratorPje {
     let { sequencial, ano, estado, comarca } = Cnj.processoSlice(cnj);
     estado = parseInt(estado);
 
-    // let id = null;
-    // while (id == null) {
-    //   id = await this.getId(cnj, this.instancia1, estado);
-    // }
-    // console.log(id);
+    let id = null;
+    while (id == null) {
+      id = await this.getId(cnj, this.instancia1, estado);
+    }
+    console.log(id);
 
     if (estado == 15) {
       // iniciando obtenção fornçada do formulario de inicio.
@@ -60,12 +60,14 @@ class ExtratorPje {
       let resposta = await this.responseCapcha(start, recapcha, estado);
       resposta
       console.log(this.robo.cookies);
-      process.exit()
+
       console.log(resposta);
+      // process.exit()
     }
     // await this.extrair(cnj);
     // // obtendo a imagem base 64 do capcha
     let captcha = await this.desafioCapcha(estado, id);
+    console.log(captcha);
     console.log(!!captcha);
 
     // let captchaSolve = await this.apiCapcha(captcha);
@@ -121,18 +123,41 @@ class ExtratorPje {
   async responseCapcha(start, recapcha, estado) {
     try {
 
+
       let form = Object.assign(start, { "g-recaptcha-response": recapcha })
-      // console.log(form);
-      // // process.exit()
-      // let url = `https://pje.trt${estado}.jus.br/captcha/login_post.php`;
-      // let request = {
-      //   url,
-      //   proxy: this.proxy,
-      //   method: "POST",
-      //   debug: true,
+      console.log(form);
+      // process.exit()
+      let url = `https://pje.trt${estado}.jus.br/captcha/login_post.php`;
+      let request = {
+        url,
+        proxy: this.proxy,
+        method: "POST",
+        debug: true,
+        headers: {
+          origin: `http://pje.trt${estado}.jus.br`,
+          referer: `http://pje.trt${estado}.jus.br/primeirograu/`,
+          "sec-ch-ua": `"Google Chrome"; v="87", " Not;A Brand"; v="99", "Chromium"; v="87"`,
+          "sec-ch-ua-mobile": "?0",
+          "upgrade-insecure-requests": "1",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-dest": "document",
+          "sec-fetch-user": "?1",
+          "upgrade-insecure-requests": "1",
+          "content-length": geraContentLenght(form)
+        },
+        formData: form
+      };
+
+      // const response = await axios({
+      //   method: 'POST',
+      //   url: `https://pje.trt${estado}.jus.br/captcha/login_post.php`,
+      //   responseType: 'stream',
+      //   httpsAgent: proxy,
+
       //   headers: {
       //     origin: `http://pje.trt${estado}.jus.br`,
       //     referer: `http://pje.trt${estado}.jus.br/primeirograu/`,
+      //     cookies: this.robo.cookies,
       //     "upgrade-insecure-requests": "1",
       //     "sec-fetch-mode": "navigate",
       //     "sec-fetch-dest": "document",
@@ -140,38 +165,20 @@ class ExtratorPje {
       //     "upgrade-insecure-requests": "1"
       //   },
       //   formData: form
-      // };
-
-      const response = await axios({
-        method: 'POST',
-        url: `https://pje.trt${estado}.jus.br/captcha/login_post.php`,
-        responseType: 'stream',
-        httpsAgent: proxy,
-
-        headers: {
-          origin: `http://pje.trt${estado}.jus.br`,
-          referer: `http://pje.trt${estado}.jus.br/primeirograu/`,
-          cookies: this.robo.cookies,
-          "upgrade-insecure-requests": "1",
-          "sec-fetch-mode": "navigate",
-          "sec-fetch-dest": "document",
-          "sec-fetch-user": "?1",
-          "upgrade-insecure-requests": "1"
-        },
-        formData: form
-      });
-      console.log(response);
+      // });
+      // console.log(response);
 
 
 
 
 
-      // await this.robo.acessar(request)
+      await this.robo.acessar(request)
 
-      // console.log(this.robo.cookies);
-      // let post = await this.robo.acessar(request);
-      // console.log(post.responseContent.request._header);
-      // console.log(this.robo.cookies);
+      console.log(this.robo.cookies);
+      let post = await this.robo.acessar(request);
+      console.log(post);
+      console.log(post.responseContent.request._header);
+      console.log(this.robo.cookies);
 
 
       // await this.responseCapcha(start, recapcha, estado);
@@ -321,7 +328,12 @@ function capturaForms($) {
   } catch (e) { console.log(e); }
 }
 
-
+function geraContentLenght(form) {
+  let n = Object.keys(form).length - 1;
+  let f = JSON.stringify(form).length;
+  let t = -n + f - 6
+  return t
+}
 
 
 

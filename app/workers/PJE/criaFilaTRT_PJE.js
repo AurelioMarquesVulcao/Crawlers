@@ -25,12 +25,12 @@ class CriaFilaPJE {
     async montaFila() {
         let data = new Date();
         data = new Date()
-        data.setDate(data.getDate() - 1)
+        data.setDate(data.getDate() - 3)
         console.log(data);
 
         let estado = [];
         console.log("Fila concluída. Iniciando criador de fila.");
-        for (let i = 1; i < 5; i++) {
+        for (let i = 1; i < 24; i++) {
             if (i != 15) {
                 estado = await this.atualizaProcessosFila(0, i, data)[0]
             }
@@ -99,6 +99,8 @@ class CriaFilaPJE {
             { $sort: { _id: -1 } },
             { $limit: 200 }
         ]).skip(pulo);
+        // console.log(agregar);
+        // process.exit()
         for (let i = 0; i < agregar.length; i++) {
             busca = `${agregar[i]._id}`;
             mensagens.push(this.criaPost(agregar[i].detalhes.numeroProcesso, busca));
@@ -138,5 +140,6 @@ class CriaFilaPJE {
         console.log(e);
     });
     new CriaFilaPJE().worker()
+    // new CriaFilaPJE().atualizaProcessosFila(0, 2, new Date("2020-12-12")) 
 
 })()

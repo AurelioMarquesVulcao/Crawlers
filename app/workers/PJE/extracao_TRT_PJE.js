@@ -165,7 +165,7 @@ var reset = '\u001b[0m';
           reset
         );
         heartBeat = 0;
-          // confirmação de atulização para o BigData
+        // confirmação de atulização para o BigData
         await axios({
           url:
             `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,

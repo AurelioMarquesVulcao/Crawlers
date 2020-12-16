@@ -31,6 +31,7 @@ module.exports.enums = Object.freeze({
   bigdataUrls: {
     captchaDecoder: 'http://172.16.16.8:5000/api/solve',
     resultadoDocumentos: `http://${bigdataAddress}/processos/documentos/uploadPeticaoInicial/`,
+    login: `http://${bigdataAddress}/login/`
   },
   proxy: {
     proxiesUrl: process.env.PROXY_ADDRESS,

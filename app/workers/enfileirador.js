@@ -13,7 +13,8 @@ const sleep = require('await-sleep');
 let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
-  SC: enums.nomesRobos.TJSC
+  SC: enums.nomesRobos.TJSC,
+  RS: enums.nomesRobos.TJRS
 };
 
 let gf = new GerenciadorFila();

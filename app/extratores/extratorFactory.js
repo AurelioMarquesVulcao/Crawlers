@@ -8,6 +8,7 @@ const { ProcessoTJSP } = require("./ProcessoTJSP");
 const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { ProcJTE } = require('./ProcJTE');
 const { PeticaoTJSP } = require('./PeticaoTJSP');
+const { PeticaoTJRS1 } = require('./PeticaoTJRS1');
 const { ExtratorTrtPje } = require('./processoPJE');
 const { ExtratorTrtPje15 } = require('./processoPJE15');
 
@@ -34,6 +35,10 @@ class ExtratorFactory {
 
     if (/processo.TJRS/.test(fila)) {
       extrator = new ProcessoTJRS('https://www.tjrs.jus.br/site_php/consulta/index.php', isDebug);
+    }
+
+    if (/peticao.TJRS/.test(fila)) {
+      extrator = new PeticaoTJRS1(false);
     }
 
     if (/processo.JTE/.test(fila)) {

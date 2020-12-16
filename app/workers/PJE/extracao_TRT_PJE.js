@@ -173,11 +173,10 @@ var reset = '\u001b[0m';
           headers: {
             // 'Content-Type': 'application/json',
             'x-api-key': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw',
-          },
-          data: envioAWS,
+          }
         })
           .then((res) => {
-            console.log(res);
+            console.log(res.data);
           })
           .catch((err) => {
             console.log(err);

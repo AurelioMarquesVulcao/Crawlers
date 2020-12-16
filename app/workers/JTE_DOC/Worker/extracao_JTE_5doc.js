@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const cheerio = require('cheerio');
 const shell = require('shelljs');
 const sleep = require('await-sleep');
+const axios = require('axios');
 
 const { enums } = require('../../../configs/enums');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
@@ -494,7 +495,23 @@ async function worker(nomeFila) {
         heartBeat +
         ' segundos -------------'
       );
-
+      // confirmação de atulização para o BigData
+      await axios({
+        url:
+          `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,
+        method: 'post',
+        headers: {
+          // 'Content-Type': 'application/json',
+          'x-api-key': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw',
+        }
+      })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+          throw err;
+        });
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');

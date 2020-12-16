@@ -202,7 +202,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2 start workers/JTE/criaFila01.yml --no-daemon
+    command: pm2 start workers/JTE/criadoresFila/3.0_criaFila01.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -216,7 +216,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2 start workers/JTE/criaFila02.yml --no-daemon
+    command: pm2 start workers/JTE/criadoresFila/3.0_criaFila02.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -230,7 +230,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2 start workers/JTE/criaFila03.yml --no-daemon
+    command: pm2 start workers/JTE/criadoresFila/3.0_criaFila03.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -244,7 +244,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2 start workers/JTE/criaFila04.yml --no-daemon
+    command: pm2 start workers/JTE/criadoresFila/3.0_criaFila04.js --no-daemon
     logging:
       driver: "json-file"
       options:

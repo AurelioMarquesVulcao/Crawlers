@@ -59,27 +59,24 @@ class GerenciadorFila {
  * @param {String} fila     String que contém o nome da fila.
  * @param {any} lista    Lista de Mensagem a serem enviadas.
  */
-  enviarLista(fila, lista) {
-    if (typeof mensagem === 'object') mensagem = JSON.stringify(mensagem);
+  async enviarLista(fila, lista) {
+    try{
+      const conn = await amqp.connect(this.host);
+      const channel = await conn.createChannel();
 
-    amqpCA.connect(this.host, (err, conn) => {
-      if (err) throw new Error(err);
-
-      conn.createChannel((err, ch) => {
-        if (err) throw new Error(err);
-
-        ch.assertQueue(fila, {
-          durable: true,
-          noAck: false,
-          maxPriority: 9,
-        });
-        for (i in lista) {
-          this.enviarMensagem(ch, fila, lista[i]);
-        }
-
+      channel.assertQueue(fila, {
+        durable: true,
+        noAck: false,
+        maxPriority: 9
       });
-    });
-    conn.close();
+
+      for (let i = 0, si = lista.length; i < si; i++){
+        this.enviarMensagem(channel, fila, JSON.stringify(lista[i]));
+      }
+
+    }catch (e) {
+      pred(e);
+    }
   }
 
 

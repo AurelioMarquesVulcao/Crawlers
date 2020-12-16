@@ -41,7 +41,8 @@ class Requisicao {
         return { objResponse: objResponse, cookies: cookies };
       })
       .catch((err) => {
-        console.log(err);
+        if(debug)
+          console.log(err);
         let objResponse = {};
         objResponse.code = err.code;
         if (err.response.status)
@@ -122,18 +123,18 @@ class Robo {
    * @returns {Promise<{Object}>}
    */
   async acessar({
-                  url,
-                  method = 'GET',
-                  encoding = 'latin1',
-                  proxy = false,
-                  queryString = {},
-                  formData = {},
-                  json = {},
-                  headers = {},
-                  randomUserAgent = false,
-                  timeout = 60000,
-                  responseType='',
-                } = {},     debug = false
+    url,
+    method = 'GET',
+    encoding = 'latin1',
+    proxy = false,
+    queryString = {},
+    formData = {},
+    json = {},
+    headers = {},
+    randomUserAgent = false,
+    timeout = 60000,
+    responseType='',
+  } = {},     debug = false
   ) {
     if (!url || url === '') throw new Error('URL Vazia');
 
@@ -153,13 +154,13 @@ class Robo {
       options.url = url + this.converterQueryString(queryString);
 
     if (Object.keys(formData).length > 0) {
-      let fd = this.converterFormData(formData);
-      this.setHeader(fd.header);
-      options.data = fd.data;
+        let fd = this.converterFormData(formData);
+        this.setHeader(fd.header);
+        options.data = fd.data;
     } else if (Object.keys(json).length > 0) {
-      this.setHeader({ 'Content-Type': 'application/json' });
-      options.data = JSON.stringify(json);
-    }
+        this.setHeader({ 'Content-Type': 'application/json' });
+        options.data = JSON.stringify(json);
+      }
 
     if (proxy) {
       options.httpsAgent = new HttpsProxyAgent(

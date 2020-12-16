@@ -8,9 +8,11 @@ let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
   SC: enums.nomesRobos.TJSC,
+  RS: enums.nomesRobos.TJRS
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {
+
   static async salvar(execucao) {
     const log = {
       status: execucao.status,
@@ -33,7 +35,15 @@ module.exports.LogExecucao = class LogExecucao {
     );
   }
 
-  static async cadastrarConsultaPendente(consultaPendente) {
+  /**
+   *
+   * @param consultaPendente
+   * @param nomeFila
+   * @returns {Promise<{mensagem: string, sucesso: boolean}|{mensagem: string, enviado: boolean, sucesso: boolean}>}
+   */
+  static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
+    let resposta;
+
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
 
     let mensagem = {
@@ -44,10 +54,15 @@ module.exports.LogExecucao = class LogExecucao {
       Instancia: consultaPendente.Instancia,
     };
     // verifica se tem processos cadastrados com aquele cnj e não processados (DataTermino nula)
-    const consultasCadastradas = await ExecucaoConsulta.countDocuments({"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, "Mensagem.Instancia": mensagem.Instancia, DataTermino: null});
+    const consultasCadastradas = await ExecucaoConsulta.find(
+        {"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, "Mensagem.Instancia": mensagem.Instancia, DataTermino: null}
+      )
+      .sort({
+      "Mensagem.NumeroProcesso": 1,
+    }).countDocuments();
 
     if (nomeRobo && !consultasCadastradas) {
-      const nomeFila = `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
+      nomeFila = nomeFila ? nomeFila : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
       
       const execucao = {
         ConsultaCadastradaId: consultaPendente._id,

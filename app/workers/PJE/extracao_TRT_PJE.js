@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const sleep = require('await-sleep');
+const axios = require('axios');
 
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
@@ -9,6 +10,7 @@ const { ExtratorTrtPje } = require('../../extratores/processoPJE');
 const { Processo } = require('../../models/schemas/processo');
 const { ProcessoTRT } = require('../../models/schemas/pje');
 const { TRTParser } = require('../../parsers/PJEParser');
+const { reloadLogs } = require('pm2');
 
 const parse = new TRTParser();
 var red = '\u001b[31m';
@@ -163,6 +165,24 @@ var reset = '\u001b[0m';
           reset
         );
         heartBeat = 0;
+          // confirmação de atulização para o BigData
+        await axios({
+          url:
+            `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,
+          method: 'post',
+          headers: {
+            // 'Content-Type': 'application/json',
+            'x-api-key': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw',
+          },
+          data: envioAWS,
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+            throw err;
+          });
       } catch (e) {
         // console.log(e);
 

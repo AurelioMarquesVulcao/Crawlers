@@ -14,7 +14,7 @@ class Helper {
    * @param {string} data Data comum. Ex.: 25/02/2020 09:40
    * @returns {string} 2020-01-01T10:10.000Z
    */
-  static data(data){
+  static data(data) {
     // O GMT-0000 mantem a hora que você inseriu sem alterar fuso -3
     // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
     //GMT-0300
@@ -28,11 +28,11 @@ class Helper {
    * @param {string} data Data comum. Ex.: 25/02/2020 09:40
    * @returns {string} 2020-01-01T10:10.000Z
    */
-  static data2(data){
+  static data2(data) {
     // O GMT-0000 mantem a hora que você inseriu sem alterar fuso -3
     // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
     //GMT-0300
-    let regex = data.replace(/.+([0-9]{1,2})\W([0-9]{1,2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2}).+/i, '$3-$2-$1 $4 GMT-0000');
+    let regex = data.replace(/(\D+)([0123]?\d)\W([01]\d)\W(\d{4})\s+([012]\d\W[0-5]\d)(\D+)/i, '$4-$3-$2 $5 GMT-0000');
     console.log(regex);
     return new Date(regex);
   }
@@ -413,7 +413,7 @@ class Cnj {
     }; let seq = novoSequencial;
     return { seq, zero }
   }
-// --------- Funções melhoradas ---------
+  // --------- Funções melhoradas ---------
 
   /**
    * Cria a mensagem a ser enviada para a fila

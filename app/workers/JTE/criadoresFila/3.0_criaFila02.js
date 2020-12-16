@@ -15,8 +15,8 @@ const awaitSleep = require("await-sleep");
 
 const Fila = new CriaFilaJTE();
 const rabbit = new GerenciadorFila();
-var fila = ".1";  // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos.1';
+var fila = ".2";  // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos.2';
 var desligado = desligar.worker;
 
 
@@ -28,8 +28,7 @@ var desligado = desligar.worker;
   const variaveis = await Variaveis.catch({ "codigo": "000001" });
   const Estados = variaveis.variaveis;
   var estados = [
-    Estados[0].rj,
-    Estados[0].sp2,
+    Estados[0].sp15, Estados[0].mg, Estados[0].ba,
   ];
 
   embaralha(estados)

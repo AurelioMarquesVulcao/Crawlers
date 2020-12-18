@@ -132,6 +132,7 @@ class ProcessoTJCE {
       proxy: true
     });
   }
+
   /**
    * Acessa a pagina de consulta
    * @returns {Promise<{Object}>}

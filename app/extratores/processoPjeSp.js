@@ -89,7 +89,7 @@ class ExtratorPje {
       let form = capturaForms($);
       this.logT("Form Data");
       // console.table(FormData);
-      console.log(this.robo.cookies);
+      console.log(this.robo.cookies.captchasess);
       return form
     } catch (e) {
       this.logE("Form Data");
@@ -110,7 +110,7 @@ class ExtratorPje {
       let response = await new CaptchaHandler(5, 15000, `PJE-${estado}`, { numeroDoProcesso: cnj }).resolveRecaptchaV2(url, this.key, "/");
       // console.log(this.robo.cookies);
       // console.log(this.robo.cookies);
-      // console.log(response.gResponse);
+      console.log(response);
       // process.exit();
       console.log(this.robo.cookies);
       return response.gResponse
@@ -129,55 +129,60 @@ class ExtratorPje {
       // process.exit()
       let url = `https://pje.trt${estado}.jus.br/captcha/login_post.php`;
       let request = {
-        url,
+        url: url,
         proxy: this.proxy,
         method: "POST",
-        debug: true,
+        // debug: true,
         headers: {
+          // "Content-Type":"application/x-www-form-urlencoded",
           origin: `http://pje.trt${estado}.jus.br`,
-          referer: `http://pje.trt${estado}.jus.br/primeirograu/`,
-          "sec-ch-ua": `"Google Chrome"; v="87", " Not;A Brand"; v="99", "Chromium"; v="87"`,
+          referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
+          // "sec-ch-ua": `"Google Chrome"; v="87", " Not;A Brand"; v="99", "Chromium"; v="87"`,
           "sec-ch-ua-mobile": "?0",
           "upgrade-insecure-requests": "1",
           "sec-fetch-mode": "navigate",
           "sec-fetch-dest": "document",
           "sec-fetch-user": "?1",
           "upgrade-insecure-requests": "1",
-          "content-length": geraContentLenght(form)
+          cookie: "1af69b77c9a62f86724f901abf43ed12"
+          // "content-length": geraContentLenght(form)
         },
         formData: form
       };
-
-      // const response = await axios({
-      //   method: 'POST',
-      //   url: `https://pje.trt${estado}.jus.br/captcha/login_post.php`,
-      //   responseType: 'stream',
-      //   httpsAgent: proxy,
-
-      //   headers: {
-      //     origin: `http://pje.trt${estado}.jus.br`,
-      //     referer: `http://pje.trt${estado}.jus.br/primeirograu/`,
-      //     cookies: this.robo.cookies,
-      //     "upgrade-insecure-requests": "1",
-      //     "sec-fetch-mode": "navigate",
-      //     "sec-fetch-dest": "document",
-      //     "sec-fetch-user": "?1",
-      //     "upgrade-insecure-requests": "1"
-      //   },
-      //   formData: form
-      // });
-      // console.log(response);
-
-
-
 
 
       await this.robo.acessar(request)
 
       console.log(this.robo.cookies);
-      let post = await this.robo.acessar(request);
+      // let post = await this.robo.acessar(request);
+      let post = await axios({
+        method: "POST",
+        url:`https://pje.trt${estado}.jus.br/captcha/login_post.php`,
+        headers: {
+          "Content-Type":"application/x-www-form-urlencoded",
+          origin: `http://pje.trt${estado}.jus.br`,
+          referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
+          // "sec-ch-ua": `"Google Chrome"; v="87", " Not;A Brand"; v="99", "Chromium"; v="87"`,
+          "sec-ch-ua-mobile": "?0",
+          "upgrade-insecure-requests": "1",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-dest": "document",
+          "sec-fetch-user": "?1",
+          "upgrade-insecure-requests": "1",
+          cookie: `captchasess=${this.robo.cookies.captchasess}`,
+          // "content-length": geraContentLenght(form)
+          "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+        },
+        formData: form,
+        
+
+      })
+
       console.log(post);
-      console.log(post.responseContent.request._header);
+      console.log(post.headers);
+
+      console.log(this.robo.cookies);
+      // console.log(post.responseContent.request._header);
       console.log(this.robo.cookies);
 
 
@@ -340,7 +345,7 @@ function geraContentLenght(form) {
 (async () => {
   // new ExtratorTrtPje().captura2({ 'X-Grau-Instancia': '1' }, "00114931020205150105", 15);
   // console.log(await new ExtratorPje().extrair("00114931020205150105"));
-  await new ExtratorPje().extrair("00114931020205150105");
+  await new ExtratorPje().extrair("00105008220205150002");
   // await new ExtratorPje().extrair("10013797020205020003");
   // await new ExtratorPje().extrair("00212492220205040211");
   process.exit()

@@ -24,6 +24,8 @@ class OabTJCE extends ExtratorBase {
     let gResponse;
     let tentativa = 1;
     let limite = 5;
+    // Variavel que diz se o acesso a pagina foi um sucesso ou se o captcha falhou
+    let paginaReturn
 
     try {
       primeiroAcesso = await this.fazerPrimeiroAcesso();
@@ -38,6 +40,15 @@ class OabTJCE extends ExtratorBase {
         this.logger.info(`Tentativa de acesso [${tentativa}]`);
         gResponse = await this.resolverCaptcha()
 
+        objResponse = await this.acessandoPaginaOabs(uuidCaptcha, gResponse);
+
+        paginaReturn = this.avaliaPagina(objResponse.responseBody);
+        if(!paginaReturn.sucesso) {
+          tentativa++;
+          continue
+        }
+
+        extracao = await this.extrairPaginas()
 
       } while(tentativa !== limite)
 
@@ -114,7 +125,10 @@ class OabTJCE extends ExtratorBase {
     });
   }
 
-
+  /**
+   * Acessa a pagina de consulta
+   * @returns {Promise<{Object}>}
+   */
   async acessarPaginaConsulta() {
     this.logger.info('Entrando na pagina de consulta');
 
@@ -133,6 +147,10 @@ class OabTJCE extends ExtratorBase {
     return this.robo.acessar(options)
   }
 
+  /**
+   * Faz o request para adquirir o UUID
+   * @returns {Promise<String>}
+   */
   async consultarUUID() {
     this.logger.info('Consultado UUID do site');
     let objResponse;
@@ -146,6 +164,10 @@ class OabTJCE extends ExtratorBase {
     return objResponse.responseBody.uuidCaptcha;
   }
 
+  /**
+   * Recebe o captcha e tenta resolve-lo, retorna string com o captcha resolvido
+   * @returns {Promise<String>}
+   */
   async resolverCaptcha() {
     const ch = new CaptchaHandler(5, 10000, 'ProcessoTJCE', {numeroDoProcesso: this.numeroProcesso});
 
@@ -161,7 +183,43 @@ class OabTJCE extends ExtratorBase {
     return captcha.gResponse;
   }
 
+  /**
+   *
+   * @param uuid
+   * @param gResponse
+   * @returns {Promise<{Object}>}
+   */
+  async acessandoPaginaOabs(uuid, gResponse) {
+    this.logger.info('Tentando acessar pagina da consulta de OAB');
+    let options = {
+      url: `${this.url}/search.do`,
+      method: 'GET',
+      queryString: {
+        conversationId: '',
+        'dadosConsulta.localPesquisa.cdLocal': '-1',
+        cbPesquisa: 'NUMOAB',
+        "dadosConsulta.tipoNuProcesso": 'UNIFICADO',
+        uuidCaptcha: uuid,
+        'g-recaptcha-response': gResponse
+      },
+      proxy: proxy,
+      encoding: 'utf8'
+    }
 
+    return await this.robo.acessar(options);
+  }
+
+  avaliaPagina(body) {
+    this.logger.info('Avaliando a pagina para detectar a presença de erros');
+
+    const $ = cheerio.load(body);
+    const mensagemRetornoSelector = '#mensagemRetorno';
+    const tabelaMovimentacoesSelector = '#tabelaTodasMovimentacoes';
+    const senhaProcessoSelector = '#senhaProcesso';
+
+    let mensagemRetornoText = $(mensagemRetornoSelector).text();
+    
+  }
 }
 
 module.exports.OabTJCE = OabTJCE;

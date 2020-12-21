@@ -49,58 +49,73 @@ class ExtratorPje {
     console.log(id);
 
     if (estado == 15) {
+      let url = "https://pje.trt15.jus.br/primeirograu/login.seam";
+      let request1 = {
+        url, proxy: this.proxy, method: "GET", headers: { "x-grau-instancia": "1" }
+      };
+      let get1 = await this.robo.acessar(request1);
+      console.log(get1.status);
+      console.log(this.robo.cookies);
+      // process.exit();
+
       // iniciando obtenção fornçada do formulario de inicio.
       let start = null;
       while (start == null) {
         start = await this.startPage(estado);
       };
-      console.log(start);
+      console.log("Inicio do sleep");
+      await sleep(3000);
+      console.log("Fim do Sleep");
       let recapcha = await this.desafioRecapcha(estado, start, cnj);
       console.log(recapcha);
       let resposta = await this.responseCapcha(start, recapcha, estado);
+
       resposta
       console.log(this.robo.cookies);
-
-      console.log(resposta);
+      process.exit();
+      // console.log(resposta);
       // process.exit()
     }
     // await this.extrair(cnj);
-    // // obtendo a imagem base 64 do capcha
+    // obtendo a imagem base 64 do capcha
     let captcha = await this.desafioCapcha(estado, id);
-    console.log(captcha);
+    // console.log(captcha);
     console.log(!!captcha);
 
-    // let captchaSolve = await this.apiCapcha(captcha);
-    // console.log(captchaSolve);
+    let captchaSolve = await this.apiCapcha(captcha);
+    console.log(captchaSolve);
 
-    // let processo = await this.processo(estado, id, captcha, captchaSolve);
-    // console.log(processo);
+    let processo = await this.processo(estado, id, captcha, captchaSolve);
+    console.log(processo);
 
-    // return processo
+    return processo
   }
 
   async startPage(estado) {
     try {
       let url = `https://pje.trt${estado}.jus.br/consultaprocessual/`;
-      let request = { url, proxy: this.proxy, method: "GET" };
+      let request = {
+        url, proxy: this.proxy, method: "GET", headers: {
+          referer: "https://pje.trt15.jus.br/primeirograu/login.seam",
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "same-origin",
+          "sec-fetch-user": "?1",
+          "sec-gpc": "1",
+          "upgrade-insecure-requests": "1"
+        }
+      };
       let get = await this.robo.acessar(request);
       let body = get.responseBody;
       let $ = cheerio.load(body);
       let form = capturaForms($);
       this.logT("Form Data");
-      // console.table(FormData);
+      console.table(form);
       console.log(this.robo.cookies);
       return form
     } catch (e) {
       this.logE("Form Data");
-      // if (/'1' of null/gmi.test(e)) {
-      //   this.logE("Form Data");
-      //   return null
-      // } else {
-      //   console.log(e);
-      // }
     }
-    process.exit();
   }
 
   async desafioRecapcha(estado, start, cnj) {
@@ -122,69 +137,39 @@ class ExtratorPje {
 
   async responseCapcha(start, recapcha, estado) {
     try {
-
-
       let form = Object.assign(start, { "g-recaptcha-response": recapcha })
       console.log(form);
-      // process.exit()
       let url = `https://pje.trt${estado}.jus.br/captcha/login_post.php`;
       let request = {
         url,
         proxy: this.proxy,
         method: "POST",
-        debug: true,
         headers: {
-          origin: `http://pje.trt${estado}.jus.br`,
-          referer: `http://pje.trt${estado}.jus.br/primeirograu/`,
-          "sec-ch-ua": `"Google Chrome"; v="87", " Not;A Brand"; v="99", "Chromium"; v="87"`,
+          Origin: "https://pje.trt15.jus.br",
+          Referer: "https://pje.trt15.jus.br/consultaprocessual/",
           "sec-ch-ua-mobile": "?0",
-          "upgrade-insecure-requests": "1",
-          "sec-fetch-mode": "navigate",
-          "sec-fetch-dest": "document",
-          "sec-fetch-user": "?1",
-          "upgrade-insecure-requests": "1",
-          "content-length": geraContentLenght(form)
+          "Sec-Fetch-Dest": "document",
+          "Sec-Fetch-Mode": "navigate",
+          "Sec-Fetch-Site": "same-origin",
+          "Sec-Fetch-User": "?1",
+          "Upgrade-Insecure-Requests": "1",
+          // "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36"
         },
         formData: form
       };
 
-      // const response = await axios({
-      //   method: 'POST',
-      //   url: `https://pje.trt${estado}.jus.br/captcha/login_post.php`,
-      //   responseType: 'stream',
-      //   httpsAgent: proxy,
-
-      //   headers: {
-      //     origin: `http://pje.trt${estado}.jus.br`,
-      //     referer: `http://pje.trt${estado}.jus.br/primeirograu/`,
-      //     cookies: this.robo.cookies,
-      //     "upgrade-insecure-requests": "1",
-      //     "sec-fetch-mode": "navigate",
-      //     "sec-fetch-dest": "document",
-      //     "sec-fetch-user": "?1",
-      //     "upgrade-insecure-requests": "1"
-      //   },
-      //   formData: form
-      // });
-      // console.log(response);
-
-
-
-
-
-      await this.robo.acessar(request)
+      // await this.robo.acessar(request)
 
       console.log(this.robo.cookies);
       let post = await this.robo.acessar(request);
-      console.log(post);
-      console.log(post.responseContent.request._header);
+      console.log(post.responseContent.request);
       console.log(this.robo.cookies);
-
-
       // await this.responseCapcha(start, recapcha, estado);
-      // console.log(this.robo.cookies);
-      this.logT("post_PHP")
+      console.log(this.robo.cookies);
+      // if (!this.robo.cookies.cookieconsultapje){
 
+      // }
+      this.logT("post_PHP")
     } catch (e) {
       console.log(e);
     }
@@ -214,7 +199,7 @@ class ExtratorPje {
   async desafioCapcha(estado, id) {
     try {
       let url = `http://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/${id}`;
-      let request = { url, proxy: this.proxy, method: "GET", debut: true };
+      let request = { url, proxy: this.proxy, method: "GET", debug: true };
       let get = await this.robo.acessar(request);
       // console.log(get);
       let resposta = [{

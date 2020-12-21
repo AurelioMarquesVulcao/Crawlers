@@ -15,6 +15,7 @@ class OabTJCE extends ExtratorBase {
     super();
     this.url = 'https://esaj.tjce.jus.br/cpopg';
     this.robo = new Robo();
+    this.resultado = [];
     this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3';
   }
 
@@ -56,12 +57,20 @@ class OabTJCE extends ExtratorBase {
 
         processosList = await this.verificaNovos(processosList);
 
-        await this.enfileirarProcessos(processosList);
+        this.resultado = await this.enfileirarProcessos(processosList);
+
+        break;
       } while (tentativa !== limite);
+      this.resposta = {
+        sucesso: true,
+        nProcessos: this.resultados,
+      };
     } catch (e) {
-      console.log(e);
+      this.logger.log('error', String(e));
+      this.resposta = { sucesso: false, detalhes: e.message };
     } finally {
-      console.log('terminou');
+      this.resposta.logs = this.logger.logs;
+      return this.resposta;
     }
   }
 

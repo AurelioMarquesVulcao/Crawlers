@@ -42,26 +42,24 @@ class ExtratorPje {
     let { sequencial, ano, estado, comarca } = Cnj.processoSlice(cnj);
     estado = parseInt(estado);
 
-    let id = null;
-    while (id == null) {
-      id = await this.getId(cnj, this.instancia1, estado);
-    }
-    console.log(id);
+
 
     if (estado == 15) {
-      let url = "https://pje.trt15.jus.br/primeirograu/login.seam";
-      let request1 = {
-        url, proxy: this.proxy, method: "GET", headers: { "x-grau-instancia": "1" }
-      };
-      let get1 = await this.robo.acessar(request1);
-      console.log(get1.status);
-      console.log(this.robo.cookies);
-      // process.exit();
+      // let url = "https://pje.trt15.jus.br/primeirograu/login.seam";
+      // let request1 = {
+      //   url, proxy: this.proxy, method: "GET", headers: { "x-grau-instancia": "1" }
+      // };
+      console.log(await get1());
+      
+      // console.log(get1.status);
+      // console.log(this.robo.cookies);
+      process.exit();
 
       // iniciando obtenção fornçada do formulario de inicio.
       let start = null;
       while (start == null) {
         start = await this.startPage(estado);
+        // process.exit();
       };
       console.log("Inicio do sleep");
       await sleep(3000);
@@ -76,6 +74,12 @@ class ExtratorPje {
       // console.log(resposta);
       // process.exit()
     }
+    let id = null;
+    while (id == null) {
+      id = await this.getId(cnj, this.instancia1, estado);
+    }
+    console.log(id);
+
     // await this.extrair(cnj);
     // obtendo a imagem base 64 do capcha
     let captcha = await this.desafioCapcha(estado, id);
@@ -261,7 +265,6 @@ class ExtratorPje {
       return null
     }
   }
-
   logT(name) {
     // const obj = [{
     //   Status: true,
@@ -274,10 +277,7 @@ class ExtratorPje {
     const obj = this.red + `Não foi possivél obter o.: ${name}` + this.reset;
     console.log(obj);
   }
-
 }
-
-
 
 module.exports.ExtratorPje = ExtratorPje;
 
@@ -320,6 +320,33 @@ function geraContentLenght(form) {
   return t
 }
 
+async function get1(){
+  var axios = require('axios');
+var FormData = require('form-data');
+var data = new FormData();
+
+var config = {
+  method: 'get',
+  url: 'https://pje.trt15.jus.br/primeirograu/login.seam',
+  headers: { 
+    'x-grau-instancia': '1', 
+    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36', 
+    // 'Cookie': 'JSESSIONID=50b8f59be55f04e5~aUBQEThKJdfyes1S5xA91XRJ; br.com.infox.ibpm.skin=skin/azul', 
+    ...data.getHeaders()
+  },
+  data : data
+};
+
+await axios(config)
+.then(function (response) {
+  console.log(response.request.res);
+  // console.log(JSON.stringify(response.data));
+})
+.catch(function (error) {
+  console.log(error);
+});
+
+}
 
 
 (async () => {

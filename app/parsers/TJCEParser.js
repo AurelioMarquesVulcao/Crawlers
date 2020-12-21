@@ -53,7 +53,7 @@ class TJCEParser extends BaseParser {
       assunto: this.extrairAssunto($),
       classe: this.extrairClasse($),
       vara: removerAcentos(this.extrairVara($)),
-      audiencias: this.extrairAudiencias($)
+      audiencias: this.extrairAudiencias($),
     };
   }
 
@@ -77,7 +77,7 @@ class TJCEParser extends BaseParser {
     let vara = /(.+)\sda\sComarca\sde/.exec(rawVara);
 
     if (vara && vara[1]) {
-      return vara[1]
+      return vara[1];
     }
 
     return 'Não identificada';
@@ -354,23 +354,30 @@ class TJCEParser extends BaseParser {
   }
 
   extrairAudiencias($) {
-    let data = $($($('[name="audienciasPlaceHolder"]').next('table').children()[0]).find('tr.fundoClaro > td')[0]).text()
-    let tipo = $($($('[name="audienciasPlaceHolder"]').next('table').children()[0]).find('tr.fundoClaro > td')[1]).text()
+    let data = $(
+      $($('[name="audienciasPlaceHolder"]').next('table').children()[0]).find(
+        'tr.fundoClaro > td'
+      )[0]
+    ).text();
+    let tipo = $(
+      $($('[name="audienciasPlaceHolder"]').next('table').children()[0]).find(
+        'tr.fundoClaro > td'
+      )[1]
+    ).text();
     let audiencia;
 
     if (/\d/.test(data) && /\w/.test(tipo)) {
-      data = data.strip()
-      data = moment(data, 'DD/MM/AAAA')
+      data = data.strip();
+      data = moment(data, 'DD/MM/AAAA');
 
-      tipo = tipo.strip()
+      tipo = tipo.strip();
 
       if (data > moment()) {
-        return [{data: data.format('YYYY-MM-DD'), tipo}]
+        return [{ data: data.format('YYYY-MM-DD'), tipo }];
       }
     }
 
-    return []
-
+    return [];
   }
 }
 

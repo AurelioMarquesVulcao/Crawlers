@@ -251,14 +251,21 @@ class OabTJCE extends ExtratorBase {
     let processos = [];
     let processosDaPagina = [];
     let proxPagina = 'true';
+    let paginaCount = 0;
 
+    this.logger.info('Extraindo paginas');
     do {
+      paginaCount++;
+      this.logger.info(`Extraindo pagina ${paginaCount}`);
       processosDaPagina = this.extrairProcessos(body);
 
       processos = [...processos, ...processosDaPagina];
 
       proxPagina = this.verificaProximaPagina(body);
-      if (!proxPagina) break;
+      if (!proxPagina) {
+        this.logger.info('Fim das paginas');
+        break;
+      }
       body = await this.acessarProximaPagina(proxPagina);
     } while (true);
 
@@ -278,6 +285,7 @@ class OabTJCE extends ExtratorBase {
   }
 
   verificaProximaPagina(body) {
+    this.logger.info('Verificando a existencia de outra pagina');
     const $ = cheerio.load(body);
     let proximaPagina = $('a[title="Próxima página"]');
 
@@ -289,6 +297,7 @@ class OabTJCE extends ExtratorBase {
   }
 
   async acessarProximaPagina(link) {
+    this.logger.info('Acessando nova pagina do processo');
     let objResponse;
 
     objResponse = await this.robo.acessar({
@@ -307,6 +316,7 @@ class OabTJCE extends ExtratorBase {
    * @returns {Promise<[String]>}
    */
   async verificaNovos(processos) {
+    this.logger.info('Verificando processos ja existentes no banco');
     let processosSalvos = await Processo.find(
       {
         'detalhes.numeroProcessoMascara': { $in: processos },
@@ -326,10 +336,14 @@ class OabTJCE extends ExtratorBase {
   }
 
   async enfileirarProcessos(processos) {
+    this.logger.info('Preparando para enfileirar processos');
+    this.logger.info(
+      `${processos.length} processos preparados para serem enviados a extração`
+    );
     let cadastroConsulta = this.cadastroConsulta;
     let resultados = [];
 
-    const fila = c'processo.TJCE.extracao.novos';
+    const fila = 'processo.TJCE.extracao.novos';
     for (let p of processos) {
       cadastroConsulta['NumeroProcesso'] = p;
 

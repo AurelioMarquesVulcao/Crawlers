@@ -29,8 +29,6 @@ class TJCEParser extends BaseParser {
     detalhes.instancia = 1;
     capa.dataDistribuicao = this.extrairDataDistribuicao($, andamentos);
 
-    const audiencias = this.extrairAudiencias($);
-
     const processo = new Processo({
       capa,
       detalhes,
@@ -54,6 +52,8 @@ class TJCEParser extends BaseParser {
       comarca: this.extrairComarca($),
       assunto: this.extrairAssunto($),
       classe: this.extrairClasse($),
+      vara: removerAcentos(this.extrairVara($)),
+      audiencias: this.extrairAudiencias($)
     };
   }
 
@@ -68,6 +68,19 @@ class TJCEParser extends BaseParser {
     }
 
     return 'Nao identificada';
+  }
+
+  extrairVara($) {
+    let distribuicaoSelector = `tr:contains("Distribuição:")`;
+    let rawVara = $(distribuicaoSelector).next('tr').text().strip();
+
+    let vara = /(.+)\sda\sComarca\sde/.exec(rawVara);
+
+    if (vara && vara[1]) {
+      return vara[1]
+    }
+
+    return 'Não identificada';
   }
 
   extrairClasse($) {

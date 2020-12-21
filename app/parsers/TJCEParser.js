@@ -29,6 +29,8 @@ class TJCEParser extends BaseParser {
     detalhes.instancia = 1;
     capa.dataDistribuicao = this.extrairDataDistribuicao($, andamentos);
 
+    const audiencias = this.extrairAudiencias($);
+
     const processo = new Processo({
       capa,
       detalhes,
@@ -336,6 +338,26 @@ class TJCEParser extends BaseParser {
 
     let tam = andamentos.length;
     if (tam > 0) return andamentos[tam - 1].data;
+  }
+
+  extrairAudiencias($) {
+    let data = $($($('[name="audienciasPlaceHolder"]').next('table').children()[0]).find('tr.fundoClaro > td')[0]).text()
+    let tipo = $($($('[name="audienciasPlaceHolder"]').next('table').children()[0]).find('tr.fundoClaro > td')[1]).text()
+    let audiencia;
+
+    if (/\d/.test(data) && /\w/.test(tipo)) {
+      data = data.strip()
+      data = moment(data, 'DD/MM/AAAA')
+
+      tipo = tipo.strip()
+
+      if (data > moment()) {
+        return [{data: data.format('YYYY-MM-DD'), tipo}]
+      }
+    }
+
+    return []
+
   }
 }
 

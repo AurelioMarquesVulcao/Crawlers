@@ -8,7 +8,8 @@ let mapaEstadoRobo = {
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
   SC: enums.nomesRobos.TJSC,
-  RS: enums.nomesRobos.TJRS
+  RS: enums.nomesRobos.TJRS,
+  CE: enums.nomesRobos.TJCE
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {

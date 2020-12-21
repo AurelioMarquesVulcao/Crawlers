@@ -1,19 +1,27 @@
 const cheerio = require('cheerio');
-const { Robo } = require('../lib/newRobo');
-const { ExtratorBase } = require('./extratores');
+const sleep = require('await-sleep');
+require('../bootstrap');
 const { CaptchaHandler } = require('../lib/captchaHandler');
-const { Logger } = require('../lib/util')
+const { ExtratorBase } = require('./extratores');
+const { Logger } = require('../lib/util');
+const { LogExecucao } = require('../lib/logExecucao');
+const { Processo } = require('../models/schemas/processo');
+const { Robo } = require('../lib/newRobo');
+
+const proxy = true;
 
 class OabTJCE extends ExtratorBase {
   constructor() {
     super();
+    this.url = 'https://esaj.tjce.jus.br/cpopg';
     this.robo = new Robo();
     this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3';
   }
 
-  async extrair(numeroOab) {
+  async extrair(numeroOab, cadastroConsultaId) {
     this.numeroOab = numeroOab;
-    this.montarLogger(numeroOab);
+    this.setLogger(numeroOab);
+    this.setCadastroConsulta(numeroOab, cadastroConsultaId);
 
     let objResponse;
     // Resposta para tentativa de primeiro acesso no site
@@ -25,33 +33,31 @@ class OabTJCE extends ExtratorBase {
     let tentativa = 1;
     let limite = 5;
     // Variavel que diz se o acesso a pagina foi um sucesso ou se o captcha falhou
-    let paginaReturn
+    let paginaReturn;
+    // É aqui que serão armazenados os processos
+    let processosList;
 
     try {
       primeiroAcesso = await this.fazerPrimeiroAcesso();
 
-      if(!primeiroAcesso.sucesso) process.exit(0);
+      if (!primeiroAcesso.sucesso) process.exit(0);
 
-      objResponse = await this.acessarPaginaConsulta()
+      objResponse = await this.acessarPaginaConsulta();
 
       uuidCaptcha = await this.consultarUUID();
 
       do {
         this.logger.info(`Tentativa de acesso [${tentativa}]`);
-        gResponse = await this.resolverCaptcha()
+        gResponse = await this.resolverCaptcha();
 
         objResponse = await this.acessandoPaginaOabs(uuidCaptcha, gResponse);
 
-        paginaReturn = this.avaliaPagina(objResponse.responseBody);
-        if(!paginaReturn.sucesso) {
-          tentativa++;
-          continue
-        }
+        processosList = await this.extrairPaginas(objResponse.responseBody);
 
-        extracao = await this.extrairPaginas()
+        processosList = await this.verificaNovos(processosList);
 
-      } while(tentativa !== limite)
-
+        await this.enfileirarProcessos(processosList);
+      } while (tentativa !== limite);
     } catch (e) {
       console.log(e);
     } finally {
@@ -59,19 +65,27 @@ class OabTJCE extends ExtratorBase {
     }
   }
 
+  setCadastroConsulta(numeroOab, cadastroConsultaId) {
+    this.cadastroConsulta = {
+      SeccionalOab: 'RS',
+      TipoConsulta: 'processo',
+      NumeroOab: numeroOab,
+      Instancia: 1,
+      NomeRobo: 'TJRS',
+      _id: cadastroConsultaId,
+    };
+  }
+
   /**
    * Monta o logger que sera usado no processo de extracao
    * @param {string} numeroOab numero da oab no formato \d+[A-Z]{2}
    */
-  montarLogger(numeroOab) {
-    this.logger = new Logger(
-      'info',
-      'logs/TJCE/oab.log',
-      {
-        nomeRobo: 'OabTJCE',
-        numeroOab: numeroOab
-      }
-    )
+  setLogger(numeroOab) {
+    console.log(numeroOab);
+    this.logger = new Logger('info', 'logs/TJCE/oab.log', {
+      nomeRobo: 'OabTJCE',
+      NumeroOab: numeroOab,
+    });
   }
 
   /**
@@ -86,18 +100,21 @@ class OabTJCE extends ExtratorBase {
     let objResponse;
 
     do {
-      this.logger.info(`Tentando realizar a primeira conexão. [Tentativa: ${tentativa}]`)
+      this.logger.info(
+        `Tentando realizar a primeira conexão. [Tentativa: ${tentativa}]`
+      );
 
       objResponse = await this.realizaPrimeiraConexao().catch((err) => err);
       if (this.isDebug) console.log({ tentativa, status: objResponse.status });
+      console.log(objResponse.status); // TODO remover
       if (objResponse.status === 200) return { sucesso: true };
 
       this.logger.info('Falha ao tentar conectar no site.');
       tentativa++;
-      await sleep(primeiroAcessoWait)
-    } while(tentativa <= primeiroAcessoTentativas)
+      await sleep(primeiroAcessoWait);
+    } while (tentativa <= primeiroAcessoTentativas);
 
-    return { sucesso: false }
+    return { sucesso: false };
   }
 
   /**
@@ -116,12 +133,12 @@ class OabTJCE extends ExtratorBase {
       'Sec-Fetch-Mode': 'navigate',
       Referer: `${this.url}/open.do`,
       'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-    })
+    });
 
     return await this.robo.acessar({
       url: `${this.url}/open.do`,
       method: 'GET',
-      proxy: true
+      proxy: proxy,
     });
   }
 
@@ -139,12 +156,12 @@ class OabTJCE extends ExtratorBase {
         conversationId: '',
         'dadosConsulta.localPesquisa.cdLocal': '-1',
         cbPesquisa: 'NUMOAB',
-        "dadosConsulta.tipoNuProcesso": 'UNIFICADO',
+        'dadosConsulta.tipoNuProcesso': 'UNIFICADO',
       },
-      proxy: true,
+      proxy: proxy,
     };
 
-    return this.robo.acessar(options)
+    return this.robo.acessar(options);
   }
 
   /**
@@ -155,11 +172,13 @@ class OabTJCE extends ExtratorBase {
     this.logger.info('Consultado UUID do site');
     let objResponse;
 
-    objResponse = await this.robo.acessar({
+    let options = {
       url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
-      proxy: true
-    })
+      proxy: proxy,
+    };
+
+    objResponse = await this.robo.acessar(options);
 
     return objResponse.responseBody.uuidCaptcha;
   }
@@ -169,14 +188,21 @@ class OabTJCE extends ExtratorBase {
    * @returns {Promise<String>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJCE', {numeroDoProcesso: this.numeroProcesso});
+    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJCE', {
+      numeroDoProcesso: this.numeroProcesso,
+    });
 
     this.logger.info('Tentando resolver captcha');
-    let captcha = await ch.resolveRecaptchaV2(`${this.url}/open.do`, this.dataSiteKey, '/')
-      .catch(err => {throw err})
+    let captcha = await ch
+      .resolveRecaptchaV2(`${this.url}/open.do`, this.dataSiteKey, '/')
+      .catch((err) => {
+        throw err;
+      });
 
-    if(!captcha.sucesso) {
-      throw new Error('Falha na resposta. Não foi possivel recuperar a resposta para o captcha');
+    if (!captcha.sucesso) {
+      throw new Error(
+        'Falha na resposta. Não foi possivel recuperar a resposta para o captcha'
+      );
     }
 
     this.logger.info('Retornada resposta da API');
@@ -198,13 +224,14 @@ class OabTJCE extends ExtratorBase {
         conversationId: '',
         'dadosConsulta.localPesquisa.cdLocal': '-1',
         cbPesquisa: 'NUMOAB',
-        "dadosConsulta.tipoNuProcesso": 'UNIFICADO',
+        'dadosConsulta.tipoNuProcesso': 'UNIFICADO',
+        'dadosConsulta.valorConsulta': this.numeroOab,
         uuidCaptcha: uuid,
-        'g-recaptcha-response': gResponse
+        'g-recaptcha-response': gResponse,
       },
       proxy: proxy,
-      encoding: 'utf8'
-    }
+      encoding: 'utf8',
+    };
 
     return await this.robo.acessar(options);
   }
@@ -218,8 +245,110 @@ class OabTJCE extends ExtratorBase {
     const senhaProcessoSelector = '#senhaProcesso';
 
     let mensagemRetornoText = $(mensagemRetornoSelector).text();
-    
+  }
+
+  async extrairPaginas(body) {
+    let processos = [];
+    let processosDaPagina = [];
+    let proxPagina = 'true';
+
+    do {
+      processosDaPagina = this.extrairProcessos(body);
+
+      processos = [...processos, ...processosDaPagina];
+
+      proxPagina = this.verificaProximaPagina(body);
+      if (!proxPagina) break;
+      body = await this.acessarProximaPagina(proxPagina);
+    } while (true);
+
+    return processos;
+  }
+
+  extrairProcessos(body) {
+    const $ = cheerio.load(body);
+
+    let divLinkProcesso = $('.nuProcesso');
+    let processos = [];
+
+    divLinkProcesso.map((index, div) => {
+      processos.push($(div).children()[0].children[0].data.trim());
+    });
+    return processos;
+  }
+
+  verificaProximaPagina(body) {
+    const $ = cheerio.load(body);
+    let proximaPagina = $('a[title="Próxima página"]');
+
+    if (proximaPagina.length) {
+      return proximaPagina[0].attribs.href;
+    }
+
+    return false;
+  }
+
+  async acessarProximaPagina(link) {
+    let objResponse;
+
+    objResponse = await this.robo.acessar({
+      url: `http://esaj.tjce.jus.br${link}`,
+      method: 'GET',
+      proxy: proxy,
+      encoding: 'utf8',
+    });
+
+    return objResponse.responseBody;
+  }
+
+  /**
+   * Consulta o banco e resgata lista de processo já salvos, devolvendo somente os processos novos que não constam no banco.
+   * @param {[String]} processos lista de processo retirados da extracao
+   * @returns {Promise<[String]>}
+   */
+  async verificaNovos(processos) {
+    let processosSalvos = await Processo.find(
+      {
+        'detalhes.numeroProcessoMascara': { $in: processos },
+      },
+      { 'detalhes.numeroProcessoMascara': 1, _id: -1 }
+    );
+
+    if (processosSalvos.length === processos.length) return [];
+
+    if (!processosSalvos.length) return processos;
+
+    let processosNovos = processos.filter(
+      (processo) => processosSalvos.indexOf(processo) === -1
+    );
+
+    return processosNovos;
+  }
+
+  async enfileirarProcessos(processos) {
+    let cadastroConsulta = this.cadastroConsulta;
+    let resultados = [];
+
+    const fila = c'processo.TJCE.extracao.novos';
+    for (let p of processos) {
+      cadastroConsulta['NumeroProcesso'] = p;
+
+      let logExec = await LogExecucao.cadastrarConsultaPendente(
+        cadastroConsulta,
+        fila
+      );
+
+      if (logExec.enviado && logExec.sucesso) {
+        this.logger.info(`Processo: ${p} ==> ${fila}`);
+        resultados.push(p);
+      }
+    }
+
+    return resultados;
   }
 }
 
+new OabTJCE()
+  .extrair('23468CE', '6fb6a87a9f0dbd915a12b0b6')
+  .then((res) => console.log(res));
 module.exports.OabTJCE = OabTJCE;

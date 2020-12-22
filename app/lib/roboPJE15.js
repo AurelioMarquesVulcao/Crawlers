@@ -24,7 +24,6 @@ async function desafioRecapcha(estado, start, cnj) {
   }
 }
 
-
 function capturaForms($) {
   try {
     // let chaveValor = {};
@@ -62,9 +61,6 @@ function capturaForms($) {
   } catch (e) { console.log(e); }
 }
 
-
-
-
 async function request1() {
   let data = new FormData();
   // console.log(...data.getHeaders());
@@ -73,7 +69,7 @@ async function request1() {
     url: 'https://pje.trt15.jus.br/primeirograu/login.seam',
     headers: {
       'x-grau-instancia': '1',
-      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36',
       ...data.getHeaders()
     },
     data: data
@@ -82,9 +78,12 @@ async function request1() {
   await axios(config)
     .then(function (response) {
       let cookie = response.headers["set-cookie"];
-      for (i in cookie) {
-        cookieAll.push(cookie[i].split(";")[0])
-      }
+      let data = cookie[0];
+      console.log(data.split(';')[0]);
+      cookieAll = data.split(';')[0];
+      // for (i in cookie) {
+      //   cookieAll.push(cookie[i])
+      // }
     })
     .catch(function (error) {
       console.log(error);
@@ -106,7 +105,7 @@ async function request2() {
       'sec-fetch-user': '?1',
       'sec-gpc': '1',
       'upgrade-insecure-requests': '1',
-      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36',
       ...data.getHeaders()
     },
     data: data
@@ -118,8 +117,12 @@ async function request2() {
       let cookie = response.headers["set-cookie"];
       // console.log(cookie);
       for (i in cookie) {
-        cookieAll.push(cookie[i])
+        let data = cookie[i];
+        console.log(data.split(';')[0]);
+        cookieAll = data.split(';')[0];
+        // cookieAll.push("teste")
       }
+      // process.exit()
       let $ = cheerio.load(response.data);
       form = capturaForms($);
 
@@ -164,7 +167,7 @@ async function request3() {
       'Sec-Fetch-Site': 'same-origin',
       'Sec-Fetch-User': '?1',
       'Upgrade-Insecure-Requests': '1',
-      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36',
       ...data.getHeaders()
     },
     data: data
@@ -191,7 +194,7 @@ async function request3() {
   await request1();
   console.log(cookieAll);
   await request2();
-  await sleep(5000)
+  // await sleep(30000)
   console.log(cookieAll);
   await request3();
   console.log(cookieAll);

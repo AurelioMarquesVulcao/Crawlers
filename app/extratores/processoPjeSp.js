@@ -51,7 +51,7 @@ class ExtratorPje {
       let request1 = {
         url, proxy: this.proxy, method: "GET", //headers: { "x-grau-instancia": "1" }
       };
-      await this.robo.acessar(request1)
+      // await this.robo.acessar(request1)
       // console.log(await get1());
       
       // console.log(get1.status);
@@ -60,15 +60,16 @@ class ExtratorPje {
 
       // iniciando obtenção fornçada do formulario de inicio.
       let start = null;
-      while (start == null) {
-        start = await this.startPage(estado);
-        // process.exit();
-      };
-      console.log("Inicio do sleep");
-      await sleep(3000);
-      console.log("Fim do Sleep");
+      // while (start == null) {
+      //   start = await this.startPage(estado);
+      //   // process.exit();
+      // };
+      // console.log("Inicio do sleep");
+      // await sleep(3000);
+      // console.log("Fim do Sleep");
       let recapcha = await this.desafioRecapcha(estado, start, cnj);
       console.log(recapcha);
+      process.exit()
       let resposta = await this.responseCapcha(start, recapcha, estado);
 
       resposta
@@ -132,10 +133,12 @@ class ExtratorPje {
       let response = await new CaptchaHandler(5, 15000, `PJE-${estado}`, { numeroDoProcesso: cnj }).resolveRecaptchaV2(url, this.key, "/");
       // console.log(this.robo.cookies);
       // console.log(this.robo.cookies);
-      // console.log(response.gResponse);
+      console.log(response.gResponse);
       // process.exit();
       console.log(this.robo.cookies);
+      process.exit()
       return response.gResponse
+
     } catch (e) {
       console.log(e);
     }

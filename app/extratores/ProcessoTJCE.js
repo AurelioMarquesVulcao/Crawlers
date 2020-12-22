@@ -20,13 +20,15 @@ class ProcessoTJCE {
     this.numeroProcesso = numeroProcesso;
     this.message = msg;
     this.detalhes = Processo.identificarDetalhes(numeroProcesso);
+    this.detalhes = Processo.formatarDetalhes(this.detalhes);
     this.logger = new Logger('info', 'logs/TJRS/processo.log', {
       nomeRobo: 'processoTJCE',
-      NumeroDoProcesso: numeroProcesso,
+      NumeroDoProcesso: this.detalhes.numeroProcessoMascara,
     });
+    this.resposta = {};
 
     this.resposta = {
-      numeroProcesso: numeroProcesso,
+      numeroProcesso: this.detalhes.numeroProcessoMascara,
     };
 
     try {
@@ -36,7 +38,7 @@ class ProcessoTJCE {
       let limite = 5;
       let gResponse;
       let paginaReturn
-      let extracao;
+      let resultado;
 
       primeiroAcesso = await this.fazerPrimeiroAcesso();
 
@@ -68,14 +70,20 @@ class ProcessoTJCE {
           continue;
         }
 
-        extracao = await this.parser.parse(objResponse.responseBody);
+        resultado = await this.parser.parse(objResponse.responseBody);
+        break;
 
       } while(tentativa <= limite)
 
+      this.resposta.resultado = resultado;
+      this.resposta.sucesso = true;
     } catch (e) {
-      console.log(e);
+      this.logger.log('error', `${e}`);
+      this.resposta.sucesso = false;
+      this.resposta.detalhes = e.message;
     } finally {
-      console.log('finalizado');
+      this.resposta.logs = this.logger.logs;
+      return this.resposta;
     }
   }
 
@@ -185,7 +193,7 @@ class ProcessoTJCE {
    * @returns {Promise<String>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJCE', {numeroDoProcesso: this.numeroProcesso});
+    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJCE', {numeroDoProcesso: this.detalhes.numeroProcessoMascara});
 
     this.logger.info('Tentando resolver captcha');
     let captcha = await ch.resolveRecaptchaV2(`${this.url}/open.do`, this.dataSiteKey, '/')

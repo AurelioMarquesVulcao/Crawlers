@@ -66,6 +66,29 @@ const processoSchema = new Schema(
   }
 );
 
+/**
+ * @param detalhes resultado da funcao de extracao de detalhes do processo
+ * @param detalhes.numeroProcessoMascara
+ * @param detalhes.numeroProcesso
+ * @param detalhes.ano
+ * @param detalhes.orgao
+ * @param detalhes.tribunal
+ * @param detalhes.origem
+ * @returns {{sequencial: string, numeroProcesso: string, ano: string, orgao: string, numeroProcessoMascara: string, origem: string, tribunal: string, digito: string}}
+ */
+processoSchema.statics.formatarDetalhes = function formatarDetalhes({numeroProcessoMascara, numeroProcesso, ano, orgao, tribunal, origem} = {}) {
+  return {
+    numeroProcessoMascara: ('0000000' + numeroProcessoMascara).slice(-25),
+    numeroProcesso: ('0000000' + numeroProcesso).slice(-20),
+    sequencial: ('0000000' + numeroProcessoMascara.split(/\D/g)[0]).slice(-7),
+    digito: ('00'+numeroProcessoMascara.split(/\D/g)[1]).slice(-2),
+    ano: ('0000' + ano).slice(-4),
+    orgao: ('00' + orgao).slice(-2),
+    tribunal: ('00' + tribunal).slice(-2),
+    origem: ('0000' + origem).slice(-4),
+  }
+}
+
 processoSchema.methods.salvar = async function salvar() {
   let processoObject = this.toObject();
   let pesquisaAndamentos = 0;

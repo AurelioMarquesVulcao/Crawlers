@@ -6,6 +6,8 @@ const sleep = require('await-sleep');
 const { CaptchaHandler } = require('../lib/captchaHandler');
 const HttpsProxyAgent = require('https-proxy-agent');
 const axios = require('axios');
+var FormData = require('form-data');
+let data = new FormData();
 
 
 
@@ -45,15 +47,16 @@ class ExtratorPje {
 
 
     if (estado == 15) {
-      // let url = "https://pje.trt15.jus.br/primeirograu/login.seam";
-      // let request1 = {
-      //   url, proxy: this.proxy, method: "GET", headers: { "x-grau-instancia": "1" }
-      // };
-      console.log(await get1());
+      let url = "https://pje.trt15.jus.br/primeirograu/login.seam";
+      let request1 = {
+        url, proxy: this.proxy, method: "GET", //headers: { "x-grau-instancia": "1" }
+      };
+      await this.robo.acessar(request1)
+      // console.log(await get1());
       
       // console.log(get1.status);
       // console.log(this.robo.cookies);
-      process.exit();
+      // process.exit();
 
       // iniciando obtenção fornçada do formulario de inicio.
       let start = null;
@@ -166,7 +169,7 @@ class ExtratorPje {
 
       console.log(this.robo.cookies);
       let post = await this.robo.acessar(request);
-      console.log(post.responseContent.request);
+      // console.log(post.responseContent.request);
       console.log(this.robo.cookies);
       // await this.responseCapcha(start, recapcha, estado);
       console.log(this.robo.cookies);
@@ -320,33 +323,29 @@ function geraContentLenght(form) {
   return t
 }
 
-async function get1(){
-  var axios = require('axios');
-var FormData = require('form-data');
-var data = new FormData();
+// async function get1(){
+// let config = {
+//   method: 'get',
+//   url: 'https://pje.trt15.jus.br/primeirograu/login.seam',
+//   headers: { 
+//     'x-grau-instancia': '1', 
+//     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36', 
+//     // 'Cookie': 'JSESSIONID=50b8f59be55f04e5~aUBQEThKJdfyes1S5xA91XRJ; br.com.infox.ibpm.skin=skin/azul', 
+//     ...data.getHeaders()
+//   },
+//   data : data
+// };
 
-var config = {
-  method: 'get',
-  url: 'https://pje.trt15.jus.br/primeirograu/login.seam',
-  headers: { 
-    'x-grau-instancia': '1', 
-    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36', 
-    // 'Cookie': 'JSESSIONID=50b8f59be55f04e5~aUBQEThKJdfyes1S5xA91XRJ; br.com.infox.ibpm.skin=skin/azul', 
-    ...data.getHeaders()
-  },
-  data : data
-};
+// await axios(config)
+// .then(function (response) {
+//   console.log(response.request.res);
+//   // console.log(JSON.stringify(response.data));
+// })
+// .catch(function (error) {
+//   console.log(error);
+// });
 
-await axios(config)
-.then(function (response) {
-  console.log(response.request.res);
-  // console.log(JSON.stringify(response.data));
-})
-.catch(function (error) {
-  console.log(error);
-});
-
-}
+// }
 
 
 (async () => {

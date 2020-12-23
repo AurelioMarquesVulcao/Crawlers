@@ -50,15 +50,15 @@ const logarExecucao = async (execucao) => {
       logger.info('Resultado da extracao salva');
 
       logger.info('Enviando resposta ao BigData');
-      const resposta = await Helper.enviarFeedback(
-        extracao.prepararEnvio()
-      ).catch((err) => {
-        console.log(err);
-        throw new Error(
-          `ProcessoTJSC - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-        );
-      });
-      logger.info('Resposta enviada ao BigData');
+      // const resposta = await Helper.enviarFeedback(
+      //   extracao.prepararEnvio()
+      // ).catch((err) => {
+      //   console.log(err);
+      //   throw new Error(
+      //     `ProcessoTJSC - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
+      //   );
+      // });
+      // logger.info('Resposta enviada ao BigData');
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
@@ -73,7 +73,7 @@ const logarExecucao = async (execucao) => {
         NomeRobo: enums.nomesRobos.TJSC,
       });
     } catch (e) {
-      console.log('ERRU', e.code, e.message, '\n\n', e);
+      console.log('ERRO', e.code, e.message, '\n\n', e);
       logger.info('Encontrado erro durante a execução');
       logger.info(`Error: ${e.message}`);
       logger.info('Reconhecendo mensagem ao RabbitMQ');

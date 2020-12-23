@@ -3,6 +3,8 @@ const FormData = require('form-data');
 const sleep = require('await-sleep');
 const cheerio = require('cheerio');
 const { CaptchaHandler } = require('../lib/captchaHandler');
+const https = require('follow-redirects').https;
+const fs = require('fs');
 var cookieAll = [];
 var form;
 
@@ -83,10 +85,10 @@ async function request1() {
       let cookie = response.headers["set-cookie"];
       let data = cookie[0];
       console.log(data.split(';')[0]);
-      cookieAll = data.split(';')[0]+";"//+"; Path=/primeirograu; Domain=pje.trt15.jus.br; Secure; ";
+      cookieAll = data.split(';')[0] + ";"//+"; Path=/primeirograu; Domain=pje.trt15.jus.br; Secure; ";
       // console.log(response.data);
       // process.exit() //em todos os meus AnalyserNode, nunca imaginei o bruno falando mal de avengers
-                      // o final foi melhor que a hq real, a hq é muito tipo, acabou porque tinha que acabar
+      // o final foi melhor que a hq real, a hq é muito tipo, acabou porque tinha que acabar
       // for (i in cookie) {
       //   cookieAll.push(cookie[i])
       // }
@@ -192,7 +194,7 @@ async function request3() {
       console.log(response.headers);
       // console.log(response.data);
       console.log(cookie);
-      
+
       // for (i in cookie) {
       //   cookieAll.push(cookie[i])
       // }
@@ -204,6 +206,81 @@ async function request3() {
 
 }
 
+async function request4() {
+  let data = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;";
+  // let data = new FormData();
+  let desafio = await desafioRecapcha(15, null, "00114931020205150105");
+  // // let desafio="03AGdBq27MVeG43nfjrLHXG_EbBVAJTiHJ0I66_fnGepyXBJjJRQ0XUFzJHVTgfGY2lhh-9npfVdQrWGgOhxts7Rhx3cfob04bgAxQxRWYV9LYgbxBWklaQEgFHxB9_tQHWGnGnANFUMAkz1R3j_BDU2vNy-vHHMZeYjjYnWIFn44x8mUthSrJk-mtHtp2xQsFs0rc2DJgZxDKzXQqaEVaE0todT75fHAscVaDZu0ExdMO3bm84pLv8lZHdYJ3h3ansIfDFuVzdQWzVOdKhQtdDEXS2F-8Kwp_P9VPFF7UEHhGYSBJDxRVgJkU9zdxe5GKbcMKjEZlk-d5-qIOflADj7bzog_6h_HQQuHHc4X8SkOMiQ-JJ-apPTAV3sSnTujhou86DN2dJYXI_OydWJocbJCtnanhGfzcqtqQADZLACKQJ2-mW0GDgsLdi8KPI1pUiXUFKG2GkgDl5vrnVH88JjnLnOua69AqDiepo0aKhbfIrxfTAcVr6oxjG7X9nukXEQP2BlG8uaM2";
+  form.push({
+    "g-recaptcha-response": desafio
+  });
+  console.log(form);
+  console.log(form.length);
+  for (let i = 0; i < form.length; i++) {
+    let chave = Object.keys(form[i]);
+    let valor = Object.values(form[i]);
+    data += ` name=\"${chave[0]}\"\r\n\r\n${valor[0]}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;`
+    //   let chave = Object.keys(form[i]);
+    //   let valor = Object.values(form[i]);
+    //   data.append(`${chave[0]}`, valor[0]);
+  }
+  console.log(data);
+  // process.exit()
+
+
+
+  let options = {
+    'method': 'POST',
+    'hostname': 'pje.trt15.jus.br',
+    'path': '/captcha/login_post.php',
+    'headers': {
+      'Origin': 'https://pje.trt15.jus.br',
+      'Referer': 'https://pje.trt15.jus.br/consultaprocessual/',
+      'sec-ch-ua-mobile': '?0',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'same-origin',
+      'Sec-Fetch-User': '?1',
+      'Upgrade-Insecure-Requests': '1',
+      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36',
+      'Cookie': cookieAll
+    },
+    'maxRedirects': 20
+  };
+  let postData = data;
+
+  let req = https.request(options, function (res) {
+    var chunks = [];
+
+    res.on("data", function (chunk) {
+      chunks.push(chunk);
+    });
+
+    res.on("end", function (chunk) {
+      var body = Buffer.concat(chunks);
+      console.log(body.toString());
+    });
+
+    res.on("error", function (error) {
+      console.error(error);
+    });
+  });
+
+  
+  // let postData = `------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; 
+  // name=\"random\"\r\n\r\n84scp8e39iks5vnltl3ng5qud7\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data;
+  //  name=\"g-recaptcha-response\"\r\n\r\n03AGdBq248hPZ0Vg4h3WOaPVKl127MTCHkrTOu_UNlvCLkAtDjar0ZzLaBLDm8jRPEa0FKmSSQMfqo3tEskJECL-XjwvfYoO1T5awxJfrT4ip0yhf6LyVSnbSAZ9uUYonajhN-93_ACMlstNeHbfVIaPwgiUhzHRzSw0LoAUaqDEdbsU1QiEvrvCN5FoJCYI1KcbKnpvrWIvhiVOXyBgihIlxdUnoFGHC17U6AFU4OlQJh0EbvhwM5TVTZOkDRqArFYJPAi_75HlyOg6ZtPBoK5KTe4Xc0onZzLYx7WpTa50ELJ7Xhq1A48lH5jqYmjq_NnposW-jCsHIRLnHFmJzqqrpuMadPy4KoWnivULbASO-KlF5vH3UwpVYfA-pTHqA3WxU--jzfJNW0Tuq5TFXXn4l9EKFnECRoDfxPbvFYMmKSFt4wlONTRQ4Bjjz07fAzkswIFI6tix7o7ku18q-CltTipoZOtwrTgDwG0LbJdQnoFv3HfrEwPdsZauGuzIw67YokK_w5cAS4Qezj8cj78qW4XqV-MoLNBA\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; 
+  //  name=\"referer\"\r\n\r\n/consultaprocessual/\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; 
+  //  name=\"aVLZQqEgdwTirHmCp\"\r\n\r\nHwFloPUfjpMLGhJdtyqrce\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; 
+  //  name=\"eNjTQPpmRWbXoDkSvuAiMO\"\r\n\r\nQiZMkmIHFCqrwjcoafEWxvTGKsDPgL\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--`;
+
+  req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
+
+  req.write(postData);
+
+  req.end();
+}
+
 (async () => {
   // await request1();
   // console.log(cookieAll);
@@ -211,7 +288,7 @@ async function request3() {
   await request2();
   // await sleep(30000)
   console.log(cookieAll);
-  await request3();
+  await request4();
   console.log(cookieAll);
 })()
 

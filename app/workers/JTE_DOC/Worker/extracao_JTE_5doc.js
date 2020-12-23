@@ -57,6 +57,7 @@ var start = 0; // server de marcador para as funções que devem carregar na ini
       // if (!desligado.worker.find(element => element == relogio.hora) && start == 0) {
       start = 1;
       await worker(`peticao.JTE.extracao.${process.argv[2]}`);
+      // await worker(`peticao.JTE.extracao.01`);
       // await worker(`Fila.axios.JTE3`);
     } else {
       //console.log("aguardando para ligar");
@@ -220,6 +221,8 @@ async function worker(nomeFila) {
         if (start == 1) {
           logger.info('Iniciando processo de logar no tribunal');
           await puppet.preencheTribunal(numeroProcesso);
+          
+          
           start = 2;
           logger.info('Loggin no tribunal realizado com sucesso');
           await sleep(1000);
@@ -231,7 +234,17 @@ async function worker(nomeFila) {
           //console.log(logadoParaIniciais);
           logger.info('Logando para pegar documentos iniciais');
           // if (message.NovosProcessos == true && logadoParaIniciais == false) {
-          await puppet.loga();
+          try{
+            await puppet.loga();
+          }catch(e){
+            console.log("entrando no fluxo2");
+            await puppet.preencheTribunal1(numeroProcesso);
+            console.log("segunda tentativa de login");
+            // await puppet.loga();
+            console.log("retorno a a comarca original");
+            await puppet.preencheTribunal2(numeroProcesso);
+          }
+          
           logadoParaIniciais = true;
         }
 

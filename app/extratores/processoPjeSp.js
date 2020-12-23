@@ -6,6 +6,8 @@ const sleep = require('await-sleep');
 const { CaptchaHandler } = require('../lib/captchaHandler');
 const HttpsProxyAgent = require('https-proxy-agent');
 const axios = require('axios');
+var FormData = require('form-data');
+let data = new FormData();
 
 
 
@@ -42,65 +44,86 @@ class ExtratorPje {
     let { sequencial, ano, estado, comarca } = Cnj.processoSlice(cnj);
     estado = parseInt(estado);
 
+
+
+    if (estado == 15) {
+      let url = "https://pje.trt15.jus.br/primeirograu/login.seam";
+      let request1 = {
+        url, proxy: this.proxy, method: "GET", //headers: { "x-grau-instancia": "1" }
+      };
+      // await this.robo.acessar(request1)
+      // console.log(await get1());
+      
+      // console.log(get1.status);
+      // console.log(this.robo.cookies);
+      // process.exit();
+
+      // iniciando obtenção fornçada do formulario de inicio.
+      let start = null;
+      // while (start == null) {
+      //   start = await this.startPage(estado);
+      //   // process.exit();
+      // };
+      // console.log("Inicio do sleep");
+      // await sleep(3000);
+      // console.log("Fim do Sleep");
+      let recapcha = await this.desafioRecapcha(estado, start, cnj);
+      console.log(recapcha);
+      process.exit()
+      let resposta = await this.responseCapcha(start, recapcha, estado);
+
+      resposta
+      console.log(this.robo.cookies);
+      process.exit();
+      // console.log(resposta);
+      // process.exit()
+    }
     let id = null;
     while (id == null) {
       id = await this.getId(cnj, this.instancia1, estado);
     }
     console.log(id);
 
-    if (estado == 15) {
-      // iniciando obtenção fornçada do formulario de inicio.
-      let start = null;
-      while (start == null) {
-        start = await this.startPage(estado);
-      };
-      console.log(start);
-      let recapcha = await this.desafioRecapcha(estado, start, cnj);
-      console.log(recapcha);
-      let resposta = await this.responseCapcha(start, recapcha, estado);
-      resposta
-      console.log(this.robo.cookies);
-
-      console.log(resposta);
-      // process.exit()
-    }
     // await this.extrair(cnj);
-    // // obtendo a imagem base 64 do capcha
+    // obtendo a imagem base 64 do capcha
     let captcha = await this.desafioCapcha(estado, id);
-    console.log(captcha);
+    // console.log(captcha);
     console.log(!!captcha);
 
-    // let captchaSolve = await this.apiCapcha(captcha);
-    // console.log(captchaSolve);
+    let captchaSolve = await this.apiCapcha(captcha);
+    console.log(captchaSolve);
 
-    // let processo = await this.processo(estado, id, captcha, captchaSolve);
-    // console.log(processo);
+    let processo = await this.processo(estado, id, captcha, captchaSolve);
+    console.log(processo);
 
-    // return processo
+    return processo
   }
 
   async startPage(estado) {
     try {
       let url = `https://pje.trt${estado}.jus.br/consultaprocessual/`;
-      let request = { url, proxy: this.proxy, method: "GET" };
+      let request = {
+        url, proxy: this.proxy, method: "GET", headers: {
+          referer: "https://pje.trt15.jus.br/primeirograu/login.seam",
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "same-origin",
+          "sec-fetch-user": "?1",
+          "sec-gpc": "1",
+          "upgrade-insecure-requests": "1"
+        }
+      };
       let get = await this.robo.acessar(request);
       let body = get.responseBody;
       let $ = cheerio.load(body);
       let form = capturaForms($);
       this.logT("Form Data");
-      // console.table(FormData);
-      console.log(this.robo.cookies.captchasess);
+      console.table(form);
+      console.log(this.robo.cookies);
       return form
     } catch (e) {
       this.logE("Form Data");
-      // if (/'1' of null/gmi.test(e)) {
-      //   this.logE("Form Data");
-      //   return null
-      // } else {
-      //   console.log(e);
-      // }
     }
-    process.exit();
   }
 
   async desafioRecapcha(estado, start, cnj) {
@@ -110,10 +133,12 @@ class ExtratorPje {
       let response = await new CaptchaHandler(5, 15000, `PJE-${estado}`, { numeroDoProcesso: cnj }).resolveRecaptchaV2(url, this.key, "/");
       // console.log(this.robo.cookies);
       // console.log(this.robo.cookies);
-      console.log(response);
+      console.log(response.gResponse);
       // process.exit();
       console.log(this.robo.cookies);
+      process.exit()
       return response.gResponse
+
     } catch (e) {
       console.log(e);
     }
@@ -122,74 +147,39 @@ class ExtratorPje {
 
   async responseCapcha(start, recapcha, estado) {
     try {
-
-
       let form = Object.assign(start, { "g-recaptcha-response": recapcha })
       console.log(form);
-      // process.exit()
       let url = `https://pje.trt${estado}.jus.br/captcha/login_post.php`;
       let request = {
         url: url,
         proxy: this.proxy,
         method: "POST",
-        // debug: true,
         headers: {
-          // "Content-Type":"application/x-www-form-urlencoded",
-          origin: `http://pje.trt${estado}.jus.br`,
-          referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
-          // "sec-ch-ua": `"Google Chrome"; v="87", " Not;A Brand"; v="99", "Chromium"; v="87"`,
+          Origin: "https://pje.trt15.jus.br",
+          Referer: "https://pje.trt15.jus.br/consultaprocessual/",
           "sec-ch-ua-mobile": "?0",
-          "upgrade-insecure-requests": "1",
-          "sec-fetch-mode": "navigate",
-          "sec-fetch-dest": "document",
-          "sec-fetch-user": "?1",
-          "upgrade-insecure-requests": "1",
-          cookie: "1af69b77c9a62f86724f901abf43ed12"
-          // "content-length": geraContentLenght(form)
+          "Sec-Fetch-Dest": "document",
+          "Sec-Fetch-Mode": "navigate",
+          "Sec-Fetch-Site": "same-origin",
+          "Sec-Fetch-User": "?1",
+          "Upgrade-Insecure-Requests": "1",
+          // "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36"
         },
         formData: form
       };
 
-
-      await this.robo.acessar(request)
-
-      console.log(this.robo.cookies);
-      // let post = await this.robo.acessar(request);
-      let post = await axios({
-        method: "POST",
-        url:`https://pje.trt${estado}.jus.br/captcha/login_post.php`,
-        headers: {
-          "Content-Type":"application/x-www-form-urlencoded",
-          origin: `http://pje.trt${estado}.jus.br`,
-          referer: `http://pje.trt${estado}.jus.br/consultaprocessual/`,
-          // "sec-ch-ua": `"Google Chrome"; v="87", " Not;A Brand"; v="99", "Chromium"; v="87"`,
-          "sec-ch-ua-mobile": "?0",
-          "upgrade-insecure-requests": "1",
-          "sec-fetch-mode": "navigate",
-          "sec-fetch-dest": "document",
-          "sec-fetch-user": "?1",
-          "upgrade-insecure-requests": "1",
-          cookie: `captchasess=${this.robo.cookies.captchasess}`,
-          // "content-length": geraContentLenght(form)
-          "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
-        },
-        formData: form,
-        
-
-      })
-
-      console.log(post);
-      console.log(post.headers);
+      // await this.robo.acessar(request)
 
       console.log(this.robo.cookies);
-      // console.log(post.responseContent.request._header);
+      let post = await this.robo.acessar(request);
+      // console.log(post.responseContent.request);
       console.log(this.robo.cookies);
-
-
       // await this.responseCapcha(start, recapcha, estado);
-      // console.log(this.robo.cookies);
-      this.logT("post_PHP")
+      console.log(this.robo.cookies);
+      // if (!this.robo.cookies.cookieconsultapje){
 
+      // }
+      this.logT("post_PHP")
     } catch (e) {
       console.log(e);
     }
@@ -219,7 +209,7 @@ class ExtratorPje {
   async desafioCapcha(estado, id) {
     try {
       let url = `http://pje.trt${estado}.jus.br/pje-consulta-api/api/processos/${id}`;
-      let request = { url, proxy: this.proxy, method: "GET", debut: true };
+      let request = { url, proxy: this.proxy, method: "GET", debug: true };
       let get = await this.robo.acessar(request);
       // console.log(get);
       let resposta = [{
@@ -281,7 +271,6 @@ class ExtratorPje {
       return null
     }
   }
-
   logT(name) {
     // const obj = [{
     //   Status: true,
@@ -294,10 +283,7 @@ class ExtratorPje {
     const obj = this.red + `Não foi possivél obter o.: ${name}` + this.reset;
     console.log(obj);
   }
-
 }
-
-
 
 module.exports.ExtratorPje = ExtratorPje;
 
@@ -340,6 +326,29 @@ function geraContentLenght(form) {
   return t
 }
 
+// async function get1(){
+// let config = {
+//   method: 'get',
+//   url: 'https://pje.trt15.jus.br/primeirograu/login.seam',
+//   headers: { 
+//     'x-grau-instancia': '1', 
+//     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36', 
+//     // 'Cookie': 'JSESSIONID=50b8f59be55f04e5~aUBQEThKJdfyes1S5xA91XRJ; br.com.infox.ibpm.skin=skin/azul', 
+//     ...data.getHeaders()
+//   },
+//   data : data
+// };
+
+// await axios(config)
+// .then(function (response) {
+//   console.log(response.request.res);
+//   // console.log(JSON.stringify(response.data));
+// })
+// .catch(function (error) {
+//   console.log(error);
+// });
+
+// }
 
 
 (async () => {

@@ -5,12 +5,12 @@ const sleep = require('await-sleep');
 
 const { enums } = require('../../../configs/enums');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
-const { ExtratorFactory } = require('../../../extratores/extratorFactory');
+// const { ExtratorFactory } = require('../../../extratores/extratorFactory');
 const { Extracao } = require('../../../models/schemas/extracao');
 const { Helper, Logger, Cnj } = require('../../../lib/util');
 const { LogExecucao } = require('../../../lib/logExecucao');
 const { Andamento } = require('../../../models/schemas/andamento');
-const { ExtratorBase } = require('../../../extratores/extratores');
+// const { ExtratorBase } = require('../../../extratores/extratores');
 const { JTEParser } = require('../../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteer');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
@@ -70,9 +70,9 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 300) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 1300) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
-      if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 1360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
   }, 1000);
 

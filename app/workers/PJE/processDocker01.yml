@@ -1,5 +1,11 @@
 apps:
   - script   : ./workers/PJE/extracao_TRT_PJE.js
     name     : 'worker-01'
-  # - script   : ./workers/PJE/PM2_Reset.js
-  #   name     : 'Reset'  
+  - script   : ./workers/PJE/limpaCore.js
+    name     : 'limpa'  
+  - script   : ./workers/PJE/extracao_TRT_PJE.js
+    name     : 'worker-02'
+  - script   : ./workers/PJE/extracao_TRT_PJE.js
+    name     : 'worker-03'
+  - script   : ./workers/PJE/extracao_TRT_PJE.js
+    name     : 'worker-04'

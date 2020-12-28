@@ -24,7 +24,7 @@ class CriaFilaJTE {
 	}
 
 	async salvaStatusComarca(numero, data, raspagem, buscaProcesso) {
-		let cnj = util.processoSlice(numero);
+		let cnj = Cnj.processoSlice(numero);
 		let busca = buscaProcesso;
 		let verifica = await statusEstadosJTE.find(busca);
 		let estado = "";
@@ -64,7 +64,7 @@ class CriaFilaJTE {
 
 		function novoSequencial(numero) {
 			let resultado;
-			let cnj = util.processoSlice(numero);
+			let cnj = Cnj.processoSlice(numero);
 			let sequencial = cnj.sequencial;
 			let sequencialSlice = util.corrigeSequencial(sequencial);
 			let zero = sequencialSlice.zero;

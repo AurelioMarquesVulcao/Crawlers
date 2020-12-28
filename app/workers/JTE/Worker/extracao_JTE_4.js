@@ -208,7 +208,7 @@ async function worker() {
           // salvando status
           let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
           let dataAtualProcesso = dadosProcesso.processo.capa.dataDistribuicao;
-          let cnj = util.processoSlice(numeroAtualProcesso);
+          let cnj = Cnj.processoSlice(numeroAtualProcesso);
           let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
           await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso);
 
@@ -293,7 +293,7 @@ async function worker() {
         // salvando status 
         let numeroAtualProcesso = numeroProcesso;
         let dataAtualProcesso = "";
-        let cnj = util.processoSlice(numeroProcesso);
+        let cnj = Cnj.processoSlice(numeroProcesso);
         let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
         await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, true, buscaProcesso);
       }

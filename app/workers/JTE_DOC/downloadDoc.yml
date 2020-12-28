@@ -9,3 +9,5 @@ apps:
     name     : 'worker-04'
   - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
     name     : 'worker-05'
+  - script   : ./workers/JTE_DOC/limpaCore.js
+    name     : 'Limpa'

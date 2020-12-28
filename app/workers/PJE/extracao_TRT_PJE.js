@@ -106,6 +106,22 @@ var reset = '\u001b[0m';
         } else if (await !extracao) {
           logger.info('Não recebi extracao');
           // process.exit();
+        } else if (extracao.segredoJustica === true) {
+          logger.info('Atualizando Jte com os 3 campos adicionais.');
+          resultado = {
+            'capa.segredoJustica': extracao.segredoJustica,
+            'capa.valor': '',
+            'capa.justicaGratuita': '',
+            origemExtracao: 'JTE.TRT',
+          };
+          console.log(resultado);
+          await Processo.findOneAndUpdate(busca, resultado);
+          console.log(
+            blue +
+            '------------------- Salvo com sucesso -------------------' +
+            reset
+          );
+          logger.info('Processo JTE atualizado para JTE.TRT');
         } else if (extracao) {
           logger.info('Processo completo. Vamos processar todas as alterações');
           resultado = {
@@ -137,22 +153,6 @@ var reset = '\u001b[0m';
             await dadosProcesso.processo.save();
           }
           logger.info('Finalizado salvamento de capa de processo');
-        } else if (extracao.segredoJustica === true) {
-          logger.info('Atualizando Jte com os 3 campos adicionais.');
-          resultado = {
-            'capa.segredoJustica': extracao.segredoJustica,
-            'capa.valor': '',
-            'capa.justicaGratuita': '',
-            origemExtracao: 'JTE.TRT',
-          };
-          console.log(resultado);
-          await Processo.findOneAndUpdate(busca, resultado);
-          console.log(
-            blue +
-            '------------------- Salvo com sucesso -------------------' +
-            reset
-          );
-          logger.info('Processo JTE atualizado para JTE.TRT');
         } else {
           const error = new Error('Erro não mapeado');
           error.code = 'Extração falhou';

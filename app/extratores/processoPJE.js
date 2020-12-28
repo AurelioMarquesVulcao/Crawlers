@@ -9,6 +9,25 @@ var red = '\u001b[31m';
 var blue = '\u001b[34m';
 var reset = '\u001b[0m';
 
+
+setInterval(async function () {
+  heartBeat++;
+  if (heartBeat > 120) {
+    console.log(
+      red +
+      '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
+      reset
+    );
+    // await mongoose.connection.close()
+    // process.exit();
+    const error = new Error('Tempo de tentativa de resolução esgotado');
+    error.code = 'Não é possível obter o processo em 5 minutos';
+    throw error;
+  }
+}, 1000);
+
+
+
 class ExtratorTrtPje {
   constructor(url, isDebug) {
     this.robo = new Robo();
@@ -52,7 +71,7 @@ class ExtratorTrtPje {
       console.log(e);
 
     }
-    process.exit();
+    // process.exit();
     try {
       let captura_2ins = await this.captura(
         { 'X-Grau-Instancia': '2' },
@@ -69,20 +88,29 @@ class ExtratorTrtPje {
   }
 
   async captura(header) {
-    let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
-    this.logger.info("Inicio da captura.")
-    let id = await this.getId(header);
-    this.logger.info("Finalizada - Captura do id do processos");
-    console.log(id);
-    let captcha = await this.getCaptcha(id);
-    this.logger.info("Finalizado - Captura do Captcha");
-    console.log(!!captcha, "captcha");
-    let solveCaptcha = await this.getSolveCaptcha(captcha);
-    console.log(solveCaptcha);
-    this.logger.info("Finalizado - Resolução do Captcha");
-    let detalhes = await this.getDetalhes();
-    console.log(detalhes);
-    this.logger.info("Finalizado - Captura dos Detalhes");
+    try{
+      let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
+      this.logger.info("Inicio da captura.")
+      let id = await this.getId(header);
+      this.logger.info("Finalizada - Captura do id do processos");
+      if (id =="Nao possui"){
+        const error = new Error('Não possui está Instância');
+        error.code = 'Processo não existe';
+        throw error;
+      }
+      console.log(id);
+      let captcha = await this.getCaptcha(id);
+      this.logger.info("Finalizado - Captura do Captcha");
+      console.log(!!captcha, "captcha");
+      let solveCaptcha = await this.getSolveCaptcha(captcha);
+      console.log(solveCaptcha);
+      this.logger.info("Finalizado - Resolução do Captcha");
+      let detalhes = await this.getDetalhes(header, id, captcha.tokenDesafio, solveCaptcha);
+      console.log(detalhes);
+      this.logger.info("Finalizado - Captura dos Detalhes");
+    }catch(e){
+      this.logger.info(e)
+    }
   }
   async getId(header) {
     this.logger.info("Iniciada - captura do id do processos")
@@ -129,6 +157,7 @@ class ExtratorTrtPje {
       };
       this.logger.info('Captcha obtido com sucesso');
       return captcha
+      
     } catch (e) {
       this.logger.info(e);
     }
@@ -167,34 +196,36 @@ class ExtratorTrtPje {
       this.logger.info(e)
     }
   }
-  async getDetalhes() {
+  async getDetalhes(header, id, tokenDesafio, texto) {
     this.logger.info("Iniciado - Captura dos Detalhes");
     try {
       const detalheProcesso = await this.robo.acessar({
-        url: `https://pje.trt${numeroEstado}.jus.br/pje-consulta-api/api/processos/${info.id}?tokenDesafio=${desafio.tokenDesafio}&resposta=${texto}`,
+        url: `https://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api/api/processos/${id}?tokenDesafio=${tokenDesafio}&resposta=${texto}`,
         method: 'get',
         encoding: 'utf8',
-        usaProxy: true,
+        proxy: true,
         headers: header,
         // responseType: 'stream'
       });
+      // console.log(detalheProcesso.responseBody);
       if (detalheProcesso.responseBody.mensagem) {
         const error = new Error('Captcha invalido');
         error.code = 'Ocorreu um problema na solução do Captcha';
         throw error;
       }
-      logger.info("passei aqui");
       if (!!detalheProcesso.responseBody.mensagemErro) {
+        // return detalheProcesso.responseBody;
+        return { segredoJustica: true };
         const error = new Error('Processo sigiloso');
         error.code = 'Não é possível obter devido ao processo ser sigiliso';
         throw error;
       }
-
-      logger.info('Dados do processo obtidos com sucesso.');
+      this.logger.info('Dados do processo obtidos com sucesso.');
       return detalheProcesso.responseBody;
 
     } catch (e) {
-
+      this.logger.info(e);
+      return e.code
     }
   }
 
@@ -302,21 +333,7 @@ class ExtratorTrtPje {
 
   async tryCaptura(cnj, numeroEstado) {
     // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
-    setInterval(async function () {
-      heartBeat++;
-      if (heartBeat > 120) {
-        console.log(
-          red +
-          '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
-          reset
-        );
-        // await mongoose.connection.close()
-        // process.exit();
-        const error = new Error('Tempo de tentativa de resolução esgotado');
-        error.code = 'Não é possível obter o processo em 5 minutos';
-        throw error;
-      }
-    }, 1000);
+    
     /**Logger para console de arquivos */
     const logger = new Logger(
       'info',

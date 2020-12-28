@@ -53,7 +53,7 @@ class ExtratorTrtPje {
       }
     );
     this.url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`
-    await this.instancias();
+    return await this.instancias();
 
   }
 
@@ -67,6 +67,7 @@ class ExtratorTrtPje {
       if (captura == "Nao possui") {
         this.logger.info("Não possui 1 instância");
       }
+      // return captura
     } catch (e) {
       console.log(e);
 
@@ -76,10 +77,11 @@ class ExtratorTrtPje {
       let captura_2ins = await this.captura(
         { 'X-Grau-Instancia': '2' },
       );
+
       if (captura_2ins == "Nao possui") {
         this.logger.info("Não possui 2 instância");
       }
-
+      // return captura_2ins
     } catch (e) {
       console.log(e);
     }
@@ -88,12 +90,12 @@ class ExtratorTrtPje {
   }
 
   async captura(header) {
-    try{
+    try {
       let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
       this.logger.info("Inicio da captura.")
       let id = await this.getId(header);
       this.logger.info("Finalizada - Captura do id do processos");
-      if (id =="Nao possui"){
+      if (id == "Nao possui") {
         const error = new Error('Não possui está Instância');
         error.code = 'Processo não existe';
         throw error;
@@ -108,7 +110,7 @@ class ExtratorTrtPje {
       let detalhes = await this.getDetalhes(header, id, captcha.tokenDesafio, solveCaptcha);
       console.log(detalhes);
       this.logger.info("Finalizado - Captura dos Detalhes");
-    }catch(e){
+    } catch (e) {
       this.logger.info(e)
     }
   }
@@ -157,7 +159,7 @@ class ExtratorTrtPje {
       };
       this.logger.info('Captcha obtido com sucesso');
       return captcha
-      
+
     } catch (e) {
       this.logger.info(e);
     }
@@ -333,7 +335,7 @@ class ExtratorTrtPje {
 
   async tryCaptura(cnj, numeroEstado) {
     // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
-    
+
     /**Logger para console de arquivos */
     const logger = new Logger(
       'info',

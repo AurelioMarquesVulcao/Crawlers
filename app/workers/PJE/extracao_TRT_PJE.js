@@ -37,7 +37,7 @@ var reset = '\u001b[0m';
   });
 
   //const nomeFila = `fila TRT-RJ`;
-  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
+  const nomeFila = `aa${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
   // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
@@ -93,7 +93,7 @@ var reset = '\u001b[0m';
         );
         logger.info('Extração concluída');
         logger.info('Iniciando Parse');
-        //console.log(extracao);
+        console.log(extracao, "extração");
         // process.exit();
 
         // tratando a resposta do extrator

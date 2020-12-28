@@ -75,9 +75,24 @@ class ProcessoTJCE {
 
       } while(tentativa <= limite)
 
+      if (tentativa === limite)
+        throw new Error('Limite de tentativas excedidos');
+
+      this.logger.info('Processo de extração concluído.');
+      this.logger.info('Iniciando salvamento de Andamento');
+      await Andamento.salvarAndamentos(extracao.andamentos);
+      this.logger.info('Andamentos salvos');
+
+      this.logger.info('Iniciando salvamento do Processo');
+      resultado = await extracao.processo.salvar();
+      this.logger.info(
+        `Processo: ${extracao.processo.detalhes.numeroProcessoMascara} salvo | Quantidade de andamentos: ${extracao.andamentos.length}`
+      );
+
       this.resposta.resultado = resultado;
       this.resposta.sucesso = true;
     } catch (e) {
+      console.log(e);
       this.logger.log('error', `${e}`);
       this.resposta.sucesso = false;
       this.resposta.detalhes = e.message;
@@ -271,6 +286,7 @@ class ProcessoTJCE {
       return {sucesso: false, causa: 'Erro de acesso', detalhes: 'Não foi encontrada a tabela de movimentações'}
     }
 
+    this.logger.info('Não foram encontrados erros');
     return {sucesso: true}
   }
 }

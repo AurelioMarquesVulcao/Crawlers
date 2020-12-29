@@ -41,7 +41,7 @@ class Requisicao {
         return { objResponse: objResponse, cookies: cookies };
       })
       .catch((err) => {
-        if(debug)
+        if (debug)
           console.log(err);
         let objResponse = {};
         objResponse.code = err.code;

@@ -10,21 +10,21 @@ var blue = '\u001b[34m';
 var reset = '\u001b[0m';
 
 
-// setInterval(async function () {
-//   heartBeat++;
-//   if (heartBeat > 120) {
-//     console.log(
-//       red +
-//       '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
-//       reset
-//     );
-//     // await mongoose.connection.close()
-//     process.exit();
-//     const error = new Error('Tempo de tentativa de resolução esgotado');
-//     error.code = 'Não é possível obter o processo em 5 minutos';
-//     throw error;
-//   }
-// }, 1000);
+setInterval(async function () {
+  heartBeat++;
+  if (heartBeat > 120) {
+    console.log(
+      red +
+      '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
+      reset
+    );
+    // await mongoose.connection.close()
+    process.exit();
+    const error = new Error('Tempo de tentativa de resolução esgotado');
+    error.code = 'Não é possível obter o processo em 5 minutos';
+    throw error;
+  }
+}, 1000);
 
 
 

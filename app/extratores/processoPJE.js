@@ -10,26 +10,26 @@ var blue = '\u001b[34m';
 var reset = '\u001b[0m';
 
 
-setInterval(async function () {
-  heartBeat++;
-  if (heartBeat > 120) {
-    console.log(
-      red +
-      '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
-      reset
-    );
-    // await mongoose.connection.close()
-    // process.exit();
-    const error = new Error('Tempo de tentativa de resolução esgotado');
-    error.code = 'Não é possível obter o processo em 5 minutos';
-    throw error;
-  }
-}, 1000);
+// setInterval(async function () {
+//   heartBeat++;
+//   if (heartBeat > 120) {
+//     console.log(
+//       red +
+//       '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
+//       reset
+//     );
+//     // await mongoose.connection.close()
+//     process.exit();
+//     const error = new Error('Tempo de tentativa de resolução esgotado');
+//     error.code = 'Não é possível obter o processo em 5 minutos';
+//     throw error;
+//   }
+// }, 1000);
 
 
 
 class ExtratorTrtPje {
-  constructor(url, isDebug) {
+  constructor() {
     this.robo = new Robo();
     this.url = `http://pje.trt1.jus.br/pje-consulta-api`;
     this.qtdTentativas = 1;
@@ -54,66 +54,87 @@ class ExtratorTrtPje {
     );
     this.url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`
     return await this.instancias();
-
   }
 
+  /**
+   * Extrai 1 e 2 instância, e caso um deles seja valido nos da esse retorno
+   */
   async instancias() {
-
-
-    try {
-      let captura = await this.captura(
-        { 'X-Grau-Instancia': '1' },
-      );
-      if (captura == "Nao possui") {
-        this.logger.info("Não possui 1 instância");
-      }
-      // return captura
-    } catch (e) {
-      console.log(e);
-
+    let captura = await this.captura(
+      { 'X-Grau-Instancia': '1' },
+    );
+    if (captura === false) {
+      this.logger.info("Não possui 1 instância");
     }
-    // process.exit();
-    try {
-      let captura_2ins = await this.captura(
-        { 'X-Grau-Instancia': '2' },
-      );
-
-      if (captura_2ins == "Nao possui") {
-        this.logger.info("Não possui 2 instância");
-      }
-      // return captura_2ins
-    } catch (e) {
-      console.log(e);
+    let captura_2ins = await this.captura(
+      { 'X-Grau-Instancia': '2' },
+    );
+    if (captura_2ins === false) {
+      this.logger.info("Não possui 2 instância");
     }
 
+    if (captura) {
+      if (/Ocorreu um problema na solução do Captcha/.test(captura)) {
+        return null
+      } else if (/Reprocessar/.test(captura)) {
+        return "Reprocessar"
+      } else {
+        return captura
+      }
 
+    } else {
+      if (/Ocorreu um problema na solução do Captcha/.test(captura)) {
+        return null
+      } else if (/Reprocessar/.test(captura)) {
+        return "Reprocessar"
+      } else {
+        return captura_2ins
+      }
+    }
   }
 
+  /**
+   * Passa por todos as fases da raspagem do processo
+   * @param {object} header Header a ser enviado, 1 ou 2 instância.
+   * @returns retorna os detalhes do processo
+   */
   async captura(header) {
     try {
-      let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
+      // let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
       this.logger.info("Inicio da captura.")
       let id = await this.getId(header);
+      console.log(heartBeat);
       this.logger.info("Finalizada - Captura do id do processos");
       if (id == "Nao possui") {
-        const error = new Error('Não possui está Instância');
-        error.code = 'Processo não existe';
-        throw error;
+        return false
+      } else if (id == "Off Line") {
+        return "Reprocessar"
       }
-      console.log(id);
+      // console.log(id);
+      // console.log(heartBeat);
       let captcha = await this.getCaptcha(id);
+      console.log(heartBeat);
       this.logger.info("Finalizado - Captura do Captcha");
-      console.log(!!captcha, "captcha");
+      // console.log(!!captcha, "captcha");
       let solveCaptcha = await this.getSolveCaptcha(captcha);
-      console.log(solveCaptcha);
+      console.log(heartBeat);
+      // console.log(solveCaptcha);
       this.logger.info("Finalizado - Resolução do Captcha");
       let detalhes = await this.getDetalhes(header, id, captcha.tokenDesafio, solveCaptcha);
-      console.log(detalhes);
+      console.log(heartBeat);
+      // console.log(detalhes);
       this.logger.info("Finalizado - Captura dos Detalhes");
+      return detalhes
     } catch (e) {
       this.logger.info(e)
+      return null
     }
   }
+
+  /**
+   * Obtem o id do processo, caso não seja possivél o processo não possui a instância pesquisada.
+   * @param {object} header Header a ser enviado, 1 ou 2 instância.
+   */
   async getId(header) {
     this.logger.info("Iniciada - captura do id do processos")
     const url = `${this.url_1}/api/processos/dadosbasicos/${this.cnj}`;
@@ -125,6 +146,11 @@ class ExtratorTrtPje {
         headers: header,
       });
       const body = getId.responseBody;
+
+      if (getId.status == 404) {
+        console.log(getId);
+        return "Off Line"
+      }
       // console.log(body);
       if (body == true) {
         return "Nao possui"
@@ -134,13 +160,19 @@ class ExtratorTrtPje {
         return null;
       }
 
-      // console.log(body[0]);
+      // console.log(getId);
+      // process.exit()
       return body[0].id
     } catch (e) {
       // console.log(e);
       this.logger.info(e)
     }
   }
+
+  /**
+   * Captura a base64 do desafio Captcha
+   * @param {number} id Numero do id do processo
+   */
   async getCaptcha(id) {
     this.logger.info("Iniciado - captura do Captcha");
     try {
@@ -164,6 +196,11 @@ class ExtratorTrtPje {
       this.logger.info(e);
     }
   }
+  /**
+   * Envia o desafio do captcha para api de resolução de captcha
+   * @param {img} captcha Imagem em base64 do captcha
+   * @returns Solução do captcha
+   */
   async getSolveCaptcha(captcha) {
     this.logger.info("Iniciado - Resolução do Captcha");
     try {
@@ -177,13 +214,10 @@ class ExtratorTrtPje {
         json: params,
       });
       const captchaSolved = resQuebrarCaptcha.responseBody;
-      // console.log(resQuebrarCaptcha.responseBody);
       if (captchaSolved.sucesso) {
         this.logger.info('Solução do captcha é: ' + captchaSolved.texto);
         // removendo caracteres especiais da solução do captcha
         const texto = captchaSolved.texto.replace(/[^a-z0-9]/g, '');
-        // console.log(texto);
-        // console.log(texto.length);
         if (texto.length < 6) {
           this.logger.info(
             'Não foi possivél resolver o Captcha corretamente, reiniciando o processo!'
@@ -198,6 +232,15 @@ class ExtratorTrtPje {
       this.logger.info(e)
     }
   }
+
+  /**
+   * Obtem detalhes do processo
+   * @param {object} header Header a ser enviado, 1 ou 2 instância.
+   * @param {number} id id do processo
+   * @param {string} tokenDesafio identificador do desafio captcha
+   * @param {string} texto Resolução do Captcha
+   * @returns Detalhes do processo ou segredoJustiça = true
+   */
   async getDetalhes(header, id, tokenDesafio, texto) {
     this.logger.info("Iniciado - Captura dos Detalhes");
     try {
@@ -235,6 +278,9 @@ class ExtratorTrtPje {
 
 
 
+
+  // ---------------------------------------------------------------------------------------------------------------------------------
+  // Código antigo não apagar até implementar captura de andamentos para processos que possuem andamentos em 1 e 2 instância
 
   /**
    * Executa a extração da capa do cnj desejado.
@@ -333,7 +379,7 @@ class ExtratorTrtPje {
     }
   }
 
-  async tryCaptura(cnj, numeroEstado) {
+  async tryCaptura1(cnj, numeroEstado) {
     // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
 
     /**Logger para console de arquivos */

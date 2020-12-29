@@ -53,7 +53,7 @@ const moment = require('moment');
     await comarca.setStatus(3);
 
     ch.ack(msg);
-    console.clear();
+    // console.clear();
     await sleep(200);
   });
 })();
@@ -89,12 +89,11 @@ async function extrairNumeros(message, ultimo) {
   ultimoNumero = ultimoNumero.split(/\D/g);
 
   do {
-    let extrator = new ProcessoTJSP(
-      '',
-      false
-    );
+    console.log({count})
+    let extrator = new ProcessoTJSP('',false);
 
     sequencial = `${Number(ultimoNumero[0]) + count}`;
+    console.log({ sequencial })
 
     let mod = CnjValidator.calcula_mod97(
       sequencial,
@@ -111,9 +110,17 @@ async function extrairNumeros(message, ultimo) {
     if (erroEncontrado && !extracao.sucesso) {
       return { continuar: false, ultimo: anterior, count: count - 1 };
     }
-    if (extracao.sucesso) anterior = numero;
-    erroEncontrado = !extracao.sucesso;
+    if (extracao.sucesso || extracao.detalhes === 'Senha necessaria') anterior = numero;
 
+    console.log({detalhes: extracao.detalhes});
+    console.log({sucesso: extracao.sucesso});
+
+
+    if (!extracao.sucesso && (extracao.detalhes !== 'Senha necessaria'))
+      erroEncontrado = !extracao.sucesso;
+
+
+    console.log({erroEncontrado})
     count++;
   } while (count < 5);
 

@@ -62,6 +62,11 @@ class TJSPParser extends BaseParser {
 
   extrairDetalhes($) {
     let numero = $('#numeroProcesso').text().strip();
+
+    if (!numero) {
+      numero = $('#containerDadosPrincipaisProcesso > div:nth-child(1) > div > div > span').text().strip()
+    }
+
     numero = re.exec(
       numero,
       re(/\d{7}\W?\d{2}\W?\d{4}\W?\d\W?\d{2}\W?\d{4}/)

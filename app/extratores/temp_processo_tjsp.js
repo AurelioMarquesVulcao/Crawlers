@@ -36,17 +36,19 @@ class ProcessoTJSP extends ExtratorBase {
     let gResponse;
     let paginaReturn;
     let objResponse;
+    let extracao;
+    let resultado;
     
     this.numeroOab = numeroOab;
-    this.numeroProcesso = numeroProcesso;
-    this.detalhes = Processo.identificarDetalhes(numeroProcesso);
+    this.numeroProcesso = `00000000${numeroProcesso}`.slice(-25);
+    this.detalhes = Processo.identificarDetalhes(this.numeroProcesso);
     this.instancia = Number(instancia);
     this.setInstanciaUrl();
     this.resposta = {numeroDoProcesso: this.numeroProcesso}
 
     this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
       nomeRobo: 'processo.TJSP',
-      NumeroDoProcesso: numeroProcesso,
+      NumeroDoProcesso: this.numeroProcesso,
     });
 
     try {
@@ -128,11 +130,15 @@ class ProcessoTJSP extends ExtratorBase {
           detalhes: '',
           logs: this.logger.logs
         }
+
+        break;
       } while(tentativa < limite)
 
-      throw new Error('Não foi possivel recuperar o processo com 5 tentativas');
+      if (tentativa === limite)
+        throw new Error('Não foi possivel recuperar o processo com 5 tentativas');
 
     } catch(e) {
+      // console.log(e);
       this.resposta = {
         sucesso: false,
         resultado: '',
@@ -213,8 +219,8 @@ class ProcessoTJSP extends ExtratorBase {
     let queryString = {
       conversationId:"",
       cbPesquisa: "NUMPROC",
-      numeroDigitoAnoUnificado: this.numeroProcesso.replace(regex, "$1-$2.$3"),
-      foroNumeroUnificado: this.numeroProcesso.replace(regex, '$6'),
+      numeroDigitoAnoUnificado: this.numeroProcesso.slice(0, 20),
+      foroNumeroUnificado: this.numeroProcesso.slice(-4),
       "dadosConsulta.valorConsultaNuUnificado": this.numeroProcesso,
       "dadosConsulta.valorConsulta":"",
       "dadosConsulta.tipoNuProcesso": "UNIFICADO",

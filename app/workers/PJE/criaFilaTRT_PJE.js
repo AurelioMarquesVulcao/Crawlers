@@ -86,7 +86,7 @@ class CriaFilaPJE {
                     'detalhes.tribunal': tribunal,
                     'detalhes.ano': 2020,
                     "origemExtracao": "JTE",
-                    'dataCriacao': {
+                    "capa.dataDistribuicao": {
                         '$lt': data,
                         '$gt': data2
                         // '$gt': new Date('2020-10-01')

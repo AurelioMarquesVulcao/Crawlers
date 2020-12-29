@@ -53,6 +53,7 @@ class ExtratorTrtPje {
       }
     );
     this.url_1 = `http://pje.trt${numeroEstado}.jus.br/pje-consulta-api`
+    heartBeat = 0;
     return await this.instancias();
   }
 
@@ -144,9 +145,9 @@ class ExtratorTrtPje {
         encoding: 'latin1',
         poxy: this.proxy,
         headers: header,
+        // debug: true
       });
       const body = getId.responseBody;
-
       if (getId.status == 404) {
         console.log(getId);
         return "Off Line"
@@ -164,7 +165,7 @@ class ExtratorTrtPje {
       // process.exit()
       return body[0].id
     } catch (e) {
-      // console.log(e);
+      console.log(e);
       this.logger.info(e)
     }
   }

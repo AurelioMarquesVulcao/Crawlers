@@ -25,9 +25,9 @@ class CriaFilaPJE {
     async montaFila() {
         let data = new Date();
         data = new Date()
-        data.setDate(data.getDate() - 3)
+        data.setDate(data.getDate() - 1)
         console.log(data);
-
+        // process.exit()
         let estado = [];
         console.log("Fila concluída. Iniciando criador de fila.");
         for (let i = 1; i < 24; i++) {
@@ -74,6 +74,9 @@ class CriaFilaPJE {
      * @param {date} data Data do dia anterior para a busca de processos
      */
     async atualizaProcessosFila(pulo, tribunal, data) {
+        let data2 = new Date();
+        data2.setDate(data.getDate() - 8)
+        console.log(data2);
         let busca;
         let mensagens = [];
         let agregar = await Processo.aggregate([
@@ -83,16 +86,17 @@ class CriaFilaPJE {
                     'detalhes.tribunal': tribunal,
                     'detalhes.ano': 2020,
                     "origemExtracao": "JTE",
-                    'dataAtualizacao': {
+                    'dataCriacao': {
                         '$lt': data,
-                        '$gt': new Date('2020-10-01')
+                        '$gt': data2
+                        // '$gt': new Date('2020-10-01')
                     }
                 }
             },
             {
                 $project: {
                     "detalhes.numeroProcesso": 1,
-                    "dataAtualizacao": 1,
+                    "capa.dataDistribuicao": 1,
                     "_id": 1
                 }
             },
@@ -103,8 +107,9 @@ class CriaFilaPJE {
         // process.exit()
         for (let i = 0; i < agregar.length; i++) {
             busca = `${agregar[i]._id}`;
-            mensagens.push(this.criaPost(agregar[i].detalhes.numeroProcesso, busca));
+            mensagens.push(this.criaPost(agregar[i].detalhes.numeroProcesso, busca, agregar[i].capa.dataDistribuicao));
         }
+        embaralha(mensagens)
         await this.rabbit.enfileirarLoteTRT(this.fila, mensagens)
     }
 
@@ -122,14 +127,27 @@ class CriaFilaPJE {
     * @param {string} busca Objeto Id para busca no MONGO-DB
     * @return {string} return.: {"NumeroProcesso" : "00004618720205130032","NovosProcessos" : true, "_id" : "5f6cb256f0375ab99a7cf367"}
     */
-    criaPost(numero, busca) {
+    criaPost(numero, busca, dataDistribuicao) {
         let busca2 = busca.toString()
-        let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true, "_id" : "${busca2}"}`;
+        let data = `${dataDistribuicao.getDate()}/${dataDistribuicao.getMonth()+1}/${dataDistribuicao.getFullYear()}`;
+        let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true, "_id" : "${busca2}", "dataDistribuicaoP.":"${data}"}`;
         console.log(post);
         return post
     }
 
 };
+
+// embaralhador de array, faz com que a ordem de consumo da fila mude 
+// para que não baixe apenas o mesmo estado toda vez que inicie a aplicação.
+function embaralha(lista) {
+    for (let indice = lista.length; indice; indice--) {
+      const indiceAleatorio = Math.floor(Math.random() * indice);
+      // guarda de um índice aleatório da lista
+      const elemento = lista[indice - 1];
+      lista[indice - 1] = lista[indiceAleatorio];
+      lista[indiceAleatorio] = elemento;
+    }
+  }
 
 (async () => {
     mongoose.connect(enums.mongo.connString, {

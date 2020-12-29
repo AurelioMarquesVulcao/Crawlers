@@ -77,7 +77,7 @@ const moment = require('moment');
  * @returns {Promise<{ultimo: string, count: number, continuar: boolean}>}
  */
 async function extrairNumeros(message, ultimo) {
-  console.log({ ultimo });
+  // console.log({ ultimo });
   let ultimoNumero = ultimo ? ultimo : message.UltimoProcesso;
   let anterior = ultimoNumero;
   let count = 1;
@@ -89,11 +89,11 @@ async function extrairNumeros(message, ultimo) {
   ultimoNumero = ultimoNumero.split(/\D/g);
 
   do {
-    console.log({count})
+    // console.log({count})
     let extrator = new ProcessoTJSP('',false);
 
     sequencial = `${Number(ultimoNumero[0]) + count}`;
-    console.log({ sequencial })
+    // console.log({ sequencial })
 
     let mod = CnjValidator.calcula_mod97(
       sequencial,
@@ -110,17 +110,18 @@ async function extrairNumeros(message, ultimo) {
     if (erroEncontrado && !extracao.sucesso) {
       return { continuar: false, ultimo: anterior, count: count - 1 };
     }
-    if (extracao.sucesso || extracao.detalhes === 'Senha necessaria') anterior = numero;
+    if (extracao.sucesso || extracao.detalhes === 'Senha necessaria') {
+      erroEncontrado = false;
+      anterior = numero;
+    }
 
-    console.log({detalhes: extracao.detalhes});
-    console.log({sucesso: extracao.sucesso});
-
+    // console.log({detalhes: extracao.detalhes});
+    // console.log({sucesso: extracao.sucesso});
 
     if (!extracao.sucesso && (extracao.detalhes !== 'Senha necessaria'))
       erroEncontrado = !extracao.sucesso;
 
-
-    console.log({erroEncontrado})
+    // console.log({erroEncontrado})
     count++;
   } while (count < 5);
 

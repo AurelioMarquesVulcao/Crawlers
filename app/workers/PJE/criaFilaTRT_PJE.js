@@ -24,7 +24,7 @@ class CriaFilaPJE {
    * Monta a os blocos de estados a serem enfileirados
    */
   async montaFila() {
-    
+
     let data = new Date();
     data = new Date()
     data.setDate(data.getDate() - 1)
@@ -36,13 +36,14 @@ class CriaFilaPJE {
       if (i != 15) {
         await this.atualizaProcessosFila(0, i, data)[0]
       }
+      if (i == 24) {
+        await shuffleArray(this.mensagens);
+        await shuffle(this.mensagens)
+        await this.rabbit.enfileirarLoteTRT(this.fila, this.mensagens)
+      }
     }
-    await shuffleArray(this.mensagens);
-    await shuffle(this.mensagens)
-    await this.rabbit.enfileirarLoteTRT(this.fila, this.mensagens)
-       
     await sleep(125000);
-    this.mensagens = [];
+    // this.mensagens = [];
     await this.testaFila();
 
   }
@@ -83,7 +84,7 @@ class CriaFilaPJE {
   async atualizaProcessosFila(pulo, tribunal, data) {
     let data2 = new Date();
     data2.setDate(data.getDate() - 10)
-    console.log(data2);
+    console.log(data2, "tribunal", tribunal);
     let busca;
     // let mensagens = [];
     let agregar = await Processo.aggregate([
@@ -108,7 +109,7 @@ class CriaFilaPJE {
         }
       },
       { $sort: { _id: -1 } },
-      { $limit: 200 }
+      { $limit: 300 }
     ]).skip(pulo);
     // console.log(agregar);
     // process.exit()
@@ -155,8 +156,8 @@ function embaralha(lista) {
 }
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
 }
 

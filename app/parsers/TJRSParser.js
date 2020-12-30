@@ -91,11 +91,18 @@ class TJRSParser extends BaseParser {
   extrairVara($) {
     let selector = '#conteudo > table:nth-child(4) > tbody > tr:nth-child(2) > td.texto_geral';
     let varaString = $(selector).text();
+    let juizadoRegex = re("(?<juizado>Juizado.+)\\s\\/.+", "gm");
     let regex = re("(?<vara>\\d{0,2}?([ºª]?\\s)?Vara.+)\\s((d[a,e]\\sComarca)|(\\s:))", "gm");
 
+    // Caso tenha explicitamente a vara
     let match = re.exec(varaString, regex);
     if (match)
       return match.vara;
+
+    // Caso tenha uma declaração de juizado
+    match = re.exec(varaString, juizadoRegex);
+    if(match)
+      return match.juizado;
 
     return varaString;
   }

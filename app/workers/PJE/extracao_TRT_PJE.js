@@ -121,8 +121,15 @@ var reset = '\u001b[0m';
               'capa.justicaGratuita': '',
               origemExtracao: 'JTE.TRT',
             };
-            console.log(resultado);
+            // console.log(resultado);
             await Processo.findOneAndUpdate(busca, resultado);
+            console.table({
+              NumeroProcesso: message.NumeroProcesso,
+              'capa.segredoJustica': extracao.segredoJustica,
+              'capa.valor': '',
+              'capa.justicaGratuita': '',
+              origemExtracao: 'JTE.TRT'
+            })
             console.log(
               blue +
               '------------------- Salvo com sucesso -------------------' +
@@ -137,8 +144,15 @@ var reset = '\u001b[0m';
               'capa.justicaGratuita': extracao.justicaGratuita,
               origemExtracao: 'JTE.TRT',
             };
-            console.log(resultado);
+            // console.log(resultado);
             await Processo.findOneAndUpdate(busca, resultado);
+            console.table({
+              NumeroProcesso: message.NumeroProcesso,
+              'capa.segredoJustica': extracao.segredoJustica,
+              'capa.valor': `${extracao.valorDaCausa}`,
+              'capa.justicaGratuita': extracao.justicaGratuita,
+              origemExtracao: 'JTE.TRT',
+            })
             console.log(
               blue +
               '------------------- Salvo com sucesso -------------------' +

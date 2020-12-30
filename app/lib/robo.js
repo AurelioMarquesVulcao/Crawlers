@@ -162,8 +162,7 @@ class Robo {
    * @param {Object} options.headers headers
    * @param {boolean} options.randomUserAgent deve utilizar um user agent aleatorio?
    */
-  async 
-  acessar({
+  async acessar({
     url,
     method = 'GET',
     encoding = '',

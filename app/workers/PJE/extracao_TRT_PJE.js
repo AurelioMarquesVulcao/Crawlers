@@ -118,7 +118,7 @@ var reset = '\u001b[0m';
             resultado = {
               'capa.segredoJustica': extracao.segredoJustica,
               'capa.valor': '',
-              'capa.justicaGratuita': '',
+              'capa.justicaGratuita': null,
               origemExtracao: 'JTE.TRT',
             };
             // console.log(resultado);
@@ -127,7 +127,7 @@ var reset = '\u001b[0m';
               NumeroProcesso: message.NumeroProcesso,
               'capa.segredoJustica': extracao.segredoJustica,
               'capa.valor': '',
-              'capa.justicaGratuita': '',
+              'capa.justicaGratuita': null,
               origemExtracao: 'JTE.TRT'
             })
             console.log(

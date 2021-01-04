@@ -29,7 +29,7 @@ var desligado = desligar.worker;
   const Estados = variaveis.variaveis;
   var estados = [
     Estados[0].rj,
-    // Estados[0].sp2,
+    Estados[0].sp2,
     // Estados[0].mg,
   ];
 

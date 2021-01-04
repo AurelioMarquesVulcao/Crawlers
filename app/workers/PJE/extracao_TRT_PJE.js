@@ -38,7 +38,7 @@ var reset = '\u001b[0m';
 
   //const nomeFila = `fila TRT-RJ`;
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
-  // const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
+  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
     var heartBeat = 0;
@@ -93,95 +93,117 @@ var reset = '\u001b[0m';
         );
         logger.info('Extração concluída');
         logger.info('Iniciando Parse');
-        //console.log(extracao);
+        // console.log(extracao, "extração");
         // process.exit();
 
         // tratando a resposta do extrator
-        if (extracao === null) {
-          const error = new Error(
-            'Extração falhou, processo será colocado na fila novamente'
-          );
-          error.code = 'Extração falhou';
-          throw error;
-        } else if (await !extracao) {
-          logger.info('Não recebi extracao');
-          // process.exit();
-        } else if (extracao) {
-          logger.info('Processo completo. Vamos processar todas as alterações');
-          resultado = {
-            'capa.segredoJustica': extracao.segredoJustica,
-            'capa.valor': `${extracao.valorDaCausa}`,
-            'capa.justicaGratuita': extracao.justicaGratuita,
-            origemExtracao: 'JTE.TRT',
-          };
-          console.log(resultado);
-          await Processo.findOneAndUpdate(busca, resultado);
-          console.log(
-            blue +
-            '------------------- Salvo com sucesso -------------------' +
-            reset
-          );
-          logger.info('Processo JTE atualizado para JTE.TRT');
-          logger.info('Parse Iniciado');
-          let dadosProcesso = await parse.parse(extracao);
-          // console.log(await dadosProcesso);
-          logger.info('Parse finalizado');
-          logger.info('Iniciando salvamento da capa do processo');
+        if (/Reprocessar/.test(extracao)) {
+          await new GerenciadorFila().enviar(reConsumo, message);
+          await sleep(200);
+          // await ch.ack(msg);
+          logger.info(red + 'Tribunal off-line enviando para reprocessamento' + reset);
+          await sleep(200);
+        } else {
+          if (extracao === null) {
+            const error = new Error(
+              'Extração falhou, processo será colocado na fila novamente'
+            );
+            error.code = 'Extração falhou';
+            throw error;
+          } else if (await !extracao) {
+            logger.info('Não recebi extracao');
+            // process.exit();
+          } else if (extracao.segredoJustica === true) {
+            logger.info('Atualizando Jte com os 3 campos adicionais.');
+            resultado = {
+              'capa.segredoJustica': extracao.segredoJustica,
+              'capa.valor': '',
+              'capa.justicaGratuita': null,
+              origemExtracao: 'JTE.TRT',
+            };
+            // console.log(resultado);
+            await Processo.findOneAndUpdate(busca, resultado);
+            console.table({
+              NumeroProcesso: message.NumeroProcesso,
+              'capa.segredoJustica': extracao.segredoJustica,
+              'capa.valor': '',
+              'capa.justicaGratuita': null,
+              origemExtracao: 'JTE.TRT'
+            })
+            console.log(
+              blue +
+              '------------------- Salvo com sucesso -------------------' +
+              reset
+            );
+            logger.info('Processo JTE atualizado para JTE.TRT');
+          } else if (extracao) {
+            logger.info('Processo completo. Vamos processar todas as alterações');
+            resultado = {
+              'capa.segredoJustica': extracao.segredoJustica,
+              'capa.valor': `${extracao.valorDaCausa}`,
+              'capa.justicaGratuita': extracao.justicaGratuita,
+              origemExtracao: 'JTE.TRT',
+            };
+            // console.log(resultado);
+            await Processo.findOneAndUpdate(busca, resultado);
+            console.table({
+              NumeroProcesso: message.NumeroProcesso,
+              'capa.segredoJustica': extracao.segredoJustica,
+              'capa.valor': `${extracao.valorDaCausa}`,
+              'capa.justicaGratuita': extracao.justicaGratuita,
+              origemExtracao: 'JTE.TRT',
+            })
+            console.log(
+              blue +
+              '------------------- Salvo com sucesso -------------------' +
+              reset
+            );
+            logger.info('Processo JTE atualizado para JTE.TRT');
+            logger.info('Parse Iniciado');
+            let dadosProcesso = await parse.parse(extracao);
+            // console.log(await dadosProcesso);
+            logger.info('Parse finalizado');
+            logger.info('Iniciando salvamento da capa do processo');
+            console.log(
+              blue +
+              `---------------------- Tempo de extração é de ${heartBeat} ----------------------` +
+              reset
+            );
+            let teste = await ProcessoTRT.findOne({ "detalhes.numeroProcesso": message.NumeroProcesso })
+            if (!teste) {
+              await dadosProcesso.processo.save();
+            }
+            logger.info('Finalizado salvamento de capa de processo');
+          } else {
+            const error = new Error('Erro não mapeado');
+            error.code = 'Extração falhou';
+            throw error;
+          }
+          logger.info('Processos extraido com sucesso');
           console.log(
             blue +
             `---------------------- Tempo de extração é de ${heartBeat} ----------------------` +
             reset
           );
-          let teste = await ProcessoTRT.findOne({ "detalhes.numeroProcesso": message.NumeroProcesso })
-          if (!teste) {
-            await dadosProcesso.processo.save();
-          }
-          logger.info('Finalizado salvamento de capa de processo');
-        } else if (extracao.segredoJustica === true) {
-          logger.info('Atualizando Jte com os 3 campos adicionais.');
-          resultado = {
-            'capa.segredoJustica': extracao.segredoJustica,
-            'capa.valor': '',
-            'capa.justicaGratuita': '',
-            origemExtracao: 'JTE.TRT',
-          };
-          console.log(resultado);
-          await Processo.findOneAndUpdate(busca, resultado);
-          console.log(
-            blue +
-            '------------------- Salvo com sucesso -------------------' +
-            reset
-          );
-          logger.info('Processo JTE atualizado para JTE.TRT');
-        } else {
-          const error = new Error('Erro não mapeado');
-          error.code = 'Extração falhou';
-          throw error;
-        }
-        logger.info('Processos extraido com sucesso');
-        console.log(
-          blue +
-          `---------------------- Tempo de extração é de ${heartBeat} ----------------------` +
-          reset
-        );
-        heartBeat = 0;
-        // confirmação de atulização para o BigData
-        await axios({
-          url:
-            `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,
-          method: 'post',
-          headers: {
-            // 'Content-Type': 'application/json',
-            'x-api-key': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw',
-          }
-        })
-          .then((res) => {
-            console.log(res.data);
+          heartBeat = 0;
+          // confirmação de atulização para o BigData
+          await axios({
+            url:
+              `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,
+            method: 'post',
+            headers: {
+              // 'Content-Type': 'application/json',
+              'x-api-key': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw',
+            }
           })
-          .catch((err) => {
-            console.log(err);
-            throw err;
-          });
+            .then((res) => {
+              console.log(res.data);
+            })
+            .catch((err) => {
+              console.log(err);
+              throw err;
+            });
+        }
       } catch (e) {
         // console.log(e);
 

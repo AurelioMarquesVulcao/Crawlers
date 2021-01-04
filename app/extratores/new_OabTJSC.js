@@ -4,17 +4,9 @@ const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Processo } = require('../models/schemas/processo');
 const { Logger } = require('../lib/util');
 const { Robo } = require('../lib/newRobo');
-
-const {
-  AntiCaptchaResponseException,
-} = require('../models/exception/exception');
 const { ExtratorBase } = require('./extratores');
-const { TJSCParser } = require('../parsers/TJSCParser');
-
 const { LogExecucao } = require('../lib/logExecucao');
-
-const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json')
-  .INSTANCIAS_URL;
+// const { INSTANCIAS_URLS } = require('../assets/TJSC/instancias_urls.json')
 
 const proxy = true;
 
@@ -39,10 +31,12 @@ class OabTJSC extends ExtratorBase {
       _id: cadastroConsultaId
     }
 
-    const nomeRobo = `${enums.tipoConsulta.oab}${enums.nomesRobos.TJSC}`;
+    const nomeRobo = `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJSC}`;
+
     this.logger = new Logger('info', `logs/TJSC/${nomeRobo}.info`, {
       nomeRobo: nomeRobo,
-      NumeroOab: numeroOab
+      NumeroOab: numeroOab,
+      NumeroDoProcesso: null
     });
 
     // IT START WITH... ONE THING I DONT KNOW WHY AND DOESNT EVEN MATTER HOW HARD I TRY
@@ -68,9 +62,13 @@ class OabTJSC extends ExtratorBase {
       if (tentativas === limite)
         throw new Error('Foi excedido as tentativas para esta oab')
     } catch (e) {
-      //TODO catch baseado no processoTJSC
+      console.log(e);
+      this.logger.log('error', `${e}`);
+      this.resposta.sucesso = false;
+      this.resposta.detalhes = e.message;
     } finally {
-      //Finnaly baseado no processoTJSC
+      this.resposta.logs = this.logger.logs;
+      return this.resposta;
     }
 
   }
@@ -130,13 +128,13 @@ class OabTJSC extends ExtratorBase {
   async recuperarListaProcessos(uuidCaptcha, gResponse) {
     this.logger.info('Fazendo consulta na pagina de oabs');
     let processos = [];
-    let url = `${this.url}/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
+    let url = `${this.url}/search.do?conversationId=&cbPesquisa=NUMOAB&dadosConsulta.valorConsulta=${this.numeroOab}&dadosConsulta.localPesquisa.cdLocal=-1&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
 
     this.logger.info('Acessando a lista de processos');
 
     do {
 
-      let objResponse = this.robo.acessar({
+      let objResponse = await this.robo.acessar({
         url,
         method: 'GET',
         encoding: 'latin1',
@@ -149,7 +147,7 @@ class OabTJSC extends ExtratorBase {
 
       let pagina = this.processaPaginaProcessos(objResponse.responseBody);
 
-      processos = [...processos, pagina.processos];
+      processos = [...processos, ...pagina.processos];
 
       if (!pagina.proximaPagina)
         break;
@@ -221,11 +219,13 @@ class OabTJSC extends ExtratorBase {
     for(let i =0; i < tam; i++) {
       let cadastroConsulta = this.cadastroConsulta;
       cadastroConsulta['NumeroProcesso'] = listaProcessos[i];
-      this.logger.info(`Verificando log de execução para o processo ${processo}.`);
-      let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta);
-      this.logger.info(`Log de execução do processo ${processo} verificado com sucesso`);
-      if (logExec.enviado)
-        resultados.push({numeroProcesso: listaProcessos[i]})
+      let logExec = await LogExecucao.cadastrarConsultaPendente(cadastroConsulta, 'processo.TJSC.extracao.novos');
+      if (logExec.enviado) {
+        this.logger.info(`${listaProcessos[i]} => processo.TJSC.extracao.novos`);
+        resultados.push({ numeroProcesso: listaProcessos[i] });
+      } else {
+        this.logger.info(`${listaProcessos[i]} não enviado. Msg.: ${logExec.mensagem}`);
+      }
     }
 
     this.logger.info(`${resultados.length} Processos enviados para a extração`);
@@ -234,6 +234,9 @@ class OabTJSC extends ExtratorBase {
       sucesso: true,
       detalhes: ''
     }
-    return ;
   }
+}
+
+module.exports = {
+  OabTJSC
 }

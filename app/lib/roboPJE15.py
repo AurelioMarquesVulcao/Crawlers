@@ -2,8 +2,10 @@ import requests
 
 url = "https://pje.trt15.jus.br/captcha/login_post.php"
 
-payload={'random': 'fglnrlrsrndahs3vnigks1bak7',
-'g-recaptcha-response': '03AGdBq269V5BxILKqFfthRVaGZcxFT4EQzf2ovgC1gX-gdJbXRpTiY2jiJ3t1-xoPdE0-FSbDKvVRpx9doG29XvRVJKVPMUc710L84QdaS4Z97CjzfgV-sNC18mGMnRaqq-UP1Pi2n1jVeuA-xnw4TQK0TV4kLkRLX9kvuZ-f-G21EWF8FqpWSR9AOS9Fg2ZXlzJ2LQcgLIg43tH0rK3QT5hGNBDYUn4eu2-MPa3FzEmywYGGdH4Rnmii-hzSflMNvecWcjcLY_bkTCKASdrkPthorouhUT3IpIHEWov3HElyefuh1R9ZB5av1pDO-9YGFaJldHs2jS2LsaqV1X0zNgy-Z3XBf7DWzFaAIJsZjOg2sWtr6VRERjeAWN6VjlmHcBBhejTg_M_W6WtsPfWyrlwaLwbRE8oPQsKyc8hHL3R7DwVDdAMwp_GGrypFM2aFljSgEYovxlWdht7PykuTA-HhW18j6Rv2plQ6PMNLETQPZjWkEWdMgJcD-JiXNhJhdlHh6dyUSlIYa-ZjEY18yQrPA8QNvN3StA',
+payload={'random': 'hkq2vqvm7fafmts9houmcceso6',
+# 'aRmehzkbJxsWLpGQZHoUduXjE': "BzasEviYuWyQM",
+# 'hNylabpcwUoFBCZtPuVJgzvQrXLnde': "Geysj",
+'g-recaptcha-response': '03AGdBq27JU-g-ShJonk9lrNRc1JXdwzRqzaIQbMxvc_u1uy4ZWS_bZ_qPHnwkYPauZqu24DwLqag86KtqaqFJjeW0vDKwwlEu3oyN0qvtpTVktP5SdDbsnr5DTpdky4vcgLvpwBVIY0Cqm393Ii8q1OOD7V4byIB_2N9clMUOo9IClU0Coz-1DcLMZ0lXtShM7B0tWkl6IL9uLjq1VPtN_XU9OlJjr2y-gbqbOSdtZkaptdjIHWunH5V1QDz3YKlWNYJrJ5iNdsjSAKIBnHwgg1L-ZNngtqT9OaSqX5MdrBxn0gjY2PcKbdvhF5HAmYVLFYV_1vVvE9RbjV0EsDNMBp6y1MSLGANsdGaTSVumpOYt5r5pplu0lydd1gAC36bLkuCG-rGxHv9FwzEf5Prrq7W9CtTpqgTM7yu1SzWa4_DPqlnXL0TmmgOJvqrAMwKooLsG5jmwFfqlJ5vUmk6YQgZJZAiu-crXrHuSRcNzc8htXgT8r4_TXrZpOXflRr_OUf5S7E8CEFq76eRv-8B4ZjJ5liLTxyY3Yw',
 'referer': '/consultaprocessual/'}
 files=[
 
@@ -18,9 +20,9 @@ headers = {
   'Sec-Fetch-User': '?1',
   'Upgrade-Insecure-Requests': '1',
   'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36',
-  'Cookie': 'captchasess=hbvqlgth6vp0ichudeq5fkink0'
+  'Cookie': 'captchasess=hkq2vqvm7fafmts9houmcceso6'
 }
 
 response = requests.request("POST", url, headers=headers, data=payload, files=files)
 
-print(response.text)
+print(response.text.encode('ascii', 'ignore').decode('ascii'))

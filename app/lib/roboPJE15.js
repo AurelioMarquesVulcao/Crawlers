@@ -7,8 +7,10 @@ const https = require('follow-redirects').https;
 const fs = require('fs');
 const request = require('request');
 
+
 var cookieAll = [];
 var form;
+var desafio;
 
 
 async function desafioRecapcha(estado, start, cnj) {
@@ -101,6 +103,8 @@ async function request1() {
 }
 
 async function request2() {
+  desafio = await desafioRecapcha(15, null, "00114931020205150105");
+  await sleep(3000);
   let data = new FormData();
 
   let config = {
@@ -110,12 +114,12 @@ async function request2() {
       accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
       Cookie: cookieAll,
       'referer': 'https://pje.trt15.jus.br/primeirograu/login.seam',
-      'sec-fetch-dest': 'document',
-      'sec-fetch-mode': 'navigate',
-      'sec-fetch-site': 'same-origin',
-      'sec-fetch-user': '?1',
-      'sec-gpc': '1',
-      'upgrade-insecure-requests': '1',
+      // 'sec-fetch-dest': 'document',
+      // 'sec-fetch-mode': 'navigate',
+      // 'sec-fetch-site': 'same-origin',
+      // 'sec-fetch-user': '?1',
+      // 'sec-gpc': '1',
+      // 'upgrade-insecure-requests': '1',
       'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36',
       ...data.getHeaders()
     },
@@ -147,14 +151,16 @@ async function request2() {
 async function request3() {
   // process.exit()
   let data = new FormData();
-  let desafio = await desafioRecapcha(15, null, "00114931020205150105");
+  
   // let desafio = "03AGdBq27MVeG43nfjrLHXG_EbBVAJTiHJ0I66_fnGepyXBJjJRQ0XUFzJHVTgfGY2lhh-9npfVdQrWGgOhxts7Rhx3cfob04bgAxQxRWYV9LYgbxBWklaQEgFHxB9_tQHWGnGnANFUMAkz1R3j_BDU2vNy-vHHMZeYjjYnWIFn44x8mUthSrJk-mtHtp2xQsFs0rc2DJgZxDKzXQqaEVaE0todT75fHAscVaDZu0ExdMO3bm84pLv8lZHdYJ3h3ansIfDFuVzdQWzVOdKhQtdDEXS2F-8Kwp_P9VPFF7UEHhGYSBJDxRVgJkU9zdxe5GKbcMKjEZlk-d5-qIOflADj7bzog_6h_HQQuHHc4X8SkOMiQ-JJ-apPTAV3sSnTujhou86DN2dJYXI_OydWJocbJCtnanhGfzcqtqQADZLACKQJ2-mW0GDgsLdi8KPI1pUiXUFKG2GkgDl5vrnVH88JjnLnOua69AqDiepo0aKhbfIrxfTAcVr6oxjG7X9nukXEQP2BlG8uaM2";
-  form.push({
+    form.push({
     "g-recaptcha-response": desafio
   });
+  await sleep(2000);
+    
   // console.log(form);
   criaFormData(form);
-  console.log(form.length);
+  // console.log(form.length);
   for (let i = 0; i < form.length; i++) {
     let chave = Object.keys(form[i]);
     let valor = Object.values(form[i]);
@@ -172,24 +178,24 @@ async function request3() {
       Cookie: cookieAll,
       'Origin': 'https://pje.trt15.jus.br',
       'Referer': 'https://pje.trt15.jus.br/consultaprocessual/',
-      'sec-ch-ua-mobile': '?0',
-      'Sec-Fetch-Dest': 'document',
-      'Sec-Fetch-Mode': 'navigate',
-      'Sec-Fetch-Site': 'same-origin',
-      'Sec-Fetch-User': '?1',
-      'Upgrade-Insecure-Requests': '1',
+      // 'sec-ch-ua-mobile': '?0',
+      // 'Sec-Fetch-Dest': 'document',
+      // 'Sec-Fetch-Mode': 'navigate',
+      // 'Sec-Fetch-Site': 'same-origin',
+      // 'Sec-Fetch-User': '?1',
+      // 'Upgrade-Insecure-Requests': '1',
       'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36',
-      'Content-Type': 'multipart/form-data',
-      'content-type': 'multipart/form-data; boundary=---011000010111000001101001',
-      // ...data.getHeaders()
+      
+      
+      ...data.getHeaders()
     },
-    data: criaFormData(form)
+    data: data
   };
-
+  
   await axios(config)
     .then(function (response) {
       // console.log(JSON.stringify(response.data));
-      console.log(response);
+      console.log(response.data);
       let cookie = response.headers["set-cookie"];
       console.log(response.headers);
       // console.log(response.data);
@@ -233,7 +239,7 @@ async function request4() {
 
   const jar = request.jar();
   jar.setCookie(request.cookie('captchasess=fglnrlrsrndahs3vnigks1bak7'), 'https://pje.trt15.jus.br/captcha/login_post.php');
-  
+
   const options = {
     method: 'POST',
     url: 'https://pje.trt15.jus.br/captcha/login_post.php',
@@ -259,13 +265,13 @@ async function request4() {
     },
     jar: 'JAR'
   };
-  
+
   request(options, function (error, response, body) {
     if (error) throw new Error(error);
     console.log(response.headers);
     console.log(body);
   });
-  
+
 }
 
 
@@ -276,7 +282,7 @@ async function request4() {
   await request2();
   // await sleep(30000)
   console.log(cookieAll);
-  await request4();
+  await request3();
   console.log(cookieAll);
 })()
 

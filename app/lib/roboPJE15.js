@@ -146,82 +146,75 @@ async function request3() {
   console.log(form.length);
   // process.exit();
   if (form.length == 2) {
-    console.log(form);
+    // console.log(chaves[1], valores[1]);
+    // console.log(form);
     let req = unirest('POST', 'https://pje.trt15.jus.br/captcha/login_post.php')
-      .headers(header)
-      .field('random', chaves[1])
+    .proxy('http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182')  
+    .headers(header)
+      .field('random', valores[1])
       // .field([Object.keys(form[0])], Object.values(form[0]))
       // .field([Object.keys(form[1])], Object.values(form[1]))
       .field('g-recaptcha-response', desafio)
       .field('referer', '/consultaprocessual/')
       .end(function (res) {
         if (res.error) throw new Error(res.error);
-        cookieAll.append(`cookieconsultapje:${res.cookieconsultapje}`)
+        // cookieAll = `${cookieAll}; cookieconsultapje:${res.cookies.cookieconsultapje}`
+        cookieAll = res.cookies
         console.log(res.cookies);
       });
   } else if (form.length == 3) {
-    console.log(form);
+    // console.log(chaves[0], valores[0]);
+    // console.log(form);
     let req = unirest('POST', 'https://pje.trt15.jus.br/captcha/login_post.php')
-      .headers(header)
-      .field('random', chaves[2])
+    .proxy('http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182')  
+    .headers(header)
+      .field('random', valores[2])
       .field(chaves[0], valores[0])
       // .field([Object.keys(form[1])], Object.values(form[1]))
       .field('g-recaptcha-response', desafio)
       .field('referer', '/consultaprocessual/')
       .end(function (res) {
         if (res.error) throw new Error(res.error);
-        cookieAll.append(`cookieconsultapje:${res.cookieconsultapje}`)
+        // cookieAll = `${cookieAll}; cookieconsultapje:${res.cookies.cookieconsultapje}`
+        cookieAll = res.cookies
         console.log(res.cookies);
       });
   } else if (form.length == 4) {
-    console.log(form);
-    console.log([chaves[0], valores[0]], [chaves[1], valores[1]]);
+    // console.log(chaves[0], valores[0]);
+    // console.log(chaves[1], valores[1]);
+    // console.log(form);
+    // console.log([chaves[0], valores[0]], [chaves[1], valores[1]]);
     let req = unirest('POST', 'https://pje.trt15.jus.br/captcha/login_post.php')
+      .proxy('http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182')
       .headers(header)
-      .field('random', chaves[3])
+      .field('random', valores[3])
       .field(chaves[0], valores[0])
       .field(chaves[1], valores[1])
       .field('g-recaptcha-response', desafio)
       .field('referer', '/consultaprocessual/')
       .end(function (res) {
         if (res.error) throw new Error(res.error);
-        cookieAll = `${cookieAll}; cookieconsultapje:${res.cookieconsultapje}`
+        // cookieAll = `${cookieAll}; cookieconsultapje:${res.cookies.cookieconsultapje}`
+        cookieAll = res.cookies
 
         console.log(res.cookies);
       });
   }
-  await sleep(20000)
+  await sleep(5000)
   console.log(cookieAll);
-  process.exit();
+  // process.exit();
 
 
-  let req = unirest('POST', 'https://pje.trt15.jus.br/captcha/login_post.php')
-    .headers({
-      'Origin': 'https://pje.trt15.jus.br',
-      'Referer': 'https://pje.trt15.jus.br/consultaprocessual/',
-      'sec-ch-ua-mobile': '?0',
-      'Sec-Fetch-Dest': 'document',
-      'Sec-Fetch-Mode': 'navigate',
-      'Sec-Fetch-Site': 'same-origin',
-      'Sec-Fetch-User': '?1',
-      'Upgrade-Insecure-Requests': '1',
-      'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36',
-      'Cookie': 'captchasess=bp0hkfot5qap9lq6508dfgj036'
-    })
-    .field('random', 'bp0hkfot5qap9lq6508dfgj036')
-    .field('EVkShBIyxUNtQYeALcRjOmvsHfrbpTGWlKdZwqPCnDoM', 'aLJhAmjIXFtwesrGnBMfHQiUczgSCPRqWuvVdNkEYbD')
-    // .field('', '')
-    .field('g-recaptcha-response', '03AGdBq244xd29FEocdr9eBsBeohf2UNuwDyLBT0U_x3Nq03VHNubDYD_URmHRcl3kDR_xyQ8F8gNJzOk2nW99trtGYMrPYZyewiP5A0KhwCoPOAiBEElG_1aXbm7RxSrsz6Pu1mw67GRJPQrtdwS1z0EhsSOlzhskyPl2FPxoe79rOuyd8N-viZ-iuq6cCmAT-r1JBL_rka-NPimpmQV7vBiVVisvYhjK9iwyaloeMIw3hbe6R4sxFp9XQzKgqKe8biMp3jjzGRIKe27g1r9RS11q0Cu7GJtvHETiYG-4gl2s-YWs2eT8D_D-VOlctI58n1M7KoiO-IHpCPQiTb2vWshms8avrF61yLdaLUv39d7G4JzYalkgwgSbsypDu-j3zMOhHkE5iMNHB1Y965DAsunzrvPdoEczwpMboOEUL5Gymxjzc_CYAYjJO0sLhw6WblF55HK8bnf7wkU211xKFtZYMApf0u0BYXE7x2Y8XTnUMyZGGc7gYXk804H1ka0UQrLinZdxzVDV')
-    .field('referer', '/consultaprocessual/')
-    .end(function (res) {
-      if (res.error) throw new Error(res.error);
-      console.log(res.cookies);
-    });
+  // let req = unirest('GET', 'https://www.meuip.com.br/')
+  //   .proxy('http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182')
+  //   .end(function (res) {
+  //     if (res.error) throw new Error(res.error);
+  //     console.log(res);
+  //   });
 
 
 
 }
-
 
 function criaFormData(datas) {
   let n = "name=";
@@ -246,15 +239,11 @@ function criaFormData(datas) {
 }
 
 
-(async () => {
-  // await request1();
-  // console.log(cookieAll);
-  // await sleep(30000)
+
+module.exports.getCookies = async () => {
   await request2();
-  // await sleep(40000)
-  console.log(cookieAll);
   await request3();
-  console.log(cookieAll);
-})()
+  return cookieAll
+}
 
 

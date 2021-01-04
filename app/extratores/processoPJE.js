@@ -3,6 +3,7 @@ const { Robo } = require('../lib/newRobo');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 const sleep = require('await-sleep');
+const { getCookies } = require('../lib/roboPJE15')
 var heartBeat = 0;
 
 var red = '\u001b[31m';
@@ -101,6 +102,7 @@ class ExtratorTrtPje {
    */
   async captura(header) {
     try {
+      this.robo.setCookies(getCookies())
       // let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
       this.logger.info("Inicio da captura.")
       let id = await this.getId(header);

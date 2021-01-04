@@ -35,7 +35,7 @@ class TJCEParser extends BaseParser {
       envolvidos,
       oabs,
       qtdAndamentos: andamentos.length,
-      origemExtracao: 'TJCE',
+      origemExtracao: 'ProcessoTJCE',
       status,
       isBaixa,
     });

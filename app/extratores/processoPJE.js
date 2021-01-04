@@ -3,7 +3,7 @@ const { Robo } = require('../lib/newRobo');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 const sleep = require('await-sleep');
-const { getCookies } = require('../lib/roboPJE15')
+const { getCookies } = require('../lib/roboPJE15');
 var heartBeat = 0;
 
 var red = '\u001b[31m';
@@ -31,6 +31,7 @@ setInterval(async function () {
 
 class ExtratorTrtPje {
   constructor() {
+    this.Cookies;
     this.robo = new Robo();
     this.url = `http://pje.trt1.jus.br/pje-consulta-api`;
     this.qtdTentativas = 1;
@@ -102,7 +103,7 @@ class ExtratorTrtPje {
    */
   async captura(header) {
     try {
-      this.robo.setCookies(getCookies())
+      
       // let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
       this.logger.info("Inicio da captura.")
       let id = await this.getId(header);
@@ -113,22 +114,35 @@ class ExtratorTrtPje {
       } else if (id == "Off Line") {
         return "Reprocessar"
       }
-      // console.log(id);
+      console.log(id);
       // console.log(heartBeat);
+
+
+
+      this.robo.cookies = await getCookies();
+      // this.robo.setCookies(this.Cookies)
+
+
+
       let captcha = await this.getCaptcha(id);
+
+
+      console.log(captcha);
       console.log(heartBeat);
       this.logger.info("Finalizado - Captura do Captcha");
       // console.log(!!captcha, "captcha");
       let solveCaptcha = await this.getSolveCaptcha(captcha);
       console.log(heartBeat);
-      // console.log(solveCaptcha);
+      console.log(solveCaptcha);
       this.logger.info("Finalizado - Resolução do Captcha");
       let detalhes = await this.getDetalhes(header, id, captcha.tokenDesafio, solveCaptcha);
       console.log(heartBeat);
       // console.log(detalhes);
       this.logger.info("Finalizado - Captura dos Detalhes");
+      console.log(detalhes);
       return detalhes
     } catch (e) {
+
       this.logger.info(e)
       return null
     }
@@ -177,6 +191,8 @@ class ExtratorTrtPje {
    * @param {number} id Numero do id do processo
    */
   async getCaptcha(id) {
+    console.log(this.robo.cookies);
+      // process.exit();
     this.logger.info("Iniciado - captura do Captcha");
     try {
       const getCaptcha = await this.robo.acessar({
@@ -186,6 +202,7 @@ class ExtratorTrtPje {
         proxy: this.proxy,
       });
       const desafio = getCaptcha.responseBody;
+      console.log(getCaptcha.headers);
       // console.log(desafio);
       const captcha = {
         refinador: 'trt_1',
@@ -193,6 +210,7 @@ class ExtratorTrtPje {
         tokenDesafio: `${desafio.tokenDesafio}`
       };
       this.logger.info('Captcha obtido com sucesso');
+      console.log(this.robo.cookies);
       return captcha
 
     } catch (e) {
@@ -587,3 +605,11 @@ class ExtratorTrtPje {
 
 
 module.exports.ExtratorTrtPje = ExtratorTrtPje;
+
+(async ()=> {
+
+  await new ExtratorTrtPje().extrair(
+    "00105008220205150002",
+    "15"
+  )
+})()

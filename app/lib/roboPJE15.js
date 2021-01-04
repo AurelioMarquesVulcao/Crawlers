@@ -3,9 +3,9 @@ const FormData = require('form-data');
 const sleep = require('await-sleep');
 const cheerio = require('cheerio');
 const { CaptchaHandler } = require('../lib/captchaHandler');
-const https = require('follow-redirects').https;
-const fs = require('fs');
-const request = require('request');
+// const https = require('follow-redirects').https;
+// const fs = require('fs');
+// const request = require('request');
 const unirest = require('unirest');
 
 
@@ -118,7 +118,7 @@ async function request2() {
 }
 
 async function request3() {
-  console.log(form);
+  // console.log(form);
   let chaves = [];
   let valores = [];
   for (i in form) {
@@ -142,8 +142,8 @@ async function request3() {
     // 'Cookie': 'captchasess=bp0hkfot5qap9lq6508dfgj036'
   }
   header.Cookie = cookieAll;
-  console.log(header);
-  console.log(form.length);
+  // console.log(header);
+  // console.log(form.length);
   // process.exit();
   if (form.length == 2) {
     // console.log(chaves[1], valores[1]);
@@ -160,7 +160,7 @@ async function request3() {
         if (res.error) throw new Error(res.error);
         // cookieAll = `${cookieAll}; cookieconsultapje:${res.cookies.cookieconsultapje}`
         cookieAll = res.cookies
-        console.log(res.cookies);
+        // console.log(res.cookies);
       });
   } else if (form.length == 3) {
     // console.log(chaves[0], valores[0]);
@@ -177,7 +177,7 @@ async function request3() {
         if (res.error) throw new Error(res.error);
         // cookieAll = `${cookieAll}; cookieconsultapje:${res.cookies.cookieconsultapje}`
         cookieAll = res.cookies
-        console.log(res.cookies);
+        // console.log(res.cookies);
       });
   } else if (form.length == 4) {
     // console.log(chaves[0], valores[0]);
@@ -197,11 +197,11 @@ async function request3() {
         // cookieAll = `${cookieAll}; cookieconsultapje:${res.cookies.cookieconsultapje}`
         cookieAll = res.cookies
 
-        console.log(res.cookies);
+        // console.log(res.cookies);
       });
   }
   await sleep(5000)
-  console.log(cookieAll);
+  // console.log(cookieAll);
   // process.exit();
 
 

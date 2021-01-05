@@ -2,7 +2,7 @@ const { Robo } = require('../lib/newRobo');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 const sleep = require('await-sleep');
-const { getCookies } = require('../lib/roboPJE15');
+const { GetCookies } = require('../lib/roboPJE15');
 var heartBeat = 0;
 
 var red = '\u001b[31m';
@@ -23,6 +23,7 @@ class ExtratorTrtPje {
     this.url_1 = "";
     this.urlCaptcha = "http://172.16.16.8:8082/api/refinar/";
     // this.urlCaptcha="http://127.0.0.1:8082/api/refinar/";
+    // this.getCookies = new GetCookies();
   }
 
   /**
@@ -108,11 +109,13 @@ class ExtratorTrtPje {
       // Caso o processo seja de campinas é necessario obter os
       // Cookies do recaptcha.
       if (this.numeroEstado == "15") {
+        heartBeat = 0;
         this.logger.info("O Processo é de Campinas");
         this.logger.info("Iniciando extração dos Cookies");
-        this.robo.cookies = await getCookies(this.cnj);
+        this.robo.cookies = await new GetCookies().extrair(this.cnj);
         console.table(this.robo.cookies);
         this.logger.info("Cookies Extraidos com Sucesso");
+        heartBeat = 0;
       }
       // Obtem a imagem do Captcha
       let captcha = await this.getCaptcha(id);

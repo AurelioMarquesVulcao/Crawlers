@@ -1,4 +1,3 @@
-// const { Robo } = require('../lib/robo');
 const { Robo } = require('../lib/newRobo');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
@@ -9,24 +8,6 @@ var heartBeat = 0;
 var red = '\u001b[31m';
 var blue = '\u001b[34m';
 var reset = '\u001b[0m';
-
-
-setInterval(async function () {
-  heartBeat++;
-  if (heartBeat > 120) {
-    console.log(
-      red +
-      '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
-      reset
-    );
-    // await mongoose.connection.close()
-    process.exit();
-    const error = new Error('Tempo de tentativa de resolução esgotado');
-    error.code = 'Não é possível obter o processo em 5 minutos';
-    throw error;
-  }
-}, 1000);
-
 
 
 class ExtratorTrtPje {
@@ -51,6 +32,7 @@ class ExtratorTrtPje {
    * @returns Retorna com os detalhes do processo.
    */
   async extrair(cnj, numeroEstado) {
+    this.heartBeat();
     this.cnj = cnj;
     this.numeroEstado = numeroEstado;
     this.logger = new Logger(
@@ -128,7 +110,7 @@ class ExtratorTrtPje {
       if (this.numeroEstado == "15") {
         this.logger.info("O Processo é de Campinas");
         this.logger.info("Iniciando extração dos Cookies");
-        this.robo.cookies = await getCookies();
+        this.robo.cookies = await getCookies(this.cnj);
         console.table(this.robo.cookies);
         this.logger.info("Cookies Extraidos com Sucesso");
       }
@@ -282,6 +264,22 @@ class ExtratorTrtPje {
       return e.code
     }
   }
+
+  async heartBeat() {
+    setInterval(async function () {
+      heartBeat++;
+      if (heartBeat > 120) {
+        console.log(
+          red +
+          '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
+          reset
+        );
+        // await mongoose.connection.close()
+        process.exit();
+      }
+    }, 1000);
+  }
+
 
 
   // ---------------------------------------------------------------------------------------------------------------------------------

@@ -93,6 +93,7 @@ async function extrairNumeros(message, ultimo) {
       false
     );
     sequencial = `${Number(ultimoNumero[0]) + count}`;
+    // console.log({ sequencial })
 
     let mod = CnjValidator.calcula_mod97(
       sequencial,
@@ -109,9 +110,18 @@ async function extrairNumeros(message, ultimo) {
     if (erroEncontrado && !extracao.sucesso) {
       return { continuar: false, ultimo: anterior, count: count - 1 };
     }
-    if (extracao.sucesso) anterior = numero;
-    erroEncontrado = !extracao.sucesso;
+    if (extracao.sucesso || extracao.detalhes === 'Senha necessaria') {
+      erroEncontrado = false;
+      anterior = numero;
+    }
 
+    // console.log({detalhes: extracao.detalhes});
+    // console.log({sucesso: extracao.sucesso});
+
+    if (!extracao.sucesso && (extracao.detalhes !== 'Senha necessaria'))
+      erroEncontrado = !extracao.sucesso;
+
+    // console.log({erroEncontrado})
     count++;
   } while (count < 5);
 

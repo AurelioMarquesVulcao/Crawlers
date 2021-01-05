@@ -109,7 +109,7 @@ class ExtratorTrtPje {
       // Caso o processo seja de campinas é necessario obter os
       // Cookies do recaptcha.
       if (this.numeroEstado == "15") {
-        heartBeat = 0;
+        heartBeat = -120;
         this.logger.info("O Processo é de Campinas");
         this.logger.info("Iniciando extração dos Cookies");
         this.robo.cookies = await new GetCookies().extrair(this.cnj);

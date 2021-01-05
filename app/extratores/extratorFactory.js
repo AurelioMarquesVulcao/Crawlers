@@ -9,7 +9,6 @@ const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { ProcJTE } = require('./ProcJTE');
 const { PeticaoTJSP } = require('./PeticaoTJSP');
 const { PeticaoTJRS1 } = require('./PeticaoTJRS1');
-const { ExtratorTrtPje } = require('./processoPJE');
 
 
 class ExtratorFactory {
@@ -66,9 +65,7 @@ class ExtratorFactory {
         isDebug
       );
     }
-    if (/processo.PJE/.test(fila)) {
-      extrator = new ExtratorTrtPje('https://www.trt1.jus.br/consulta-processual', isDebug);
-    }
+    
     return extrator;
   }
 }

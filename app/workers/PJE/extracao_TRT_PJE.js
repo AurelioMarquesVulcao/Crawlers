@@ -37,7 +37,7 @@ var reset = '\u001b[0m';
   });
 
   //const nomeFila = `fila TRT-RJ`;
-  const nomeFila = `15.${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
+  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
   const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
@@ -66,12 +66,12 @@ var reset = '\u001b[0m';
       Cnj.processoSlice(message.NumeroProcesso).estado
     );
     // console.log("---------------------------",numeroEstado,"-------------------------------------");
-    if (numeroEstado == 15) {
-      ch.ack(msg);
-      await mongoose.connection.close();
-      await sleep(2000);
-      process.exit()
-    } else {
+    // if (numeroEstado == 15) {
+    //   ch.ack(msg);
+    //   await mongoose.connection.close();
+    //   await sleep(2000);
+    //   process.exit()
+    // } else {
 
 
       let busca = { _id: message._id };
@@ -223,7 +223,7 @@ var reset = '\u001b[0m';
         logger.info('Mensagem reconhecida');
         logger.info('Finalizando proceso');
       }
-    }
+    // }
   });
 })();
 function numeroAleatorio(min, max) {

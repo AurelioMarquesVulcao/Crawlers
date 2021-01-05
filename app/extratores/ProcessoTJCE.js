@@ -2,6 +2,7 @@ const sleep = require('await-sleep');
 const cheerio = require('cheerio');
 const { TJCEParser } = require('../parsers/TJCEParser');
 const { CaptchaHandler } = require('../lib/captchaHandler');
+const { Andamento } = require('../models/schemas/andamento')
 const { Logger } = require('../lib/util');
 const { Processo } = require('../models/schemas/processo');
 const { Robo } = require('../lib/newRobo');
@@ -39,6 +40,7 @@ class ProcessoTJCE {
       let gResponse;
       let paginaReturn
       let resultado;
+      let extracao;
 
       primeiroAcesso = await this.fazerPrimeiroAcesso();
 
@@ -70,10 +72,10 @@ class ProcessoTJCE {
           continue;
         }
 
-        resultado = await this.parser.parse(objResponse.responseBody);
+        extracao = await this.parser.parse(objResponse.responseBody);
         break;
 
-      } while(tentativa <= limite)
+      } while(tentativa === limite)
 
       if (tentativa === limite)
         throw new Error('Limite de tentativas excedidos');

@@ -43,6 +43,13 @@ class ExtratorTrtPje {
     this.urlCaptcha = "http://172.16.16.8:8082/api/refinar/";
     // this.urlCaptcha="http://127.0.0.1:8082/api/refinar/";
   }
+
+  /**
+   * Inicia o Processo de extração e carrega as primeiras variavéis
+   * @param {string} cnj numero cnj sem mascara
+   * @param {string} numeroEstado numero corespondente ao estado
+   * @returns Retorna com os detalhes do processo.
+   */
   async extrair(cnj, numeroEstado) {
     this.cnj = cnj;
     this.numeroEstado = numeroEstado;
@@ -50,7 +57,7 @@ class ExtratorTrtPje {
       'info',
       'logs/ProcessoJTE/ProcessoTRT-RJInfo.log',
       {
-        nomeRobo: enums.nomesRobos.TRTRJ,
+        nomeRobo: enums.nomesRobos.PJE,
         NumeroDoProcesso: cnj,
       }
     );
@@ -76,6 +83,10 @@ class ExtratorTrtPje {
       this.logger.info("Não possui 2 instância");
     }
 
+    // Verificações das extrações obtidas
+
+    // Caso captura for verdadeira, verifico se houve problema de capcha ou outro erro qq
+    // Se captura for falso, o processo é de 2 instância. Faço as mesmas checagens
     if (captura) {
       if (/Ocorreu um problema na solução do Captcha/.test(captura)) {
         return null
@@ -84,7 +95,6 @@ class ExtratorTrtPje {
       } else {
         return captura
       }
-
     } else {
       if (/Ocorreu um problema na solução do Captcha/.test(captura)) {
         return null
@@ -103,47 +113,38 @@ class ExtratorTrtPje {
    */
   async captura(header) {
     try {
-      
-      // let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
       this.logger.info("Inicio da captura.")
       let id = await this.getId(header);
-      console.log(heartBeat);
+      // console.log(heartBeat);
       this.logger.info("Finalizada - Captura do id do processos");
+      // Testa a resposta do ID para reprocessar ou não o processo.
       if (id == "Nao possui") {
         return false
       } else if (id == "Off Line") {
         return "Reprocessar"
       }
-      console.log(id);
-      // console.log(heartBeat);
-
-
-
-      this.robo.cookies = await getCookies();
-      // this.robo.setCookies(this.Cookies)
-
-
-
+      // Caso o processo seja de campinas é necessario obter os
+      // Cookies do recaptcha.
+      if (this.numeroEstado == "15") {
+        this.logger.info("O Processo é de Campinas");
+        this.logger.info("Iniciando extração dos Cookies");
+        this.robo.cookies = await getCookies();
+        console.table(this.robo.cookies);
+        this.logger.info("Cookies Extraidos com Sucesso");
+      }
+      // Obtem a imagem do Captcha
       let captcha = await this.getCaptcha(id);
-
-
-      console.log(captcha);
-      console.log(heartBeat);
       this.logger.info("Finalizado - Captura do Captcha");
-      // console.log(!!captcha, "captcha");
+      // Obtem a solução do Captcha
       let solveCaptcha = await this.getSolveCaptcha(captcha);
-      console.log(heartBeat);
-      console.log(solveCaptcha);
       this.logger.info("Finalizado - Resolução do Captcha");
+      // Obtem os detalhes do processo
       let detalhes = await this.getDetalhes(header, id, captcha.tokenDesafio, solveCaptcha);
-      console.log(heartBeat);
-      // console.log(detalhes);
       this.logger.info("Finalizado - Captura dos Detalhes");
-      console.log(detalhes);
       return detalhes
     } catch (e) {
-
       this.logger.info(e)
+      this.logger.log(e)
       return null
     }
   }
@@ -176,9 +177,6 @@ class ExtratorTrtPje {
         this.logger.info('Não foi possivel obter a resposta inicial');
         return null;
       }
-
-      // console.log(getId);
-      // process.exit()
       return body[0].id
     } catch (e) {
       console.log(e);
@@ -191,8 +189,6 @@ class ExtratorTrtPje {
    * @param {number} id Numero do id do processo
    */
   async getCaptcha(id) {
-    console.log(this.robo.cookies);
-      // process.exit();
     this.logger.info("Iniciado - captura do Captcha");
     try {
       const getCaptcha = await this.robo.acessar({
@@ -202,17 +198,13 @@ class ExtratorTrtPje {
         proxy: this.proxy,
       });
       const desafio = getCaptcha.responseBody;
-      console.log(getCaptcha.headers);
-      // console.log(desafio);
       const captcha = {
         refinador: 'trt_1',
         imagem: `${desafio.imagem}`,
         tokenDesafio: `${desafio.tokenDesafio}`
       };
       this.logger.info('Captcha obtido com sucesso');
-      console.log(this.robo.cookies);
       return captcha
-
     } catch (e) {
       this.logger.info(e);
     }
@@ -282,22 +274,14 @@ class ExtratorTrtPje {
       if (!!detalheProcesso.responseBody.mensagemErro) {
         // return detalheProcesso.responseBody;
         return { segredoJustica: true };
-        const error = new Error('Processo sigiloso');
-        error.code = 'Não é possível obter devido ao processo ser sigiliso';
-        throw error;
       }
       this.logger.info('Dados do processo obtidos com sucesso.');
       return detalheProcesso.responseBody;
-
     } catch (e) {
       this.logger.info(e);
       return e.code
     }
   }
-
-
-
-
 
 
   // ---------------------------------------------------------------------------------------------------------------------------------
@@ -605,11 +589,3 @@ class ExtratorTrtPje {
 
 
 module.exports.ExtratorTrtPje = ExtratorTrtPje;
-
-(async ()=> {
-
-  await new ExtratorTrtPje().extrair(
-    "00105008220205150002",
-    "15"
-  )
-})()

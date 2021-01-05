@@ -9,3 +9,7 @@ apps:
     name     : 'worker-03'
   - script   : ./workers/PJE/extracao_TRT_PJE.js
     name     : 'worker-04'
+  - script   : ./workers/PJE/extracao_TRT_PJE.js
+    name     : 'worker-05'
+  - script   : ./workers/PJE/extracao_TRT_PJE.js
+    name     : 'worker-06'

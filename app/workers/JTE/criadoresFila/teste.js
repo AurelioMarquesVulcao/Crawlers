@@ -24,7 +24,9 @@ var desligado = desligar.worker;
 
 
 (async () => {
-  let estados = ["01", "02", "03", "04", "05", "06", "07", "08", '09', "10", "11", "12", "13", "14", "15", "16", "17", "18", '19', "20", "21", "22", "23", "24"];
+  let teste = "0036";
+  console.log(!/-/.test(teste));
+  let estados = ["05", "01", "02", "03", "04", "06", "07", "08", '09', "10", "11", "12", "13", "14", "15", "16", "17", "18", '19', "20", "21", "22", "23", "24"];
   for (let i = 0; i < estados.length; i++) {
     await estado(estados[i]);
   }
@@ -34,14 +36,25 @@ var desligado = desligar.worker;
 })()
 
 async function estado(str) {
+
+
+
+
   let estados = await statusEstadosJTE.find({
     "estadoNumero": str
   })
   for (let i = 0; i < estados.length; i++) {
     let comarca = estados[i].comarca;
     // console.log(estados[i].comarca);
-    await rastreio(parseInt(str), comarca);
+    // console.log(!/-/.test(comarca));
+    let teste = `${!/-/.test(comarca)}`
+    if ( teste == "true") {
+      // console.log("teste ok");
+      await rastreio(parseInt(str), comarca);
+    }
   }
+
+
 }
 
 async function rastreio(tribunal, comarca) {

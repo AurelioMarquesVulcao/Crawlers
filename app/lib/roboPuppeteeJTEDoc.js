@@ -20,7 +20,7 @@ setInterval(function () {
     process.exit();
   }
   // }
-  console.log(heartBeat,"Segundos");
+  console.log(heartBeat, "Segundos");
 }, 1000);
 
 // Senhas de login no tribunal
@@ -69,7 +69,7 @@ class RoboPuppeteer3 {
       // headless: false,
       headless: true,
       slowMo: 50,
-      ignoreHTTPSErrors: true,
+      // ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
@@ -140,6 +140,176 @@ class RoboPuppeteer3 {
     await this.page.click('#consultaProcessual');
     await sleep(timerSleep);
     //await console.log("Logado ao tribunal desejado");
+    heartBeat = 0;
+  }
+  async preencheTribunal1(numero) {
+    heartBeat = 0;
+    let escolha = escolheEstado(numero) + 1;
+    if (escolha == 25) {
+      escolha = 2;
+    }
+    console.log("clianco no elemento button");
+
+
+    await this.page.evaluate(() => {
+      document.querySelector(
+        `#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button > i`).click();
+      console.log("estou tentando abrir o elemento");
+    });
+
+
+    // await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(3)');
+    // await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(3)');
+    // para esperar carregar o elemento onde fica o tribunal
+    await sleep(timerSleep);
+
+    // await this.page.waitFor('mat-form-field');
+    await sleep(timerSleep);
+    await this.page.waitFor(
+      '#mat-dialog-1'
+    );
+    await sleep(timerSleep);
+    // console.log(!! await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper'));
+    await this.page.evaluate(() => {
+      document.querySelector(
+        `#mat-select-3`).click();
+      console.log("estou tentando abrir o elemento");
+    });
+    // await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper');
+    await sleep(timerSleep);
+    await this.page.evaluate((escolha) => {
+      document.querySelector(
+        `#cdk-overlay-3 > div > div :nth-child(${escolha})`).click();
+      console.log("estou tentando abrir o elemento");
+    }, escolha);
+    // await this.page.click(`#mat-option-${escolha}`);
+    await sleep(timerSleep1);
+
+    await this.page.evaluate(() => {
+      document.querySelector(
+        `ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span`).click();
+      console.log("estou tentando abrir o elemento");
+    });
+    // await this.page.click(
+    //   'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
+    // );
+    await sleep(timerSleep5);
+    await this.page.evaluate(() => {
+      document.querySelector("#tituloLogin > ion-item:nth-child(5) > ion-label").click();
+      console.log("estou tentando abrir o elemento");
+    });
+    await sleep(timerSleep5);
+    await this.page.type('#senha > input', senha);
+    await sleep(timerSleep5);
+    await this.page.evaluate(() => {
+      document.querySelector("#formLogin > ion-toolbar > ion-button").click();
+      console.log("estou tentando abrir o elemento");
+    });
+    await sleep(10000);
+    // await this.page.waitFor('#consultaProcessual')
+    // await this.page.evaluate(() => {
+    //   document.querySelector("#consultaProcessual").click();
+    //   console.log("estou tentando abrir o elemento");
+    // });
+    //  await this.page.evaluate(() => {
+    //   document.querySelector("body > app-root > ion-app > ion-menu > ion-content > ion-list > ion-item:nth-child(2)").click();
+    //   console.log("estou tentando abrir o elemento");
+    // });
+    // await this.page.click('#consultaProcessual');
+    await sleep(timerSleep);
+    //await console.log("Logado ao tribunal desejado");
+    heartBeat = 0;
+  }
+
+
+  async preencheTribunal2(numero) {
+    let escolha = escolheEstado(numero);
+    // if (escolha == 25) {
+    //   escolha = 2;
+    // }
+    console.log("clianco no elemento button");
+
+
+    await this.page.evaluate(() => {
+      document.querySelector(
+        `#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button > i`).click();
+      console.log("estou tentando abrir o elemento");
+    });
+
+
+    // await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(3)');
+    // await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(3)');
+    // para esperar carregar o elemento onde fica o tribunal
+    await sleep(timerSleep);
+
+    // await this.page.waitFor('mat-form-field');
+    await sleep(30000);
+    await this.page.waitFor(
+      '#mat-dialog-2'
+
+    );
+    await sleep(timerSleep);
+    // console.log(!! await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper'));
+    await this.page.evaluate(() => {
+      document.querySelector(
+        `#mat-select-5`).click();
+      console.log("estou tentando abrir o elemento");
+    });
+    // await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper');
+    await sleep(timerSleep);
+    if (escolha == 2) {
+      await this.page.evaluate(() => {
+        document.querySelector("#mat-option-54").click();
+        console.log("estou tentando abrir o elemento");
+      });
+    } else {
+      await this.page.evaluate((escolha) => {
+        document.querySelector(
+          `#cdk-overlay-5 > div > div :nth-child(${escolha})`).click();
+        console.log("estou tentando abrir o elemento");
+      }, escolha);
+    }
+
+    // await this.page.click(`#mat-option-${escolha}`);
+    await sleep(timerSleep1);
+
+    await this.page.evaluate(() => {
+      document.querySelector(
+        `ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span`).click();
+      console.log("estou tentando abrir o elemento");
+    });
+    // await this.page.click(
+    //   'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
+    // );
+    // await sleep(timerSleep5);
+    // await this.page.evaluate(() => {
+    //   document.querySelector("#tituloLogin > ion-item:nth-child(5) > ion-label").click();
+    //   console.log("estou tentando abrir o elemento");
+    // });
+    // await sleep(timerSleep5);
+    // await this.page.type('#senha > input', senha);
+    // await sleep(timerSleep5);
+    // await this.page.evaluate(() => {
+    //   document.querySelector("#formLogin > ion-toolbar > ion-button").click();
+    //   console.log("estou tentando abrir o elemento");
+    // });
+    await sleep(10000);
+    // await this.page.waitFor('#consultaProcessual')
+    // await this.page.click('#consultaProcessual');
+    // await sleep(timerSleep);
+    await console.log("Logado ao tribunal desejado");
+    await this.page.evaluate(() => {
+      document.querySelector("body > app-root > ion-app > ion-menu > ion-content > ion-list > ion-item:nth-child(2)").click();
+      console.log("estou tentando abrir o elemento");
+    });
+    heartBeat = 0;
+    await sleep(10000);
+    heartBeat = 0;
+    await sleep(10000);
+    heartBeat = 0;
+    await sleep(10000);
+    heartBeat = 0;
+    await sleep(10000);
     heartBeat = 0;
   }
 

@@ -52,10 +52,10 @@ const comarcaSchema = new mongoose.Schema({
 	dataBusca: {},
 	dataCriaçãoJTE: Date,
 	numeroUltimoProcecesso: String,
-
+	ano:String
 })
 
-const statusEstadosJTE = mongoose.model('comarcasJTE', comarcaSchema, 'comarcasJTE');
+const statusEstadosJTE = mongoose.model('comarcasJTE-teste', comarcaSchema, 'comarcasJTE-teste');
 
 module.exports.statusEstadosJTE = statusEstadosJTE;
 

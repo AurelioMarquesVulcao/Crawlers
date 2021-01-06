@@ -34,6 +34,7 @@ class CriaFilaJTE {
 		let dataBusca = { dia: this.relogio().dia, mes: this.relogio().mes }
 		let dataCriaçãoJTE = data;
 		let numeroUltimoProcecesso = numero;
+		let ano = cnj.ano
 
 		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
 
@@ -57,7 +58,7 @@ class CriaFilaJTE {
 			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
 		} else {
 			status = "Atualizado";
-			let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
+			let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano};
 			console.log("-------- update -------------");
 			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
 		}

@@ -61,6 +61,7 @@ const colocaMascara = (cnj) => {
   return `${cnjObject.sequencial}-${cnjObject.dois}.${cnjObject.ano}.${cnjObject.tipo}.${cnjObject.estado}.${cnjObject.comarca}`
 }
 
+
 const retornaOrgaoTribunal = (cnj) => {
   cnj = Cnj.processoSlice(cnj.replace(/\D/g, ''));
   return {

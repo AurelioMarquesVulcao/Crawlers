@@ -193,7 +193,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: node workers/TJSR/processosAtualizacao.js
+    command: node workers/TJRS/processosAtualizacao.js
 
   tjrs-processos-reprocessamento:
     extends:
@@ -203,6 +203,15 @@ services:
       context: ./
       dockerfile: dockerfile-node
     command: node workers/TJRS/processosReprocessamento.js
+
+  tjrs-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJRS/extracaoPeticao.js\
 
   novos-processos-jte-1:
     extends:

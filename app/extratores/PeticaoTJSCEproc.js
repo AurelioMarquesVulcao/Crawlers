@@ -8,7 +8,7 @@ const { Robo } = require('../lib/newRobo');
 
 const estado = 'SC'
 
-class PeticaoTJSC extends ExtratorBase {
+class PeticaoTJSCEproc extends ExtratorBase {
   constructor(isDebug=false) {
     super('https://eproc1g.tjsc.jus.br/eproc', isDebug);
 
@@ -26,7 +26,7 @@ class PeticaoTJSC extends ExtratorBase {
     this.numeroProcesso = numeroProcesso;
     this.resposta = { numeroProcesso: numeroProcesso };
 
-    this.logger = new Logger('info', 'logs/TJSC/peticao.log', {
+    this.logger = new Logger('info', 'logs/TJSC/peticao_eproc.log', {
       nomeRobo: 'peticaoTJSC',
       NumeroDoProcesso: this.numeroProcesso,
       NumeroOab: null
@@ -351,4 +351,4 @@ class PeticaoTJSC extends ExtratorBase {
   }
 }
 
-module.exports.PeticaoTJSC = PeticaoTJSC;
+module.exports.PeticaoTJSCEproc = PeticaoTJSCEproc;

@@ -6,7 +6,9 @@ const { enums } = require('../../configs/enums');
 const { Logger } = require('../../lib/util')
 const { Extracao } = require('../../models/schemas/extracao')
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
+const { Helper } = require('../../lib/util')
 const { GerenciadorFila } = require('../../lib/filaHandler');
+const { PeticaoTJSCEsaj } = require('../../extratores/PeticaoTJSCEsaj');
 
 (() => {
   mongoose.connect(enums.mongo.connString, {
@@ -36,7 +38,7 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
 
     try {
       logger.info('Mensagem recebida');
-      const extrator = ExtratorFactory.getExtrator(nomeFila, true);
+      const extrator = new PeticaoTJSCEsaj()
 
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(message.NumeroProcesso);
@@ -52,15 +54,16 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
 
       logger.info('Resultado da extração salva');
 
-      if (!resultadoExtracao.sucesso)
+      if (!resultadoExtracao.sucesso) {
         throw new Error(resultadoExtracao.detalhes);
+      }
 
       logger.info('Preparando arquivo para upload');
 
       arquivoPath = Path.resolve(
         __dirname,
-        '../../downlodas',
-        `${message.NumeroProcesso.replace(/\D/g, '')}.pdf`
+        '../../downloads',
+        `${message.NumeroProcesso}.pdf`
       );
 
       let data = fs.readFileSync(arquivoPath).toString('base64');
@@ -103,7 +106,11 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
     } catch (e) {
       logger.info('Extração não foi bem sucedida');
       logger.log('error', e);
+      console.log(e);
       logger.info('Finalizando operação');
+      if (/Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(e.message)) {
+        new GerenciadorFila().enviar('peticao.TJSC.extracao.eproc', JSON.stringify(message));
+      }
       // await logarExecucao({
       //   LogConsultaId: message.LogConsultaId,
       //   Mensagem: message,
@@ -115,6 +122,7 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
       //   NomeRobo: enums.nomesRobos.TJSC,
       // });
     } finally {
+      console.log({arquivoPath})
       if (fs.existsSync(arquivoPath)) {
         logger.info('Apagando arquivo temporario');
         await fs.unlinkSync(arquivoPath);
@@ -122,7 +130,7 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
       }
 
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
+      // ch.ack(msg);
       logger.info('Mensagem reconhecida');
       console.log('\n'+'='.repeat(process.stdout.columns)+'\n');
       await sleep(2000);

@@ -93,7 +93,7 @@ var desligado = desligar.worker;
           }
 
         })
-        process.exit()
+        // process.exit()
         await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
         mensagens = [];
       }

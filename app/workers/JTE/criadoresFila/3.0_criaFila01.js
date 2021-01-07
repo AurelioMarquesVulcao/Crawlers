@@ -28,7 +28,7 @@ var desligado = desligar.worker;
   const variaveis = await Variaveis.catch({ "codigo": "000001" });
   const Estados = variaveis.variaveis;
   var estados = [
-    Estados[0].rj,
+    // Estados[0].rj,
     Estados[0].sp2,
   ];
 
@@ -55,12 +55,35 @@ var desligado = desligar.worker;
     for (let w = 0; w < 1;) {
       let relogio = Fila.relogio();
       let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
-      console.log(statusFila);
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
       await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);
-      let status = comarcas.filter(x => x.status == 'Atualizado');
+
+
+      // for (let q = 0; q < comarcas.length; q++) {
+      //   console.log(comarcas[q]);
+      //   let id = comarcas[q]._id;
+      //   console.log(id);
+      //   let ano = Cnj.processoSlice(comarcas[q].numeroUltimoProcecesso).ano;
+      //   console.log(ano);
+      //   // await CriaFilaJTE.updateEstado(id, { "ano": ano })
+        
+      // }
+      
+
+
+
+
+
+
+
+
+
+      // console.log(comarcas);
+      let status = comarcas.filter(x => x.status == 'Atualizado' && x.ano == new Date().getFullYear());
+      console.log(status);
+      process.exit()
       // Pega apenas as comarcas que não são ultimo estado
       let processos = extraiDados(comarcas);
       // console.log(comarcas);
@@ -74,7 +97,7 @@ var desligado = desligar.worker;
             mensagens.push(arrayMensages[ii]);
           }
         })
-        await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
+        // await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
         mensagens = [];
       }
       mensagens = [];

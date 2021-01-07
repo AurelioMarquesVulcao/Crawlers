@@ -36,7 +36,7 @@ class CriaFilaJTE {
 		let numeroUltimoProcecesso = numero;
 		let ano = cnj.ano
 
-		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, };
+		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano};
 
 		if (cnj.sequencial == "0000000") {
 

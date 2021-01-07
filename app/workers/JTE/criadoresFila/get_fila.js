@@ -13,7 +13,7 @@ module.exports.getFilas = async () => {
 
             }
             // }).filter(x => x.qtd == 0 && x.status == 'Aguardando' && /^processo\.jte\.extracao/i.test(x.nome))
-        }).filter(x => x.qtd < 1000 && /^processo\.jte\.extracao/i.test(x.nome))
+        }).filter(x => x.qtd < 1 && /^processo\.jte\.extracao/i.test(x.nome))
     })
 }
 

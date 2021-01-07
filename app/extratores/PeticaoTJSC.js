@@ -1,4 +1,5 @@
 require('../bootstrap');
+const cheerio = require('cheerio')
 const Path = require('path');
 const { CredenciaisAdvogados } = require('../models/schemas/credenciaisAdvogados');
 const { ExtratorBase } = require('./extratores');
@@ -67,7 +68,6 @@ class PeticaoTJSC extends ExtratorBase {
       this.resposta.sucesso = false;
       this.resposta.detalhes = e.message;
     } finally {
-      this.logger.info('Extracao finalizada');
       this.resposta.logs = this.logger.logs;
       return this.resposta;
     }
@@ -102,7 +102,7 @@ class PeticaoTJSC extends ExtratorBase {
   }
 
   async getCredenciais() {
-    const credenciais = await CredenciaisAdvogados.getCredenciais(estado,this.idsUsadas)
+    const credenciais = await CredenciaisAdvogados.getCredenciais(estado,this.idsUsadas);
     this.idsUsadas.push(credenciais._doc._id);
 
     return credenciais._doc;

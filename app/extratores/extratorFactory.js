@@ -1,3 +1,4 @@
+const { PeticaoTJSC } = require('./PeticaoTJSC');
 const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJSP } = require('./OabTJSP');
 const { OabTJMG } = require('./OabTJMG');
@@ -57,6 +58,10 @@ class ExtratorFactory {
 
     if (/processo.TJSC/.test(fila)) {
       extrator = new ProcessoTJSC('https://esaj.tjsc.jus.br/cpopg', isDebug);
+    }
+
+    if (/peticao\.TJSC/.test(fila)) {
+      extrator = new PeticaoTJSC();
     }
 
     if (/oab.TJMG/.test(fila)) {

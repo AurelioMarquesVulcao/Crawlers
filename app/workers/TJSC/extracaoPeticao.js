@@ -1,7 +1,10 @@
+const fs = require('fs');
 const mongoose = require('mongoose');
 const Path = require('path');
-const fs = require('fs');
+const sleep = require('await-sleep')
 const { enums } = require('../../configs/enums');
+const { Logger } = require('../../lib/util')
+const { Extracao } = require('../../models/schemas/extracao')
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 
@@ -48,6 +51,10 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
       );
 
       logger.info('Resultado da extração salva');
+
+      if (!resultadoExtracao.sucesso)
+        throw new Error(resultadoExtracao.detalhes);
+
       logger.info('Preparando arquivo para upload');
 
       arquivoPath = Path.resolve(
@@ -55,9 +62,6 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
         '../../downlodas',
         `${message.NumeroProcesso.replace(/\D/g, '')}.pdf`
       );
-
-      if (!resultadoExtracao.sucesso)
-        throw new Error(resultadoExtracao.detalhes);
 
       let data = fs.readFileSync(arquivoPath).toString('base64');
 
@@ -86,7 +90,7 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
       }
 
       logger.info('Resposta enviada ao BigData');
-      logger.info('Finalizando processo');
+      logger.info('Finalizando operação');
 
       await logarExecucao({
         Mensagem: message,
@@ -97,20 +101,19 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
         nomeRobo: 'PeticaoTJSC',
       });
     } catch (e) {
-      logger.info('Encontrado erro durante a execução');
-      console.log(e);
+      logger.info('Extração não foi bem sucedida');
       logger.log('error', e);
-      logger.info('Finalizando processo');
-      await logarExecucao({
-        LogConsultaId: message.LogConsultaId,
-        Mensagem: message,
-        DataInicio: dataInicio,
-        DataTermino: new Date(),
-        status: e.message,
-        error: e.stack.replace(/\n+/, ' ').trim(),
-        logs: logger.logs,
-        NomeRobo: enums.nomesRobos.TJSC,
-      });
+      logger.info('Finalizando operação');
+      // await logarExecucao({
+      //   LogConsultaId: message.LogConsultaId,
+      //   Mensagem: message,
+      //   DataInicio: dataInicio,
+      //   DataTermino: new Date(),
+      //   status: e.message,
+      //   error: e.stack.replace(/\n+/, ' ').trim(),
+      //   logs: logger.logs,
+      //   NomeRobo: enums.nomesRobos.TJSC,
+      // });
     } finally {
       if (fs.existsSync(arquivoPath)) {
         logger.info('Apagando arquivo temporario');
@@ -121,9 +124,7 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
-      console.log(
-        '\n===========================================================\n'
-      );
+      console.log('\n'+'='.repeat(process.stdout.columns)+'\n');
       await sleep(2000);
     }
   });

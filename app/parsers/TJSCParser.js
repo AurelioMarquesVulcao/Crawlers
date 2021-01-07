@@ -38,7 +38,7 @@ class TJSCParser extends BaseParser {
       envolvidos: envolvidos,
       oabs: oabs,
       qtdAndamentos: andamentos.length,
-      origemExtracao: 'OabTJSP',
+      origemExtracao: 'ProcessoTJSC',
     });
 
     return {

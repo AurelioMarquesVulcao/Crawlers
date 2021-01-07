@@ -83,7 +83,7 @@ var desligado = desligar.worker;
       // console.log(comarcas);
       let status = comarcas.filter(x => x.status == 'Atualizado' && x.ano == new Date().getFullYear());
       console.log(status);
-      process.exit()
+      // process.exit()
       // Pega apenas as comarcas que não são ultimo estado
       let processos = extraiDados(comarcas);
       // console.log(comarcas);
@@ -97,6 +97,7 @@ var desligado = desligar.worker;
             mensagens.push(arrayMensages[ii]);
           }
         })
+        console.log(mensagens);
         // await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
         mensagens = [];
       }

@@ -66,12 +66,12 @@ var reset = '\u001b[0m';
       Cnj.processoSlice(message.NumeroProcesso).estado
     );
     // console.log("---------------------------",numeroEstado,"-------------------------------------");
-    if (numeroEstado == 15) {
-      ch.ack(msg);
-      await mongoose.connection.close();
-      await sleep(2000);
-      process.exit()
-    } else {
+    // if (numeroEstado == 15) {
+    //   ch.ack(msg);
+    //   await mongoose.connection.close();
+    //   await sleep(2000);
+    //   process.exit()
+    // } else {
 
 
       let busca = { _id: message._id };
@@ -223,7 +223,7 @@ var reset = '\u001b[0m';
         logger.info('Mensagem reconhecida');
         logger.info('Finalizando proceso');
       }
-    }
+    // }
   });
 })();
 function numeroAleatorio(min, max) {

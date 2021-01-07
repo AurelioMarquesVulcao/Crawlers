@@ -27,7 +27,7 @@ class ProcessoTJSP extends ExtratorBase {
 
   setInstanciaUrl(instancia) {
     this.url = INSTANCIAS_URLS[instancia - 1];
-    console.log('instancia:', instancia, '/// url:', this.url);
+    // console.log('instancia:', instancia, '/// url:', this.url);
   }
 
   /**
@@ -42,7 +42,7 @@ class ProcessoTJSP extends ExtratorBase {
     this.numeroDaOab = numeroDaOab;
     this.numeroDoProcesso = numeroDoProcesso;
     this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
-    console.log('INSTANCIA ', instancia);
+    // console.log('INSTANCIA ', instancia);
     this.instancia = Number(instancia);
     this.setInstanciaUrl(this.instancia);
 
@@ -74,9 +74,15 @@ class ProcessoTJSP extends ExtratorBase {
     let limite = 5;
     this.resposta = {};
 
-    console.log(headers);
+    // console.log(headers);
 
     try {
+
+      // objResponse = await this.robo.acessar({
+      //   url: 'http://esaj.tjsp.jus.br/cpopg/open.do',
+      //   method: 'GET'
+      // });
+
       this.logger.info('Fazendo primeira conexão.');
 
       url = `${
@@ -88,11 +94,13 @@ class ProcessoTJSP extends ExtratorBase {
         this.detalhes.numeroProcessoMascara
       }&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`;
 
-      console.log('PRE URL', url);
+      // console.log('PRE URL', url);
 
       objResponse = await this.robo.acessar({
         url: url,
-        usaProxy: true,
+        method: 'get',
+        proxy: true,
+        debug: true
       });
 
       this.logger.info('Conexão ao website concluido.');
@@ -129,8 +137,8 @@ class ProcessoTJSP extends ExtratorBase {
           }&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
         }
 
-        console.log(url);
-        console.log(cookies);
+        // console.log(url);
+        // console.log(cookies);
 
         this.logger.info(`Acessando o site. [Tentativa: ${tentativas++}]`);
         objResponse = await this.robo.acessar({
@@ -143,7 +151,7 @@ class ProcessoTJSP extends ExtratorBase {
         const $ = cheerio.load(objResponse.responseBody);
         // Verifica se input é valido
         const selector = '#mensagemRetorno';
-        console.log('TEXTO DE MENSAGEM RETORNO', $(selector).text().strip());
+        // console.log('TEXTO DE MENSAGEM RETORNO', $(selector).text().strip());
         if (
           /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(
             $(selector).text()

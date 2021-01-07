@@ -92,7 +92,7 @@ class CriaFilaPJE {
         $match: {
           'detalhes.orgao': 5,
           'detalhes.tribunal': tribunal,
-          'detalhes.ano': 2020,
+          'detalhes.ano': new Date().getFullYear(),
           "origemExtracao": "JTE",
           "capa.dataDistribuicao": {
             '$lt': data,
@@ -109,7 +109,7 @@ class CriaFilaPJE {
         }
       },
       { $sort: { _id: -1 } },
-      { $limit: 300 }
+      { $limit: 30 }
     ]).skip(pulo);
     // console.log(agregar);
     // process.exit()

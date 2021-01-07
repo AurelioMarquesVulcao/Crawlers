@@ -59,20 +59,40 @@ var desligado = desligar.worker;
       await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);
+      // console.log(comarcas);
+
+      // process.exit();
       let status = comarcas.filter(x => x.status == 'Atualizado');
       // Pega apenas as comarcas que não são ultimo estado
       let processos = extraiDados(comarcas);
       // console.log(comarcas);
       console.log(processos.length);
-      // process.exit()
+
       if (processos.length > 0) {
         processos.map(x => {
-          let arrayMensages = Fila.procura(x.numero.sequencial, x.numero.comarca, 4, x.numero.estado)
-          console.log(arrayMensages);
-          for (let ii = 0; ii < arrayMensages.length; ii++) {
-            mensagens.push(arrayMensages[ii]);
+          // Para a virada do ano será usado esse código.
+          if (x.numero.ano != new Date().getFullYear()) {
+            // Gera um numero de Start Para a comarca.
+            // console.log(x);
+            if (x.numero.sequencial != "0000000"){
+              let sequencial = trataSequencial(x)
+            let arrayMensages = Fila.procura(sequencial, x.numero.comarca, 4, x.numero.estado)
+            console.log(arrayMensages);
+            for (let ii = 0; ii < arrayMensages.length; ii++) {
+              mensagens.push(arrayMensages[ii]);
+            }
+            }
+          } else {
+
+            let arrayMensages = Fila.procura(x.numero.sequencial, x.numero.comarca, 4, x.numero.estado)
+            console.log(arrayMensages);
+            for (let ii = 0; ii < arrayMensages.length; ii++) {
+              mensagens.push(arrayMensages[ii]);
+            }
           }
+
         })
+        process.exit()
         await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
         mensagens = [];
       }
@@ -153,5 +173,67 @@ async function testeFila(nomeFila, contador) {
       await sleep(10000)
     } else { break }
   }
+}
+
+function trataSequencial(x) {
+  // console.log(x);
+  // return comarcas.map((x) => {
+  // console.log(
+  //   Cnj.processoSlice(x.numeroUltimoProcecesso).sequencial,
+  //   Cnj.processoSlice(x.numeroUltimoProcecesso).estado,
+  //   Cnj.processoSlice(x.numeroUltimoProcecesso).comarca
+  // );
+  // let processo = [Cnj.processoSlice(x.numeroUltimoProcecesso).sequencial];
+  let processo = [x.numero.sequencial];
+  if (processo == "0000000") {
+    return processo
+  } else {
+    // console.log(processo);
+    let number = [];
+    processo.map((y) => {
+      for (let i = 0; i < y.length; i++) {
+        number.push(y[i]);
+      }
+      return number
+    })
+    // console.log(number);
+    let zeros = "";
+    while (true) {
+      if (number[0] == '0') {
+        number.splice(0, 1);
+        zeros += "0"
+      } else if (number[0] != '0' || number.length == 1) {
+        break
+      }
+    }
+    // console.log(number.join(""));
+    // console.log(number.length);
+    if (number.length >= 5) {
+      for (let i = 1; i < number.length; i++) {
+        if (i < number.length - 1) {
+          number[i] = "0"
+        } else {
+          // ajustei para zero para a função procura fila acrescentar 4 numeros ao zero
+          // ficando 1--2--3 e não 2--3--4
+          number[i] = "0"
+        }
+      }
+    } else if (number.length <= 4) {
+      for (let i = 0; i < number.length; i++) {
+        if (i < number.length - 1) {
+          number[i] = "0"
+        } else {
+          // ajustei para zero para a função procura fila acrescentar 4 numeros ao zero
+          // ficando 1--2--3 e não 2--3--4
+          number[i] = "0"
+        }
+      }
+    }
+    // console.log(zeros + number.join(""));
+    return zeros + number.join("");
+  }
+  // console.log(number);
+  // process.exit();
+  // })
 }
 

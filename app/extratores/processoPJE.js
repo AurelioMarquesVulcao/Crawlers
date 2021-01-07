@@ -1,8 +1,8 @@
-// const { Robo } = require('../lib/robo');
 const { Robo } = require('../lib/newRobo');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
 const sleep = require('await-sleep');
+const { GetCookies } = require('../lib/roboPJE15');
 var heartBeat = 0;
 
 var red = '\u001b[31m';
@@ -10,26 +10,9 @@ var blue = '\u001b[34m';
 var reset = '\u001b[0m';
 
 
-setInterval(async function () {
-  heartBeat++;
-  if (heartBeat > 120) {
-    console.log(
-      red +
-      '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
-      reset
-    );
-    // await mongoose.connection.close()
-    process.exit();
-    const error = new Error('Tempo de tentativa de resolução esgotado');
-    error.code = 'Não é possível obter o processo em 5 minutos';
-    throw error;
-  }
-}, 1000);
-
-
-
 class ExtratorTrtPje {
   constructor() {
+    this.Cookies;
     this.robo = new Robo();
     this.url = `http://pje.trt1.jus.br/pje-consulta-api`;
     this.qtdTentativas = 1;
@@ -40,15 +23,24 @@ class ExtratorTrtPje {
     this.url_1 = "";
     this.urlCaptcha = "http://172.16.16.8:8082/api/refinar/";
     // this.urlCaptcha="http://127.0.0.1:8082/api/refinar/";
+    // this.getCookies = new GetCookies();
   }
+
+  /**
+   * Inicia o Processo de extração e carrega as primeiras variavéis
+   * @param {string} cnj numero cnj sem mascara
+   * @param {string} numeroEstado numero corespondente ao estado
+   * @returns Retorna com os detalhes do processo.
+   */
   async extrair(cnj, numeroEstado) {
+    this.heartBeat();
     this.cnj = cnj;
     this.numeroEstado = numeroEstado;
     this.logger = new Logger(
       'info',
       'logs/ProcessoJTE/ProcessoTRT-RJInfo.log',
       {
-        nomeRobo: enums.nomesRobos.TRTRJ,
+        nomeRobo: enums.nomesRobos.PJE,
         NumeroDoProcesso: cnj,
       }
     );
@@ -74,6 +66,10 @@ class ExtratorTrtPje {
       this.logger.info("Não possui 2 instância");
     }
 
+    // Verificações das extrações obtidas
+
+    // Caso captura for verdadeira, verifico se houve problema de capcha ou outro erro qq
+    // Se captura for falso, o processo é de 2 instância. Faço as mesmas checagens
     if (captura) {
       if (/Ocorreu um problema na solução do Captcha/.test(captura)) {
         return null
@@ -82,7 +78,6 @@ class ExtratorTrtPje {
       } else {
         return captura
       }
-
     } else {
       if (/Ocorreu um problema na solução do Captcha/.test(captura)) {
         return null
@@ -101,33 +96,40 @@ class ExtratorTrtPje {
    */
   async captura(header) {
     try {
-      // let url_1 = `http://pje.trt${this.numeroEstado}.jus.br/pje-consulta-api`;
       this.logger.info("Inicio da captura.")
       let id = await this.getId(header);
-      console.log(heartBeat);
+      // console.log(heartBeat);
       this.logger.info("Finalizada - Captura do id do processos");
+      // Testa a resposta do ID para reprocessar ou não o processo.
       if (id == "Nao possui") {
         return false
       } else if (id == "Off Line") {
         return "Reprocessar"
       }
-      // console.log(id);
-      // console.log(heartBeat);
+      // Caso o processo seja de campinas é necessario obter os
+      // Cookies do recaptcha.
+      if (this.numeroEstado == "15") {
+        heartBeat = -120;
+        this.logger.info("O Processo é de Campinas");
+        this.logger.info("Iniciando extração dos Cookies");
+        this.robo.cookies = await new GetCookies().extrair(this.cnj);
+        console.table(this.robo.cookies);
+        this.logger.info("Cookies Extraidos com Sucesso");
+        heartBeat = 0;
+      }
+      // Obtem a imagem do Captcha
       let captcha = await this.getCaptcha(id);
-      console.log(heartBeat);
       this.logger.info("Finalizado - Captura do Captcha");
-      // console.log(!!captcha, "captcha");
+      // Obtem a solução do Captcha
       let solveCaptcha = await this.getSolveCaptcha(captcha);
-      console.log(heartBeat);
-      // console.log(solveCaptcha);
       this.logger.info("Finalizado - Resolução do Captcha");
+      // Obtem os detalhes do processo
       let detalhes = await this.getDetalhes(header, id, captcha.tokenDesafio, solveCaptcha);
-      console.log(heartBeat);
-      // console.log(detalhes);
       this.logger.info("Finalizado - Captura dos Detalhes");
       return detalhes
     } catch (e) {
       this.logger.info(e)
+      this.logger.log(e)
       return null
     }
   }
@@ -160,9 +162,6 @@ class ExtratorTrtPje {
         this.logger.info('Não foi possivel obter a resposta inicial');
         return null;
       }
-
-      // console.log(getId);
-      // process.exit()
       return body[0].id
     } catch (e) {
       console.log(e);
@@ -184,7 +183,6 @@ class ExtratorTrtPje {
         proxy: this.proxy,
       });
       const desafio = getCaptcha.responseBody;
-      // console.log(desafio);
       const captcha = {
         refinador: 'trt_1',
         imagem: `${desafio.imagem}`,
@@ -192,7 +190,6 @@ class ExtratorTrtPje {
       };
       this.logger.info('Captcha obtido com sucesso');
       return captcha
-
     } catch (e) {
       this.logger.info(e);
     }
@@ -262,21 +259,29 @@ class ExtratorTrtPje {
       if (!!detalheProcesso.responseBody.mensagemErro) {
         // return detalheProcesso.responseBody;
         return { segredoJustica: true };
-        const error = new Error('Processo sigiloso');
-        error.code = 'Não é possível obter devido ao processo ser sigiliso';
-        throw error;
       }
       this.logger.info('Dados do processo obtidos com sucesso.');
       return detalheProcesso.responseBody;
-
     } catch (e) {
       this.logger.info(e);
       return e.code
     }
   }
 
-
-
+  async heartBeat() {
+    setInterval(async function () {
+      heartBeat++;
+      if (heartBeat > 120) {
+        console.log(
+          red +
+          '----------------- Fechando o processo por Indisponibilidade 120 -------------------' +
+          reset
+        );
+        // await mongoose.connection.close()
+        process.exit();
+      }
+    }, 1000);
+  }
 
 
 

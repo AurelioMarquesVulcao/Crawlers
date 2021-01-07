@@ -25,8 +25,8 @@ const logarExecucao = async (execucao) => {
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
-    let logger = new Logger('info', 'logs/OabTJSC/OabTJSCInfo.log', {
-      nomeRobo: `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJSC}`,
+    let logger = new Logger('info', 'logs/TJSC/oabTJSC.log', {
+      nomeRobo: `${enums.tipoConsulta.Oab}${enums.nomesRobos.TJSC}`,
       NumeroOab: message.NumeroOab,
     });
     console.table(message);

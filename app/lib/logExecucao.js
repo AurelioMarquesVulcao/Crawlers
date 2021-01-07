@@ -42,7 +42,6 @@ module.exports.LogExecucao = class LogExecucao {
    * @returns {Promise<{mensagem: string, sucesso: boolean}|{mensagem: string, enviado: boolean, sucesso: boolean}>}
    */
   static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
-    let resposta;
 
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
 
@@ -85,13 +84,13 @@ module.exports.LogExecucao = class LogExecucao {
     }
 
     if (!nomeRobo) {
-      return { sucesso: false, mensagem: 'Nome do robo inválido.' };
+      return { sucesso: false, enviado: false, mensagem: 'Nome do robo inválido.' };
     }
 
     return {
       sucesso: true,
-      enviado: true,
-      mensagem: `${mensagem.NumeroProcesso} => ${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`,
+      enviado: false,
+      mensagem: `Mensagem já cadastrada e não consumida`,
     };
   }
 };

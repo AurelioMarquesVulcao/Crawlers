@@ -34,7 +34,7 @@ class TJSPParser extends BaseParser {
   extrairComarca($) {
     let comarca;
 
-    comarca = $('td:contains("Origem:")').next('td').text().strip();
+    comarca = $('#foroProcesso').text().strip();
     comarca = removerAcentos(comarca);
     comarca = comarca.replace(/(Comarca\sde\s|Foro\s(de\s?))(\w+)\s\/\s(.*)/, '$1$2');
 
@@ -51,17 +51,22 @@ class TJSPParser extends BaseParser {
   }
 
   extrairAssunto($) {
-    let assunto = $('td:contains("Assunto:")').next('td').text().strip();
+    let assunto = $('#assuntoProcesso').text().strip();
     assunto = assunto.split(/\s\W\s/);
     return assunto.map(element => removerAcentos(element));
   }
 
   extrairClasse($) {
-    return $('td:contains("Classe:")').next('td').text().strip();
+    return $('#areaProcesso').text().strip();
   }
 
   extrairDetalhes($) {
-    let numero = $('td:contains("Processo:")').next('td').text().strip();
+    let numero = $('#numeroProcesso').text().strip();
+
+    if (!numero) {
+      numero = $('#containerDadosPrincipaisProcesso > div:nth-child(1) > div > div > span').text().strip()
+    }
+
     numero = re.exec(
       numero,
       re(/\d{7}\W?\d{2}\W?\d{4}\W?\d\W?\d{2}\W?\d{4}/)
@@ -301,7 +306,7 @@ class TJSPParser extends BaseParser {
       envolvidos: envolvidos,
       oabs: oabs,
       qtdAndamentos: andamentos.length,
-      origemExtracao: 'OabTJSP',
+      origemExtracao: 'ProcessoTJSP',
       status: status,
       isBaixa: isBaixa
     });

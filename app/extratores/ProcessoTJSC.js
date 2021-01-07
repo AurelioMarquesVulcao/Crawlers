@@ -3,16 +3,11 @@ const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
-const { Robo } = require('../lib/robo');
-
-const {
-  AntiCaptchaResponseException,
-} = require('../models/exception/exception');
+const { Robo } = require('../lib/newRobo');
 const { ExtratorBase } = require('./extratores');
 const { TJSCParser } = require('../parsers/TJSCParser');
 
-const INSTANCIAS_URLS = require('../assets/TJSC/instancias_urls.json')
-  .INSTANCIAS_URL;
+const proxy = true;
 
 class ProcessoTJSC extends ExtratorBase {
   constructor(url, isDebug) {
@@ -21,208 +16,194 @@ class ProcessoTJSC extends ExtratorBase {
     this.robo = new Robo();
     this.dataSiteKey = '6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL';
     this.logger = null;
-    this.numeroDoProcesso = '';
-  }
-
-  setInstanciaUrl(instancia) {
-    this.url = INSTANCIAS_URLS[instancia - 1];
-  }
-
-  /**
-   *
-   * @param {String} numeroDoProcesso o numero do processo
-   * @param {String} numeroDaOab indica que a extração teve inicio com uma oab
-   * @param {Number} instancia instancia da pesquisa do processo
-   * @returns {Promise<{sucesso: boolean, logs: [], numeroDoProcesso: string}|{sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: ("undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint")}|{resultado: (void|*|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos: *}|{numeroProcesso: *, temAndamentosNovos: *, qtdAndamentosNovos}), sucesso: boolean, logs: [], numeroDoProcesso: string, detalhes: string}>}
-   */
-  async extrair(numeroDoProcesso, numeroDaOab = '', instancia = 1) {
-    const nomeRobo = 'ProcessoTJSC';
-    this.numeroDaOab = numeroDaOab;
-    this.numeroDoProcesso = numeroDoProcesso;
-    this.detalhes = Processo.identificarDetalhes(numeroDoProcesso);
-    this.instancia = Number(instancia);
-    this.setInstanciaUrl(this.instancia);
-
-    this.logger = new Logger('info', `logs/${nomeRobo}/${nomeRobo}Info.log`, {
-      nomeRobo: 'processo.TJSC',
-      NumeroDoProcesso: numeroDoProcesso,
-    });
-
-    let resultado;
-    let uuidCaptcha;
-    let gResponse;
-    let cookies;
-    let objResponse;
-    let url = '';
-    let headers = {
-      Host: 'esaj.tjsc.jus.br',
-      Connection: 'keep-alive',
-      'Upgrade-Insecure-Requests': '1',
-      'Sec-Fetch-User': '?1',
-      Accept:
-        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-      'Sec-Fetch-Site': 'same-origin',
-      'Sec-Fetch-Mode': 'navigate',
-      Referer: `${this.url}/search.do`,
-      'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-    };
-    let tentativas = 0;
-    let extracao;
-    let limite = 5;
-
-    try {
-      this.logger.info('Fazendo primeira conexão.');
-
-      url = `${
-        this.url
-      }/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(
-        0,
-        15
-      )}&foroNumeroUnificado=${this.detalhes.origem}&dePesquisaNuUnificado=${
-        this.detalhes.numeroProcessoMascara
-      }&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO`;
-
-      console.log('PRE URL', url);
-
-      objResponse = await this.robo.acessar({
-        url: url,
-        usaProxy: true,
-      });
-      this.logger.info('Conexão ao website concluido.');
-      cookies = objResponse.cookies;
-      cookies = cookies.map((element) => {
-        return element.replace(/;.*/, '');
-      });
-      cookies = cookies.join('; ');
-      headers['Cookie'] = cookies;
-
-      this.logger.info('Consultando uuid.');
-      uuidCaptcha = await this.getCaptchaUuid(cookies);
-      this.logger.info('Uuid recuperado.');
-
-      do {
-        this.logger.info('Preparando para resolver captcha');
-        gResponse = await this.getCaptcha();
-        this.logger.info('Captcha resolvido');
-
-        this.logger.info('Preparando para acessar site do processo.');
-
-        if (this.instancia === 1) {
-          url = `${this.url}/show.do?processo.codigo=2B0000W8N0000&processo.foro=${this.detalhes.origem}&processo.numero=${this.detalhes.numeroProcessoMascara}&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-        } else {
-          url = `${
-            this.url
-          }/search.do?conversationId=&paginaConsulta=0&cbPesquisa=NUMPROC&numeroDigitoAnoUnificado=${this.detalhes.numeroProcessoMascara.slice(
-            0,
-            15
-          )}&foroNumeroUnificado=${
-            this.detalhes.origem
-          }&dePesquisaNuUnificado=${
-            this.detalhes.numeroProcessoMascara
-          }&dePesquisaNuUnificado=UNIFICADO&dePesquisa=&tipoNuProcesso=UNIFICADO&uuidCaptcha=${uuidCaptcha}&g-recaptcha-response=${gResponse}`;
-        }
-
-        console.log(url);
-        console.log(cookies);
-
-        this.logger.info(`Acessando o site. [Tentativa: ${tentativas + 1}]`);
-        objResponse = await this.robo.acessar({
-          url: url,
-          method: 'GET',
-          encoding: 'latin1',
-          headers: headers,
-          usaProxy: true,
-        });
-        const $ = cheerio.load(objResponse.responseBody);
-        // verifica se há uma tabela de movimentação dentro da pagina.
-        if ($('#tabelaTodasMovimentacoes').length === 0) {
-          this.logger.info(
-            `Não foi possivel acessar a pagina do processo [Tentativas: ${
-              tentativas + 1
-            }]`
-          );
-          tentativas = tentativas++;
-        } else {
-          this.logger.info(
-            `Pagina capturada com sucesso. [Tentativas: ${tentativas + 1}]`
-          );
-          this.logger.info('Iniciando processo de extração.');
-          extracao = await this.parser.parse(objResponse.responseBody, this.instancia);
-          this.logger.info('Processo de extração concluído.');
-          this.logger.info('Iniciando salvamento de Andamento');
-          await Andamento.salvarAndamentos(extracao.andamentos);
-          this.logger.info('Andamentos salvos');
-
-          this.logger.info('Iniciando salvamento do Processo');
-          resultado = await extracao.processo.salvar();
-          this.logger.info(
-            `Processo: ${this.numeroDoProcesso} salvo | Quantidade de andamentos: ${extracao.andamentos.length}`
-          );
-
-          return {
-            sucesso: true,
-            numeroDoProcesso: this.numeroDoProcesso,
-            resultado: resultado,
-            detalhes: '',
-            logs: this.logger.logs,
-          };
-        }
-      } while (tentativas < limite);
-      this.logger.info(`Tentativas de conexão excederam ${limite} tentativas.`);
-      return {
-        sucesso: false,
-        numeroDoProcesso: this.numeroDoProcesso,
-        logs: this.logger.logs,
-      };
-    } catch (err) {
-      this.logger.log('error', err);
-      return {
-        sucesso: false,
-        numeroDoProcesso: this.numeroDoProcesso,
-        detalhes: typeof err,
-        logs: this.logger.logs,
-      };
+    this.resposta = {
+      sucesso: false,
+      resultado: null,
+      detalhes: null,
+      logs: null
     }
   }
 
-  async getCaptchaUuid(cookies) {
+  async extrair(numeroProcesso, numeroOab) {
+    const nomeRobo = 'ProcessoTJSC';
+    this.numeroOab = numeroOab;
+    this.numeroProcesso = numeroProcesso;
+    this.detalhes = Processo.identificarDetalhes(numeroProcesso);
+
+    this.logger = new Logger('info', `logs/TJSC/${nomeRobo}.log`, {
+      nomeRobo: nomeRobo,
+      NumeroDoProcesso: this.numeroProcesso
+    });
+
+    let tentativas = 0;
+    const limite = 5;
+
+    try {
+
+      await this.fazerPrimeiroAcesso();
+      let uuidCaptcha = await this.consultarUuid();
+
+      do {
+        let captchaString = await this.resolveCaptcha();
+        let objResponse = await this.consultarProcesso(uuidCaptcha, captchaString);
+        let avaliacao = await this.avaliaPagina(objResponse.responseBody);
+
+        if (!avaliacao.sucesso && avaliacao.causa === 'Erro de acesso') {
+          this.logger.info(paginaReturn.detalhes);
+          tentativa++;
+          continue;
+        }
+
+        this.logger.info('Pagina capturada com sucesso');
+        this.logger.info('Iniciando processo de extração');
+        let extracao = await this.parser.parse(objResponse.responseBody);
+
+        this.logger.info('Processo de extração concluido');
+        this.logger.info(`Andamentos recuperados: ${extracao.andamentos.length}`);
+
+        let resultado = await this.salvarProcessos(extracao.processo, extracao.andamentos);
+
+        this.resposta = {
+          sucesso: true,
+          resultado: resultado,
+          detalhes: '',
+        }
+
+        break;
+      } while(tentativas <= limite)
+
+      if (tentativas === limite){
+        throw new Error('Não foi possivel recuperar o processo com 5 tentativas');
+      }
+    } catch (e) {
+      console.log(e)
+      this.logger.log('error', `${e}`);
+      this.resposta.sucesso = false;
+      this.resposta.detalhes = e.message;
+    }
+    finally {
+      this.resposta.logs = this.logger.logs;
+      return this.resposta;
+    }
+  }
+
+  async fazerPrimeiroAcesso() {
+    this.logger.info('Fazendo primeira conexão.');
+
+    let url = `${this.url}/open.do`;
+
+    let objResponse = await this.robo.acessar({
+      url: url,
+      method: 'GET',
+      proxy: proxy
+    });
+
+    let regexErroBanco = /Erro\sao\sestabelecer\suma\sconexão\scom\so\sbanco\sde\sdados/;
+
+    if (regexErroBanco.test(objResponse.responseBody)) {
+      console.log('===============Pagina com erro com o banco===============');
+      process.exit(0);
+    }
+
+    if (objResponse.status === 500) {
+      console.log('===============Pagina com status 500===============');
+      process.exit(0);
+    }
+
+    return objResponse;
+  }
+
+  async consultarUuid() {
+    this.logger.info(`Recuperando UUID`);
     let objResponse;
+
     objResponse = await this.robo.acessar({
       url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
-      encoding: 'latin1',
-      usaProxy: true,
-      headers: {
-        Cookie: cookies,
-      },
-    });
+      encoding: 'utf8',
+      proxy: proxy
+    })
+
     return objResponse.responseBody.uuidCaptcha;
   }
 
-  async getCaptcha() {
-    const captchaHandler = new CaptchaHandler(5, 5000, 'ProcessoTJSC', {
-      numeroDoProcesso: this.numeroDoProcesso,
-    });
-    let captcha;
-    captcha = await captchaHandler
-      .resolveRecaptchaV2(
-        // captcha = await antiCaptchaHandler(
-        `${this.url}/open.do`,
-        this.dataSiteKey,
-        '/'
-      )
-      .catch((error) => {
-        throw error;
-      });
+  async resolveCaptcha() {
+    this.logger.info('Tentando resolver captcha');
+    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJSC', {numeroDoProcesso: this.numeroProcesso});
 
-    if (!captcha.sucesso) {
-      throw new AntiCaptchaResponseException(
-        'Falha na resposta',
-        'Nao foi possivel recuperar a resposta para o captcha'
-      );
-    }
+    let captcha = await ch.resolveRecaptchaV2(`${this.url}/open.do`, this.dataSiteKey, '/');
+
+    if (!captcha.sucesso)
+      throw new Error('Falha ao tentar resolver captcha');
 
     return captcha.gResponse;
+  }
+
+  async consultarProcesso(uuidCaptcha, gResponse) {
+    this.logger.info('Fazendo consulta a pagina do processo.')
+    let url = `${this.url}/search.do`;
+    let regex = /(\d+)-(\d{2}).(\d{4}).(\d).(\d{2}).(\d{4})/
+
+    let queryString = {
+      conversationId:"",
+      cbPesquisa: "NUMPROC",
+      numeroDigitoAnoUnificado: this.numeroProcesso.replace(regex, "$1-$2.$3"),
+      foroNumeroUnificado: this.numeroProcesso.replace(regex, '$6'),
+      "dadosConsulta.valorConsultaNuUnificado": this.numeroProcesso,
+      "dadosConsulta.valorConsulta":"",
+      "dadosConsulta.tipoNuProcesso": "UNIFICADO",
+      uuidCaptcha: uuidCaptcha,
+      "g-recaptcha-response": gResponse
+    }
+
+    return await this.robo.acessar({
+      url,
+      method:'GET',
+      proxy,
+      encoding: 'utf8',
+      queryString
+    });
+  }
+
+  async avaliaPagina(body) {
+    const $ = cheerio.load(body);
+    const mensagemRetornoSelector = '#mensagemRetorno';
+    let mensagemRetornoText = $(mensagemRetornoSelector).text();
+    const tableMovimentacoesSelector = '#tabelaTodasMovimentacoes';
+    const senhaProcessoSelector = '#senhaProcesso';
+
+    const regexErroInfo = /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/;
+
+    if (regexErroInfo.test(mensagemRetornoText)){
+      this.logger.info('Não existem informações disponíveis para o processo informado');
+      throw new Error('Processo não encontrado');
+    }
+
+    if ($(senhaProcessoSelector).length && $(tableMovimentacoesSelector).length === 0){
+      this.logger.info('Se for uma parte ou interessado, digite a senha do processo');
+      throw new Error('Senha necessária');
+    }
+
+    if($(tableMovimentacoesSelector).length === 0)
+      return {
+        sucesso: false,
+        causa: 'Erro de acesso',
+        detalhes: 'Não foi encontrada a tabela de movimentações'
+      }
+
+    return {sucesso: true}
+  }
+
+  async salvarProcessos(processo, andamentos) {
+    this.logger.info('Iniciando salvamento de andamentos');
+    await Andamento.salvarAndamentos(andamentos);
+    this.logger.info('Andamentos salvos');
+
+    this.logger.info('Iniciando salvamento do processo');
+    let resultado = await processo.salvar();
+    this.logger.info(`Processo: ${this.numeroProcesso} | Andamentos: ${andamentos.length}`);
+
+    return resultado;
   }
 }
 

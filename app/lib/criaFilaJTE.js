@@ -13,9 +13,59 @@ const util = new Cnj();
 
 
 class CriaFilaJTE {
+	/**
+	 * Busca dados de comarca de um dado estado.
+	 * @param {string} codigo Numero do estado 
+	 * @returns {Array} C	omarcas com detalhes do ultimo processo baixado.
+	 */
 	static async getEstado(codigo) {
 		return await statusEstadosJTE.find({ "estadoNumero": codigo })
 	}
+
+	/**
+	 * Obtem dados do ultimo processo de mesma comarca/Estado do processo pesquisado. 
+	 * @param {String} cnj numero processo qualquer
+	 */
+	static async getComarca(cnj) {
+		let detalhes = Cnj.processoSlice(cnj);
+		return await statusEstadosJTE.find({
+			"estadoNumero": detalhes.estado,
+			"comarca": detalhes.comarca
+		})
+	}
+
+	/**
+	 * Compara se o numero de cnj e o ultimo processo de mesma comarca possuiem um fork de numeração.
+	 * @param {*} cnj numero processo qualquer
+	 */
+	static async verificaSequencial(cnj) {
+		let get = await CriaFilaJTE.getComarca(cnj);
+		let retornos = [];
+		get.map(x => {
+			let { numeroUltimoProcecesso } = x;
+			let sequencial = Cnj.processoSlice(numeroUltimoProcecesso).sequencial;
+			let sequencial_1 = Cnj.processoSlice(cnj).sequencial;
+			console.log(sequencial_1, sequencial);
+			let teste = sequencial_1 - sequencial;
+
+			console.log(teste);
+			if (teste > 1000) {
+				retornos.push(true);
+			} else {
+				retornos.push(false);
+			}
+		})
+		// localizar um false o retorno final é false => se todos os retornos forem true o retorno é true
+		console.log(retornos);
+		console.log(retornos.indexOf(false));
+		let index = retornos.indexOf(false);
+		if (index >= 0) {
+			return false
+		} else {
+			return true
+		}
+	}
+
 	static async updateEstado(id, update = { status: 'Atualizado' }) {
 		let find = { _id: id };
 		// let update = { status: 'Atualizado2' };
@@ -23,20 +73,42 @@ class CriaFilaJTE {
 		return await statusEstadosJTE.findOneAndUpdate(find, update)
 	}
 
-	async salvaStatusComarca(numero, data, raspagem, buscaProcesso) {
+	async salvaStatusComarca(numero, data, raspagem, buscaProcesso, estado) {
+		console.log(numero, data, raspagem, buscaProcesso, estado);
 		let cnj = Cnj.processoSlice(numero);
 		let busca = buscaProcesso;
 		let verifica = await statusEstadosJTE.find(busca);
-		let estado = "";
+		// let estado = "";
 		let estadoNumero = cnj.estado;
+		// let dataAtualizacao = new Date();
 		let comarca = cnj.comarca;
 		let status = "Novo";
-		let dataBusca = { dia: this.relogio().dia, mes: this.relogio().mes }
+		let dataBusca = new Date();
 		let dataCriaçãoJTE = data;
 		let numeroUltimoProcecesso = numero;
-		let ano = cnj.ano
-
-		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano};
+		let ano = cnj.ano;
+		let verificaSequencial = await CriaFilaJTE.verificaSequencial(numero);
+		console.log(verificaSequencial);
+		if (verificaSequencial) {
+			let getComarca = await statusEstadosJTE.find({
+				"estadoNumero": cnj.estado,
+				"comarca": cnj.comarca,
+				"ano": new Date().getFullYear()
+			})
+			console.log(getComarca);
+			if (getComarca.length == 1) {
+				estado = "fork-1"
+			} else {
+				estado = `fork-${getComarca.length}`
+			}
+			// estado = "1"		} else {
+			// estado = "Principal"
+		}
+		console.log(estado);
+		busca.estado = estado;
+		console.log(busca);
+		// process.exit();
+		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano };
 
 		if (cnj.sequencial == "0000000") {
 
@@ -46,22 +118,31 @@ class CriaFilaJTE {
 
 				await new statusEstadosJTE(obj2).save()
 			} else {
-				await statusEstadosJTE.findOneAndUpdate(busca, obj2)
+				await statusEstadosJTE.findOneAndUpdate(busca, obj2, {
+					new: true,
+					upsert: true // Make this update into an upsert
+				})
 			}
-
 		} else if (verifica.length == 0) {
 			await new statusEstadosJTE(obj).save()
 		} else if (raspagem == true) {
 			status = "Ultimo Processo";
 			let obj2 = { status, dataBusca };
 			console.log("-------- update -------------");
-			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
+			await statusEstadosJTE.findOneAndUpdate(busca, obj2, {
+				new: true,
+				upsert: true // Make this update into an upsert
+			})
 		} else {
 			status = "Atualizado";
-			let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano};
+			let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano };
 			console.log("-------- update -------------");
-			await statusEstadosJTE.findOneAndUpdate(busca, obj2)
+			await statusEstadosJTE.findOneAndUpdate(busca, obj2, {
+				new: true,
+				upsert: true // Make this update into an upsert
+			})
 		}
+		process.exit();
 
 		function novoSequencial(numero) {
 			let resultado;
@@ -79,6 +160,7 @@ class CriaFilaJTE {
 
 			return resultado
 		}
+
 	}
 
 	enviarMensagem(nome, message) {
@@ -150,8 +232,11 @@ class CriaFilaJTE {
 	 * @param {string} fila fila que receberá a mensagem.
 	 * @return {string} Retorna um Array de numeros CNJ para serem buscados
 	 */
-	procura(sequencial, origem, tentativas, tribunal, fila) {
+	procura(sequencial, origem, tentativas, tribunal, estado) {
 		// console.log(sequencial, origem, tentativas, tribunal);
+		if (estado == "") {
+			estado = "Principal";
+		}
 		let mensagens = [];
 		try {
 			let obj = corrigeSequencial(sequencial)
@@ -167,7 +252,7 @@ class CriaFilaJTE {
 				} else {
 					processo = `${obj.zero}${a}00${new Date().getFullYear()}5${tribunal}${origem}`
 				}
-				mensagens.push(criaPost(processo));
+				mensagens.push(criaPost(processo, estado));
 
 			}
 			return mensagens
@@ -333,8 +418,8 @@ function corrigeOrigem(origem) {
  * Cria Mensagem para ser enviada ao rabbit
  * @param {string} numero Numero CNJ que será usado para criar mensagem
  */
-function criaPost(numero) {
-	let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true}`;
+function criaPost(numero, estado) {
+	let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true, "estado":"${estado}"}`;
 	return post
 }
 

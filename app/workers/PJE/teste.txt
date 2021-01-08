@@ -1,0 +1,28 @@
+Payload
+70 bytes
+Encoding: string
+{"NumeroProcesso":"00100037620215150085","instancia":1,"inicial":true}
+Message 2
+The server reported 1 messages remaining.
+
+Exchange	(AMQP default)
+Routing Key	peticao.JTE.extracao.15
+Redelivered	○
+Properties	
+headers:	
+Payload
+70 bytes
+Encoding: string
+{"NumeroProcesso":"00100043520215150126","instancia":1,"inicial":true}
+Message 3
+The server reported 0 messages remaining.
+
+Exchange	(AMQP default)
+Routing Key	peticao.JTE.extracao.15
+Redelivered	○
+Properties	
+headers:	
+Payload
+70 bytes
+Encoding: string
+{"NumeroProcesso":"00100016320215150067","instancia":1,"inicial":true}

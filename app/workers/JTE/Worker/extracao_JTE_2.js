@@ -26,7 +26,7 @@ const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
 // Filas a serem usadas
-const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.2`;
+const nomeFila = `aaa-teste-${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.2`;
 const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.2`;
 
 var estadoAnterior;   // Recebe o estado atual que está sendo baixado
@@ -212,7 +212,7 @@ async function worker() {
           let dataAtualProcesso = dadosProcesso.processo.capa.dataDistribuicao;
           let cnj = Cnj.processoSlice(numeroAtualProcesso);
           let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca, "ano": cnj.ano  };
-          await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso);
+          await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso, message.estado );
 
           // Enviando para Collection de controle *ultimosProcessos*
           // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {

@@ -39,6 +39,7 @@ class CriaFilaJTE {
 	 * @param {*} cnj numero processo qualquer
 	 */
 	static async verificaSequencial(cnj) {
+		try{
 		let get = await CriaFilaJTE.getComarca(cnj);
 		let retornos = [];
 		get.map(x => {
@@ -64,6 +65,7 @@ class CriaFilaJTE {
 		} else {
 			return true
 		}
+	}catch(e){}
 	}
 
 	static async updateEstado(id, update = { status: 'Atualizado' }) {
@@ -113,7 +115,7 @@ class CriaFilaJTE {
 		if (cnj.sequencial == "0000000") {
 
 			status = "Não possui processos";
-			let obj2 = { status, estadoNumero, comarca, dataBusca, numeroUltimoProcecesso };
+			let obj2 = { status, estadoNumero, comarca, dataBusca, numeroUltimoProcecesso, ano };
 			if (verifica.length == 0) {
 
 				await new statusEstadosJTE(obj2).save()
@@ -126,23 +128,46 @@ class CriaFilaJTE {
 		} else if (verifica.length == 0) {
 			await new statusEstadosJTE(obj).save()
 		} else if (raspagem == true) {
+			let buscaUltimo = {
+				estado, estadoNumero, comarca, ano
+			}
+			console.log(buscaUltimo);
 			status = "Ultimo Processo";
 			let obj2 = { status, dataBusca };
 			console.log("-------- update -------------");
-			await statusEstadosJTE.findOneAndUpdate(busca, obj2, {
-				new: true,
-				upsert: true // Make this update into an upsert
-			})
+			console.log(await statusEstadosJTE.findOne(buscaUltimo));
+			await statusEstadosJTE.findOneAndUpdate(buscaUltimo, obj2)
 		} else {
-			status = "Atualizado";
-			let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano };
-			console.log("-------- update -------------");
-			await statusEstadosJTE.findOneAndUpdate(busca, obj2, {
-				new: true,
-				upsert: true // Make this update into an upsert
-			})
+			// verifica se o numero atual não é menor do que o registrado.
+			if (verificaUltimo(estado, estadoNumero, comarca, numeroUltimoProcecesso, ano)) {
+				status = "Atualizado";
+				let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano };
+				console.log("-------- update -------------");
+				await statusEstadosJTE.findOneAndUpdate(busca, obj2, {
+					new: true,
+					upsert: true // Make this update into an upsert
+				})
+			}
 		}
-		process.exit();
+		// process.exit();
+
+		async function verificaUltimo(estado, estadoNumero, comarca, numeroUltimoProcecesso, ano) {
+			try {
+				let busca = await statusEstadosJTE.findOne({ estado, estadoNumero, comarca, ano });
+				let sequencial1 = Cnj.processoSlice(busca.numeroUltimoProcecesso).sequencial;
+				let sequencial2 = Cnj.processoSlice(numeroUltimoProcecesso).sequencial;
+				if (sequencial2 < sequencial1) {
+					return true
+				} else {
+					return false
+				}
+			} catch (e) {
+				// caso seja o 1 processo da comarca o retorno da busca e um erro,
+				// nesse caso tenho que possuir retorno true para salvar o 1 processo.
+				return true
+			}
+		}
+
 
 		function novoSequencial(numero) {
 			let resultado;
@@ -233,6 +258,11 @@ class CriaFilaJTE {
 	 * @return {string} Retorna um Array de numeros CNJ para serem buscados
 	 */
 	procura(sequencial, origem, tentativas, tribunal, estado) {
+		console.log(sequencial, "aqui");
+		if (sequencial == "0000000") {
+			sequencial = "0000000"
+		}
+		console.log(sequencial, "2");
 		// console.log(sequencial, origem, tentativas, tribunal);
 		if (estado == "") {
 			estado = "Principal";
@@ -245,7 +275,9 @@ class CriaFilaJTE {
 			origem = corrigeOrigem(origem)
 			for (let i = 0; i < tentativas; i++) {
 				sequencial = parseInt(obj.seq)
+				// console.log(sequencial);
 				let a = sequencial + 1 + i
+				// console.log(a);
 				if ((obj.zero + a).length > 7) {
 					zeros = obj.zero.substr(1)
 					processo = `${zeros}${a}00${new Date().getFullYear()}5${tribunal}${origem}`
@@ -389,6 +421,10 @@ class CriaFilaTRT {
 
 
 function corrigeSequencial(sequencial) {
+	// console.log(sequencial);
+	if (sequencial == "0000000") {
+		return obj = { seq: "0", zero: "000000" }
+	}
 	let novoSequencial = sequencial
 	let zero = ''
 	for (let i = 0; i < sequencial.length; i++) {
@@ -399,6 +435,7 @@ function corrigeSequencial(sequencial) {
 			break
 		};
 	}; let seq = novoSequencial;
+	// console.log({ seq, zero });
 	return obj = { seq, zero }
 }
 function corrigeOrigem(origem) {

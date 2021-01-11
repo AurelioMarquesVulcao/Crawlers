@@ -26,7 +26,10 @@ var desligado = desligar.worker;
 (async () => {
   let teste = "0036";
   console.log(!/-/.test(teste));
-  let estados = ["05", "01", "02", "03", "04", "06", "07", "08", '09', "10", "11", "12", "13", "14", "15", "16", "17", "18", '19', "20", "21", "22", "23", "24"];
+  let estados = [
+    "05", 
+    // "01", "02", "03", "04", "06", "07", "08", '09', "10", "11", "12", "13", "14", "15", "16", "17", "18", '19', "20", "21", "22", "23", "24"
+  ];
   for (let i = 0; i < estados.length; i++) {
     await estado(estados[i]);
   }
@@ -95,6 +98,7 @@ async function rastreio(tribunal, comarca) {
       "comarca": `${comarcaF}`,
     }
     let updatef = {
+      estado: "Principal",
       numeroUltimoProcecesso: number,
       status: 'Atualizado',
       ano: anoF

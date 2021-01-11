@@ -159,7 +159,7 @@ async function atualizaStatusDownload(estado, relogio) {
 
 function extraiDados(comarcas) {
   return comarcas.map(x => {
-    if (new Date().getDay() == "1" && new Date().getMonth() == "11") {
+    if (new Date().getDay() == "1" && new Date().getMonth() == "1") {
     // if (true){
       if (x.status != 'Ultimo Processo') {
         return {

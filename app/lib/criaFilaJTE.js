@@ -109,6 +109,7 @@ class CriaFilaJTE {
 		console.log(estado);
 		busca.estado = estado;
 		console.log(busca);
+		// console.log(verifica);
 		// process.exit();
 		let obj = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano };
 
@@ -120,16 +121,13 @@ class CriaFilaJTE {
 
 				await new statusEstadosJTE(obj2).save()
 			} else {
-				await statusEstadosJTE.findOneAndUpdate(busca, obj2, {
-					new: true,
-					upsert: true // Make this update into an upsert
-				})
+				await statusEstadosJTE.findOneAndUpdate(busca, obj2)
 			}
 		} else if (verifica.length == 0) {
 			await new statusEstadosJTE(obj).save()
 		} else if (raspagem == true) {
 			let buscaUltimo = {
-				estado, estadoNumero, comarca, ano
+				estado, estadoNumero, comarca
 			}
 			console.log(buscaUltimo);
 			status = "Ultimo Processo";
@@ -143,10 +141,7 @@ class CriaFilaJTE {
 				status = "Atualizado";
 				let obj2 = { estado, estadoNumero, comarca, status, dataBusca, dataCriaçãoJTE, numeroUltimoProcecesso, ano };
 				console.log("-------- update -------------");
-				await statusEstadosJTE.findOneAndUpdate(busca, obj2, {
-					new: true,
-					upsert: true // Make this update into an upsert
-				})
+				await statusEstadosJTE.findOneAndUpdate(busca, obj2)
 			}
 		}
 		// process.exit();

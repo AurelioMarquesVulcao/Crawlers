@@ -11,13 +11,13 @@ const { Helper, Logger, Cnj } = require('../../../lib/util');
 const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 const { GerenciadorFila } = require("../../../lib/filaHandler");
 const awaitSleep = require("await-sleep");
-const {statusEstadosJTE} = require("../../../models/schemas/jte");
+const {statusEstadosJTE} = require("../../../models/schemas/jte")
 
 
 const Fila = new CriaFilaJTE();
 const rabbit = new GerenciadorFila();
-var fila = ".4";  // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos.4';
+var fila = ".1";  // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos.1';
 var desligado = desligar.worker;
 
 
@@ -29,8 +29,8 @@ var desligado = desligar.worker;
   const variaveis = await Variaveis.catch({ "codigo": "000001" });
   const Estados = variaveis.variaveis;
   var estados = [
-    Estados[0].rs, Estados[0].pe, Estados[0].ce, Estados[0].pa,
-    Estados[0].to, Estados[0].am, Estados[0].sc, Estados[0].ac, Estados[0].pb,
+    Estados[0].rj,
+    // Estados[0].sp2,
   ];
 
   embaralha(estados)
@@ -56,9 +56,9 @@ var desligado = desligar.worker;
     for (let w = 0; w < 1;) {
       let mensagens = [];
       let relogio = Fila.relogio();
-      let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
+      // let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
-      // await atualizaStatusDownload(estados[contador].codigo, relogio);
+      await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);
       // console.log(comarcas);
@@ -66,8 +66,7 @@ var desligado = desligar.worker;
       // process.exit();
       // let status = comarcas.filter(x => x.ano == '2021' || x.status == 'Atualizado' || x.status == 'Novo');
       let status = comarcas.filter(x => x.status == 'Atualizado' || x.status == 'Novo');
-      console.log(status);
-      // process.exit()
+      // console.log(status);
       // Pega apenas as comarcas que não são ultimo estado
       let processos = extraiDados(status);
       // console.log(comarcas);
@@ -107,7 +106,7 @@ var desligado = desligar.worker;
         // let find 
         // await statusEstadosJTE.findOneAndUpdate(find, update)
         // process.exit()
-        // mensagens.length = 8
+        mensagens.length = 8
         await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
         mensagens = [];
       }
@@ -127,25 +126,25 @@ async function atualizaStatusDownload(estado, relogio) {
   let comarcas = await CriaFilaJTE.getEstado(estado);
   // new Date().getMonth()
   let desatualizadas = comarcas.filter(
-    // async x => {
-      // //  este try => trata as comarcas na virada do ano
-      // try {
-      //   x.dataBusca.getDay()
-      // } catch (e) {
-      //   let id = x._id;
-      //   let find = { "_id": id };
-      //   let update = {
-      //     estado: "Principal",
-      //     status: 'Atualizado',
-      //     dataBusca: new Date(),
-      //     ano: new Date().getFullYear()
-      //   };
-      //   await statusEstadosJTE.findOneAndUpdate(find, update)
-      // }
-      // console.log(x);
-      x => x.dataBusca.getDay() < new Date().getDay() || x.dataBusca.getMonth() < new Date().getMonth()
+    async x => {
+      //  este try => trata as comarcas na virada do ano
+      try {
+        x.dataBusca.getDay()
+      } catch (e) {
+        let id = x._id;
+        let find = { "_id": id };
+        let update = {
+          estado: "Principal",
+          status: 'Atualizado',
+          dataBusca: new Date(),
+          ano: new Date().getFullYear()
+        };
+        await statusEstadosJTE.findOneAndUpdate(find, update)
+      }
+      console.log(x);
+      return x.dataBusca.getDay() < new Date().getDay() || x.dataBusca.getMonth() < new Date().getMonth()
 
-    // }
+    }
   );
   // console.log(desatualizadas);
   if (desatualizadas.length != 0) {
@@ -159,8 +158,7 @@ async function atualizaStatusDownload(estado, relogio) {
 
 function extraiDados(comarcas) {
   return comarcas.map(x => {
-    // if (new Date().getDay() == "11" && new Date().getMonth() == "11") {
-    if (true){
+    if (new Date().getDay() == "11" && new Date().getMonth() == "11") {
       if (x.status != 'Ultimo Processo') {
         return {
           numero: Cnj.processoSlice(x.numeroUltimoProcecesso),

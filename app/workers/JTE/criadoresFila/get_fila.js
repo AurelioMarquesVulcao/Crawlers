@@ -12,7 +12,8 @@ module.exports.getFilas = async () => {
                 qtdConsumo: fila.messages_unacknowledged
 
             }
-        }).filter(x => x.qtd == 0 && x.status == 'Aguardando' && /^processo\.jte\.extracao/i.test(x.nome))
+            // }).filter(x => x.qtd == 0 && x.status == 'Aguardando' && /^processo\.jte\.extracao/i.test(x.nome))
+        }).filter(x => x.qtd < 1 && /^processo\.jte\.extracao/i.test(x.nome))
     })
 }
 

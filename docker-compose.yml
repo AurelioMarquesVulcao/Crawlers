@@ -465,8 +465,7 @@ services:
       file: common-services.yml
       service: base_node
     build:
-      context: ./
-      dockerfile: dockerfile-node
+      dockerfile: Dockerfile
     restart: always
     command: pm2 start controller/limpaCoreDocker.js --no-daemon 
     logging:

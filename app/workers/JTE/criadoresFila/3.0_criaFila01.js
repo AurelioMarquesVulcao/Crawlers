@@ -136,7 +136,7 @@ async function atualizaStatusDownload(estado, relogio) {
   let comarcas = await CriaFilaJTE.getEstado(estado);
   // new Date().getMonth()
   let validaData = comarcas.filter(x => x.dataBusca);
-  let desatualizadas = comarcas.filter(x =>
+  let desatualizadas = validaData.filter(x =>
     x.dataBusca.getDay() < new Date().getDay() || x.dataBusca.getMonth() < new Date().getMonth()
   );
   // console.log(desatualizadas);

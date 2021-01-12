@@ -32,6 +32,7 @@ class downloadFiles {
 
     logger.info('Url recebida iniciando o download.');
     try {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
       const url = link;
       const path = Path.resolve(__dirname, local, name);
       const response = await Axios({
@@ -56,6 +57,7 @@ class downloadFiles {
         });
       });
     } catch (e) {
+      console.log(e);
       console.log('erro no Download');
     }
   }

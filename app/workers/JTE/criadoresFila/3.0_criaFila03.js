@@ -57,7 +57,7 @@ var desligado = desligar.worker;
     for (let w = 0; w < 1;) {
       let mensagens = [];
       let relogio = Fila.relogio();
-      // let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
+      let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
       // await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas

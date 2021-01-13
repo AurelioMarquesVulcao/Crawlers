@@ -76,5 +76,6 @@ let tribunaisCodigo = {
   '8.06': 'TJCE',
   '8.19': 'TJRJ',
   '8.21': 'TJRS',
+  '8.24': 'TJSC',
   '8.26': 'TJSP',
 }

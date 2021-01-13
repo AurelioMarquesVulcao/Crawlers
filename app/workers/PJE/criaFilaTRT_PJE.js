@@ -109,7 +109,7 @@ class CriaFilaPJE {
         }
       },
       { $sort: { _id: -1 } },
-      { $limit: 30 }
+      { $limit: 100 }
     ]).skip(pulo);
     // console.log(agregar);
     // process.exit()

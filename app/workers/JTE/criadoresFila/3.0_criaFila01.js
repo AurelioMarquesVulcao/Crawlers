@@ -93,10 +93,10 @@ var desligado = desligar.worker;
             // console.log(x);
             if (x.numero.sequencial != "0000001") {
               let sequencial = trataSequencial(x)
-              console.log(sequencial);
+              // console.log(sequencial);
 
               let arrayMensages = Fila.procura(sequencial, x.numero.comarca, 4, x.numero.estado, x.estado)
-              console.log(arrayMensages);
+              // console.log(arrayMensages);
               // process.exit()
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
@@ -105,7 +105,7 @@ var desligado = desligar.worker;
           } else {
 
             let arrayMensages = Fila.procura(x.numero.sequencial, x.numero.comarca, 4, x.numero.estado, x.estado)
-            console.log(arrayMensages);
+            // console.log(arrayMensages);
             for (let ii = 0; ii < arrayMensages.length; ii++) {
               mensagens.push(arrayMensages[ii]);
             }

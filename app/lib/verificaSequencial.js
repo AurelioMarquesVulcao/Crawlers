@@ -92,7 +92,7 @@ class Verificador {
 		let sequencial = [];
 		let busca = await Processo.aggregate([{
 			$match: {
-				"detalhes.ano": 2020,
+				"detalhes.ano": new Date().getFullYear(),
 				"detalhes.orgao": 5,
 				"detalhes.tribunal": tribunal,
 				"detalhes.origem": comarca,

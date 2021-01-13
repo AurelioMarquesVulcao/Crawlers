@@ -22,6 +22,25 @@ class CriaFilaJTE {
 		return await statusEstadosJTE.find({ "estadoNumero": codigo })
 	}
 
+	static async ajusta(codigo) {
+		let dados = (await statusEstadosJTE.find({}))
+			.filter(x =>x.estadoNumero != "51" && x.estadoNumero != "50")
+		for (let i = 0; i < dados.length; i++) {
+			let obj = {
+				"estado": "Principal",
+				// dataCriaçãoJTE: new Date(),
+				// "dataBusca" : new Date(),
+				// status: 'Atualizado',
+				// ano: "2021"
+				// numeroUltimoProcecesso:`10000006620215${dados[i].estadoNumero}${dados[i].comarca}`
+			}
+			console.log(await await statusEstadosJTE.findOneAndUpdate({ _id: dados[i]._id },obj));
+			console.log(dados[i]);
+		}
+
+		// console.log(dados);
+	}
+
 	/**
 	 * Obtem dados do ultimo processo de mesma comarca/Estado do processo pesquisado. 
 	 * @param {String} cnj numero processo qualquer
@@ -39,33 +58,33 @@ class CriaFilaJTE {
 	 * @param {*} cnj numero processo qualquer
 	 */
 	static async verificaSequencial(cnj) {
-		try{
-		let get = await CriaFilaJTE.getComarca(cnj);
-		let retornos = [];
-		get.map(x => {
-			let { numeroUltimoProcecesso } = x;
-			let sequencial = Cnj.processoSlice(numeroUltimoProcecesso).sequencial;
-			let sequencial_1 = Cnj.processoSlice(cnj).sequencial;
-			console.log(sequencial_1, sequencial);
-			let teste = sequencial_1 - sequencial;
+		try {
+			let get = await CriaFilaJTE.getComarca(cnj);
+			let retornos = [];
+			get.map(x => {
+				let { numeroUltimoProcecesso } = x;
+				let sequencial = Cnj.processoSlice(numeroUltimoProcecesso).sequencial;
+				let sequencial_1 = Cnj.processoSlice(cnj).sequencial;
+				console.log(sequencial_1, sequencial);
+				let teste = sequencial_1 - sequencial;
 
-			console.log(teste);
-			if (teste > 1000) {
-				retornos.push(true);
+				console.log(teste);
+				if (teste > 1000) {
+					retornos.push(true);
+				} else {
+					retornos.push(false);
+				}
+			})
+			// localizar um false o retorno final é false => se todos os retornos forem true o retorno é true
+			console.log(retornos);
+			console.log(retornos.indexOf(false));
+			let index = retornos.indexOf(false);
+			if (index >= 0) {
+				return false
 			} else {
-				retornos.push(false);
+				return true
 			}
-		})
-		// localizar um false o retorno final é false => se todos os retornos forem true o retorno é true
-		console.log(retornos);
-		console.log(retornos.indexOf(false));
-		let index = retornos.indexOf(false);
-		if (index >= 0) {
-			return false
-		} else {
-			return true
-		}
-	}catch(e){}
+		} catch (e) { }
 	}
 
 	static async updateEstado(id, update = { status: 'Atualizado' }) {
@@ -496,4 +515,3 @@ module.exports.CriaFilaJTE = CriaFilaJTE;
 
 
 module.exports.linkDocumento1 = linkDocumento;
-

@@ -119,11 +119,11 @@ class Busca {
   static async buscaBigdata(tribunal) {
     let url = "http://172.16.16.3:8083/processos/obterUltimosSequenciaisPorUnidade";
     let resultado;
-    console.log(`${url}/?orgao=5&tribunal=${tribunal}&ano=2020`);
+    console.log(`${url}/?orgao=5&tribunal=${tribunal}&ano=${new Date().getFullYear()}`);
     console.log(" --------- Inicio da extração do estado --------- ");
     try {
       await Axios({
-        url: `${url}/?orgao=5&tribunal=${tribunal}&ano=2020`,
+        url: `${url}/?orgao=5&tribunal=${tribunal}&ano=${new Date().getFullYear()}`,
         method: 'post',
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
@@ -167,7 +167,7 @@ class Busca {
     let sequencial = this.completaNumero(ultimoSequencial, "ultimoSequencial");
     let tribunal = this.completaNumero(Tribunal, "Tribunal");
     let origem = this.completaNumero(unidadeOrigem, "unidadeOrigem");
-    return `${sequencial}0020205${tribunal}${origem}`
+    return `${sequencial}00${new Date().getFullYear()}5${tribunal}${origem}`
   }
 
   /**

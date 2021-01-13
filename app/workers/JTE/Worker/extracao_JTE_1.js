@@ -260,7 +260,7 @@ async function worker() {
         let numeroAtualProcesso = numeroProcesso;
         let dataAtualProcesso = "";
         let cnj = Cnj.processoSlice(numeroProcesso);
-        let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca, "ano": cnj.ano };
+        let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca, "estado" : status };
         await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, true, buscaProcesso, status);
       }
       // Salva meus erros nos logs

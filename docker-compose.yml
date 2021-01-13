@@ -294,7 +294,7 @@ services:
         max-size: "5m"
         max-file: "2"
 
-  worker-doc-01:
+  worker-jte-doc-links-01:
     extends:
       file: common-services.yml
       service: base_node

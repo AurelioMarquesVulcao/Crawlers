@@ -21,7 +21,8 @@ module.exports.enums = Object.freeze({
     JTE: 'JTE',
     TRTRJ: 'TRTRJ',
     TRTSP: 'PJE',
-    PJE: 'PJE'
+    PJE: 'PJE',
+    TJCE: 'TJCE'
   },
   tipoConsulta: {
     Oab: 'oab',

@@ -43,7 +43,7 @@ const { Cnj } = require('../lib/util');
         inicial: message.inicial
       }
 
-      new GerenciadorFila().enviarMensagem(ch, fila, novaMensagem.toString());
+      new GerenciadorFila().enviarMensagem(ch, fila, JSON.stringify(novaMensagem));
 
       console.log(`${numeroProcesso} => ${fila}`);
     } catch(e) {

@@ -198,18 +198,6 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSP/extracaoPeticao.js
 
-  # worker-tjsc-oab:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/TJSC/extracaoNovos.js
-
-  # worker-tjsc-processo:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/TJSC/extracaoProcesso.js
-
   tjrs-oab:
     extends:
       file: common-services.yml
@@ -253,7 +241,52 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: node workers/TJRS/extracaoPeticao.js\
+    command: node workers/TJRS/extracaoPeticao.js
+
+  tjce-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJCE/extracaoOab.js
+
+  tjce-processo-novo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJCE/processoNovo.js
+
+  tjce-processo-atualizacao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJCE/processoAtualizacao.js
+
+  tjce-comarcas:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJCE/extracaoComarcas.js
+
+  tjce-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
+    command: node workers/TJCE/extracaoPeticao.js
 
   novos-processos-jte-1:
     extends:

@@ -130,7 +130,7 @@ const { PeticaoTJSCEsaj } = require('../../extratores/PeticaoTJSCEsaj');
       }
 
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-      // ch.ack(msg);
+      ch.ack(msg);
       logger.info('Mensagem reconhecida');
       console.log('\n'+'='.repeat(process.stdout.columns)+'\n');
       await sleep(2000);

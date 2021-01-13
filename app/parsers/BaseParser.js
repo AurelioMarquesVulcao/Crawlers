@@ -28,6 +28,14 @@ module.exports.BaseParser = class BaseParser {
     this.jsonAdvogados = [];
     this.jsonAssuntos = [];
     this.jsonAndamentos = [];
+
+    this.possiveisStatusBaixa = [
+      'Arquivamento com baixa',
+      'Arquivado Definitivamente',
+      'Arquivamento',
+      'Baixa Definitiva'
+    ]
+
   }
 
   filtrarUnicosLista(lista) {

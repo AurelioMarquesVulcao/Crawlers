@@ -3,7 +3,7 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const sleep = require('await-sleep');
 const { CnjValidator } = require('../../lib/util');
-const { ProcessoTJRS } = require('../../extratores/ProcessoTJRS');
+const { ProcessoTJCE } = require('../../extratores/ProcessoTJCE');
 const Comarca = require('../../models/schemas/comarcas');
 const moment = require('moment');
 
@@ -17,12 +17,17 @@ const moment = require('moment');
     console.log(e);
   });
 
-  const nomeFila = 'comarcas.TJRS.extracao';
+  const nomeFila = 'comarcas.TJCE.extracao';
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     let message = JSON.parse(msg.content.toString());
     let comarca = new Comarca(message);
     console.table(message);
+
+    if (!/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/.test(message.UltimoProcesso)) {
+      message.UltimoProcesso = ('000000'+message.UltimoProcesso).slice(-20)
+      message.UltimoProcesso = message.UltimoProcesso.replace(/(\d{7})(\d{2})(\d{4})(\d)(\d{2})(\d{4})/, '$1-$2.$3.$4.$5.$6');
+    }
 
     await comarca.setStatus(2);
 
@@ -88,12 +93,11 @@ async function extrairNumeros(message, ultimo) {
   ultimoNumero = ultimoNumero.split(/\D/g);
 
   do {
-    let extrator = new ProcessoTJRS(
+    let extrator = new ProcessoTJCE(
       'https://www.tjrs.jus.br/site_php/consulta/index.php',
       false
     );
     sequencial = `${Number(ultimoNumero[0]) + count}`;
-    // console.log({ sequencial })
 
     let mod = CnjValidator.calcula_mod97(
       sequencial,
@@ -102,7 +106,7 @@ async function extrairNumeros(message, ultimo) {
       ultimoNumero[5]
     );
     numero = `${sequencial}-${mod}.${ultimoNumero[2]}.${ultimoNumero[3]}.${ultimoNumero[4]}.${ultimoNumero[5]}`;
-
+    numero = ('000000'+numero).slice(-25)
     extracao = await extrator.extrair(numero, null, 1);
 
     // console.log({ count, sequencial,ultimoNumero, numero, mod })
@@ -110,19 +114,11 @@ async function extrairNumeros(message, ultimo) {
     if (erroEncontrado && !extracao.sucesso) {
       return { continuar: false, ultimo: anterior, count: count - 1 };
     }
-    if (extracao.sucesso || extracao.detalhes === 'Senha necessaria') {
-      erroEncontrado = false;
-      anterior = numero;
-    }
+    if (extracao.sucesso) anterior = numero;
+    erroEncontrado = !extracao.sucesso;
 
-    // console.log({detalhes: extracao.detalhes});
-    // console.log({sucesso: extracao.sucesso});
-
-    if (!extracao.sucesso && (extracao.detalhes !== 'Senha necessaria'))
-      erroEncontrado = !extracao.sucesso;
-
-    // console.log({erroEncontrado})
     count++;
+    console.log('====== Passando ao proximo processo ======');
   } while (count < 5);
 
   return { continuar: true, ultimo: numero, count };

@@ -307,7 +307,7 @@ class PeticaoTJCE extends ExtratorPuppeteer {
 
     await this.page._client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
-      downloadPath: './temp/peticoes/tjce',
+      downloadPath: './downloads',
     });
 
     // Interceptando request
@@ -345,8 +345,8 @@ class PeticaoTJCE extends ExtratorPuppeteer {
    * @returns {Promise<unknown>}
    */
   async aguardaDownload() {
-    const path = `./temp/peticoes/tjce/${this.numeroProcesso}.pdf`;
-    const tempPath = `./temp/peticoes/tjce/${this.numeroProcesso}.pdf.crdownload`;
+    const path = `./downloads/${this.numeroProcesso}.pdf`;
+    const tempPath = `./downloads/${this.numeroProcesso}.pdf.crdownload`;
 
     return new Promise(async (resolve) => {
       do {
@@ -356,7 +356,7 @@ class PeticaoTJCE extends ExtratorPuppeteer {
         }
         const size =
           fs.statSync(
-            `./temp/peticoes/tjce/${this.numeroProcesso}.pdf.crdownload`
+            `./downloads/${this.numeroProcesso}.pdf.crdownload`
           ).size / 1000000.0;
         this.logger.info(`Download não finalizado | ${size} Mb baixados`);
         await sleep(5000);

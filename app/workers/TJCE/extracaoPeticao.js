@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const sleep = require('await-sleep');
-
+const Path = require('path');
 const fs = require('fs');
 const { PeticaoTJCE } = require('../../extratores/PeticaoTJCE');
 const { enums } = require('../../configs/enums');
@@ -37,7 +37,7 @@ const logarExecucao = async (execucao) => {
     });
     try {
       logger.info('Mensagem recebida');
-      const extrator = new PeticaoTJCE(); //TODO retirar isso antes de subir a producao
+      const extrator = new PeticaoTJCE();
       let resposta;
 
       logger.info('Iniciando processo de extração');
@@ -54,36 +54,46 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      logger.info('Preparando arquivo para upload');
-      arquivoPath = `./temp/peticoes/tjce/${message.NumeroProcesso}.pdf`;
-      let data = fs.readFileSync(arquivoPath).toString('base64');
-      logger.info('Arquivo preparado');
+      arquivoPath = Path.resolve(
+        __dirname,
+        '../../downloads',
+        `${message.NumeroProcesso}.pdf`
+      );
 
-      logger.info('Enviando resposta ao BigData');
+      if (fs.existsSync(arquivoPath)) {
+        logger.info('Preparando arquivo para upload');
 
-      if (resultadoExtracao.sucesso) {
-        resposta = {
-          NumeroCNJ: message.NumeroProcesso,
-          // Instancia: message.Instancia,
-          Documentos: [
-            {
-              DocumentoBody: data,
-              UrlOrigem: resultadoExtracao.urlOrigem,
-              NomeOrigem: `${message.NumeroProcesso}.pdf`,
-            },
-          ],
-        };
-        await Helper.feedbackDocumentos(resposta).catch((err) => {
-          console.log(err);
-          throw new Error(
-            `PeticaoTJCE - Erro ao enviar resposta ao BigData - Processo: ${message.Processo}`
-          );
-        });
-      } else {
-        console.log('Envia resposta para o endpoint de erro');
+        let data = fs.readFileSync(arquivoPath).toString('base64');
+        logger.info('Arquivo preparado');
+
+        logger.info('Enviando resposta ao BigData');
+
+        if (resultadoExtracao.sucesso) {
+          resposta = {
+            NumeroCNJ: message.NumeroProcesso,
+            // Instancia: message.Instancia,
+            Documentos: [
+              {
+                DocumentoBody: data,
+                UrlOrigem: resultadoExtracao.urlOrigem,
+                NomeOrigem: `${message.NumeroProcesso}.pdf`,
+              },
+            ],
+          };
+          await Helper.feedbackDocumentos(resposta).catch((err) => {
+            console.log(err);
+            throw new Error(
+              `PeticaoTJCE - Erro ao enviar resposta ao BigData - Processo: ${message.Processo}`
+            );
+          });
+        } else {
+          console.log('Envia resposta para o endpoint de erro');
+        }
+
+        logger.info('Resposta enviada ao BigData');
+
       }
 
-      logger.info('Resposta enviada ao BigData');
       logger.info('Finalizando processo');
       await logarExecucao({
         Mensagem: message,

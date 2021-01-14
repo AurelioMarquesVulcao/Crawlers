@@ -122,6 +122,7 @@ class CriaFilaJTE {
 	}
 
 	async salvaStatusComarca(numero, data, raspagem, buscaProcesso, estado) {
+		// if (!estado){estado = "Principal"}
 		console.log(numero, data, raspagem, buscaProcesso, estado);
 		let cnj = Cnj.processoSlice(numero);
 		let busca = buscaProcesso;
@@ -292,7 +293,7 @@ class CriaFilaJTE {
 	/**
 	 * Cria um numero de processo para ser enviado para fila
 	 * @param {string} sequencial numero sequencial que deverá ser trabalhado para o envio a fila.
-	 * @param {string} origem comarca do esdo que será buscada
+	 * @param {string} origem comarca que será buscada
 	 * @param {number} tentativas numero de processos a serem testados
 	 * @param {string} tribunal referêncial numerico do estado a ser buscado
 	 * @param {string} fila fila que receberá a mensagem.

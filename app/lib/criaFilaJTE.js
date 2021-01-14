@@ -24,7 +24,7 @@ class CriaFilaJTE {
 
 	static async ajusta(codigo) {
 		let dados = (await statusEstadosJTE.find({}))
-			.filter(x =>x.estadoNumero != "51" && x.estadoNumero != "50")
+			// .filter(x => x.numeroUltimoProcecesso == null)
 		for (let i = 0; i < dados.length; i++) {
 			let obj = {
 				"estado": "Principal",
@@ -34,9 +34,36 @@ class CriaFilaJTE {
 				// ano: "2021"
 				// numeroUltimoProcecesso:`10000006620215${dados[i].estadoNumero}${dados[i].comarca}`
 			}
-			console.log(await await statusEstadosJTE.findOneAndUpdate({ _id: dados[i]._id },obj));
-			console.log(dados[i]);
+			let teste = await statusEstadosJTE.find({ estadoNumero: dados[i].estadoNumero, comarca: dados[i].comarca });
+			// console.log(teste);
+			if (teste.length >1){
+				console.log(teste);
+				let numero = [teste[0].numeroUltimoProcecesso,teste[1].numeroUltimoProcecesso]
+				console.log(retornaIndiceMaiorValor(numero));
+				console.log(numero[retornaIndiceMaiorValor(numero)]);
+				await statusEstadosJTE.deleteOne({ numeroUltimoProcecesso: numero[retornaIndiceMaiorValor(numero)] })
+				
+				
+			}
+			// console.log(dados[i].estadoNumero, dados[i].comarca);
+			// await statusEstadosJTE.deleteOne({ _id: dados[i]._id })
+			// console.log(await statusEstadosJTE.find({ estadoNumero: dados[i].estadoNumero, comarca: dados[i].comarca }));
+
+			// console.log( await statusEstadosJTE.findOneAndUpdate({ _id: dados[i]._id },obj));
+			// await statusEstadosJTE.deleteOne({ numeroUltimoProcecesso: del })
+			// console.log(dados[i]);
 		}
+		function retornaIndiceMaiorValor(array) {
+			let maior = array[0];
+			let indice = 0;
+			for (let i = 1; i < array.length; i++) {
+					if (array[i] < maior) {
+							maior = array[i];
+							indice = i;
+					}
+			}
+			return indice;
+	}
 
 		// console.log(dados);
 	}
@@ -515,3 +542,16 @@ module.exports.CriaFilaJTE = CriaFilaJTE;
 
 
 module.exports.linkDocumento1 = linkDocumento;
+
+// (async () => {
+// 	mongoose.connect(enums.mongo.connString, {
+// 		useNewUrlParser: true,
+// 		useUnifiedTopology: true,
+// 	});
+// 	mongoose.connection.on('error', (e) => {
+// 		console.log(e);
+// 	});
+// 	await CriaFilaJTE.ajusta()
+// 	process.exit()
+
+// })()

@@ -24,7 +24,7 @@ module.exports.Filas = async function Filas() {
         .then(res => {
           for (let ii = 0; ii < res.length; ii++) {
             console.log("Criando mensagem.:" + ii);
-              resultado.push(Cnj.criaPostJTE(Cnj.organizaCNJ(res[ii], tribunal, comarca)))
+              resultado.push(Cnj.criaPostJTE(Cnj.organizaCNJ(res[ii], tribunal, comarca), ))
           }
           console.log(" Mensagesn.: ", tribunal, comarca, "Criadas...");
         })

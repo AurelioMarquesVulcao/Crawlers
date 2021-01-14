@@ -24,7 +24,7 @@ class CriaFilaJTE {
 
 	static async ajusta(codigo) {
 		let dados = (await statusEstadosJTE.find({}))
-			// .filter(x => x.numeroUltimoProcecesso == null)
+		// .filter(x => x.numeroUltimoProcecesso == null)
 		for (let i = 0; i < dados.length; i++) {
 			let obj = {
 				"estado": "Principal",
@@ -36,14 +36,14 @@ class CriaFilaJTE {
 			}
 			let teste = await statusEstadosJTE.find({ estadoNumero: dados[i].estadoNumero, comarca: dados[i].comarca });
 			// console.log(teste);
-			if (teste.length >1){
+			if (teste.length > 1) {
 				console.log(teste);
-				let numero = [teste[0].numeroUltimoProcecesso,teste[1].numeroUltimoProcecesso]
+				let numero = [teste[0].numeroUltimoProcecesso, teste[1].numeroUltimoProcecesso]
 				console.log(retornaIndiceMaiorValor(numero));
 				console.log(numero[retornaIndiceMaiorValor(numero)]);
 				await statusEstadosJTE.deleteOne({ numeroUltimoProcecesso: numero[retornaIndiceMaiorValor(numero)] })
-				
-				
+
+
 			}
 			// console.log(dados[i].estadoNumero, dados[i].comarca);
 			// await statusEstadosJTE.deleteOne({ _id: dados[i]._id })
@@ -57,13 +57,13 @@ class CriaFilaJTE {
 			let maior = array[0];
 			let indice = 0;
 			for (let i = 1; i < array.length; i++) {
-					if (array[i] < maior) {
-							maior = array[i];
-							indice = i;
-					}
+				if (array[i] < maior) {
+					maior = array[i];
+					indice = i;
+				}
 			}
 			return indice;
-	}
+		}
 
 		// console.log(dados);
 	}

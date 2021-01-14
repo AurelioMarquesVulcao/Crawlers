@@ -29,7 +29,7 @@ var desligado = desligar.worker;
   const variaveis = await Variaveis.catch({ "codigo": "000001" });
   const Estados = variaveis.variaveis;
   var estados = [
-    // Estados[0].rj,
+    Estados[0].rj,
     Estados[0].sp2,
   ];
 
@@ -56,6 +56,7 @@ var desligado = desligar.worker;
     for (let w = 0; w < 1;) {
       let mensagens = [];
       let relogio = Fila.relogio();
+      console.log(" ---------------- ", "Estado numero: ", estados[contador].codigo, " ---------------- ");
       let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
 
@@ -151,8 +152,8 @@ async function atualizaStatusDownload(estado, relogio) {
 
 function extraiDados(comarcas) {
   return comarcas.map(x => {
-    if(x.ano == 2020){
-    // if (new Date().getDay() == "1" && new Date().getMonth() == "1") {
+    if (x.ano == 2020) {
+      // if (new Date().getDay() == "1" && new Date().getMonth() == "1") {
       // if (true){
       if (x.status != 'Ultimo Processo') {
         return {
@@ -217,14 +218,6 @@ async function testeFila(nomeFila, contador) {
 }
 
 function trataSequencial(x) {
-  // console.log(x);
-  // return comarcas.map((x) => {
-  // console.log(
-  //   Cnj.processoSlice(x.numeroUltimoProcecesso).sequencial,
-  //   Cnj.processoSlice(x.numeroUltimoProcecesso).estado,
-  //   Cnj.processoSlice(x.numeroUltimoProcecesso).comarca
-  // );
-  // let processo = [Cnj.processoSlice(x.numeroUltimoProcecesso).sequencial];
   let processo = [x.numero.sequencial];
   if (processo == "000000") {
     return processo
@@ -247,8 +240,6 @@ function trataSequencial(x) {
         break
       }
     }
-    // console.log(number.join(""));
-    // console.log(number.length);
     if (number.length >= 5) {
       for (let i = 1; i < number.length; i++) {
         if (i < number.length - 1) {

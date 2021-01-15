@@ -5,8 +5,8 @@ apps:
     name     : 'worker-02'
   - script   : ./workers/TJBAPortal/extracaoNovos.js
     name     : 'worker-03'
-  - script   : ./controller/limpaCore.js
-    name     : 'limpa1'
-  - script   : ./controller/limpaCoreDocker.js
-    name     : 'limpa2'
+#  - script   : ./controller/limpaCore.js
+#    name     : 'limpa1'
+#  - script   : ./controller/limpaCoreDocker.js
+#    name     : 'limpa2'
     

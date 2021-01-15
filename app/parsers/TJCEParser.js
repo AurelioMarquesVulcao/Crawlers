@@ -1,3 +1,4 @@
+// parsers/TJCEParser.js
 const cheerio = require('cheerio');
 const moment = require('moment');
 const re = require('xregexp');
@@ -48,7 +49,7 @@ class TJCEParser extends BaseParser {
 
   extrairCapa($) {
     return {
-      uf: 'SP',
+      uf: 'CE',
       comarca: this.extrairComarca($),
       assunto: this.extrairAssunto($),
       classe: this.extrairClasse($),
@@ -161,7 +162,7 @@ class TJCEParser extends BaseParser {
       // Extracao
       envolvido.tipo = $(
         `${selector} > tbody > tr:nth-child(${
-          index + 1
+                index + 1
         }) > td:nth-child(1) > span`
       )[0].children[0].data.strip();
       envolvido.nome = $(

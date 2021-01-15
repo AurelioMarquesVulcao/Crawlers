@@ -162,7 +162,7 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSP/extracao.js
 
-  comarcas-tjsp:
+  tjsp-comarcas:
     extends:
       file: common-services.yml
       service: base_node
@@ -171,7 +171,7 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSP/extracaoComarcas.js
 
-  comarcas-tjrs:
+  tjrs-comarcas:
     extends:
       file: common-services.yml
       service: base_node

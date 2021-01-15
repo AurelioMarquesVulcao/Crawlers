@@ -69,7 +69,7 @@ class Sequencial {
         new Date()
         // data = Helper.data(`12/09/2020 00:00`);
         data = Helper.data(`${busca.dataBusca.getDate()}/${busca.dataBusca.getMonth() + 1}/${ano} 00:00`);
-        // console.log(`${busca.dataBusca.dia}/${busca.dataBusca.mes}/${ano} 00:00`);
+        // console.log(`${busca.dataBusca.getDate()}/${busca.dataBusca.getMonth() + 1}/${ano} 00:00`);
         return {
           estado: busca.estadoNumero,
           comarca: busca.comarca,
@@ -103,11 +103,7 @@ class Sequencial {
           if (this.verificaData(new Date(), processos[ii].dataDistribuicao))
             desatualizados.push(processos[ii]);
         }
-        console.log(desatualizados[ii]);
-
       }
-      
-      process.exit()
       return desatualizados
     } catch (e) {
       console.log(e);

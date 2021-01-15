@@ -102,5 +102,9 @@ const tribunalFactory = {
   'TJCE': {
     tribunal: 6,
     orgao: 8
+  },
+  'TJMG': {
+    tribunal: 13,
+    orgao: 8
   }
 }

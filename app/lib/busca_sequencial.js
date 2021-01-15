@@ -1,3 +1,4 @@
+// lib/busca_sequencial.js
 const MongoClient = require('mongodb').MongoClient;
 const moment = require('moment')
 const ObjectId = require('mongoose/lib/types/objectid');
@@ -77,7 +78,7 @@ let consultar = (db, tribunal) => {
         if (err) reject(err);
         console.log('consulta bem sucedida');
         resolve(docs)
-    })
+      })
   })
 }
 
@@ -88,6 +89,18 @@ const tribunalFactory = {
   },
   'TJSP': {
     tribunal: 26,
+    orgao: 8
+  },
+  'TJSC': {
+    tribunal: 24,
+    orgao: 8
+  },
+  'TJBA': {
+    tribunal: 5,
+    orgao: 8
+  },
+  'TJCE': {
+    tribunal: 6,
     orgao: 8
   }
 }

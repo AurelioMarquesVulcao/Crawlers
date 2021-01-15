@@ -1,3 +1,4 @@
+// workers/TJCE/extracaoComarcas.js
 const mongoose = require('mongoose');
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
@@ -114,11 +115,19 @@ async function extrairNumeros(message, ultimo) {
     if (erroEncontrado && !extracao.sucesso) {
       return { continuar: false, ultimo: anterior, count: count - 1 };
     }
-    if (extracao.sucesso) anterior = numero;
-    erroEncontrado = !extracao.sucesso;
+    if (extracao.sucesso || extracao.detalhes === 'Senha necessaria') {
+      erroEncontrado = false;
+      anterior = numero;
+    }
 
+    // console.log({detalhes: extracao.detalhes});
+    // console.log({sucesso: extracao.sucesso});
+
+    if (!extracao.sucesso && (extracao.detalhes !== 'Senha necessaria'))
+      erroEncontrado = !extracao.sucesso;
+
+    // console.log({erroEncontrado})
     count++;
-    console.log('====== Passando ao proximo processo ======');
   } while (count < 5);
 
   return { continuar: true, ultimo: numero, count };

@@ -138,7 +138,7 @@ class ProcessoTJSP extends ExtratorBase {
         throw new Error('Não foi possivel recuperar o processo com 5 tentativas');
 
     } catch(e) {
-      // console.log(e);
+      console.log(e);
       this.resposta = {
         sucesso: false,
         resultado: '',
@@ -192,6 +192,7 @@ class ProcessoTJSP extends ExtratorBase {
   async consultarUUID() {
     let objResponse;
 
+    await sleep(200);
     objResponse = await this.robo.acessar({
       url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
@@ -325,7 +326,7 @@ class ProcessoTJSP extends ExtratorBase {
   //===================== Funções secundarias =====================
   setInstanciaUrl() {
     // this.url = INSTANCIAS_URLS[this.instancia - 1];
-    this.url = "http://esaj.tjsp.jus.br/cpopg"
+    this.url = "https://esaj.tjsp.jus.br/cpopg"
 
   }
 }

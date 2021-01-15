@@ -26,7 +26,7 @@ module.exports.buscar_sequencial = async (tribunalExplicito, ano) => {
 
         const db = client.db('bigDataV2');
 
-        let comarcas = consultar(db, tribunal)
+        let comarcas = consultar(db, tribunal, ano)
           .then(res => {
             console.log(res.length);
             client.close();
@@ -43,7 +43,7 @@ module.exports.buscar_sequencial = async (tribunalExplicito, ano) => {
   })
 }
 
-let consultar = (db, tribunal) => {
+let consultar = (db, tribunal, ano) => {
   return new Promise((resolve, reject) => {
     const collection = db.collection('processo');
 
@@ -55,7 +55,7 @@ let consultar = (db, tribunal) => {
     collection.aggregate([
       {'$match': {
           '_id': {'$gt': OBJ_ID},
-          'CnjDetalhes.Ano': 2020,
+          'CnjDetalhes.Ano': Number(ano),
           'CnjDetalhes.OrgaoJustica': tribunal.orgao,
           'CnjDetalhes.Tribunal': tribunal.tribunal,
         }},

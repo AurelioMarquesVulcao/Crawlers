@@ -138,7 +138,7 @@ async function atualizaStatusDownload(estado, relogio) {
   // new Date().getMonth()
   let validaData = comarcas.filter(x => x.dataBusca);
   let desatualizadas = validaData.filter(x =>
-    x.dataBusca.getDay() < new Date().getDay() || x.dataBusca.getMonth() < new Date().getMonth()
+    x.dataBusca.getDate() < new Date().getDate() || x.dataBusca.getMonth() < new Date().getMonth()
   );
   // console.log(desatualizadas);
   if (desatualizadas.length != 0) {

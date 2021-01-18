@@ -29,7 +29,7 @@ var desligado = desligar.worker;
   const variaveis = await Variaveis.catch({ "codigo": "000001" });
   const Estados = variaveis.variaveis;
   var estados = [
-    Estados[0].rj,
+    // Estados[0].rj,
     Estados[0].sp2,
   ];
 
@@ -137,10 +137,11 @@ async function atualizaStatusDownload(estado, relogio) {
   let comarcas = await CriaFilaJTE.getEstado(estado);
   // new Date().getMonth()
   let validaData = comarcas.filter(x => x.dataBusca);
+  // console.log(validaData[0].dataBusca.getDate(),"data", validaData[0].dataBusca, "dia", new Date().getDay());
   let desatualizadas = validaData.filter(x =>
-    x.dataBusca.getDay() < new Date().getDay() || x.dataBusca.getMonth() < new Date().getMonth()
+    x.dataBusca.getDate() < new Date().getDate() || x.dataBusca.getMonth() < new Date().getMonth()
   );
-  // console.log(desatualizadas);
+  console.log(desatualizadas);
   if (desatualizadas.length != 0) {
     for (let i = 0; i < desatualizadas.length; i++) {
       let { _id } = desatualizadas[i];

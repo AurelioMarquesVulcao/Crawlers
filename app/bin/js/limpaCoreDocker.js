@@ -7,5 +7,5 @@ const shell = require('shelljs');
 
         console.log("Executei remoção de core");
 
-    }, 60000);
+    }, 30000);
 })()

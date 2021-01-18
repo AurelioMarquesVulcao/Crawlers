@@ -3,7 +3,7 @@ const shell = require('shelljs');
     setInterval(async function () {
         console.log("Vou executar remoção de core");
         
-        shell.exec('rm core* -f')
+        shell.exec('rm ./core* -f')
 
         console.log("Executei remoção de core");
 

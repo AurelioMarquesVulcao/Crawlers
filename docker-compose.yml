@@ -542,7 +542,7 @@ services:
     build:
       dockerfile: Dockerfile
     restart: always
-    command: pm2 start controller/limpaCoreDocker.js --no-daemon 
+    command: pm2 start bin/js/limpaCoreDocker.js --no-daemon 
     logging:
       driver: "json-file"
       options:

@@ -1,3 +1,4 @@
+// extratores/ProcessoTJCE.js
 const sleep = require('await-sleep');
 const cheerio = require('cheerio');
 const { TJCEParser } = require('../parsers/TJCEParser');
@@ -275,12 +276,12 @@ class ProcessoTJCE {
 
     if (/Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(mensagemRetornoText)) {
       this.logger.info('Não existem informações disponíveis para o processo informado.');
-      throw new Error('Não encontrados')
+      throw new Error('Não encontrados');
     }
 
     if ($(senhaProcessoSelector).length && $(tabelaMovimentacoesSelector).length === 0) {
       this.logger.info('Se for uma parte ou interessado, digite a senha do processo')
-      throw new Error('Senha necessária')
+      throw new Error('Senha necessaria');
     }
 
     if ($(tabelaMovimentacoesSelector).length === 0) {

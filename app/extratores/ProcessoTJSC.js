@@ -181,7 +181,7 @@ class ProcessoTJSC extends ExtratorBase {
 
     if ($(senhaProcessoSelector).length && $(tableMovimentacoesSelector).length === 0){
       this.logger.info('Se for uma parte ou interessado, digite a senha do processo');
-      throw new Error('Senha necessária');
+      throw new Error('Senha necessaria');
     }
 
     if($(tableMovimentacoesSelector).length === 0)

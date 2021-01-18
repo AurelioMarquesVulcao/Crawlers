@@ -1,3 +1,4 @@
+// lib/busca_sequencial.js
 const MongoClient = require('mongodb').MongoClient;
 const moment = require('moment')
 const ObjectId = require('mongoose/lib/types/objectid');
@@ -25,7 +26,7 @@ module.exports.buscar_sequencial = async (tribunalExplicito, ano) => {
 
         const db = client.db('bigDataV2');
 
-        let comarcas = consultar(db, tribunal)
+        let comarcas = consultar(db, tribunal, ano)
           .then(res => {
             console.log(res.length);
             client.close();
@@ -42,7 +43,7 @@ module.exports.buscar_sequencial = async (tribunalExplicito, ano) => {
   })
 }
 
-let consultar = (db, tribunal) => {
+let consultar = (db, tribunal, ano) => {
   return new Promise((resolve, reject) => {
     const collection = db.collection('processo');
 
@@ -54,7 +55,7 @@ let consultar = (db, tribunal) => {
     collection.aggregate([
       {'$match': {
           '_id': {'$gt': OBJ_ID},
-          'CnjDetalhes.Ano': 2020,
+          'CnjDetalhes.Ano': Number(ano),
           'CnjDetalhes.OrgaoJustica': tribunal.orgao,
           'CnjDetalhes.Tribunal': tribunal.tribunal,
         }},
@@ -77,7 +78,7 @@ let consultar = (db, tribunal) => {
         if (err) reject(err);
         console.log('consulta bem sucedida');
         resolve(docs)
-    })
+      })
   })
 }
 
@@ -88,6 +89,22 @@ const tribunalFactory = {
   },
   'TJSP': {
     tribunal: 26,
+    orgao: 8
+  },
+  'TJSC': {
+    tribunal: 24,
+    orgao: 8
+  },
+  'TJBA': {
+    tribunal: 5,
+    orgao: 8
+  },
+  'TJCE': {
+    tribunal: 6,
+    orgao: 8
+  },
+  'TJMG': {
+    tribunal: 13,
     orgao: 8
   }
 }

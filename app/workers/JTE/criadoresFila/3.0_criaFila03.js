@@ -11,6 +11,7 @@ const { Helper, Logger, Cnj } = require('../../../lib/util');
 const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 const { GerenciadorFila } = require("../../../lib/filaHandler");
 const awaitSleep = require("await-sleep");
+const {statusEstadosJTE} = require("../../../models/schemas/jte");
 
 
 const Fila = new CriaFilaJTE();
@@ -28,6 +29,7 @@ var desligado = desligar.worker;
   const variaveis = await Variaveis.catch({ "codigo": "000001" });
   const Estados = variaveis.variaveis;
   var estados = [
+    // Estados[0].ma
     Estados[0].ma, Estados[0].es, Estados[0].go, Estados[0].al, Estados[0].se,
     Estados[0].pi, Estados[0].mt, Estados[0].rn, Estados[0].ms, Estados[0].pr
   ];
@@ -53,27 +55,69 @@ var desligado = desligar.worker;
       console.log(min);
     }, 60000);
     for (let w = 0; w < 1;) {
+      let mensagens = [];
       let relogio = Fila.relogio();
       let statusFila = await testeFila(nomeFila); // Se a fila estiver vazia libera para download
-      console.log(statusFila);
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
+
+      // let all = await statusEstadosJTE.find({});
+      // let teste = all.filter(x => x.dataBusca)
+      // teste = teste.filter(x =>x.dataBusca.getDay() <= new Date().getDay() || x.dataBusca.getMonth() < new Date().getMonth())
+      // console.log(teste);
+      // process.exit()
+
       await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);
-      let status = comarcas.filter(x => x.status == 'Atualizado');
-      // Pega apenas as comarcas que não são ultimo estado
-      let processos = extraiDados(comarcas);
       // console.log(comarcas);
-      console.log(processos.length);
+
+      // process.exit();
+      // let status = comarcas.filter(x => x.ano == '2021' || x.status == 'Atualizado' || x.status == 'Novo');
+      let status = comarcas.filter(x => x.status == 'Atualizado' || x.status == 'Novo');
+      status = status.filter(x => x.dataBusca);
+      // console.log(status);
       // process.exit()
+      console.log("Filtrado dados da comarca");
+      // Pega apenas as comarcas que não são ultimo estado
+      let processos = extraiDados(status);
+      // console.log(comarcas);
+      // console.log(processos);
+      // process.exit()
+      console.log(processos.length);
+
       if (processos.length > 0) {
+        mensagens = [];
         processos.map(x => {
-          let arrayMensages = Fila.procura(x.numero.sequencial, x.numero.comarca, 4, x.numero.estado)
-          console.log(arrayMensages);
-          for (let ii = 0; ii < arrayMensages.length; ii++) {
-            mensagens.push(arrayMensages[ii]);
+          // Para a virada do ano será usado esse código.
+          if (x.numero.ano != new Date().getFullYear()) {
+            // Gera um numero de Start Para a comarca.
+            // console.log(x);
+            if (x.numero.sequencial != "0000001") {
+              let sequencial = trataSequencial(x)
+              console.log(sequencial);
+
+              let arrayMensages = Fila.procura(sequencial, x.numero.comarca, 4, x.numero.estado, x.estado)
+              console.log(arrayMensages);
+              // process.exit()
+              for (let ii = 0; ii < arrayMensages.length; ii++) {
+                mensagens.push(arrayMensages[ii]);
+              }
+            }
+          } else {
+
+            let arrayMensages = Fila.procura(x.numero.sequencial, x.numero.comarca, 4, x.numero.estado, x.estado)
+            console.log(arrayMensages);
+            for (let ii = 0; ii < arrayMensages.length; ii++) {
+              mensagens.push(arrayMensages[ii]);
+            }
           }
+
         })
+        // console.log(mensagens);
+        // let find 
+        // await statusEstadosJTE.findOneAndUpdate(find, update)
+        // process.exit()
+        // mensagens.length = 8
         await rabbit.enfileirarLoteTRT(nomeFila, mensagens);
         mensagens = [];
       }
@@ -82,19 +126,20 @@ var desligado = desligar.worker;
       console.log(relogio);
       if (status.length == 0) { contador++ }
       if (contador == estados.length) { contador = 0 }
-      await sleep(10000);
+      await sleep(20000);
       // process.exit();
     }
   } catch (e) {
     console.log(e);
   }
 })()
-
 async function atualizaStatusDownload(estado, relogio) {
   let comarcas = await CriaFilaJTE.getEstado(estado);
-  let { dia, hora } = relogio;
-  console.log(dia);
-  let desatualizadas = comarcas.filter(x => x.dataBusca.dia != 9);
+  // new Date().getMonth()
+  let validaData = comarcas.filter(x => x.dataBusca);
+  let desatualizadas = validaData.filter(x =>
+    x.dataBusca.getDay() < new Date().getDay() || x.dataBusca.getMonth() < new Date().getMonth()
+  );
   // console.log(desatualizadas);
   if (desatualizadas.length != 0) {
     for (let i = 0; i < desatualizadas.length; i++) {
@@ -104,15 +149,31 @@ async function atualizaStatusDownload(estado, relogio) {
   }
 }
 
+
 function extraiDados(comarcas) {
   return comarcas.map(x => {
-    if (x.status != 'Ultimo Processo') {
-      return {
-        numero: Cnj.processoSlice(x.numeroUltimoProcecesso)
+    if(x.ano == 2020){
+    // if (new Date().getDay() == "1" && new Date().getMonth() == "1") {
+      // if (true){
+      if (x.status != 'Ultimo Processo') {
+        return {
+          numero: Cnj.processoSlice(x.numeroUltimoProcecesso),
+          estado: x.estado
+        }
+      } else {
+        return null
       }
     } else {
-      return null
+      if (x.status != 'Ultimo Processo' && x.ano == new Date().getFullYear()) {
+        return {
+          numero: Cnj.processoSlice(x.numeroUltimoProcecesso),
+          estado: x.estado
+        }
+      } else {
+        return null
+      }
     }
+
   }).filter((x => x != null))
   // console.log(dados);
 
@@ -156,3 +217,64 @@ async function testeFila(nomeFila, contador) {
   }
 }
 
+function trataSequencial(x) {
+  // console.log(x);
+  // return comarcas.map((x) => {
+  // console.log(
+  //   Cnj.processoSlice(x.numeroUltimoProcecesso).sequencial,
+  //   Cnj.processoSlice(x.numeroUltimoProcecesso).estado,
+  //   Cnj.processoSlice(x.numeroUltimoProcecesso).comarca
+  // );
+  // let processo = [Cnj.processoSlice(x.numeroUltimoProcecesso).sequencial];
+  let processo = [x.numero.sequencial];
+  if (processo == "000000") {
+    return processo
+  } else {
+    // console.log(processo);
+    let number = [];
+    processo.map((y) => {
+      for (let i = 0; i < y.length; i++) {
+        number.push(y[i]);
+      }
+      return number
+    })
+    // console.log(number);
+    let zeros = "";
+    while (true) {
+      if (number[0] == '0') {
+        number.splice(0, 1);
+        zeros += "0"
+      } else if (number[0] != '0' || number.length == 1) {
+        break
+      }
+    }
+    // console.log(number.join(""));
+    // console.log(number.length);
+    if (number.length >= 5) {
+      for (let i = 1; i < number.length; i++) {
+        if (i < number.length - 1) {
+          number[i] = "0"
+        } else {
+          // ajustei para zero para a função procura fila acrescentar 4 numeros ao zero
+          // ficando 1--2--3 e não 2--3--4
+          number[i] = "0"
+        }
+      }
+    } else if (number.length <= 4) {
+      for (let i = 0; i < number.length; i++) {
+        if (i < number.length - 1) {
+          number[i] = "0"
+        } else {
+          // ajustei para zero para a função procura fila acrescentar 4 numeros ao zero
+          // ficando 1--2--3 e não 2--3--4
+          number[i] = "0"
+        }
+      }
+    }
+    console.log(zeros, number.join(""));
+    return zeros + number.join("");
+  }
+  // console.log(number);
+  // process.exit();
+  // })
+}

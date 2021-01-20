@@ -49,10 +49,10 @@ const comarcaSchema = new mongoose.Schema({
 	estadoNumero: String,
 	comarca: String,
 	status: String,
-	dataBusca: {},
+	dataBusca: Date,
 	dataCriaçãoJTE: Date,
 	numeroUltimoProcecesso: String,
-
+	ano:String
 })
 
 const statusEstadosJTE = mongoose.model('comarcasJTE', comarcaSchema, 'comarcasJTE');

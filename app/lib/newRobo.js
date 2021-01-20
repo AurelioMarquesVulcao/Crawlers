@@ -7,6 +7,8 @@ class Requisicao {
   constructor() {}
 
   async enviarRequest(options, debug) {
+    // Alteração importante de segurança no código
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     if (!options) {
       throw new Error('Options vazio');
     }
@@ -41,7 +43,7 @@ class Requisicao {
         return { objResponse: objResponse, cookies: cookies };
       })
       .catch((err) => {
-        if(debug)
+        if (debug)
           console.log(err);
         let objResponse = {};
         objResponse.code = err.code;

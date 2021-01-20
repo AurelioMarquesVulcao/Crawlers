@@ -42,6 +42,7 @@ var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicaç
 var resultado = [];
 var catchError = 0;   // Captura erros;
 var start = 0;
+var status = "";
 
 
 
@@ -70,7 +71,7 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 190) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 300) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
       if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
@@ -103,6 +104,7 @@ async function worker() {
     let message = JSON.parse(msg.content.toString());
     let novosProcesso = message.NovosProcessos;
     let numeroProcesso = message.NumeroProcesso;
+    status = message.estado;
 
     let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
@@ -133,20 +135,6 @@ async function worker() {
         contador = 0;
       }
 
-      // // desliga o worker para parar de baixar as iniciais
-      // // if (message.inicial == true && logadoParaIniciais == true) {
-      // if (!message.NovosProcessos && logadoParaIniciais == true) {
-      //   logadoParaIniciais = false;
-      //   await mongoose.connection.close()
-      //   process.exit();
-      // }
-      // // reinicia o worker para baixarmos os processos iniciais.
-      // // if (message.inicial == true && contador != 0 && logadoParaIniciais == false) {
-      // if (message.NovosProcessos == true && contador != 0 && logadoParaIniciais == false) {
-      //   //console.log('vou deslogar a aplicação ----01');
-      //   await mongoose.connection.close()
-      //   process.exit();
-      // }
 
       estadoAnterior = estadoDaFila;
       logger.info('O Estado do consumer é o numero: ' + estadoAnterior);
@@ -164,16 +152,6 @@ async function worker() {
           logger.info('Loggin no tribunal realizado com sucesso');
           await sleep(1000);
         }
-
-        // loga para pegar iniciais
-        // if (message.inicial == true  && logadoParaIniciais == false) {
-        // condicional provisório para testes
-        //console.log(logadoParaIniciais);
-        // logger.info("Logando para pegar documentos iniciais")
-        // if (message.NovosProcessos == true && logadoParaIniciais == false) {
-        //   await puppet.loga();
-        //   logadoParaIniciais = true;
-        // }
 
 
         // caregando as variaveis que receberam os dados do parser
@@ -196,9 +174,6 @@ async function worker() {
         if (!!objResponse) contador++;
 
         if (message.inicial != true) {
-          // condicional provisório para testes1
-          // if (message.inicial != true) {
-          // if (message.NovosProcessos != true) {
           logger.info("Enviando dados para o banco de dados.")
           await dadosProcesso.processo.salvar();
           //console.log(dadosProcesso.andamentos[0]);
@@ -209,11 +184,12 @@ async function worker() {
           logger.info("Sucesso ao enviar para o banco de dados.")
 
           // salvando status
+                   
           let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
           let dataAtualProcesso = dadosProcesso.processo.capa.dataDistribuicao;
-          let cnj = util.processoSlice(numeroAtualProcesso);
+          let cnj = Cnj.processoSlice(numeroAtualProcesso);
           let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
-          await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso);
+          await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso, status);
 
           // Enviando para Collection de controle *ultimosProcessos*
           // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
@@ -233,19 +209,6 @@ async function worker() {
         }
 
 
-
-        // if (message.inicial == true) {
-        // condicional provisório para testes
-        // if (message.NovosProcessos == true) {
-        //   console.log('---------- Vou baixar link das iniciais-------');
-        //   let link = await puppet.pegaInicial();
-        //   await console.log(link.length);
-        //   for (let w = 0; w < link.length; w++) {
-        //     console.log('entrou no laço');
-        //     await new CriaFilaJTE().salvaDocumentoLink(link[w]);
-        //     await console.log('O link ' + w + ' Foi salvo');
-        //   }
-        // }
 
         logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {
@@ -290,15 +253,15 @@ async function worker() {
 
     } catch (e) {
       catchError++;
-      // console.log(e)
+      console.log(e)
       if (e == "ultimo processo") {
         catchError--;
         // salvando status 
         let numeroAtualProcesso = numeroProcesso;
         let dataAtualProcesso = "";
-        let cnj = util.processoSlice(numeroProcesso);
-        let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
-        await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, true, buscaProcesso);
+        let cnj = Cnj.processoSlice(numeroProcesso);
+        let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca, "ano": cnj.ano };
+        await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, true, buscaProcesso, status);
       }
       // Salva meus erros nos logs
       logger.log("info", numeroProcesso + " " + e);
@@ -307,14 +270,14 @@ async function worker() {
       if (catchError > 4) {
         //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close()
-        shell.exec('pkill chrome');
+        shell.exec('/usr/bin/pkill chrome');
         process.exit();
       }
 
       // envia a mensagem para a fila de reprocessamento
-      if (!novosProcesso) {
-        new GerenciadorFila().enviar(reConsumo, message);
-      }
+      // if (!novosProcesso) {
+      //   new GerenciadorFila().enviar(reConsumo, message);
+      // }
 
       logger.info('Encontrado erro durante a execução');
       // trata erro especifico para falha na extração
@@ -344,7 +307,3 @@ function desligaAgendado() {
     process.exit();
   }
 }
-
-
-
-

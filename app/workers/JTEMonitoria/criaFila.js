@@ -20,7 +20,7 @@ module.exports.Filas = async function Filas() {
       comarca = parseInt(comarcas[i].comarca)
       console.log(" iniciando comarca.: ", tribunal, comarca);
 
-      await Verificador.buscaProcessos(tribunal, comarca, 7)
+      await Verificador.buscaProcessos(tribunal, comarca, 15)
         .then(res => {
           for (let ii = 0; ii < res.length; ii++) {
             console.log("Criando mensagem.:" + ii);
@@ -37,6 +37,6 @@ module.exports.Filas = async function Filas() {
     return resultado
 
   } catch (e) {
-    Filas
+    await Filas()
   }
 }

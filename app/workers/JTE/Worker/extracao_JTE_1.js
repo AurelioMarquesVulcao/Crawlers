@@ -42,6 +42,7 @@ var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicaç
 var resultado = [];
 var catchError = 0;   // Captura erros;
 var start = 0;
+var status = "";
 
 
 
@@ -70,9 +71,9 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 1300) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 300) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     } else {
-      if (heartBeat > 1360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
     }
   }, 1000);
 
@@ -103,6 +104,7 @@ async function worker() {
     let message = JSON.parse(msg.content.toString());
     let novosProcesso = message.NovosProcessos;
     let numeroProcesso = message.NumeroProcesso;
+    status = message.estado;
 
     let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
@@ -152,7 +154,6 @@ async function worker() {
         }
 
 
-
         // caregando as variaveis que receberam os dados do parser
         let dadosProcesso;
         var processo;
@@ -173,24 +174,25 @@ async function worker() {
         if (!!objResponse) contador++;
 
         if (message.inicial != true) {
-          // condicional provisório para testes1
           logger.info("Enviando dados para o banco de dados.")
           await dadosProcesso.processo.salvar();
           //console.log(dadosProcesso.andamentos[0]);
           await Andamento.salvarAndamentos(dadosProcesso.andamentos);
           processo = await dadosProcesso.processo.salvar();
+          // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
           // após que todas as comarcas estiverem no mes corrente aplicar o código acima
           logger.info("Sucesso ao enviar para o banco de dados.")
 
           // salvando status
+                   
           let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
           let dataAtualProcesso = dadosProcesso.processo.capa.dataDistribuicao;
           let cnj = Cnj.processoSlice(numeroAtualProcesso);
-          // let buscaProcesso = verificaSalto(numeroAtualProcesso);
           let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
-          await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso);
+          await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso, status);
 
           // Enviando para Collection de controle *ultimosProcessos*
+          // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
           logger.info("Salvando na Collection ultimosProcessos")
 
           await new CriaFilaJTE().salvaUltimo({
@@ -205,6 +207,8 @@ async function worker() {
           });
           // }
         }
+
+
 
         logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {
@@ -249,15 +253,15 @@ async function worker() {
 
     } catch (e) {
       catchError++;
-      // console.log(e)
+      console.log(e)
       if (e == "ultimo processo") {
         catchError--;
         // salvando status 
         let numeroAtualProcesso = numeroProcesso;
         let dataAtualProcesso = "";
         let cnj = Cnj.processoSlice(numeroProcesso);
-        let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
-        await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, true, buscaProcesso);
+        let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca, "ano": cnj.ano };
+        await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, true, buscaProcesso, status);
       }
       // Salva meus erros nos logs
       logger.log("info", numeroProcesso + " " + e);
@@ -266,10 +270,14 @@ async function worker() {
       if (catchError > 4) {
         //new RoboPuppeteer3().finalizar()
         await mongoose.connection.close()
-        shell.exec('pkill chrome');
+        shell.exec('/usr/bin/pkill chrome');
         process.exit();
       }
 
+      // envia a mensagem para a fila de reprocessamento
+      // if (!novosProcesso) {
+      //   new GerenciadorFila().enviar(reConsumo, message);
+      // }
 
       logger.info('Encontrado erro durante a execução');
       // trata erro especifico para falha na extração
@@ -300,17 +308,6 @@ function desligaAgendado() {
   }
 }
 
-async function verificaSalto(numeroAtualProcesso) {
-  let cnj = Cnj.processoSlice(numeroAtualProcesso);
-  await Processo.find({"comarcaOriginal":cnj.comarca});
-  
-  if (cnj.sequencial.length) {
 
-  };
-
-
-
-  let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
-}
 
 

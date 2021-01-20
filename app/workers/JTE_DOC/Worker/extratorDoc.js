@@ -134,7 +134,7 @@ async function worker(nomeFila) {
         for (let w = 0; w < 1; w++) {
           // Criando fila para Download de documentos
 
-          // let local = '/home/aurelio/crawlers-bigdata/downloads';
+          // let local = '/home/aurelio/crawlers-bigdata/app/downloads';
           let local = '/app/downloads';
 
           if (tipo != 'HTML') {

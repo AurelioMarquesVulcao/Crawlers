@@ -48,18 +48,60 @@ services:
       context: ./
       dockerfile: dockerfile-node
     command: node workers/enfileirador.js
- 
-  # worker-tjsc-oab:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/TJSC/extracaoNovos.js
+  consumer-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/consumer_peticao.js
 
-  # worker-tjsc-processo:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/TJSC/extracaoProcesso.js
+  tjsc-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJSC/extracaoNovos.js
+
+  tjsc-processo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJSC/extracaoProcesso.js
+
+  tjsc-peticao-esaj:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
+    command: node workers/TJSC/extracaoPeticaoEsaj.js
+
+  tjsc-peticao-eproc:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJSC/extracaoPeticaoEproc.js
+
+  tjsc-comarcas:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJSC/extracaoComarcas.js
+
 
   # worker-tjmg-oab:
   #   extends:
@@ -120,7 +162,16 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSP/extracao.js
 
-  comarcas-tjrs:
+  tjsp-comarcas:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJSP/extracaoComarcas.js
+
+  tjrs-comarcas:
     extends:
       file: common-services.yml
       service: base_node
@@ -147,18 +198,6 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSP/extracaoPeticao.js
 
-  # worker-tjsc-oab:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/TJSC/extracaoNovos.js
-
-  # worker-tjsc-processo:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/TJSC/extracaoProcesso.js
-
   tjrs-oab:
     extends:
       file: common-services.yml
@@ -184,7 +223,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: node workers/TJSR/processosAtualizacao.js
+    command: node workers/TJRS/processosAtualizacao.js
 
   tjrs-processos-reprocessamento:
     extends:
@@ -194,6 +233,60 @@ services:
       context: ./
       dockerfile: dockerfile-node
     command: node workers/TJRS/processosReprocessamento.js
+
+  tjrs-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJRS/extracaoPeticao.js
+
+  tjce-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJCE/extracaoOab.js
+
+  tjce-processo-novo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJCE/processoNovo.js
+
+  tjce-processo-atualizacao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJCE/processoAtualizacao.js
+
+  tjce-comarcas:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJCE/extracaoComarcas.js
+
+  tjce-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
+    command: node workers/TJCE/extracaoPeticao.js
 
   novos-processos-jte-1:
     extends:
@@ -276,7 +369,7 @@ services:
         max-size: "5m"
         max-file: "2"
 
-  worker-doc-01:
+  worker-jte-doc-links-01:
     extends:
       file: common-services.yml
       service: base_node
@@ -447,10 +540,9 @@ services:
       file: common-services.yml
       service: base_node
     build:
-      context: ./
-      dockerfile: dockerfile-node
+      dockerfile: Dockerfile
     restart: always
-    command: pm2 start controller/limpaCoreDocker.js --no-daemon 
+    command: pm2 start bin/js/limpaCoreDocker.js --no-daemon 
     logging:
       driver: "json-file"
       options:

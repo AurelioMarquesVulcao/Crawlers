@@ -5,7 +5,7 @@ const { enums } = require("../configs/enums");
 const { GerenciadorFila } = require("../lib/filaHandler");
 const { Processo } = require('../models/schemas/processo');
 const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../models/schemas/jte');
-const { Cnj } = require('../lib/util');
+const { Cnj, CnjValidator } = require('../lib/util');
 require("dotenv/config");
 
 const util = new Cnj();
@@ -14,14 +14,18 @@ const util = new Cnj();
 
 class CriaFilaJTE {
 	/**
-	 * Busca dados de comarca de um dado estado.
-	 * @param {string} codigo Numero do estado 
-	 * @returns {Array} C	omarcas com detalhes do ultimo processo baixado.
-	 */
+ * Busca dados de comarca de um dado estado.
+ * @param {string} codigo Numero do estado 
+ * @returns {Array} C	omarcas com detalhes do ultimo processo baixado.
+ */
 	static async getEstado(codigo) {
 		return await statusEstadosJTE.find({ "estadoNumero": codigo })
 	}
 
+	/**
+	 * Ajusta os dados de controle da colection de controle de comarcas
+	 * @param {*} codigo 
+	 */
 	static async ajusta(codigo) {
 		let dados = (await statusEstadosJTE.find({}))
 		// .filter(x => x.numeroUltimoProcecesso == null)
@@ -82,7 +86,7 @@ class CriaFilaJTE {
 
 	/**
 	 * Compara se o numero de cnj e o ultimo processo de mesma comarca possuiem um fork de numeração.
-	 * @param {*} cnj numero processo qualquer
+	 * @param {String} cnj numero processo qualquer
 	 */
 	static async verificaSequencial(cnj) {
 		try {
@@ -119,6 +123,17 @@ class CriaFilaJTE {
 		// let update = { status: 'Atualizado2' };
 		// let update = {status: 'Ultimo Processo'}
 		return await statusEstadosJTE.findOneAndUpdate(find, update)
+	}
+
+	static async resetEstado(codigo) {
+		let comarcas = await this.getEstado(codigo);
+		console.log(comarcas);
+		comarcas.map(async x => {
+			await this.updateEstado(x._id);
+			let datas = await statusEstadosJTE.findOne(x._id)
+			console.log(datas.estadoNumero, datas.comarca, datas.status);
+		})
+
 	}
 
 	async salvaStatusComarca(numero, data, raspagem, buscaProcesso, estado) {
@@ -299,8 +314,8 @@ class CriaFilaJTE {
 	 * @param {string} fila fila que receberá a mensagem.
 	 * @return {string} Retorna um Array de numeros CNJ para serem buscados
 	 */
-	procura(sequencial, origem, tentativas, tribunal, estado) {
-		console.log(sequencial, "aqui");
+	async procura(sequencial, origem, tentativas, tribunal, estado) {
+		// console.log(sequencial, "aqui");
 		if (sequencial == "0000000") {
 			sequencial = "0000000"
 		}
@@ -322,12 +337,21 @@ class CriaFilaJTE {
 				// console.log(a);
 				if ((obj.zero + a).length > 7) {
 					zeros = obj.zero.substr(1)
-					processo = `${zeros}${a}00${new Date().getFullYear()}5${tribunal}${origem}`
-				} else {
-					processo = `${obj.zero}${a}00${new Date().getFullYear()}5${tribunal}${origem}`
-				}
-				mensagens.push(criaPost(processo, estado));
+					let numeroAleatorio = CnjValidator.calcula_mod97(
+						`${zeros}${a}`, `${new Date().getFullYear()}`, `5${tribunal}`, `${origem}`
+					);
+					processo = `${zeros}${a}${numeroAleatorio}${new Date().getFullYear()}5${tribunal}${origem}`
 
+				} else {
+					let numeroAleatorio = CnjValidator.calcula_mod97(
+						`${zeros}${a}`, `${new Date().getFullYear()}`, `5${tribunal}`, `${origem}`
+					);
+					processo = `${zeros}${a}${numeroAleatorio}${new Date().getFullYear()}5${tribunal}${origem}`
+				}
+				let teste = await Processo.find({ "detalhes.numeroProcesso": processo });
+				if (teste.length == 0) {
+					mensagens.push(criaPost(processo, estado));
+				}
 			}
 			return mensagens
 		} catch (e) {

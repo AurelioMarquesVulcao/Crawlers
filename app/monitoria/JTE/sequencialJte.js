@@ -34,7 +34,7 @@ class Sequencial {
   }
 
   static async saveLogs(logs) {
-    let date = new Date
+    let date = new Date()
     let log = {
       aplicacao: "comarcas7dias",
       codigo: "00001",
@@ -64,11 +64,12 @@ class Sequencial {
         if (("ano" in busca.dataBusca)) {
           ano = busca.dataBusca.ano
         } else {
-          ano = 2020
+          ano = new Date().getFullYear()
         }
+        new Date()
         // data = Helper.data(`12/09/2020 00:00`);
-        data = Helper.data(`${busca.dataBusca.dia}/${busca.dataBusca.mes + 1}/${ano} 00:00`);
-        // console.log(`${busca.dataBusca.dia}/${busca.dataBusca.mes}/${ano} 00:00`);
+        data = Helper.data(`${busca.dataBusca.getDate()}/${busca.dataBusca.getMonth() + 1}/${ano} 00:00`);
+        // console.log(`${busca.dataBusca.getDate()}/${busca.dataBusca.getMonth() + 1}/${ano} 00:00`);
         return {
           estado: busca.estadoNumero,
           comarca: busca.comarca,
@@ -99,10 +100,9 @@ class Sequencial {
       }
       for (let ii = 0; ii < processos.length; ii++) {
         if (processos[ii]) {
-          if (this.verificaData(new Date, processos[ii].dataDistribuicao))
+          if (this.verificaData(new Date(), processos[ii].dataDistribuicao))
             desatualizados.push(processos[ii]);
         }
-
       }
       return desatualizados
     } catch (e) {
@@ -117,10 +117,11 @@ class Sequencial {
    * @param {date} data2 Recebe a data a ser comparada
    */
   static verificaData(data1, data2) {
+    console.log(data1, data2);
     const diferenca = data1 - data2;
     const dias = Math.ceil(diferenca / (1000 * 60 * 60 * 24));
-    // console.log(diferenca);
-    // console.log(dias);
+    console.log(diferenca);
+    console.log(dias);
     if (dias >= 7) {
       return true
     } else { return false };

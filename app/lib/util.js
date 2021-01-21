@@ -92,7 +92,7 @@ class Helper {
       headers: {
         'Content-Type': 'text/plain'
       },
-      data : data
+      data: data
     };
     return axios(options)
   }
@@ -336,7 +336,7 @@ class Logger {
   constructor(
     logLevel = 'info',
     nomeArquivo = '',
-    { nomeRobo, NumeroDoProcesso, NumeroOab} = {}
+    { nomeRobo, NumeroDoProcesso, NumeroOab } = {}
   ) {
     this.nomeRobo = nomeRobo;
     this.NumeroProcesso = NumeroDoProcesso;
@@ -419,8 +419,8 @@ class Cnj {
    * Cria a mensagem a ser enviada para a fila
    * @param {string} numero 
    */
-  static criaPostJTE(numero) {
-    let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true}`;
+  static criaPostJTE(numero, status = "Principal") {
+    let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true}, "estado": "${status}"`;
     return post
   }
   /**

@@ -187,7 +187,7 @@ async function worker() {
           let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
           let dataAtualProcesso = dadosProcesso.processo.capa.dataDistribuicao;
           let cnj = Cnj.processoSlice(numeroAtualProcesso);
-          let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca };
+          let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca, "estado" : status };
           await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso, status);
 
           // Enviando para Collection de controle *ultimosProcessos*

@@ -19,6 +19,7 @@ class CriaFilaPJE {
   };
   async worker() {
     await this.testaFila();
+
   }
   /**
    * Monta a os blocos de estados a serem enfileirados
@@ -35,15 +36,13 @@ class CriaFilaPJE {
     for (let i = 1; i < 25; i++) {
       if (i != 15) {
         await this.atualizaProcessosFila(0, i, data)[0]
-      }
-      if (i == 24) {
-        await shuffleArray(this.mensagens);
-        await shuffle(this.mensagens)
-        await this.rabbit.enfileirarLoteTRT(this.fila, this.mensagens)
+        await sleep(3000)
       }
     }
-    await sleep(125000);
+    await this.rabbit.enfileirarLoteTRT(this.fila, this.mensagens)
     // this.mensagens = [];
+    await sleep(5000);
+    // 
     await this.testaFila();
 
   }
@@ -54,6 +53,8 @@ class CriaFilaPJE {
    */
   async testaFila() {
     console.log("Testando Fila");
+    this.mensagens = [];
+    console.log("Quantidade de Mensagens é.:", this.mensagens.length);
     let statusFila = false
     let rabbit = await getFilas();
     console.log(rabbit);

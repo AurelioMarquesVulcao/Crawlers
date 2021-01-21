@@ -51,6 +51,6 @@ class GeraFila {
 }
 
 // Coloque o nome da fila aqui.
-new GeraFila().god("Oab", "JTE", "Extracao", "01")
-// peticao.JTE.extracao.link.doc
-
+new GeraFila().god("Peticao", "JTE", "Extracao", "links-01");
+new GeraFila().god("Processo", "JTE", "Reprocessamento", "01");
+new GeraFila().god("Processo", "PJE", "Atualizacao", "01");

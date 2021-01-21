@@ -32,7 +32,8 @@ module.exports.enums = Object.freeze({
   tipoFila: {
     Novos: "novos",
     Atualizacao: "atualizacao",
-    Extracao: "extracao"
+    Extracao: "extracao",
+    Reprocessamento: "reprocessamento"
   },
   bigdataUrls: {
     captchaDecoder: 'http://172.16.16.8:5000/api/solve',

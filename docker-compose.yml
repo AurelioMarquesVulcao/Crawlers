@@ -1,4 +1,4 @@
-version: "2.4"
+version: '2.4'
 services:
   web:
     extends:
@@ -7,7 +7,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: "node server.js"
+    command: 'node server.js'
     ports:
       - ${API_PORT}:3300
     restart: always
@@ -102,18 +102,17 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSC/extracaoComarcas.js
 
-
   # worker-tjmg-oab:
   #   extends:
   #     file: common-services.yml
   #     service: base_node
   #   command: node workers/TJMG/extracaoNovos.js
 
-  # cadastro-consulta:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: node workers/consumer_cadastro_consulta.js
+  cadastro-consulta:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/consumer_cadastro_consulta.js
 
   # novos-processos-jte-sp-2:
   #   extends:
@@ -126,7 +125,7 @@ services:
   #     options:
   #       max-size: "5m"
   #       max-file: "2"
-  
+
   # novos-processos-jte-sp-15:
   #   extends:
   #     file: common-services.yml
@@ -138,9 +137,7 @@ services:
   #     options:
   #       max-size: "5m"
   #       max-file: "2"
-      
-  
-  
+
   worker-tjba-portal:
     extends:
       file: common-services.yml
@@ -151,7 +148,6 @@ services:
     mem_limit: 1000M
     mem_reservation: 1000M
     command: pm2 start workers/TJBAPortal/processDocker01.yml --no-daemon
-    
 
   worker-tjsp-oab:
     extends:
@@ -297,10 +293,10 @@ services:
       dockerfile: dockerfile-node
     command: pm2 start workers/JTE/criadoresFila/3.0_criaFila01.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   novos-processos-jte-2:
     extends:
@@ -311,10 +307,10 @@ services:
       dockerfile: dockerfile-node
     command: pm2 start workers/JTE/criadoresFila/3.0_criaFila02.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   novos-processos-jte-3:
     extends:
@@ -325,10 +321,10 @@ services:
       dockerfile: dockerfile-node
     command: pm2 start workers/JTE/criadoresFila/3.0_criaFila03.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   novos-processos-jte-4:
     extends:
@@ -339,10 +335,10 @@ services:
       dockerfile: dockerfile-node
     command: pm2 start workers/JTE/criadoresFila/3.0_criaFila04.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   # novos-processos-trt-1:
   #   extends:
@@ -364,10 +360,10 @@ services:
       dockerfile: dockerfile-node
     command: pm2 start workers/PJE/criaFilaTRT_PJE.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   worker-jte-doc-links-01:
     extends:
@@ -378,11 +374,11 @@ services:
       dockerfile: dockerfile-node
     command: pm2 start workers/JTE_DOC/downloadDoc.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"       
-        
+        max-size: '5m'
+        max-file: '2'
+
   # novos-processos-jte-all:
   #   extends:
   #     file: common-services.yml
@@ -407,10 +403,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker01.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   worker-jte-02:
     extends:
@@ -422,12 +418,12 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker02.yml --no-daemon 
+    command: pm2 start workers/JTE/processDocker02.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   worker-jte-03:
     extends:
@@ -441,10 +437,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE/processDocker03.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   worker-jte-04:
     extends:
@@ -455,12 +451,12 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/processDocker04.yml --no-daemon 
+    command: pm2 start workers/JTE/processDocker04.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   worker-jte-05:
     extends:
@@ -471,13 +467,12 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2 start workers/JTE/reprocessamento.yml --no-daemon 
+    command: pm2 start workers/JTE/reprocessamento.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
-
+        max-size: '10m'
+        max-file: '5'
 
   worker-trt-02:
     extends:
@@ -486,12 +481,12 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/PJE/processDocker01.yml --no-daemon 
+    command: pm2-runtime workers/PJE/processDocker01.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   verifica-novos:
     extends:
@@ -500,12 +495,12 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2 start workers/JTEMonitoria/verificaUltimoProcesso.js --no-daemon 
+    command: pm2 start workers/JTEMonitoria/verificaUltimoProcesso.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   verifica-sequencial:
     extends:
@@ -514,12 +509,12 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2 start workers/JTEMonitoria/workerCnjSequencial.js --no-daemon 
+    command: pm2 start workers/JTEMonitoria/workerCnjSequencial.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   monitoria-jte-1:
     extends:
@@ -528,12 +523,12 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2 start workers/JTEMonitoria/comcarcas7dias.js --no-daemon 
+    command: pm2 start workers/JTEMonitoria/comcarcas7dias.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   limpa-core:
     extends:
@@ -542,12 +537,12 @@ services:
     build:
       dockerfile: Dockerfile
     restart: always
-    command: pm2 start bin/js/limpaCoreDocker.js --no-daemon 
+    command: pm2 start bin/js/limpaCoreDocker.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   worker-jte-doc01:
     extends:
@@ -559,10 +554,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 01
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   worker-jte-doc02:
     extends:
@@ -574,11 +569,11 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 02
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
-  
+        max-size: '10m'
+        max-file: '5'
+
   worker-jte-doc03:
     extends:
       file: common-servicesDoc.yml
@@ -589,10 +584,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 03
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   worker-jte-doc04:
     extends:
@@ -604,10 +599,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 04
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   worker-jte-doc05:
     extends:
@@ -619,10 +614,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 05
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc06:
     extends:
       file: common-servicesDoc.yml
@@ -633,10 +628,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 06
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc07:
     extends:
       file: common-servicesDoc.yml
@@ -647,10 +642,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 07
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc08:
     extends:
       file: common-servicesDoc.yml
@@ -661,10 +656,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 08
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc09:
     extends:
       file: common-servicesDoc.yml
@@ -675,10 +670,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 09
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc10:
     extends:
       file: common-servicesDoc.yml
@@ -689,10 +684,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 10
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc11:
     extends:
       file: common-servicesDoc.yml
@@ -703,10 +698,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 11
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc12:
     extends:
       file: common-servicesDoc.yml
@@ -717,10 +712,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 12
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc13:
     extends:
       file: common-servicesDoc.yml
@@ -731,10 +726,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 13
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc14:
     extends:
       file: common-servicesDoc.yml
@@ -745,10 +740,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 14
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc15:
     extends:
       file: common-servicesDoc.yml
@@ -759,10 +754,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 15
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc16:
     extends:
       file: common-servicesDoc.yml
@@ -773,10 +768,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 16
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc17:
     extends:
       file: common-servicesDoc.yml
@@ -787,10 +782,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 17
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc18:
     extends:
       file: common-servicesDoc.yml
@@ -801,10 +796,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 18
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc19:
     extends:
       file: common-servicesDoc.yml
@@ -815,10 +810,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 19
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc21:
     extends:
       file: common-servicesDoc.yml
@@ -829,10 +824,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 21
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc20:
     extends:
       file: common-servicesDoc.yml
@@ -843,10 +838,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 20
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc22:
     extends:
       file: common-servicesDoc.yml
@@ -857,10 +852,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 22
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc23:
     extends:
       file: common-servicesDoc.yml
@@ -871,10 +866,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 23
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   worker-jte-doc24:
     extends:
       file: common-servicesDoc.yml
@@ -885,8 +880,7 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2 start workers/JTE_DOC/Worker/extracao_JTE_5doc.js --no-daemon -- 24
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
-
+        max-size: '10m'
+        max-file: '5'

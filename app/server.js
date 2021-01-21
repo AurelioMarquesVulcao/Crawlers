@@ -3,7 +3,6 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
-const { ProcessoController } = require('./api/controller/processoController');
 
 const { enums } = require('./configs/enums');
 

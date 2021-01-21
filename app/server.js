@@ -16,8 +16,6 @@ app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
 app.use(bodyParser.json({ limit: '500mb' }));
 app.use('/api', routes);
 
-app.get('/', ProcessoController.contarDocumentos);
-
 console.log(enums.mongo.connString);
 
 mongoose.connect(enums.mongo.connString, {

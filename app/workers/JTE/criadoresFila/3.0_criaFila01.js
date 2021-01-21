@@ -66,7 +66,7 @@ var desligado = desligar.worker;
       if (contador == estados.length) { contador = 0 }
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
       console.log(estados[contador].codigo);
-      process.exit()
+      
       await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);

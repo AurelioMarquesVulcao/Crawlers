@@ -1,6 +1,7 @@
 const { modelNames } = require("mongoose");
 
 require("../bootstrap");
+const { FluxoController } = require('../lib/fluxoController');
 const axios = require("axios").default;
 const GerenciadorFila = require("../lib/filaHandler").GerenciadorFila;
 const { ConsultasCadastradas } = require("../models/schemas/consultas_cadastradas");
@@ -8,30 +9,22 @@ const bigDataAddress = require("../configs/enums").enums.bigdataAddress;
 
 const gerenciadorFila = new GerenciadorFila();
 
-const identificarDetalhes = (cnj) => {
-
-  let tribunal;
-
-  try {
-
-    const cnjMascara = cnj.replace(/([0-9]{7})([0-9]{2})([0-9]{4})([0-9])([0-9]{2})([0-9]{4})/,
-    '$1-$2.$3.$4.$5.$6');
-
-    const numeroMatch = cnjMascara.match(/\.([0-9]{1}\.[0-9]{2})\./);
-
-    if (numeroMatch) {
-      const numeroSplit = numeroMatch[1].split('.');
-      tribunal = {
-        Orgao: parseInt(numeroSplit[0]),
-        Tribunal: parseInt(numeroSplit[1])
-      }
-    }
-
-  } catch(e) {
-    console.log(e.message);
-  }
-
-  return tribunal;
+async function feedbackCadastroConsulta(mensagemObj) {
+  const res = await axios
+    .get(`${bigDataAddress}/consultaPublica/confirmarCadastro/${mensagemObj.CadastroConsultaId}`)
+    .then(res => {
+      return {
+        data: res.data,
+        error: null,
+      };
+    })
+    .catch(err => {
+      return {
+        data: null,
+        error: err,
+      };
+    });
+  return res;
 }
 
 gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
@@ -40,41 +33,10 @@ gerenciadorFila.consumir("cadastro_consulta", async (ch, mensagem) => {
 
   try {
 
-    const query = {
-      NumeroOab: mensagemObj.NumeroOab,
-      NumeroProcesso: mensagemObj.NumeroProcesso,
-      TipoConsulta: mensagemObj.TipoConsulta,
-      SeccionalOab: mensagemObj.SeccionalOab,
-      Instancia: mensagemObj.Instancia
-    };    
-
-    if (mensagemObj.NumeroProcesso)
-      tribunal = identificarDetalhes(mensagemObj.NumeroProcesso);
-
-    if (tribunal) {
-      mensagemObj.Detalhes = tribunal;
-    }
-
-    const consulta = await ConsultasCadastradas.findOne(query);
+    let consulta = await FluxoController.cadastrarConsulta(mensagemObj)
 
     if (!consulta) {
-      const consultaSalva = await new ConsultasCadastradas(mensagemObj).save();      
-      mensagemObj.CadastroConsultaId = consultaSalva._id;
-      console.log(`Criado documento com _id ${mensagemObj.CadastroConsultaId}`);
-      const res = await axios
-        .get(`${bigDataAddress}/consultaPublica/confirmarCadastro/${mensagemObj.CadastroConsultaId}`)
-        .then(res => {
-          return {
-            data: res.data,
-            error: null
-          }
-        })
-        .catch(err => {
-          return {
-            data: null,
-            error: err
-          }
-        });
+      const res = await feedbackCadastroConsulta(mensagemObj);
 
       if (res.data) {
         console.log(`Cadastro da consulta ${mensagemObj.CadastroConsultaId} no bigdata confirmado com sucesso!`);

@@ -1,5 +1,6 @@
 const router = require('express').Router();
 
+const { json } = require('body-parser');
 const {
   ConsultasCadastradas,
 } = require('../../models/schemas/consultas_cadastradas');
@@ -46,6 +47,9 @@ const identificarDetalhes = (cnj) => {
   return tribunal;
 };
 
+/**
+ * Realiza o processo de cadastramento de uma consulta na aplicação.
+ */
 router.post('', async (req, res) => {
   const consulta = new ConsultasCadastradas(req.body);
   consulta.NumeroProcesso = normalizarNumProcesso(
@@ -80,6 +84,35 @@ router.post('', async (req, res) => {
       .json({ detalhes: 'Falha durante registro da consulta.' + e });
     return;
   }
+});
+
+router.delete('', async (req, res) => {
+  let resultado;
+
+  const consulta = new ConsultasCadastradas(req.body);
+  consulta.NumeroProcesso = normalizarNumProcesso(
+    consulta.NumeroProcesso,
+    true
+  );
+  consulta.ClienteId = req.cliente._id;
+
+  const query = {
+    NumeroProcesso: consulta.NumeroProcesso,
+    ClienteId: consulta.ClienteId,
+    TipoConsulta: consulta.TipoConsulta,
+    Instancia: consulta.Instancia,
+  };
+
+  try {
+    resultado = await ConsultasCadastradas.updateOne(query, {
+      $set: { AtivoParaAtualizacao: false },
+    });
+  } catch (e) {
+    res.status(500).json({ detalhes: e });
+    return;
+  }
+  res.status(200).json(resultado);
+  return;
 });
 
 module.exports = router;

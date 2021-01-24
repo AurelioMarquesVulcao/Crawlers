@@ -1,11 +1,17 @@
 const Cliente = require('../../models/schemas/cliente');
 
+/**
+ * Middleware para autenticação da chave de API do cliente fornecida na requisição.
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 const requerClienteApiKey = async (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
 
   if (!apiKey) {
-    res.statusCode = 401;
-    res.json({ detalhes: 'Header X-API-KEY não informado.' });
+    res.status(401).json({ detalhes: 'Header X-API-KEY não informado.' });
     return;
   }
 
@@ -13,16 +19,13 @@ const requerClienteApiKey = async (req, res, next) => {
   try {
     cliente = await Cliente.findOne({ ApiKey: apiKey });
   } catch (e) {
-    res
-      .statusCode(500)
-      .json({ detalhes: 'Falha durante consulta do cliente.' });
+    res.status(500).json({ detalhes: 'Falha durante consulta do cliente.' });
     return;
   }
 
   if (!cliente || !cliente.Ativo) {
-    res
-      .statusCode(401)
-      .json({ detalhes: 'Cliente não localizado ou inativado.' });
+    res.status(401).json({ detalhes: 'Cliente não localizado ou inativado.' });
+    return;
   }
 
   req.cliente = cliente;

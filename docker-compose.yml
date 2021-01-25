@@ -327,7 +327,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jte_DOC/downloadDoc.yml --no-daemon
+    command: pm2-runtime workers/JTE_DOC/downloadDoc.yml --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -497,7 +497,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 01
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 01
     logging:
       driver: "json-file"
       options:
@@ -512,7 +512,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 02
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 02
     logging:
       driver: "json-file"
       options:
@@ -527,7 +527,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 03
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 03
     logging:
       driver: "json-file"
       options:
@@ -542,7 +542,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 04
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 04
     logging:
       driver: "json-file"
       options:
@@ -557,7 +557,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 05
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 05
     logging:
       driver: "json-file"
       options:
@@ -571,7 +571,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 06
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 06
     logging:
       driver: "json-file"
       options:
@@ -585,7 +585,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 07
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 07
     logging:
       driver: "json-file"
       options:
@@ -599,7 +599,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 08
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 08
     logging:
       driver: "json-file"
       options:
@@ -613,7 +613,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 09
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 09
     logging:
       driver: "json-file"
       options:
@@ -627,7 +627,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 10
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 10
     logging:
       driver: "json-file"
       options:
@@ -641,7 +641,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 11
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 11
     logging:
       driver: "json-file"
       options:
@@ -655,7 +655,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 12
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 12
     logging:
       driver: "json-file"
       options:
@@ -669,7 +669,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 13
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 13
     logging:
       driver: "json-file"
       options:
@@ -683,7 +683,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 14
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 14
     logging:
       driver: "json-file"
       options:
@@ -697,7 +697,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 15
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 15
     logging:
       driver: "json-file"
       options:
@@ -711,7 +711,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 16
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 16
     logging:
       driver: "json-file"
       options:
@@ -725,7 +725,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 17
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 17
     logging:
       driver: "json-file"
       options:
@@ -739,7 +739,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 18
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 18
     logging:
       driver: "json-file"
       options:
@@ -753,7 +753,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 19
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 19
     logging:
       driver: "json-file"
       options:
@@ -767,7 +767,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 21
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 21
     logging:
       driver: "json-file"
       options:
@@ -781,7 +781,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 20
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 20
     logging:
       driver: "json-file"
       options:
@@ -795,7 +795,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 22
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 22
     logging:
       driver: "json-file"
       options:
@@ -809,7 +809,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 23
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 23
     logging:
       driver: "json-file"
       options:
@@ -823,7 +823,7 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 24
+    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 24
     logging:
       driver: "json-file"
       options:

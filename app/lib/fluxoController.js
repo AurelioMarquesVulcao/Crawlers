@@ -1,6 +1,6 @@
 require('../bootstrap');
 const moment = require('moment');
-const { Processo } = require('../models/schemas/processo');
+const { ExecucaoConsulta } = require('../models/schemas/execucao_consulta');
 const {
   ConsultasCadastradas,
 } = require('../models/schemas/consultas_cadastradas');
@@ -31,6 +31,14 @@ const sleep = require('await-sleep');
  * @property {String} NumeroProcesso formato /[0-9]{7}\.[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}\.[0-9]{4}/
  * @property {String} NumeroOab formato /[0-9]+[A-Z]?[A-Z]{2}/
  * @property {String} SeccionalOab formato /[A-Z]{2}/
+ */
+
+/**
+ * Mensagem que é enviada pelo BigData para iniciar a execução do robo de peticao
+ * @typedef {Object} MensagemPeticaoTJ
+ * @property {string} NumeroProcesso Numero do processo com ou sem mascara
+ * @property {number} Instancia a instancia do processo
+ * @property {boolean} inicial .
  */
 
 class FluxoController {
@@ -121,6 +129,49 @@ class FluxoController {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  /**
+   *
+   * @param {string} nomeRobo
+   * @param {String} nomeFila
+   * @param {MensagemPeticaoTJ} msg
+   * @return {Promise<boolean>}
+   */
+  static async cadastrarExecucao(nomeRobo, nomeFila, msg) {
+    let gf = GerenciadorFila();
+    let execucao = {
+      NomeRobo: nomeRobo,
+      Log: [
+        {
+          status: `Execução do robô ${nomeRobo} para consulta ${msg.NumeroProcesso} foi cadastrada com sucesso!`,
+        },
+      ],
+      Instancia: msg.Instancia,
+      Mensagem: [msg],
+    };
+
+    let pendentes = await ExecucaoConsulta.find({
+      'mensagem.NomeRobo': nomeRobo,
+      'mensagem.Instancia': msg.Instancia,
+      'mensagem.NumeroProcesso': msg.NumeroProcesso,
+      DataTermino: null,
+    })
+      .limit(1)
+      .countDocuments();
+
+    if (pendentes) {
+      console.log(
+        `O processo ${nomeRobo} - ${msg.NumeroProcesso} já cadastrada`
+      );
+      return false;
+    }
+
+    gf.enviar(nomeFila, msg);
+
+    await new ExecucaoConsulta(execucao).save();
+
+    return true;
   }
 
   /**

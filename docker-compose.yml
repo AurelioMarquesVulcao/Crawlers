@@ -368,6 +368,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
+
   processo.jte.extracao.novos.03:
     extends:
       file: common-services.yml
@@ -828,4 +829,3 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-

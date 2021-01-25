@@ -3,7 +3,6 @@ require('dotenv/config');
 const env = 'dev';
 
 const bigdataAddress = process.env.BIG_DATA_ADDRESS;
-console.log('BigData Address', bigdataAddress); //TODO remove
 
 module.exports.enums = Object.freeze({
   mongo: {
@@ -22,17 +21,23 @@ module.exports.enums = Object.freeze({
     TRTRJ: 'TRTRJ',
     TRTSP: 'PJE',
     PJE: 'PJE',
-    TJCE: 'TJCE'
+    TJCE: 'TJCE',
   },
   tipoConsulta: {
     Oab: 'oab',
     Processo: 'processo',
     Peticao: 'peticao',
   },
+  tipoFila: {
+    Novos: "novos",
+    Atualizacao: "atualizacao",
+    Extracao: "extracao",
+    Reprocessamento: "reprocessamento"
+  },
   bigdataUrls: {
     captchaDecoder: 'http://172.16.16.8:5000/api/solve',
     resultadoDocumentos: `http://${bigdataAddress}/processos/documentos/uploadPeticaoInicial/`,
-    login: `http://${bigdataAddress}/login/`
+    login: `http://${bigdataAddress}/login/`,
   },
   proxy: {
     proxiesUrl: process.env.PROXY_ADDRESS,

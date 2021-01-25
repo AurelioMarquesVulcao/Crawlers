@@ -11,7 +11,8 @@ const { Helper, Logger, Cnj } = require('../../../lib/util');
 const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 const { GerenciadorFila } = require("../../../lib/filaHandler");
 const awaitSleep = require("await-sleep");
-const {statusEstadosJTE} = require("../../../models/schemas/jte");
+const { statusEstadosJTE } = require("../../../models/schemas/jte");
+const { StatusTribunais } = require('../../../models/schemas/monitoria');
 
 
 const Fila = new CriaFilaJTE();

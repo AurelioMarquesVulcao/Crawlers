@@ -11,7 +11,8 @@ const { Helper, Logger, Cnj } = require('../../../lib/util');
 const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 const { GerenciadorFila } = require("../../../lib/filaHandler");
 const awaitSleep = require("await-sleep");
-const {statusEstadosJTE} = require("../../../models/schemas/jte");
+const { statusEstadosJTE } = require("../../../models/schemas/jte");
+const { StatusTribunais } = require('../../../models/schemas/monitoria');
 
 
 const Fila = new CriaFilaJTE();
@@ -29,6 +30,7 @@ var desligado = desligar.worker;
   const variaveis = await Variaveis.catch({ "codigo": "000001" });
   const Estados = variaveis.variaveis;
   var estados = [
+    // Estados[0].rs,
     Estados[0].rs, Estados[0].pe, Estados[0].ce, Estados[0].pa,
     Estados[0].to, Estados[0].am, Estados[0].sc, Estados[0].ac, Estados[0].pb,
   ];

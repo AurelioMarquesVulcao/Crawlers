@@ -315,11 +315,11 @@ class CriaFilaJTE {
 	 * @return {string} Retorna um Array de numeros CNJ para serem buscados
 	 */
 	async procura(sequencial, origem, tentativas, tribunal, estado) {
-		// console.log(sequencial, "aqui");
+		console.log(sequencial, "aqui");
 		if (sequencial == "0000000") {
 			sequencial = "0000000"
 		}
-		console.log(sequencial, "2");
+		// console.log(sequencial, "2");
 		// console.log(sequencial, origem, tentativas, tribunal);
 		if (estado == "") {
 			estado = "Principal";
@@ -327,6 +327,8 @@ class CriaFilaJTE {
 		let mensagens = [];
 		try {
 			let obj = corrigeSequencial(sequencial)
+			console.log(obj);
+			
 			let zeros = ""
 			let processo = ""
 			origem = corrigeOrigem(origem)
@@ -336,26 +338,37 @@ class CriaFilaJTE {
 				let a = sequencial + 1 + i
 				// console.log(a);
 				if ((obj.zero + a).length > 7) {
-					zeros = obj.zero.substr(1)
+					// console.log(zeros);
+					zeros = obj.zero
+					// console.log(zeros);
+					// process.exit()
 					let numeroAleatorio = CnjValidator.calcula_mod97(
 						`${zeros}${a}`, `${new Date().getFullYear()}`, `5${tribunal}`, `${origem}`
 					);
 					processo = `${zeros}${a}${numeroAleatorio}${new Date().getFullYear()}5${tribunal}${origem}`
 
 				} else {
+					// console.log(obj);
+					zeros = obj.zero
+					// console.log(zeros);
+					// process.exit()
 					let numeroAleatorio = CnjValidator.calcula_mod97(
 						`${zeros}${a}`, `${new Date().getFullYear()}`, `5${tribunal}`, `${origem}`
 					);
 					processo = `${zeros}${a}${numeroAleatorio}${new Date().getFullYear()}5${tribunal}${origem}`
 				}
+				console.log(processo);
 				let teste = await Processo.find({ "detalhes.numeroProcesso": processo });
 				if (teste.length == 0) {
 					mensagens.push(criaPost(processo, estado));
 				}
+				// process.exit();
 			}
+			// console.log(mensagens);
+			// process.exit()
 			return mensagens
 		} catch (e) {
-			// console.log(e);
+			console.log(e);
 			console.log(`O Processo numero: ${processo} FALHOU !!!`);
 		}
 

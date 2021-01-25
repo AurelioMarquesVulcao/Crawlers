@@ -28,6 +28,12 @@ module.exports.enums = Object.freeze({
     Processo: 'processo',
     Peticao: 'peticao',
   },
+  tipoFila: {
+    Novos: "novos",
+    Atualizacao: "atualizacao",
+    Extracao: "extracao",
+    Reprocessamento: "reprocessamento"
+  },
   bigdataUrls: {
     captchaDecoder: 'http://172.16.16.8:5000/api/solve',
     resultadoDocumentos: `http://${bigdataAddress}/processos/documentos/uploadPeticaoInicial/`,

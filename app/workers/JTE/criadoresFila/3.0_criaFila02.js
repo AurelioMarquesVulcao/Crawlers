@@ -11,7 +11,8 @@ const { Helper, Logger, Cnj } = require('../../../lib/util');
 const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 const { GerenciadorFila } = require("../../../lib/filaHandler");
 const awaitSleep = require("await-sleep");
-const {statusEstadosJTE} = require("../../../models/schemas/jte");
+const { statusEstadosJTE } = require("../../../models/schemas/jte");
+const { StatusTribunais } = require('../../../models/schemas/monitoria');
 
 
 const Fila = new CriaFilaJTE();
@@ -65,6 +66,7 @@ var desligado = desligar.worker;
       if (contador == estados.length) { contador = 0 }
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
       console.log(estados[contador].codigo);
+      
       await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);
@@ -84,7 +86,6 @@ var desligado = desligar.worker;
             // console.log(x);
             if (x.numero.sequencial != "0000001") {
               let sequencial = trataSequencial(x)
-              // console.log(sequencial);
 
               let arrayMensages = await Fila.procura(sequencial, x.numero.comarca, 4, x.numero.estado, x.estado)
               // console.log(arrayMensages);
@@ -94,7 +95,6 @@ var desligado = desligar.worker;
               }
             }
           } else {
-
             let arrayMensages = await Fila.procura(x.numero.sequencial, x.numero.comarca, 4, x.numero.estado, x.estado)
             // console.log(arrayMensages);
             for (let ii = 0; ii < arrayMensages.length; ii++) {

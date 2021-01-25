@@ -154,7 +154,7 @@ class FluxoController {
 
     if (error) execucao.Error = error.stack.replace(/\n+/, ' ').trim();
 
-    return await LogExecucao(execucao);
+    return await LogExecucao.salvar(execucao);
   }
 }
 

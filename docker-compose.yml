@@ -257,7 +257,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jte/criadoresFila/3.0_criaFila01.js --no-daemon
+    command: node workers/JTE/criadoresFila/3.0_criaFila01.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -271,7 +271,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jte/criadoresFila/3.0_criaFila02.js --no-daemon
+    command: node workers/JTE/criadoresFila/3.0_criaFila02.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -285,7 +285,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jte/criadoresFila/3.0_criaFila03.js --no-daemon
+    command: node workers/JTE/criadoresFila/3.0_criaFila03.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -299,7 +299,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jte/criadoresFila/3.0_criaFila04.js --no-daemon
+    command: node workers/JTE/criadoresFila/3.0_criaFila04.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -313,7 +313,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/PJE/criaFilaTRT_PJE.js --no-daemon
+    command: node workers/PJE/criaFilaTRT_PJE.js --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -344,7 +344,7 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte/processDocker01.yml --no-daemon
+    command: pm2-runtime workers/JTE/processDocker01.yml
     logging:
       driver: "json-file"
       options:
@@ -361,7 +361,7 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte/processDocker02.yml --no-daemon 
+    command: pm2-runtime workers/JTE/processDocker02.yml --no-daemon 
     logging:
       driver: "json-file"
       options:
@@ -379,7 +379,7 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte/processDocker03.yml --no-daemon
+    command: pm2-runtime workers/JTE/processDocker03.yml --no-daemon
     logging:
       driver: "json-file"
       options:
@@ -395,7 +395,7 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte/processDocker04.yml --no-daemon 
+    command: pm2-runtime workers/JTE/processDocker04.yml --no-daemon 
     logging:
       driver: "json-file"
       options:
@@ -411,7 +411,7 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/jte/reprocessamento.yml --no-daemon 
+    command: pm2-runtime workers/JTE/reprocessamento.yml --no-daemon 
     logging:
       driver: "json-file"
       options:

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const sleep = require('await-sleep');
 
 const fs = require('fs');
+const { FluxoController } = require('../../lib/fluxoController');
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
@@ -34,6 +35,8 @@ const logarExecucao = async (execucao) => {
       nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJSP}`,
       NumeroDoProcesso: message.NumeroProcesso,
     });
+    let execucao = {};
+
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
@@ -84,29 +87,30 @@ const logarExecucao = async (execucao) => {
 
       logger.info('Resposta enviada ao BigData');
       logger.info('Finalizando processo');
-      await logarExecucao({
-        Mensagem: message,
-        DataInicio: dataInicio,
-        DataTermino: new Date(),
+      execucao = {
+        mensagem: message,
+        dataInicio: dataInicio,
+        dataTermino: new Date(),
         status: 'OK',
         logs: logger.logs,
-        NomeRobo: 'PeticaoTJSP',
-      });
+        nomeRobo: enums.nomesRobos.TJSP,
+      };
     } catch (e) {
       logger.info('Encontrado erro durante a execução');
       logger.log('error', e);
       logger.info('Finalizando proceso');
-      await logarExecucao({
-        LogConsultaId: message.LogConsultaId,
-        Mensagem: message,
-        DataInicio: dataInicio,
-        DataTermino: new Date(),
+      execucao = {
+        mensagem: message,
+        dataInicio: dataInicio,
+        dataTermino: new Date(),
         status: e.message,
-        error: e.stack.replace(/\n+/, ' ').trim(),
+        error: e,
         logs: logger.logs,
-        NomeRobo: enums.nomesRobos.TJSP,
-      });
+        nomeRobo: enums.nomesRobos.TJSP,
+      };
     } finally {
+      await FluxoController.finalizarConsultaPendente(execucao);
+
       if (fs.existsSync(arquivoPath)) {
         logger.info('Apagando arquivo temporario');
         await fs.unlinkSync(arquivoPath);

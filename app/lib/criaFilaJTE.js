@@ -535,8 +535,15 @@ function corrigeOrigem(origem) {
  * @param {string} numero Numero CNJ que será usado para criar mensagem
  */
 function criaPost(numero, estado) {
-	let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true, "estado":"${estado}"}`;
-	return post
+  if (numero.length != 20) {
+    if (numero.substr(0, 1) != 0) {
+      numero = numero.replace("0","");
+    } else {
+      numero = numero.slice(-20);
+    }
+  }
+  let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true, "estado":"${estado}"}`;
+  return post;
 }
 
 // gera numero aleatório para preencher os campos os dados

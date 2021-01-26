@@ -334,7 +334,7 @@ services:
         max-size: "5m"
         max-file: "2"       
 
-  processo.jte.extracao.novos.01:
+  processo.jte.extracao.novos.1:
     extends:
       file: common-services.yml
       service: base_node
@@ -351,7 +351,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  processo.jte.extracao.novos.02:
+  processo.jte.extracao.novos.2:
     extends:
       file: common-services.yml
       service: base_node
@@ -369,7 +369,7 @@ services:
         max-file: "5"
 
 
-  processo.jte.extracao.novos.03:
+  processo.jte.extracao.novos.3:
     extends:
       file: common-services.yml
       service: base_node
@@ -386,7 +386,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  processo.jte.extracao.novos.04:
+  processo.jte.extracao.novos.4:
     extends:
       file: common-services.yml
       service: base_node

@@ -41,10 +41,10 @@ class CriaFilaJTE {
 			let teste = await statusEstadosJTE.find({ estadoNumero: dados[i].estadoNumero, comarca: dados[i].comarca });
 			// console.log(teste);
 			if (teste.length > 1) {
-				console.log(teste);
+				// console.log(teste);
 				let numero = [teste[0].numeroUltimoProcecesso, teste[1].numeroUltimoProcecesso]
-				console.log(retornaIndiceMaiorValor(numero));
-				console.log(numero[retornaIndiceMaiorValor(numero)]);
+				// console.log(retornaIndiceMaiorValor(numero));
+				// console.log(numero[retornaIndiceMaiorValor(numero)]);
 				await statusEstadosJTE.deleteOne({ numeroUltimoProcecesso: numero[retornaIndiceMaiorValor(numero)] })
 
 
@@ -127,11 +127,11 @@ class CriaFilaJTE {
 
 	static async resetEstado(codigo) {
 		let comarcas = await this.getEstado(codigo);
-		console.log(comarcas);
+		// console.log(comarcas);
 		comarcas.map(async x => {
 			await this.updateEstado(x._id);
 			let datas = await statusEstadosJTE.findOne(x._id)
-			console.log(datas.estadoNumero, datas.comarca, datas.status);
+			// console.log(datas.estadoNumero, datas.comarca, datas.status);
 		})
 
 	}
@@ -357,9 +357,12 @@ class CriaFilaJTE {
 					);
 					processo = `${zeros}${a}${numeroAleatorio}${new Date().getFullYear()}5${tribunal}${origem}`
 				}
-				console.log(processo);
+				// console.log(processo);
 				let teste = await Processo.find({ "detalhes.numeroProcesso": processo });
 				if (teste.length == 0) {
+					console.log("teste ok");
+					mensagens.push(criaPost(processo, estado));
+				}else{
 					mensagens.push(criaPost(processo, estado));
 				}
 				// process.exit();
@@ -542,7 +545,7 @@ function criaPost(numero, estado) {
       numero = numero.slice(-20);
     }
   }
-  let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true, "estado":"${estado}"}`;
+	let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true, "estado":"${estado}"}`;
   return post;
 }
 

@@ -66,7 +66,7 @@ var desligado = desligar.worker;
       if (tribunalStatus == false) { contador++ }
       if (contador == estados.length) { contador = 0 }
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
-      console.log(estados[contador].codigo);
+      // console.log(estados[contador].codigo);
       await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);
@@ -75,7 +75,7 @@ var desligado = desligar.worker;
       console.log("Filtrado dados da comarca");
       // Pega apenas as comarcas que não são ultimo estado
       let processos = extraiDados(status);
-      console.log(processos.length);
+      // console.log(processos.length);
 
       if (processos.length > 0) {
         mensagens = [];
@@ -130,7 +130,7 @@ async function atualizaStatusDownload(estado, relogio) {
   let desatualizadas = validaData.filter(x =>
     x.dataBusca.getDate() < new Date().getDate() || x.dataBusca.getMonth() < new Date().getMonth()
   );
-  console.log(desatualizadas);
+  // console.log(desatualizadas);
   if (desatualizadas.length != 0) {
     for (let i = 0; i < desatualizadas.length; i++) {
       let { _id } = desatualizadas[i];

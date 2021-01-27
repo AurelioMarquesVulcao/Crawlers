@@ -21,7 +21,9 @@ const desligado = require('../../../assets/jte/horarioRoboJTE.json');
  */
 let logger;
 
-const logarExecucao = async (execucao) => { await LogExecucao.salvar(execucao); };
+const logarExecucao = async (execucao) => {
+  await LogExecucao.salvar(execucao);
+};
 const fila = new CriaFilaJTE();
 const puppet = new RoboPuppeteer3();
 const util = new Cnj();
@@ -29,23 +31,19 @@ const util = new Cnj();
 const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.3`;
 const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.JTE}.extracao.novos.3`;
 
-var estadoAnterior;   // Recebe o estado atual que está sendo baixado
-var estadoDaFila;     // Recebe o estado da fila
-var contador = 0;     // Conta quantos processos foram abertos pelo pupperteer, para poder selecionar os botões da pagina
-var heartBeat = 0;    // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
+var estadoAnterior; // Recebe o estado atual que está sendo baixado
+var estadoDaFila; // Recebe o estado da fila
+var contador = 0; // Conta quantos processos foram abertos pelo pupperteer, para poder selecionar os botões da pagina
+var heartBeat = 0; // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
 let data = 1;
-var logadoParaIniciais = false;   // Marca se estamos logados para baixar documentos
+var logadoParaIniciais = false; // Marca se estamos logados para baixar documentos
 var testeErros1 = []; // Contador de erros
 var testeErros2 = []; // Contador de erros
-var contadorErros = 0;  // Conta a quantidade de erros para reiniciar a aplicação
+var contadorErros = 0; // Conta a quantidade de erros para reiniciar a aplicação
 var resultado = [];
-var catchError = 0;   // Captura erros;
+var catchError = 0; // Captura erros;
 var start = 0;
-var status = "";
-
-
-
-
+var status = '';
 
 // posso aplicar condições para rodar o worker
 (async () => {
@@ -59,10 +57,7 @@ var status = "";
       //console.log("aguardando para ligar");
     }
   }, 6000);
-
-})()
-
-
+})();
 
 async function worker() {
   // função que reinicia a aplicação caso ela fique parada sem consumir a fila.
@@ -70,9 +65,19 @@ async function worker() {
     heartBeat++;
     //console.log(`setInterval: Ja passou ${heartBeat} segundos!`);
     if (logadoParaIniciais == false) {
-      if (heartBeat > 300) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 300) {
+        console.log(
+          '----------------- Fechando o processo por inatividade -------------------'
+        );
+        process.exit();
+      }
     } else {
-      if (heartBeat > 360) { console.log('----------------- Fechando o processo por inatividade -------------------'); process.exit(); }
+      if (heartBeat > 360) {
+        console.log(
+          '----------------- Fechando o processo por inatividade -------------------'
+        );
+        process.exit();
+      }
     }
   }, 1000);
 
@@ -85,20 +90,17 @@ async function worker() {
     console.log(e);
   });
 
-
   // Ligando o puppeteer.
   await puppet.iniciar();
   await sleep(3000);
   await puppet.acessar('https://jte.csjt.jus.br/');
   await sleep(3000);
 
-
-
   contador = 0;
   // tudo que está abaixo é acionado para cada consumer na fila.
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     contadorErros++;
-    heartBeat = 0;  // Zero o Contador indicando que a aplicação esta consumindo a fila.
+    heartBeat = 0; // Zero o Contador indicando que a aplicação esta consumindo a fila.
     let dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     let novosProcesso = message.NovosProcessos;
@@ -114,7 +116,6 @@ async function worker() {
     logger.info('É busca de novo processo novo processo ' + novosProcesso);
     // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
-
     logger.info('Iniciando processo de extração');
     //-------------------------------------------------- inicio do extrator--------------------------------------------
     try {
@@ -128,12 +129,11 @@ async function worker() {
       estadoDaFila = puppet.processaNumero(numeroProcesso).estado;
 
       if (estadoDaFila != estadoAnterior) {
-        await mongoose.connection.close()
+        await mongoose.connection.close();
         await puppet.mudaTribunal(estadoDaFila);
         await sleep(1000);
         contador = 0;
       }
-
 
       estadoAnterior = estadoDaFila;
       logger.info('O Estado do consumer é o numero: ' + estadoAnterior);
@@ -147,11 +147,10 @@ async function worker() {
         if (start == 1) {
           logger.info('Iniciando processo de logar no tribunal');
           await puppet.preencheTribunal(numeroProcesso);
-          start = 2
+          start = 2;
           logger.info('Loggin no tribunal realizado com sucesso');
           await sleep(1000);
         }
-
 
         // caregando as variaveis que receberam os dados do parser
         let dadosProcesso;
@@ -162,37 +161,55 @@ async function worker() {
         // caso exista eu obtenho o html da capa e dos andamentos como resposta.
         let objResponse = await puppet.preencheProcesso(
           numeroProcesso,
-          contador,
+          contador
         );
-        logger.info("Execuntando Parser do processo");
+        logger.info('Execuntando Parser do processo');
         let $ = cheerio.load(objResponse.geral);
         let $2 = cheerio.load(objResponse.andamentos);
         dadosProcesso = parser.parse($, $2, contador);
-        logger.info("Parser executado com sucesso.");
+        logger.info('Parser executado com sucesso.');
 
         if (!!objResponse) contador++;
 
         if (message.inicial != true) {
-          logger.info("Enviando dados para o banco de dados.")
+          logger.info('Enviando dados para o banco de dados.');
           await dadosProcesso.processo.salvar();
           //console.log(dadosProcesso.andamentos[0]);
           await Andamento.salvarAndamentos(dadosProcesso.andamentos);
           processo = await dadosProcesso.processo.salvar();
           // if (new Date().getDate() == dadosProcesso.processo.capa.dataDistribuicao.getDate()) {
           // após que todas as comarcas estiverem no mes corrente aplicar o código acima
-          logger.info("Sucesso ao enviar para o banco de dados.")
+          logger.info('Sucesso ao enviar para o banco de dados.');
 
           // salvando status
-                   
-          let numeroAtualProcesso = dadosProcesso.processo.detalhes.numeroProcesso;
+
+          let numeroAtualProcesso =
+            dadosProcesso.processo.detalhes.numeroProcesso;
           let dataAtualProcesso = dadosProcesso.processo.capa.dataDistribuicao;
           let cnj = Cnj.processoSlice(numeroAtualProcesso);
-          let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca, "estado" : status };
-          await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, "", buscaProcesso, status);
+          let buscaProcesso = {
+            estadoNumero: cnj.estado,
+            comarca: cnj.comarca,
+            estado: status,
+          };
+          try {
+            if (dataAtualProcesso == null) {
+              throw 'Erro na obtenção da data da extração.';
+            }
+            await fila.salvaStatusComarca(
+              numeroAtualProcesso,
+              dataAtualProcesso,
+              '',
+              buscaProcesso,
+              status
+            );
+          } catch (e) {
+            console.log(e);
+          }
 
           // Enviando para Collection de controle *ultimosProcessos*
           // if (new Date(2020, 1, 20) < dadosProcesso.processo.capa.dataDistribuicao) {
-          logger.info("Salvando na Collection ultimosProcessos")
+          logger.info('Salvando na Collection ultimosProcessos');
 
           await new CriaFilaJTE().salvaUltimo({
             numeroProcesso: dadosProcesso.processo.detalhes.numeroProcesso,
@@ -207,8 +224,6 @@ async function worker() {
           // }
         }
 
-
-
         logger.info('Processo extraidos com sucesso');
         if (!!dadosProcesso) {
           resultadoExtracao = {
@@ -222,9 +237,10 @@ async function worker() {
         if (!!dadosProcesso)
           await console.log(
             '\033[0;32m' +
-            'Resultado da extração ' +
-            '\033[0;34m' +
-            !!resultadoExtracao);
+              'Resultado da extração ' +
+              '\033[0;34m' +
+              !!resultadoExtracao
+          );
 
         logger.logs = [...logger.logs, ...resultadoExtracao.logs];
         logger.info('Processo extraido');
@@ -241,34 +257,47 @@ async function worker() {
       }
 
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
-      console.log("\033[1;35m  ------------ Tempo de para baixar o processo é de " + heartBeat + " segundos -------------");
-
+      console.log(
+        '\033[1;35m  ------------ Tempo de para baixar o processo é de ' +
+          heartBeat +
+          ' segundos -------------'
+      );
 
       ch.ack(msg);
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
       desligaAgendado();
-
-
     } catch (e) {
       catchError++;
-      console.log(e)
-      if (e == "ultimo processo") {
+      console.log(e);
+      if (e == 'ultimo processo') {
         catchError--;
-        // salvando status 
+        // salvando status
         let numeroAtualProcesso = numeroProcesso;
-        let dataAtualProcesso = "";
+        let dataAtualProcesso = '';
         let cnj = Cnj.processoSlice(numeroProcesso);
-        let buscaProcesso = { "estadoNumero": cnj.estado, "comarca": cnj.comarca, "ano": cnj.ano };
-        await fila.salvaStatusComarca(numeroAtualProcesso, dataAtualProcesso, true, buscaProcesso, status);
+        let buscaProcesso = {
+          estadoNumero: cnj.estado,
+          comarca: cnj.comarca,
+          ano: cnj.ano,
+        };
+        await fila.salvaStatusComarca(
+          numeroAtualProcesso,
+          dataAtualProcesso,
+          true,
+          buscaProcesso,
+          status
+        );
       }
       // Salva meus erros nos logs
-      logger.log("info", numeroProcesso + " " + e);
-      console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
+      logger.log('info', numeroProcesso + ' ' + e);
+      console.log(
+        '-------------- estamos com : ' + catchError + ' erros ------- '
+      );
       // caso o puppeteer fique perdido na sequencias de clicks nós o reiniciamos.
       if (catchError > 4) {
         //new RoboPuppeteer3().finalizar()
-        await mongoose.connection.close()
+        await mongoose.connection.close();
         shell.exec('/usr/bin/pkill chrome');
         process.exit();
       }
@@ -290,19 +319,18 @@ async function worker() {
       ch.ack(msg);
       logger.info('Mensagem enviada ao reprocessamento');
       logger.info('\033[31m' + 'Finalizando processo de extração');
-      desligaAgendado()
-
+      desligaAgendado();
     }
   });
 }
 
 function desligaAgendado() {
-  let relogio = fila.relogio()
-  if (desligado.worker.find(element => element == relogio.hora)) {
+  let relogio = fila.relogio();
+  if (desligado.worker.find((element) => element == relogio.hora)) {
     //await mongoose.connection.close();
     shell.exec('pkill chrome');
     start = 0;
-    console.log("vou desligar");
+    console.log('vou desligar');
     process.exit();
   }
 }

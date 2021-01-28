@@ -13,21 +13,25 @@ const { statusEstadosJTE } = require('../../../models/schemas/jte');
 const { StatusTribunais } = require('../../../models/schemas/monitoria');
 const { Variaveis } = require('../../../lib/variaveisRobos');
 
-
 const Fila = new CriaFilaJTE();
 const rabbit = new GerenciadorFila();
 var nomeFila = 'processo.JTE.extracao.novos.4';
 
-
-
 (async () => {
   let contador = 0;
-  const variaveis = await Variaveis.catch({ "codigo": "000001" });
+  const variaveis = await Variaveis.catch({ codigo: '000001' });
   const Estados = variaveis.variaveis;
   var estados = [
     // Estados[0].rs,
-    Estados[0].rs, Estados[0].pe, Estados[0].ce, Estados[0].pa,
-    Estados[0].to, Estados[0].am, Estados[0].sc, Estados[0].ac, Estados[0].pb,
+    Estados[0].rs,
+    Estados[0].pe,
+    Estados[0].ce,
+    Estados[0].pa,
+    Estados[0].to,
+    Estados[0].am,
+    Estados[0].sc,
+    Estados[0].ac,
+    Estados[0].pb,
   ];
 
   embaralha(estados);

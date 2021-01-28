@@ -23,7 +23,9 @@ var nomeFila = 'processo.JTE.extracao.novos.2';
   const Estados = variaveis.variaveis;
   var estados = [
     // Estados[0].sp15,
-    Estados[0].sp15, Estados[0].mg, Estados[0].ba,
+    Estados[0].sp15,
+    Estados[0].mg,
+    Estados[0].ba,
   ];
 
   embaralha(estados);

@@ -22,9 +22,17 @@ var nomeFila = 'processo.JTE.extracao.novos.3';
   const variaveis = await Variaveis.catch({ codigo: '000001' });
   const Estados = variaveis.variaveis;
   var estados = [
+    // Estados[0].ms,
+    Estados[0].ma,
+    Estados[0].es,
+    Estados[0].go,
+    Estados[0].al,
+    Estados[0].se,
+    Estados[0].pi,
+    Estados[0].mt,
+    Estados[0].rn,
     Estados[0].ms,
-    // Estados[0].ma, Estados[0].es, Estados[0].go, Estados[0].al, Estados[0].se,
-    // Estados[0].pi, Estados[0].mt, Estados[0].rn, Estados[0].ms, Estados[0].pr
+    Estados[0].pr,
   ];
 
   embaralha(estados);

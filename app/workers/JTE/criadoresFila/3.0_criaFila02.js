@@ -22,7 +22,7 @@ var nomeFila = 'processo.JTE.extracao.novos.2';
   const variaveis = await Variaveis.catch({ codigo: '000001' });
   const Estados = variaveis.variaveis;
   var estados = [
-    // Estados[0].mg,
+    // Estados[0].sp15,
     Estados[0].sp15, Estados[0].mg, Estados[0].ba,
   ];
 
@@ -260,7 +260,7 @@ async function tribunalOn(estado) {
     {
       $match: {
         ufCode: numeroEstado,
-        site: 'pje',
+        site: 'jte',
       },
     },
     {

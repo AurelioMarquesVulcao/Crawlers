@@ -264,7 +264,7 @@ async function tribunalOn(estado) {
     {
       $match: {
         ufCode: numeroEstado,
-        site: 'pje',
+        site: 'jte',
       },
     },
     {

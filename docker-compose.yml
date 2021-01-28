@@ -489,7 +489,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  peticao.jte.extracao.1:
+  peticao.jte.extracao.01:
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -504,7 +504,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  peticao.jte.extracao.2:
+  peticao.jte.extracao.02:
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -519,7 +519,7 @@ services:
         max-size: "10m"
         max-file: "5"
   
-  peticao.jte.extracao.3:
+  peticao.jte.extracao.03:
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -534,7 +534,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  peticao.jte.extracao.4:
+  peticao.jte.extracao.04:
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -549,7 +549,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  peticao.jte.extracao.5:
+  peticao.jte.extracao.05:
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -563,7 +563,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  peticao.jte.extracao.6:
+  peticao.jte.extracao.06:
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -577,7 +577,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  peticao.jte.extracao.7:
+  peticao.jte.extracao.07:
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -591,7 +591,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  peticao.jte.extracao.8:
+  peticao.jte.extracao.08:
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -605,7 +605,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-  peticao.jte.extracao.9:
+  peticao.jte.extracao.09:
     extends:
       file: common-servicesDoc.yml
       service: base_node

@@ -1,27 +1,23 @@
-const mongoose = require('mongoose');
 const cheerio = require('cheerio');
+const mongoose = require('mongoose');
 const re = require('xregexp');
 const sleep = require('await-sleep');
+
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const comarcas = require('../../../assets/jte/comarcas');
-const { Variaveis } = require('../../../lib/variaveisRobos');
-// const Estados = require('../../../assets/jte/comarcascopy.json');
+
 const { getFilas } = require('./get_fila');
-const { Helper, Logger, Cnj } = require('../../../lib/util');
-const desligar = require('../../../assets/jte/horarioRoboJTE.json');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
-const awaitSleep = require('await-sleep');
+const { Helper, Logger, Cnj } = require('../../../lib/util');
 const { statusEstadosJTE } = require('../../../models/schemas/jte');
 const { StatusTribunais } = require('../../../models/schemas/monitoria');
+const { Variaveis } = require('../../../lib/variaveisRobos');
 
 const Fila = new CriaFilaJTE();
 const rabbit = new GerenciadorFila();
-var fila = '.1'; // string de escolha de fila
 var nomeFila = 'processo.JTE.extracao.novos.1';
-var desligado = desligar.worker;
 
 (async () => {
-  let mensagens = [];
   let contador = 0;
   let start = 0; // cria uma condição que permite que a aplicação inicie ao ligar o worker.
   const variaveis = await Variaveis.catch({ codigo: '000001' });
@@ -36,8 +32,6 @@ var desligado = desligar.worker;
     useUnifiedTopology: true,
   });
   try {
-    // fara com que as 18:00 reset todos as comarcas
-
     for (let w = 0; w < 1; ) {
       let mensagens = [];
       let relogio = Fila.relogio();
@@ -57,8 +51,6 @@ var desligado = desligar.worker;
         contador = 0;
       }
       // faz com que todas as comarcas sejam colocadas para download todos os dias.
-      console.log(estados[contador].codigo);
-
       await atualizaStatusDownload(estados[contador].codigo, relogio);
       // pega as comarcas já atualizadas
       let comarcas = await CriaFilaJTE.getEstado(estados[contador].codigo);
@@ -77,11 +69,8 @@ var desligado = desligar.worker;
           // Para a virada do ano será usado esse código.
           if (x.numero.ano != new Date().getFullYear()) {
             // Gera um numero de Start Para a comarca.
-            // console.log(x);
             if (x.numero.sequencial != '0000001') {
               let sequencial = trataSequencial(x);
-              // console.log(sequencial);
-
               let arrayMensages = await Fila.procura(
                 sequencial,
                 x.numero.comarca,
@@ -89,8 +78,6 @@ var desligado = desligar.worker;
                 x.numero.estado,
                 x.estado
               );
-              // console.log(arrayMensages);
-              // process.exit()
               for (let ii = 0; ii < arrayMensages.length; ii++) {
                 mensagens.push(arrayMensages[ii]);
               }
@@ -103,7 +90,6 @@ var desligado = desligar.worker;
               x.numero.estado,
               x.estado
             );
-            // console.log(arrayMensages);
             for (let ii = 0; ii < arrayMensages.length; ii++) {
               mensagens.push(arrayMensages[ii]);
             }
@@ -122,14 +108,12 @@ var desligado = desligar.worker;
       }
       if (contador == estados.length) {
         contador = 0;
-        // testando para caso eu vire a fila toda reinicie todos as comarcas
+        // Ao chegar no fim dos estados reinicio todas as comarcas de todos os estados
         for (let y = 0; y < estados.length; y++) {
-          // await CriaFilaJTE.getEstado(estados[y].codigo);
           await CriaFilaJTE.resetEstado(estados[y].codigo);
         }
       }
       await sleep(20000);
-      // process.exit();
     }
   } catch (e) {
     console.log(e);
@@ -137,9 +121,7 @@ var desligado = desligar.worker;
 })();
 async function atualizaStatusDownload(estado, relogio) {
   let comarcas = await CriaFilaJTE.getEstado(estado);
-  // new Date().getMonth()
   let validaData = comarcas.filter((x) => x.dataBusca);
-  // console.log(validaData[0].dataBusca.getDate(),"data", validaData[0].dataBusca, "dia", new Date().getDay());
   let desatualizadas = validaData.filter(
     (x) =>
       x.dataBusca.getDate() < new Date().getDate() ||
@@ -158,8 +140,6 @@ function extraiDados(comarcas) {
   return comarcas
     .map((x) => {
       if (x.ano == 2020) {
-        // if (new Date().getDay() == "1" && new Date().getMonth() == "1") {
-        // if (true){
         if (x.status != 'Ultimo Processo') {
           return {
             numero: Cnj.processoSlice(x.numeroUltimoProcecesso),
@@ -183,7 +163,6 @@ function extraiDados(comarcas) {
       }
     })
     .filter((x) => x != null);
-  // console.log(dados);
 }
 
 // embaralhador de array, faz com que a ordem de consumo da fila mude
@@ -231,7 +210,6 @@ function trataSequencial(x) {
   if (processo == '000000') {
     return processo;
   } else {
-    // console.log(processo);
     let number = [];
     processo.map((y) => {
       for (let i = 0; i < y.length; i++) {
@@ -239,7 +217,6 @@ function trataSequencial(x) {
       }
       return number;
     });
-    // console.log(number);
     let zeros = '';
     while (true) {
       if (number[0] == '0') {

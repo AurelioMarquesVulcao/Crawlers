@@ -1,34 +1,43 @@
 const cheerio = require('cheerio');
+const { ExtratorBase } = require('./extratores');
+const { Processo } = require('../models/schemas/processo');
 const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Logger } = require('../lib/util');
-const { BaseParser } = require('../parsers/BaseParser');
 const { Robo } = require('../lib/newRobo');
+const parsers = require('../parsers');
 
 const proxy = true;
 
-class ProcessoESAJ extends BaseParser {
+class ProcessoESAJ extends ExtratorBase {
   constructor(url, isDebug) {
     super(url, isDebug);
     this.parser = null;
     this.robo = new Robo();
+    this.logger = null;
     this.resposta = {};
+    this.url = url;
   }
 
+  /**
+   * Extrai o processo e o salva no banco
+   * @param {string} numeroProcesso
+   * @param {string} numeroOab
+   * @param {number} instancia
+   * @param {Object} mensagem
+   * @return {Promise<*|{}>}
+   */
   async extrair(numeroProcesso, numeroOab, instancia = 1, mensagem) {
     this.numeroProcesso = numeroProcesso;
     this.mensagem = mensagem;
 
     this.resposta = { numeroProcesso: this.numeroProcesso };
+    this.detalhes = this.dividirNumeroProcesso(this.numeroProcesso);
 
     this.setLogger();
     let uuidCaptcha;
 
     try {
       let objResponse;
-      let tentativa = 1;
-      let limite = 5;
-      let gResponse;
-      let paginaReturn;
       let resultado;
       let extracao;
 
@@ -36,32 +45,7 @@ class ProcessoESAJ extends BaseParser {
 
       objResponse = await this.acessarPaginaConsulta();
 
-      uuidCaptcha = await this.consultarUUID();
-
-      this.logger.info('Preparando para resolver captcha');
-      do {
-        this.logger.info(`Tentativa de acesso [${tentativa}]`);
-
-        gResponse = await this.resolverCaptcha();
-
-        objResponse = await this.acessandoPaginaProcesso(
-          uuidCaptcha,
-          gResponse
-        );
-
-        paginaReturn = this.avaliaPagina(objResponse.responseBody);
-
-        if (!paginaReturn.sucesso) {
-          tentativa++;
-          continue;
-        }
-
-        extracao = await this.parser.parse(objResponse.responseBody);
-        break;
-      } while (tentativa === limite);
-      if (tentativa === limite)
-        throw new Error('Limite de tentativas excedidos');
-
+      extracao = this.parser.parse(objResponse.responseBody);
       this.logger.info('Processo de extração concluído.');
       this.logger.info('Iniciando salvamento de Andamento');
       await Andamento.salvarAndamentos(extracao.andamentos);
@@ -86,10 +70,15 @@ class ProcessoESAJ extends BaseParser {
     }
   }
 
+  /**
+   *
+   * @param {String} tribunal
+   * @return {Logger}
+   */
   setLogger(tribunal) {
     this.logger = new Logger('info', `logs/${tribunal}/processo.js`, {
       nomeRobo: `Processo${tribunal}`,
-      NumeroDoProcesso: numeroProcesso,
+      NumeroDoProcesso: this.numeroProcesso,
       NumeroOab: null,
     });
   }
@@ -109,19 +98,15 @@ class ProcessoESAJ extends BaseParser {
       method: 'GET',
       queryString: {
         conversationId: '',
-        'dadosConsulta.localPesquisa.cdLocal': '-1',
         cbPesquisa: 'NUMPROC',
         'dadosConsulta.tipoNuProcesso': 'UNIFICADO',
-        numeroDigitoAnoUnificado: this.detalhes.numeroProcessoMascara.slice(
-          0,
-          15
-        ),
-        foroNumeroUnificado: this.detalhes.origem,
-        'dadosConsulta.valorConsultaNuUnificado': this.detalhes
-          .numeroProcessoMascara,
+        numeroDigitoAnoUnificado: `${this.detalhes.sequencial}-${this.detalhes.digito}.${this.detalhes.ano}`,
+        foroNumeroUnificado: this.detalhes.comarca,
+        'dadosConsulta.valorConsultaNuUnificado': this.numeroProcesso,
         'dadosConsulta.valorConsulta': '',
       },
       proxy: true,
+      encoding: 'utf8',
     };
 
     return this.robo.acessar(options);
@@ -217,11 +202,9 @@ class ProcessoESAJ extends BaseParser {
     const tabelaMovimentacoesSelector = '#tabelaTodasMovimentacoes'; //TODO checar selector
     const senhaProcessoSelector = '#senhaProcesso'; //TODO checar selector
 
-    if (
-      /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(
-        mensagemRetornoText
-      )
-    ) {
+    let regex = /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/;
+
+    if (regex.test(mensagemRetornoText)) {
       this.logger.info(
         'Não existem informações disponíveis para o processo informado.'
       );
@@ -254,13 +237,20 @@ class ProcessoESAJ extends BaseParser {
 
 class ProcessoTJMS extends ProcessoESAJ {
   constructor() {
-    super('https://esaj.tjms.jus.br/cpopg', false);
+    super('https://esaj.tjms.jus.br/cpopg5', false);
+    this.parser = new parsers.TJMSParser();
   }
 
-  async setLogger() {
+  async setLogger(tribunal = '') {
     super.setLogger('TJMS');
   }
 }
+
+new ProcessoTJMS()
+  .extrair('0800031-46.2021.8.12.0032', '', 1, {})
+  .then((res) => {
+    console.log({ res });
+  });
 
 module.exports = {
   ProcessoTJMS,

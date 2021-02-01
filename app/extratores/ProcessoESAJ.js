@@ -247,12 +247,6 @@ class ProcessoTJMS extends ProcessoESAJ {
   }
 }
 
-new ProcessoTJMS()
-  .extrair('0800031-46.2021.8.12.0032', '', 1, {})
-  .then((res) => {
-    console.log({ res });
-  });
-
 module.exports = {
   ProcessoTJMS,
 };

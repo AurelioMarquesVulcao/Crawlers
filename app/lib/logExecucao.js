@@ -9,16 +9,15 @@ let mapaEstadoRobo = {
   SP: enums.nomesRobos.TJSP,
   SC: enums.nomesRobos.TJSC,
   RS: enums.nomesRobos.TJRS,
-  CE: enums.nomesRobos.TJCE
+  CE: enums.nomesRobos.TJCE,
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {
-
   static async salvar(execucao) {
     const log = {
-      status: execucao.status,
-      error: execucao.error,
-      logs: execucao.logs,
+      status: execucao.Status,
+      error: execucao.Error,
+      logs: execucao.Logs,
     };
 
     delete execucao['status'];
@@ -43,7 +42,6 @@ module.exports.LogExecucao = class LogExecucao {
    * @returns {Promise<{mensagem: string, sucesso: boolean}|{mensagem: string, enviado: boolean, sucesso: boolean}>}
    */
   static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
-
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
 
     let mensagem = {
@@ -54,38 +52,52 @@ module.exports.LogExecucao = class LogExecucao {
       Instancia: consultaPendente.Instancia,
     };
     // verifica se tem processos cadastrados com aquele cnj e não processados (DataTermino nula)
-    const consultasCadastradas = await ExecucaoConsulta.find(
-        {"Mensagem.NumeroProcesso": mensagem.NumeroProcesso, "Mensagem.Instancia": mensagem.Instancia, DataTermino: null}
-      )
+    const consultasCadastradas = await ExecucaoConsulta.find({
+      'Mensagem.NumeroProcesso': mensagem.NumeroProcesso,
+      'Mensagem.Instancia': mensagem.Instancia,
+      DataTermino: null,
+    })
       .sort({
-      "Mensagem.NumeroProcesso": 1,
-    }).countDocuments();
-
+        'Mensagem.NumeroProcesso': 1,
+      })
+      .countDocuments();
+    console.log('vai0');
     if (nomeRobo && !consultasCadastradas) {
-      nomeFila = nomeFila ? nomeFila : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
-      
+      console.log('vai1');
+      nomeFila = nomeFila
+        ? nomeFila
+        : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
+
       const execucao = {
         ConsultaCadastradaId: consultaPendente._id,
         NomeRobo: nomeRobo,
         Log: [
           {
-            status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`
-          }
+            status: `Execução do robô ${nomeRobo} para consulta ${consultaPendente._id} foi cadastrada com sucesso!`,
+          },
         ],
         Instancia: mensagem.Instancia,
-        Mensagem: [mensagem]
+        Mensagem: [mensagem],
       };
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();
-      mensagem.ExecucaoConsultaId = ex._id
+      mensagem.ExecucaoConsultaId = ex._id;
       mensagem.ConsultaCadastradaId = consultaPendente._id;
       gf.enviar(nomeFila, mensagem);
 
-      return { sucesso: true, enviado: true, mensagem: `Processo ${mensagem.NumeroProcesso} enviado para a fila.` };
+      return {
+        sucesso: true,
+        enviado: true,
+        mensagem: `Processo ${mensagem.NumeroProcesso} enviado para a fila.`,
+      };
     }
-
+    console.log('vai2');
     if (!nomeRobo) {
-      return { sucesso: false, enviado: false, mensagem: 'Nome do robo inválido.' };
+      return {
+        sucesso: false,
+        enviado: false,
+        mensagem: 'Nome do robo inválido.',
+      };
     }
 
     return {

@@ -31,7 +31,7 @@ async function verificador() {
 			console.log(data.getHours(), data.getMinutes());
 			if (data.getHours() == 7) { teste = true }
 			console.log(teste);
-			if (data.getHours() == 8 && teste == true) {
+			if (data.getHours() == 18 && teste == true) {
 				await Sequencial.onDB();
 				// console.log(await Sequencial.geraEmail());
 				comarcas = await Sequencial.geraEmail();

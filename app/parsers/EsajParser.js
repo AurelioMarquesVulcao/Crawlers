@@ -297,22 +297,32 @@ class EsajParser extends BaseParser {
    * @return {Object}
    */
   extrairMetadados($) {
-    let metadados = [];
+    let metadados = {};
     let juiz = this.extrairJuiz($);
     let valorDaAcao = this.extrairValorDaAcao($);
 
-    metadados = { ...juiz, ...valorDaAcao };
+    if (juiz.juiz) {
+      metadados = { ...juiz, ...metadados };
+    }
+
+    if (valorDaAcao.valorDaAcao) {
+      metadados = { ...valorDaAcao, ...metadados };
+    }
 
     return metadados;
   }
 
   extrairJuiz($) {
-    return { juiz: this.tratarTexto($('#juizProcesso').text().strip()) };
+    let juiz = this.tratarTexto($('#juizProcesso').text().strip());
+    juiz = /\w+/g.test(juiz) ? juiz : null;
+    return { juiz };
   }
 
   extrairValorDaAcao($) {
+    let valorDaAcao = this.tratarTexto($('#valorAcaoProcesso').text().strip());
+    valorDaAcao = /\w+/g.test(valorDaAcao) ? valorDaAcao : null;
     return {
-      valorDaAcao: this.tratarTexto($('#valorAcaoProcesso').text().strip()),
+      valorDaAcao,
     };
   }
 }

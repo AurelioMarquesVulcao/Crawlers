@@ -46,6 +46,8 @@ class ProcessoESAJ extends ExtratorBase {
 
       objResponse = await this.acessarPaginaConsulta();
 
+      this.avaliaPagina(objResponse.responseBody);
+
       extracao = this.parser.parse(objResponse.responseBody);
       this.logger.info('Processo de extração concluído.');
       this.logger.info('Iniciando salvamento de Andamento');

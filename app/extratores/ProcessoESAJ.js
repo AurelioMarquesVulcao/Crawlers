@@ -1,6 +1,7 @@
+require('../bootstrap');
 const cheerio = require('cheerio');
 const { ExtratorBase } = require('./extratores');
-const { Processo } = require('../models/schemas/processo');
+const { Andamento } = require('../models');
 const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Logger } = require('../lib/util');
 const { Robo } = require('../lib/newRobo');

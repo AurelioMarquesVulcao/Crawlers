@@ -1,7 +1,8 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
-const { BaseParser, traduzir } = require('./BaseParser');
-const { Processo } = require('../models/schemas/processo');
+const re = require('xregexp');
+const { BaseParser, traduzir, removerAcentos } = require('./BaseParser');
+const { Processo, Andamento } = require('../models');
 
 class EsajParser extends BaseParser {
   parse(body) {
@@ -21,7 +22,7 @@ class EsajParser extends BaseParser {
     let isBaixa = this.extrairBaixa(status);
 
     detalhes.instancia = 1;
-    capa.dataDistribuicao = this.extrairDataDistribuicao($, andamentos);
+    capa.dataDistribuicao = this.extrairDataDistribuicao($, andamentos); //TODO dataDistribuicao
 
     const processo = new Processo({
       capa,
@@ -39,6 +40,11 @@ class EsajParser extends BaseParser {
     console.log('teste');
   }
 
+  /**
+   * Realiza a extração dos envolvidos
+   * @param {cheerio.load} $
+   * @return {*[]}
+   */
   extrairEnvolvidos($) {
     const table = $('#tablePartesPrincipais > tbody')[0];
     const linhas = $(table).find('tr');
@@ -119,6 +125,54 @@ class EsajParser extends BaseParser {
     let numeroProcesso = $('#numeroProcesso').text().trim();
 
     return Processo.identificarDetalhes(numeroProcesso);
+  }
+
+  extrairAndamentos($, dataAtual, numeroProcesso) {
+    let andamentos = [];
+    let andamentosHash = [];
+
+    let linhas = $('#tabelaTodasMovimentacoes > tr');
+
+    linhas.map((index, linha) => {
+      let data;
+      let descricao;
+      let observacao;
+
+      data = $($(linha).children()[0]).text().strip();
+      data = moment(data, 'DD/MM/YYYY').format('YYYY-MM-DD');
+
+      let rawDescricao = $($(linha).children()[2]);
+      observacao = rawDescricao.find('span')[0].children.length
+        ? rawDescricao.find('span')[0].children[0].data.strip()
+        : rawDescricao.find('span').text().strip();
+
+      descricao = re.replace(rawDescricao.text(), observacao, '').strip();
+      descricao = this.tratarTexto(descricao);
+
+      observacao = this.tratarTexto(observacao);
+      observacao = removerAcentos(observacao);
+
+      let andamento = {
+        numeroProcesso: numeroProcesso,
+        data: data,
+        dataInclusao: dataAtual,
+        descricao: descricao,
+      };
+
+      andamento.observacao = /\w/g.test(observacao) ? observacao : null;
+
+      let hash = Andamento.criarHash(andamento);
+
+      if (andamentosHash.indexOf(hash) !== -1) {
+        let count = andamentosHash.filter((element) => element == hash).length;
+        andamento.descricao = `${andamento.descricao} [${count + 1}]`;
+      }
+
+      andamentos.push(new Andamento(andamento));
+      andamentosHash.push(hash);
+    });
+
+    return andamentos;
   }
 }
 

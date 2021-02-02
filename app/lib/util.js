@@ -18,7 +18,10 @@ class Helper {
     // O GMT-0000 mantem a hora que você inseriu sem alterar fuso -3
     // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
     //GMT-0300
-    let regex = data.replace(/([0-9]{1,2})\W([0-9]{1,2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2})/i, '$3-$2-$1 $4 GMT-0000');
+    let regex = data.replace(
+      /([0-9]{1,2})\W([0-9]{1,2})\W([0-9]{4})\s([0-9]{2}\W[0-9]{2})/i,
+      '$3-$2-$1 $4 GMT-0000'
+    );
     console.log(regex);
     return new Date(regex);
   }
@@ -32,7 +35,10 @@ class Helper {
     // O GMT-0000 mantem a hora que você inseriu sem alterar fuso -3
     // se quiser inserir fuso, ex.: horario de brazilia -3GMT.
     //GMT-0300
-    let regex = data.replace(/(\D+)([0123]?\d)\W([01]\d)\W(\d{4})\s+([012]\d\W[0-5]\d)(\D+)/i, '$4-$3-$2 $5 GMT-0000');
+    let regex = data.replace(
+      /(\D+)([0123]?\d)\W([01]\d)\W(\d{4})\s+([012]\d\W[0-5]\d)(\D+)/i,
+      '$4-$3-$2 $5 GMT-0000'
+    );
     console.log(regex);
     return new Date(regex);
   }
@@ -85,16 +91,17 @@ class Helper {
 
   static async resgatarNovoToken() {
     const robo = new Robo();
-    const data = '{\n	"Login":"extratificador_bigdata@impacta.adv.br",\n	"Senha":"extratificador2019"\n}';
+    const data =
+      '{\n	"Login":"extratificador_bigdata@impacta.adv.br",\n	"Senha":"extratificador2019"\n}';
     const config = {
       method: 'post',
       url: 'http://172.16.16.3:8083/login/',
       headers: {
-        'Content-Type': 'text/plain'
+        'Content-Type': 'text/plain',
       },
-      data: data
+      data: data,
     };
-    return axios(options)
+    return axios(options);
   }
 
   static async enviarFeedback(msg) {
@@ -322,17 +329,16 @@ class CnjValidator {
   }
 }
 
-
+/**
+ * @type {Class} Logger
+ * @param {string} logLevel
+ * @param {string} nomeArquivo
+ * @param {object} options
+ * @param {string} options.nomeRobo
+ * @param {null|string} options.NumeroDoProcesso
+ * @param {null|string} options.NumeroOab
+ */
 class Logger {
-  /**
-   * Logger
-   * @param {string} logLevel
-   * @param {string} nomeArquivo
-   * @param {object} options
-   * @param {string} options.nomeRobo
-   * @param {null|string} options.NumeroDoProcesso
-   * @param {null|string} options.NumeroOab
-   */
   constructor(
     logLevel = 'info',
     nomeArquivo = '',
@@ -397,31 +403,32 @@ class Cnj {
     let estado = numero.slice(14, 16);
     let comarca = numero.slice(16, 20);
 
-    return { sequencial, dois, ano, tipo, estado, comarca }
+    return { sequencial, dois, ano, tipo, estado, comarca };
   }
   // separa os zeros a serem acrecidos no inicio do numero sequencial
   corrigeSequencial(sequencial) {
-    let novoSequencial = sequencial
-    let zero = ''
+    let novoSequencial = sequencial;
+    let zero = '';
     for (let i = 0; i < sequencial.length; i++) {
       if (sequencial[i] == '0') {
-        novoSequencial = novoSequencial.slice(1, novoSequencial.length)
-        zero += "0"
+        novoSequencial = novoSequencial.slice(1, novoSequencial.length);
+        zero += '0';
       } else {
-        break
-      };
-    }; let seq = novoSequencial;
-    return { seq, zero }
+        break;
+      }
+    }
+    let seq = novoSequencial;
+    return { seq, zero };
   }
   // --------- Funções melhoradas ---------
 
   /**
    * Cria a mensagem a ser enviada para a fila
-   * @param {string} numero 
+   * @param {string} numero
    */
-  static criaPostJTE(numero, status = "Principal") {
+  static criaPostJTE(numero, status = 'Principal') {
     let post = `{"NumeroProcesso" : "${numero}","NovosProcessos" : true}, "estado": "${status}"`;
-    return post
+    return post;
   }
   /**
    * Cria um numero CNJ para consumo.
@@ -432,43 +439,40 @@ class Cnj {
    */
   static organizaCNJ(ultimoSequencial, Tribunal, unidadeOrigem) {
     // console.log(ultimoSequencial, Tribunal, unidadeOrigem);
-    let sequencial = this.completaNumero(ultimoSequencial, "ultimoSequencial");
-    let tribunal = this.completaNumero(Tribunal, "Tribunal");
-    let origem = this.completaNumero(unidadeOrigem, "unidadeOrigem");
-    return `${sequencial}00${new Date().getFullYear}5${tribunal}${origem}`
+    let sequencial = this.completaNumero(ultimoSequencial, 'ultimoSequencial');
+    let tribunal = this.completaNumero(Tribunal, 'Tribunal');
+    let origem = this.completaNumero(unidadeOrigem, 'unidadeOrigem');
+    return `${sequencial}00${new Date().getFullYear}5${tribunal}${origem}`;
   }
 
   /**
    * Ajusta o numero para string e completa com zeros para ficar no padrão do numero CNJ
-   * @param {number} numero 
-   * @param {string} tipo 
+   * @param {number} numero
+   * @param {string} tipo
    */
   static completaNumero(numero, tipo) {
     let teste;
-    if (tipo == "unidadeOrigem") {
+    if (tipo == 'unidadeOrigem') {
       teste = 4;
-    } else if (tipo == "Tribunal") {
+    } else if (tipo == 'Tribunal') {
       teste = 2;
-    } else if (tipo == "ultimoSequencial") {
+    } else if (tipo == 'ultimoSequencial') {
       teste = 7;
     }
-    let resultado = ''
+    let resultado = '';
     numero = numero.toString();
     if (numero.length < teste) {
-      let zero = teste - numero.length
+      let zero = teste - numero.length;
       for (let i = 0; i < zero; i++) {
-        resultado += "0"
+        resultado += '0';
       }
-      resultado = resultado + numero
+      resultado = resultado + numero;
     } else {
       resultado = numero;
     }
-    return resultado
+    return resultado;
   }
-
 }
-
-
 
 module.exports.Helper = Helper;
 module.exports.CnjValidator = CnjValidator;

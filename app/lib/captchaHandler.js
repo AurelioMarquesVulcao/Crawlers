@@ -327,6 +327,23 @@ class AntiCaptchaHandler {
 
     return resultado;
   }
+
+  /**
+   * Consulta a API do AntiCaptcha retornando o valor do saldo disponível.
+   *
+   * @returns {Number} Saldo disponível para a conta do AntiCaptcha.
+   */
+  static async saldo() {
+    try {
+      let objResponse = await axios.post(
+        'http://api.anti-captcha.com/getBalance',
+        { clientKey: ANTICAPTCHA_KEY }
+      );
+      return objResponse.data.balance;
+    } catch (e) {
+      throw e;
+    }
+  }
 }
 
 class CaptchaIOHandler {
@@ -588,21 +605,26 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     );
     const taskId = response.data.taskId;
 
-    if(!taskId) {
+    if (!taskId) {
       console.log('Não foi possivel recuperar a TaskId');
       return { sucesso: false };
     }
 
-    let tentativa = 0
-    console.log(`Captcha TaskId [${taskId}] - Iniciando Captcha`)
+    let tentativa = 0;
+    console.log(`Captcha TaskId [${taskId}] - Iniciando Captcha`);
     do {
       tentativa++;
       await sleep(5000);
-      console.log(`Captcha TaskId [${taskId}] - Tentativa: ${tentativa} - Aguardando 10 segundos.`)
-      response = await axios.post('https://api.anti-captcha.com/getTaskResult', {
-        clientKey: ANTICAPTCHA_KEY,
-        taskId: taskId,
-      });
+      console.log(
+        `Captcha TaskId [${taskId}] - Tentativa: ${tentativa} - Aguardando 10 segundos.`
+      );
+      response = await axios.post(
+        'https://api.anti-captcha.com/getTaskResult',
+        {
+          clientKey: ANTICAPTCHA_KEY,
+          taskId: taskId,
+        }
+      );
 
       if (response.data.status === 'ready') {
         logCaptcha.Servico = 'AntiCaptcha';
@@ -610,11 +632,11 @@ module.exports.CaptchaHandler = class CaptchaHandler {
         new LogCaptcha(logCaptcha).save();
         return { sucesso: true, resposta: response.data.solution.text };
       }
-
     } while (tentativa < 6);
 
-    return {sucesso: false}
+    return { sucesso: false };
   }
 };
 
 module.exports.antiCaptchaHandler = antiCaptchaHandler;
+module.exports.AntiCaptchaAPI = AntiCaptchaHandler;

@@ -157,7 +157,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     await new Promise(async (resolve) => {
       do {
         await this.acessar(
-          'https://esaj.tjce.jus.br/sajcas/login?service', //TODO verificar se esse link ainda é valido para os processos do TJMS
+          `${this.loginUrl}?service`, //TODO verificar se esse link ainda é valido para os processos do TJMS
           this.pageOptions,
           false
         );
@@ -365,6 +365,7 @@ class PeticaoTJMS extends PeticaoEsaj {
     super({
       url: 'https://esaj.tjms.jus.br/cpopg5',
     });
+    this.loginUrl = 'https://esaj.tjms.jus.br/sajcas/login';
     this.estado = 'MS';
   }
 }

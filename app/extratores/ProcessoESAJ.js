@@ -17,6 +17,8 @@ class ProcessoESAJ extends ExtratorBase {
     this.logger = null;
     this.resposta = {};
     this.url = url;
+    this.tentativa = 1;
+    this.limite = 5;
   }
 
   /**
@@ -41,14 +43,45 @@ class ProcessoESAJ extends ExtratorBase {
       let objResponse;
       let resultado;
       let extracao;
+      let paginaReturn;
 
       await this.fazerPrimeiroAcesso();
 
       objResponse = await this.acessarPaginaConsulta();
 
+      let captchaExiste = this.verificaCaptcha(objResponse.responseBody);
+
+      if (captchaExiste) {
+        this.logger.info('Captcha detectado');
+        do {
+          this.logger.info(`Tentativa de acesso [${this.tentativa}]`);
+
+          let uuidCaptcha = await this.getUuidCaptcha();
+          let gResponse = await this.resolverCaptcha();
+
+          objResponse = await this.acessandoPaginaProcesso(
+            uuidCaptcha,
+            gResponse
+          );
+
+          paginaReturn = this.avaliaPagina(objResponse.responseBody);
+
+          if (paginaReturn.sucesso) {
+            this.tentativa++;
+            continue;
+          }
+
+          break;
+        } while (this.tentativa === this.limite);
+      }
+
+      if (this.limite === this.tentativa)
+        throw new Error('Limite de tentativas excedidos');
+
       this.avaliaPagina(objResponse.responseBody);
 
       extracao = this.parser.parse(objResponse.responseBody);
+
       this.logger.info('Processo de extração concluído.');
       this.logger.info('Iniciando salvamento de Andamento');
       await Andamento.salvarAndamentos(extracao.andamentos);
@@ -175,16 +208,11 @@ class ProcessoESAJ extends ExtratorBase {
       method: 'GET',
       queryString: {
         conversationId: '',
-        'dadosConsulta.localPesquisa.cdLocal': '-1',
         cbPesquisa: 'NUMPROC',
         'dadosConsulta.tipoNuProcesso': 'UNIFICADO',
-        numeroDigitoAnoUnificado: this.detalhes.numeroProcessoMascara.slice(
-          0,
-          15
-        ),
-        foroNumeroUnificado: this.detalhes.origem,
-        'dadosConsulta.valorConsultaNuUnificado': this.detalhes
-          .numeroProcessoMascara,
+        numeroDigitoAnoUnificado: `${this.detalhes.sequencial}-${this.detalhes.digito}.${this.detalhes.ano}`,
+        foroNumeroUnificado: this.detalhes.comarca,
+        'dadosConsulta.valorConsultaNuUnificado': this.numeroProcesso,
         'dadosConsulta.valorConsulta': '',
         uuidCaptcha: uuid,
         'g-recaptcha-response': gResponse,
@@ -235,6 +263,14 @@ class ProcessoESAJ extends ExtratorBase {
 
     this.logger.info('Não foram encontrados erros');
     return { sucesso: true };
+  }
+
+  verificaCaptcha(body) {
+    const $ = cheerio.load(body);
+
+    let captcha = $('.g-recaptcha').length;
+
+    return Boolean(captcha);
   }
 }
 

@@ -16,11 +16,12 @@ class OabESAJ extends ExtratorBase {
     this.robo = new Robo();
   }
 
-  async extrait(numeroOab, cadastroConsultaId) {
+  async extrair(numeroOab, cadastroConsultaId) {
     this.numeroOab = numeroOab;
     this.setLogger();
     this.setCadastroConsulta(numeroOab, cadastroConsultaId);
 
+    console.log(this.cadastroConsulta);
     let objResponse;
     let primeiroAcesso;
     // let tentativa = 1;
@@ -55,6 +56,8 @@ class OabESAJ extends ExtratorBase {
       processosList = await this.extrairPaginas(objResponse.responseBody);
       processosList = await this.verificaNovos(processosList);
 
+      console.log({ processosList: processosList.length });
+
       this.resultado = await this.enfileirarProcessos(processosList);
 
       this.resposta = {
@@ -62,12 +65,21 @@ class OabESAJ extends ExtratorBase {
         nProcesso: this.resultados,
       };
     } catch (e) {
+      console.log(e);
       this.logger.log('error', String(e));
       this.resposta = { sucesso: false, detalhes: e.message };
     } finally {
       this.resposta.logs = this.logger.logs;
       return this.resposta;
     }
+  }
+
+  verificaCaptcha(body) {
+    const $ = cheerio.load(body);
+
+    let captcha = $('.g-recaptcha').length;
+
+    return Boolean(captcha);
   }
 
   setLogger() {
@@ -293,6 +305,7 @@ class OabESAJ extends ExtratorBase {
     let resultados = [];
 
     const fila = `processo.${this.tribunal}.extracao.novos`;
+    console.log({ fila });
     for (let p of processos) {
       cadastroConsulta['NumeroProcesso'] = p;
 
@@ -301,6 +314,7 @@ class OabESAJ extends ExtratorBase {
         fila
       );
 
+      console.log(logExec);
       if (logExec.enviado && logExec.sucesso) {
         this.logger.info(`Processo: ${p} => ${fila}`);
         resultados.push(p);
@@ -322,5 +336,9 @@ class OabTJMS extends OabESAJ {
     super.setLogger();
   }
 }
+
+new OabTJMS()
+  .extrair('4232MS', '600dd7179b6c600b30364193')
+  .then((res) => console.log(res));
 
 module.exports.OabTJMS = OabTJMS;

@@ -22,6 +22,7 @@ module.exports.enums = Object.freeze({
     TRTSP: 'PJE',
     PJE: 'PJE',
     TJCE: 'TJCE',
+    TJMS: 'TJMS',
   },
   tipoConsulta: {
     Oab: 'oab',
@@ -29,10 +30,10 @@ module.exports.enums = Object.freeze({
     Peticao: 'peticao',
   },
   tipoFila: {
-    Novos: "novos",
-    Atualizacao: "atualizacao",
-    Extracao: "extracao",
-    Reprocessamento: "reprocessamento"
+    Novos: 'novos',
+    Atualizacao: 'atualizacao',
+    Extracao: 'extracao',
+    Reprocessamento: 'reprocessamento',
   },
   bigdataUrls: {
     captchaDecoder: 'http://172.16.16.8:5000/api/solve',

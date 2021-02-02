@@ -5,6 +5,7 @@ const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila;
 const { enums } = require('../configs/enums');
 
 let mapaEstadoRobo = {
+  MS: enums.nomesRobos.TJMS,
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
   SC: enums.nomesRobos.TJSC,
@@ -43,7 +44,7 @@ module.exports.LogExecucao = class LogExecucao {
    */
   static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
-
+    console.log(consultaPendente.SeccionalOab, nomeRobo);
     let mensagem = {
       DataEnfileiramento: new Date(),
       NumeroProcesso: consultaPendente.NumeroProcesso,
@@ -61,9 +62,7 @@ module.exports.LogExecucao = class LogExecucao {
         'Mensagem.NumeroProcesso': 1,
       })
       .countDocuments();
-    console.log('vai0');
     if (nomeRobo && !consultasCadastradas) {
-      console.log('vai1');
       nomeFila = nomeFila
         ? nomeFila
         : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
@@ -91,7 +90,6 @@ module.exports.LogExecucao = class LogExecucao {
         mensagem: `Processo ${mensagem.NumeroProcesso} enviado para a fila.`,
       };
     }
-    console.log('vai2');
     if (!nomeRobo) {
       return {
         sucesso: false,

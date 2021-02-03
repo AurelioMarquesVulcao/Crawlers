@@ -305,7 +305,6 @@ class OabESAJ extends ExtratorBase {
     let resultados = [];
 
     const fila = `processo.${this.tribunal}.extracao.novos`;
-    console.log({ fila });
     for (let p of processos) {
       cadastroConsulta['NumeroProcesso'] = p;
 
@@ -314,14 +313,13 @@ class OabESAJ extends ExtratorBase {
         fila
       );
 
-      console.log(logExec);
       if (logExec.enviado && logExec.sucesso) {
         this.logger.info(`Processo: ${p} => ${fila}`);
         resultados.push(p);
       }
     }
 
-    return resultados;
+    return resultados.length;
   }
 }
 
@@ -338,7 +336,7 @@ class OabTJMS extends OabESAJ {
 }
 
 new OabTJMS()
-  .extrair('4232MS', '600dd7179b6c600b30364193')
+  .extrair('4232MS', '601ab3599225ed7086230be4')
   .then((res) => console.log(res));
 
 module.exports.OabTJMS = OabTJMS;

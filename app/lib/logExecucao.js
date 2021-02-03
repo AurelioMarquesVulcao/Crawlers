@@ -1,4 +1,5 @@
 require('../bootstrap');
+const mongoose = require('mongoose');
 const ExecucaoConsulta = require('../models/schemas/execucao_consulta')
   .ExecucaoConsulta;
 const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila;
@@ -44,7 +45,6 @@ module.exports.LogExecucao = class LogExecucao {
    */
   static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
-    console.log(consultaPendente.SeccionalOab, nomeRobo);
     let mensagem = {
       DataEnfileiramento: new Date(),
       NumeroProcesso: consultaPendente.NumeroProcesso,
@@ -68,7 +68,7 @@ module.exports.LogExecucao = class LogExecucao {
         : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
 
       const execucao = {
-        ConsultaCadastradaId: consultaPendente._id,
+        ConsultaCadastradaId: mongoose.ObjectId(consultaPendente._id),
         NomeRobo: nomeRobo,
         Log: [
           {

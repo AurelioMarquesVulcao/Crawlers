@@ -1,6 +1,7 @@
 require('../bootstrap');
 const fs = require('fs');
 const sleep = require('await-sleep');
+const Path = require('path');
 const { ExtratorPuppeteer } = require('./extratores');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
@@ -11,7 +12,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     url = '',
     debug = false,
     timeout = 30000,
-    headless = true,
+    headless = false,
     usuario = { username: '', password: '' },
   } = {}) {
     super(url, debug);
@@ -60,6 +61,10 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     if (!this.usuario.login)
       this.usuario = await this.getCredenciais(this.estado);
 
+    this.numeroProcessoDetalhes = this.dividirNumeroProcesso(
+      this.numeroProcesso
+    );
+
     this.logger = new Logger('info', 'logs/TJCE/peticao.log', {
       nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJMS}`,
       NumeroDoProcesso: numeroProcesso,
@@ -70,7 +75,10 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       this.debug(`Paginas: ${this.browser.pages().length}`);
       await sleep(100);
 
-      await this.acessar(`${this.url}/portal.do`, this.pageOptions);
+      await this.acessar(
+        `https://esaj.${this.tribunal.toLowerCase()}.jus.br/portal.do`,
+        this.pageOptions
+      );
 
       this.debug(`pageoptions: ${JSON.stringify(this.pageOptions)}`);
       await sleep(100);
@@ -203,7 +211,10 @@ class PeticaoEsaj extends ExtratorPuppeteer {
 
   async consultarProcesso(numeroProcesso, instancia = 1) {
     this.logger.info('Iniciando procedimento de consulta do processo');
-    numeroProcesso = numeroProcesso.replace('.8.06.', '.');
+    numeroProcesso = numeroProcesso.replace(
+      `.${this.numeroProcessoDetalhes.tribunal}.${this.numeroProcessoDetalhes.orgao}.`,
+      '.'
+    );
     numeroProcesso = numeroProcesso.replace(/\W/gm, '');
     let url;
     this.logger.info(`Escolhendo url para ${instancia}`);
@@ -212,7 +223,22 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     this.logger.info(
       `Acessando pagina de consulta da ${this.instancia}a instancia`
     );
-    await this.acessar(url, this.pageOptions, false);
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.click(
+        '#esajConteudoHome > table:nth-child(10) > tbody > tr > td.esajCelulaDescricaoServicos > a'
+      ),
+    ]);
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.click(
+        '#esajConteudoHome > table:nth-child(3) > tbody > tr > td.esajCelulaDescricaoServicos > a'
+      ),
+    ]);
+
+    // await this.acessar(url, this.pageOptions, false);
     this.logger.info('Aguardando o carregamento da pagina');
     await sleep(700);
 
@@ -283,15 +309,18 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     });
     this.logger.info('Documentos selecionados');
     this.logger.info('Preparar para download');
+
     await this.page.click('#salvarButton');
 
     await this.page.waitForSelector('td.modalTitulo');
 
-    await this.page.click('#opcao1');
+    await this.page.click('#opcao2');
 
     await this.page.click('#botaoContinuar');
 
-    await this.page.waitForSelector('#popupGerarDocumentoOpcoes');
+    await this.page.waitForSelector('#popupGerarDocumentoOpcoes', {
+      timeout: 180000,
+    });
     await this.page.waitForSelector('#popupGerarDocumentoOpcoes', {
       hidden: true,
     });
@@ -301,9 +330,12 @@ class PeticaoEsaj extends ExtratorPuppeteer {
 
     this.logger.info('Iniciando download');
 
+    this.filePath = Path.resolve(__dirname, '../downloads');
+    console.log({ filePath: this.filePath });
+
     await this.page._client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
-      downloadPath: './downloads',
+      downloadPath: this.filePath,
     });
 
     // Interceptando request
@@ -341,8 +373,8 @@ class PeticaoEsaj extends ExtratorPuppeteer {
    * @returns {Promise<unknown>}
    */
   async aguardaDownload() {
-    const path = `./downloads/${this.numeroProcesso}.pdf`;
-    const tempPath = `./downloads/${this.numeroProcesso}.pdf.crdownload`;
+    const path = `${this.filePath}/${this.numeroProcesso}.zip`;
+    const tempPath = `${this.filePath}/${this.numeroProcesso}.zip.crdownload`;
 
     return new Promise(async (resolve) => {
       do {
@@ -350,9 +382,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
           this.logger.info('Download finalizado');
           return resolve(true);
         }
-        const size =
-          fs.statSync(`./downloads/${this.numeroProcesso}.pdf.crdownload`)
-            .size / 1000000.0;
+        const size = fs.statSync(tempPath).size / 1000000.0;
         this.logger.info(`Download não finalizado | ${size} Mb baixados`);
         await sleep(5000);
       } while (true);
@@ -367,12 +397,13 @@ class PeticaoTJMS extends PeticaoEsaj {
     });
     this.loginUrl = 'https://esaj.tjms.jus.br/sajcas/login';
     this.estado = 'MS';
+    this.tribunal = 'TJMS';
   }
 }
 
 (() => {
   new PeticaoTJMS()
-    .extrair('0214821-58.2015.8.06.0001', 1)
+    .extrair('0000135-74.2021.8.12.0031', 1)
     .then((r) => console.log(r));
 })();
 

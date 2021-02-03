@@ -74,6 +74,11 @@ class OabESAJ extends ExtratorBase {
     }
   }
 
+  /**
+   * Verificando se existe a presença de captcha
+   * @param body
+   * @return {boolean}
+   */
   verificaCaptcha(body) {
     const $ = cheerio.load(body);
 
@@ -82,6 +87,9 @@ class OabESAJ extends ExtratorBase {
     return Boolean(captcha);
   }
 
+  /**
+   * Prepara as variaveis de para realizar o logging
+   */
   setLogger() {
     this.logger = new Logger('info', `logs/${this.tribunal}/oab.log`, {
       nomeRobo: `Oab${this.tribunal}`,
@@ -89,6 +97,10 @@ class OabESAJ extends ExtratorBase {
     });
   }
 
+  /**
+   * Prepara a variavel de cadastro consulta
+   * @param cadastroConsultaId
+   */
   setCadastroConsulta(cadastroConsultaId) {
     this.cadastroConsulta = {
       SeccionalOab: this.estado,
@@ -100,6 +112,10 @@ class OabESAJ extends ExtratorBase {
     };
   }
 
+  /**
+   * Faz a primeira conexão com o site do tribunal
+   * @return {Promise<{sucesso: boolean}>}
+   */
   async fazerPrimeiroAcesso() {
     this.logger.info('Fazendo primeiro acesso');
     let primeiroAcessoWait = 10000;
@@ -123,6 +139,10 @@ class OabESAJ extends ExtratorBase {
     return { sucesso: false };
   }
 
+  /**
+   * Faz a requisição para acessar o site do tribubal
+   * @return {Promise<{Object}>}
+   */
   async realizaPrimeiraConexao() {
     return await this.robo.acessar({
       url: `${this.url}/open.do`,
@@ -131,6 +151,10 @@ class OabESAJ extends ExtratorBase {
     });
   }
 
+  /**
+   * Acessar pagina de consulta
+   * @return {Promise<{Object}>}
+   */
   async acessarPaginaConsulta() {
     this.logger.info('Entrando na pagina de consulta');
 
@@ -149,6 +173,10 @@ class OabESAJ extends ExtratorBase {
     return this.robo.acessar(options);
   }
 
+  /**
+   * Recuperar UUID do site
+   * @return {Promise<string>}
+   */
   async consultarUUID() {
     this.logger.info('Consultado UUID do site');
     let objResponse;
@@ -164,6 +192,10 @@ class OabESAJ extends ExtratorBase {
     return objResponse.responseBody.uuidCaptcha;
   }
 
+  /**
+   * Resolve o captcha da pagina
+   * @return {Promise<*>}
+   */
   async resolverCaptcha() {
     const ch = new CaptchaHandler(5, 10000, `Processo${this.tribunal}`, {
       numeroDoProcesso: this.numeroProcesso,
@@ -186,6 +218,12 @@ class OabESAJ extends ExtratorBase {
     return captcha.gResponse;
   }
 
+  /**
+   * Consulta o processo
+   * @param {string|null} uuid
+   * @param {string|null} gResponse
+   * @return {Promise<{Object}>}
+   */
   async acessarPaginaConsulta(uuid, gResponse) {
     this.logger.info('Tentando acessar pagina da consulta de OAB');
     let options = {
@@ -210,6 +248,11 @@ class OabESAJ extends ExtratorBase {
     return await this.robo.acessar(options);
   }
 
+  /**
+   * Carrega a pagina do processo e troca de pagina se ela estiver paginada
+   * @param {string} body codigo html em string
+   * @return {Promise<[]>}
+   */
   async extrairPaginas(body) {
     let processos = [];
     let processosDaPagina = [];
@@ -237,6 +280,11 @@ class OabESAJ extends ExtratorBase {
     return processos;
   }
 
+  /**
+   * extrai o numero de processos da pagina
+   * @param body
+   * @return {[String]}
+   */
   extrairProcessos(body) {
     const $ = cheerio.load(body);
 
@@ -250,6 +298,11 @@ class OabESAJ extends ExtratorBase {
     return processos;
   }
 
+  /**
+   * Verifica a existencia de uma proxima pagina
+   * @param body
+   * @return {boolean}
+   */
   verificaProximaPagina(body) {
     this.logger.info('Verificando a existencia de outra pagina');
     const $ = cheerio.load(body);
@@ -262,6 +315,11 @@ class OabESAJ extends ExtratorBase {
     return false;
   }
 
+  /**
+   * Acessa a pagina seguinte
+   * @param link
+   * @return {Promise<String>}
+   */
   async acessarProximaPagina(link) {
     this.logger.info('Acessando nova pagina do processo');
     let objResponse;
@@ -278,6 +336,11 @@ class OabESAJ extends ExtratorBase {
     return objResponse.responseBody;
   }
 
+  /**
+   * Verifica os processos que ainda não constam no banco
+   * @param {[String]} processos
+   * @return {Promise<[String]>}
+   */
   async verificaNovos(processos) {
     this.logger.info('Verificando processos já existentes no banco');
 
@@ -296,6 +359,11 @@ class OabESAJ extends ExtratorBase {
     );
   }
 
+  /**
+   * Enfileira processos que existem
+   * @param processos
+   * @return {Promise<number>}
+   */
   async enfileirarProcessos(processos) {
     this.logger.info('Preparando para enfileirar processos');
     this.logger.info(

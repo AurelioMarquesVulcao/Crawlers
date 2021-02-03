@@ -402,7 +402,7 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  processo.jte.reprocessamento.novos.05:
+  processo.jte.reprocessamento.01:
     extends:
       file: common-services.yml
       service: base_node

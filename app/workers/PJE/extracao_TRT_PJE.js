@@ -37,8 +37,8 @@ var reset = '\u001b[0m';
   });
 
   //const nomeFila = `fila TRT-RJ`;
-  const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
-  const reConsumo = `Reconsumo ${enums.tipoConsulta.Processo}.${enums.nomesRobos.TRTSP}.extracao.novos.1`;
+  const nomeFila = `processo.PJE.atualizacao.01`;
+  const reConsumo = `Reconsumo.processo.PJE.atualizacao.01`;
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
     var heartBeat = 0;

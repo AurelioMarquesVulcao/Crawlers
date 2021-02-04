@@ -1,10 +1,13 @@
 require('../bootstrap');
+const cheerio = require('cheerio');
 const fs = require('fs');
 const sleep = require('await-sleep');
 const Path = require('path');
+const { Robo } = require('../lib/newRobo');
 const { ExtratorPuppeteer } = require('./extratores');
 const { Logger } = require('../lib/util');
 const { enums } = require('../configs/enums');
+const { Helper } = require('../lib/util');
 const { CredenciaisAdvogados } = require('../models');
 
 class PeticaoEsaj extends ExtratorPuppeteer {
@@ -20,7 +23,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     this.timeout = timeout;
     this.headless = headless;
     if (usuario) this.usuario = usuario;
-
+    this.robo = new Robo();
     this.args = [
       '--no-sandbox',
       `--proxy-server=http://proxy-proadv.7lan.net:8181`,
@@ -124,11 +127,13 @@ class PeticaoEsaj extends ExtratorPuppeteer {
 
         await this.fecharOutrasPaginas();
 
-        await this.resgataDocumentos(); //TODO alterar essa função para resgatar todos os links de donwloads sem necessariamente ativar o download pelo chrome
-        await sleep(100);
+        await this.baixarDocumentos(); //TODO descomentar essa parte =)
 
-        await this.aguardaDownload();
-        await sleep(100);
+        // await this.resgataDocumentos(); //TODO alterar essa função para resgatar todos os links de donwloads sem necessariamente ativar o download pelo chrome
+        // await sleep(100);
+        //
+        // await this.aguardaDownload();
+        // await sleep(100);
 
         count++;
       } while (count < tam);
@@ -314,7 +319,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
 
     await this.page.waitForSelector('td.modalTitulo');
 
-    await this.page.click('#opcao2');
+    await this.page.click('#opcao1');
 
     await this.page.click('#botaoContinuar');
 
@@ -373,8 +378,8 @@ class PeticaoEsaj extends ExtratorPuppeteer {
    * @returns {Promise<unknown>}
    */
   async aguardaDownload() {
-    const path = `${this.filePath}/${this.numeroProcesso}.zip`;
-    const tempPath = `${this.filePath}/${this.numeroProcesso}.zip.crdownload`;
+    const path = `${this.filePath}/${this.numeroProcesso}.pdf`;
+    const tempPath = `${this.filePath}/${this.numeroProcesso}.pdf.crdownload`;
 
     return new Promise(async (resolve) => {
       do {
@@ -387,6 +392,117 @@ class PeticaoEsaj extends ExtratorPuppeteer {
         await sleep(5000);
       } while (true);
     });
+  }
+
+  async baixarDocumentos() {
+    // 1 verificar os documentos que eu tenho que baixar
+    this.logger.info('Iniciando procedimento de resgate dos documentos');
+    this.logger.info('Verificando se existe o documento "DECISAO"');
+    this.logger.info('Selecionando documentos de interessa para download');
+
+    let body = await this.page.evaluate(
+      () => document.querySelector('html').innerHTML
+    );
+    let $ = cheerio.load(body);
+
+    let todosDocumentos = $('#arvore_principal > ul > li > a');
+    let documentos = [];
+    let documentoSalvo = [];
+    for (let i = 1, tam = todosDocumentos.length; i <= tam; i++) {
+      let selector = `#arvore_principal > ul > li:nth-child(${i}) > a`;
+      if (/(Decisão)|(Despachos?)/.test($(selector).text())) break;
+      documentos.push(selector);
+    }
+
+    this.logger.info('Documentos separados');
+
+    //Setando comportamento de download
+    this.filePath = Path.resolve(__dirname, '../downloads');
+    console.log({ filePath: this.filePath });
+
+    await this.page._client.send('Page.setDownloadBehavior', {
+      behavior: 'allow',
+      downloadPath: this.filePath,
+    });
+
+    for (let i = 0, tam = documentos.length; i < tam; i++) {
+      let resposta = await this.downloadAndSave(documentos[i], $);
+      documentoSalvo.push(resposta);
+    }
+  }
+
+  // para
+
+  async downloadAndSave(selector, $) {
+    await this.page.click(`${selector} > i`);
+    await sleep(200);
+    let nomeArquivo = $(selector).text().trim();
+    let urlDocumento = '';
+
+    this.logger.info('Preparar para download');
+
+    await this.page.click('#salvarButton');
+    await sleep(500);
+
+    await this.page.waitForSelector('td.modalTitulo');
+    await sleep(500);
+
+    $ = cheerio.load(
+      await this.page.evaluate(() => document.querySelector('body').innerHTML)
+    );
+
+    if (!/display:\snone/.test($('#popupDividirDocumentos').attr().style)) {
+      await this.page.click('#opcao1');
+
+      await this.page.click('#botaoContinuar');
+    }
+
+    await this.page.waitForSelector('#popupGerarDocumentoOpcoes', {
+      timeout: 180000,
+    });
+    await this.page.waitForSelector('#popupGerarDocumentoOpcoes', {
+      hidden: true,
+    });
+
+    await this.page.click('#btnDownloadDocumento');
+
+    // const xRequest = await new Promise((resolve) => {
+    //   this.page.on('request', (interceptedRequest) => {
+    //     if (/getPDFImpressao\.do/.test(interceptedRequest._url)) {
+    //       interceptedRequest.abort();
+    //       resolve(interceptedRequest);
+    //     }
+    //   });
+    // });
+
+    // await this.page.waitForSelector(
+    //   'input.botaoPopupGeracaoDocumento.spwBotao.btBaixarDocumento'
+    // );
+
+    console.log('botaoClicado');
+    this.logger.info('Download iniciado');
+    this.logger.info(`Baixando arquivo: ${nomeArquivo}`);
+
+    await this.aguardaDownload();
+
+    await this.salvarArquivo(nomeArquivo);
+
+    await this.page.click(`${selector} > i`);
+    await sleep(200);
+  }
+
+  // para
+
+  async salvarArquivo(nomeArquivo) {
+    let path = Path.resolve(__dirname, '../downloads');
+    nomeArquivo = nomeArquivo.replace(/\s/g, '_');
+    let filePath = `${path}/${nomeArquivo}.pdf`;
+
+    this.logger.info(
+      `Mudando nome do arquivo de ${this.numeroProcesso}.pdf => ${nomeArquivo}.pdf`
+    );
+
+    fs.renameSync(`${path}/${this.numeroProcesso}.pdf`, filePath);
   }
 }
 

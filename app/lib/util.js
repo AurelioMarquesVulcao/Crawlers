@@ -194,10 +194,10 @@ class Helper {
     });
   }
 
-  static async downloadFiles(url, headers) {
+  static async downloadFiles(url, headers, method = 'GET') {
     return await Axios({
       url,
-      method: 'GET',
+      method: method,
       responseType: 'arraybuffer',
       headers: headers,
     }).then((response) => {

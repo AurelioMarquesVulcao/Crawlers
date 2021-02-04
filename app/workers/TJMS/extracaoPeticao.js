@@ -129,8 +129,3 @@ const logarExecucao = async (execucao) => {
     }
   });
 })();
-
-const unzipFile = (caminho) => {
-  //TODO unzip o arquivo dentro da propria pasta
-  //npm install node-cmd
-};

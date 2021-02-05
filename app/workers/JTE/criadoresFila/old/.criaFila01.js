@@ -2,24 +2,24 @@ const mongoose = require("mongoose");
 const cheerio = require('cheerio');
 const re = require('xregexp');
 const sleep = require('await-sleep');
-const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
-const comarcas = require('../../../assets/jte/comarcas');
-const Estados = require('../../../assets/jte/comarcascopy.json');
+const { CriaFilaJTE } = require('../../../../lib/criaFilaJTE');
+const comarcas = require('../../../../assets/jte/comarcas');
+const Estados = require('../../../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
-const { Helper, Logger } = require('../../../lib/util');
-const { GerenciadorFila } = require("../../../lib/filaHandler");
-const desligar = require('../../../assets/jte/horarioRoboJTE.json');
+const { Helper, Logger } = require('../../../../lib/util');
+const { GerenciadorFila } = require("../../../../lib/filaHandler");
+const desligar = require('../../../../assets/jte/horarioRoboJTE.json');
 
 
 const Fila = new CriaFilaJTE();
 const rabbit = new GerenciadorFila();
-var fila = ".2"; // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos.2';
+var fila = ".1"; // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos.1';
 // var desligado = [];
 var desligado = desligar.worker
 var estados = [
-  // Estados.ba,
-  Estados.sp15, Estados.mg, Estados.ba,
+  // Estados.sp15, Estados.mg, Estados.ba,
+  Estados.sp2
 ];
 
 

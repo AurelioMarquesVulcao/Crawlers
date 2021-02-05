@@ -5,12 +5,10 @@ const sleep = require('await-sleep');
 
 const { enums } = require('../../../configs/enums');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
-// const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../../models/schemas/extracao');
 const { Logger, Cnj, Helper } = require('../../../lib/util');
 const { LogExecucao } = require('../../../lib/logExecucao');
 const { Andamento } = require('../../../models/schemas/andamento');
-// const { ExtratorBase } = require('../../extratores/extratores');
 const { JTEParser } = require('../../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
@@ -18,6 +16,7 @@ const { downloadFiles } = require('../../../lib/downloadFiles');
 const { Log } = require('../../../models/schemas/logsEnvioAWS');
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 const { Processo } = require('../../../models/schemas/processo');
+const {FluxoController} = require('../../../lib/fluxoController');
 
 
 /**
@@ -35,24 +34,30 @@ var Processos = [];
 })();
 
 async function worker() {
-
-  // liga ao banco de dados
-  mongoose.connect(enums.mongo.connString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.connection.on('error', (e) => {
-    console.log(e);
-  });
+  try{
+// liga ao banco de dados
+mongoose.connect(enums.mongo.connString, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+mongoose.connection.on('error', (e) => {
+  console.log(e);
+});
+  } catch(e){
+    // Pare o container!
+  }
+  
 
 
   // tudo que está abaixo é acionado para cada consumer na fila.
-  await new GerenciadorFila(false, 10).consumir(nomeFila, async (ch, msg) => {
+  await new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
     try {
 
       let message = JSON.parse(msg.content.toString());
       let numeroProcesso = message.NumeroProcesso;
+      // await FluxoController.cadastrarExecucao("robo ","fila", "mensagem")
 
+      console.log(message);
       
       // função de processamento PJE
       let estadoProcesso = Cnj.processoSlice(numeroProcesso).estado
@@ -65,8 +70,9 @@ async function worker() {
       console.log("envio para fila ok");
       // console.log(message);
 
-      ch.ack(msg);
-      await sleep(20000);
+      // ch.ack(msg);
+      // await sleep(20000);
+      await sleep(1000);
       process.exit();
 
 

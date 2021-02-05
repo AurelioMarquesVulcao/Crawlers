@@ -1,6 +1,7 @@
 const sleep = require('await-sleep');
 const { enums } = require('../configs/enums');
 const axios = require('axios');
+const FormData = require('form-data');
 let Anticaptcha = require('../bin/js/anticaptcha')(
   '4b93beb6fe87d3bf3cfd92966ec841a6'
 );
@@ -756,7 +757,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
 
   async antiCaptchaImage(captchaB64, website) {
     let logCaptcha = {
-      Tipo: 'ImageToTextTask',
+      Tipo: 'ImageCaptcha',
       Website: website,
       Robo: this.robo,
       NumeroProcesso: this.identificador.numeroDoProcesso,
@@ -803,6 +804,77 @@ module.exports.CaptchaHandler = class CaptchaHandler {
         logCaptcha.CaptchaBody = response.data;
         new LogCaptcha(logCaptcha).save();
         return { sucesso: true, resposta: response.data.solution.text };
+      }
+    } while (tentativa < 6);
+
+    return { sucesso: false };
+  }
+
+  async imagetyperzCaptchaImage(captchaB64, website) {
+    let logCaptcha = {
+      Tipo: 'ImageCaptcha',
+      Website: website,
+      Robo: this.robo,
+      NumeroProcesso: this.identificador.numeroDoProcesso,
+      NumeroOab: this.identificador.numeroDaOab,
+    };
+
+    let data = new FormData();
+    data.append('token', IMAGETYPERZ_KEY);
+    data.append('action', 'UPLOADCAPTCHA');
+    data.append('file', `${captchaB64}`);
+
+    let config = {
+      method: 'post',
+      url: 'http://captchatypers.com/Forms/UploadFileAndGetTextNEW.ashx',
+      headers: {
+        ...data.getHeaders(),
+      },
+      data: data,
+    };
+
+    let response = await axios(config);
+    let taskId = response.data.replace(/\D/g, '');
+    console.log({ taskId });
+
+    if (!taskId) {
+      console.log('Não foi possivel recuperar a TaskId');
+      return { sucesso: false };
+    }
+
+    let tentativa = 0;
+    console.log(`Captcha TaskId [${taskId}] - Iniciando Captcha`);
+    do {
+      tentativa++;
+      await sleep(10000);
+      console.log(
+        `Captcha TaskId [${taskId}] - Tentativa: ${tentativa} - Aguardando 10 segundos`
+      );
+
+      let retrieveData = new FormData();
+      retrieveData.append('token', IMAGETYPERZ_KEY);
+      retrieveData.append('captchaid', taskId);
+      retrieveData.append('action', 'GETTEXT');
+
+      let options = {
+        method: 'post',
+        url: 'http://captchatypers.com/captchaapi/GetCaptchaResponseJson.ashx',
+        headers: {
+          ...retrieveData.getHeaders(),
+        },
+        data: retrieveData,
+      };
+
+      /**@type {Object}
+       * @property {imagetyperz_resposta_api} data*/
+      let response = await axios(options);
+      response.data = response.data[0];
+      console.log(response.data);
+      if (response.data.Status === 'Solved') {
+        logCaptcha.Servico = 'AntiCaptcha';
+        logCaptcha.CaptchaBody = response.data;
+        new LogCaptcha(logCaptcha).save();
+        return { sucesso: true, resposta: response.data.Response };
       }
     } while (tentativa < 6);
 

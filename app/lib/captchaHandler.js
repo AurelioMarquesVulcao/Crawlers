@@ -4,8 +4,13 @@ const axios = require('axios');
 let Anticaptcha = require('../bin/js/anticaptcha')(
   '4b93beb6fe87d3bf3cfd92966ec841a6'
 );
+const imagetyperzapi = require('imagetyperz-api');
+
 const CAPTCHAIO_KEY = '405d27c9-5ef38c01c76b79.16080721';
 const ANTICAPTCHA_KEY = '49e40ab829a227a307ad542c7d003c7d';
+const IMAGETYPERZ_KEY = '522693887591496D9DD3AA7F3F193938';
+
+imagetyperzapi.set_access_key(IMAGETYPERZ_KEY);
 
 const { Robo } = require('../lib/robo');
 const { LogCaptcha } = require('../models/schemas/logCaptcha');
@@ -13,6 +18,37 @@ const { LogCaptcha } = require('../models/schemas/logCaptcha');
 const {
   AntiCaptchaResponseException,
 } = require('../models/exception/exception');
+
+/**
+ * @typedef RespostaResvolveV2
+ * @property {object} body
+ * @property {string} gResponse
+ * @property {string} captchaId
+ * @property {string} detalhes
+ * @property {boolean} sucesso
+ */
+
+/**
+ * @typedef imagetyperz_resposta_api
+ * @property {Number} CaptchaId
+ * @property {string} Response
+ * @property {string} Cookie_OutPut
+ * @property {string} Proxy_reason
+ * @property {string} Recaptcha_score
+ * @property {string} Status
+ */
+
+/**
+ * @typedef recaptchav2_resposta_api
+ * @property {number} errorId
+ * @property {string} status
+ * @property {string} solution.gRecaptchaResponse
+ * @property {string} cost
+ * @property {string} ip
+ * @property {Date} createTime
+ * @property {Date} endTime
+ * @property {number} solveCount
+ */
 
 const antiCaptchaHandler = async (website, websiteKey, pageAction) => {
   return new Promise((resolve, reject) => {
@@ -67,6 +103,13 @@ const antiCaptchaHandler = async (website, websiteKey, pageAction) => {
 };
 
 class AntiCaptchaHandler {
+  /**
+   *
+   * @param website
+   * @param websiteKey
+   * @param pageAction
+   * @return {Promise<RespostaResvolveV2>}
+   */
   static async resolverV2(website, websiteKey, pageAction) {
     const robo = new Robo();
     let objResponse;
@@ -330,14 +373,14 @@ class AntiCaptchaHandler {
 
   /**
    * Consulta a API do AntiCaptcha retornando o valor do saldo disponível.
-   *
    * @returns {Number} Saldo disponível para a conta do AntiCaptcha.
    */
   static async saldo() {
     try {
       let objResponse = await axios.post(
         'http://api.anti-captcha.com/getBalance',
-        { clientKey: ANTICAPTCHA_KEY }
+        { clientKey: ANTICAPTCHA_KEY },
+        { timeout: 20000 }
       );
       return objResponse.data.balance;
     } catch (e) {
@@ -348,7 +391,12 @@ class AntiCaptchaHandler {
 
 class CaptchaIOHandler {
   constructor() {}
-
+  /**
+   * @param website
+   * @param websiteKey
+   * @param pageAction
+   * @return {Promise<RespostaResvolveV2>}
+   */
   static async resolverV2(website, websiteKey, pageAction) {
     const robo = new Robo();
     let objResponse;
@@ -486,14 +534,101 @@ class CaptchaIOHandler {
   }
 }
 
-module.exports.CaptchaHandler = class CaptchaHandler {
+class ImageTyperZHandler {
   /**
-   *
-   * @param {Number} tentativas numero de repetições antes de desistir do captcha
-   * @param {Number} espera tempo de espera entre uma chamada de captcha e outra
-   * @param {String} robo nome do robo
-   * @param {{numeroDoProcesso: String, numeroDaOab: String}} identificador
+   * Faz a resolução de decaptcha V2 de um determinado website
+   * @param website
+   * @param websiteKey
+   * @param pageAction
+   * @return {Promise<RespostaResvolveV2>}
    */
+  static async resolverV2(website, websiteKey, pageAction) {
+    const espera = 20000; // 20 segundos
+    let options = {};
+    let tentativa = 0;
+    let resposta;
+
+    options['page_url'] = website;
+    options['sitekey'] = websiteKey;
+
+    let createTime = new Date();
+
+    let captchaId = await imagetyperzapi.submit_recaptcha(options);
+
+    console.log({ captchaId });
+
+    do {
+      await sleep(espera);
+
+      /**@type imagetyperz_resposta_api*/
+      let respostaCaptcha = await imagetyperzapi.retrieve_response(captchaId);
+
+      if (respostaCaptcha.Status === 'Solved') {
+        let endTime = new Date();
+        resposta = {
+          body: {
+            ...respostaCaptcha,
+            createTime,
+            endTime,
+            cost: String(this.getCaptchaValues('RecaptchaV2')),
+          },
+          gResponse: respostaCaptcha.Response,
+          captchaId: respostaCaptcha.CaptchaId,
+          sucesso: true,
+        };
+        break;
+      }
+    } while (tentativa < 5);
+
+    if (tentativa === 5) {
+      resposta.sucesso = false;
+      resposta.detalhes = 'Tentativas excedidas';
+    }
+
+    console.log(resposta);
+    return resposta;
+  }
+
+  /**
+   * Consulta a API do ressolvedor de captcha retornando o valor do saldo disponível.
+   * @returns {Number} Saldo disponível para a conta do AntiCaptcha.
+   */
+  static async saldo() {
+    try {
+      let balance = await imagetyperzapi.account_balance();
+      return balance;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
+   * @param {String} captchaType
+   * @return {number}
+   */
+  static getCaptchaValues(captchaType) {
+    let valorPorMil = {
+      RecaptchaV2: 2.1,
+      RecaptchaV3: 2.1,
+      RecaptchaEnterprise: 3.0,
+      Geetest: 1.5,
+      Capy: 1.5,
+      Hcaptcha: 1.8,
+      Tiktok: 1.8,
+    };
+
+    return valorPorMil[captchaType] / 1000;
+  }
+}
+
+/**
+ *
+ * @param {Number} tentativas numero de repetições antes de desistir do captcha
+ * @param {Number} espera tempo de espera entre uma chamada de captcha e outra
+ * @param {String} robo nome do robo
+ * @param {{numeroDoProcesso: String, numeroDaOab: String}} identificador
+ */
+module.exports.CaptchaHandler = class CaptchaHandler {
   constructor(tentativas = 5, espera = 5000, robo, identificador) {
     this.tentativas = tentativas;
     this.espera = espera;
@@ -534,28 +669,65 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     //
     // tentativas = 0;
 
-    do {
-      console.log(
-        `\tAntiCaptcha - ReCaptchaV2 - [TENTATIVA: ${tentativas + 1}]`
-      );
-      resultado = await this.getCaptcha(
-        website,
-        websiteKey,
-        pageAction,
-        AntiCaptchaHandler
-      );
-      if (resultado.sucesso) {
-        logCaptcha.Servico = 'AntiCaptcha';
-        logCaptcha.CaptchaBody = resultado.body;
-        new LogCaptcha(logCaptcha).save();
-        return resultado;
-      }
-      tentativas++;
-      console.log(`\t\t${resultado.detalhes[0].errorCode}`);
-      await sleep(100);
-      // } while (tentativas < maxTentativas);
-    } while (true);
-    // console.log('1', resultado);
+    let anticaptchaDisponivel = await AntiCaptchaHandler.saldo()
+      .then((res) => (res.balance > 0.7 ? res.balance : false))
+      .catch((e) => false);
+
+    if (anticaptchaDisponivel) {
+      console.log('Anticaptcha V2 Selecionado');
+      console.log(anticaptchaDisponivel);
+      do {
+        console.log(
+          `\tAntiCaptcha - ReCaptchaV2 - [TENTATIVA: ${tentativas + 1}]`
+        );
+        resultado = await this.getCaptcha(
+          website,
+          websiteKey,
+          pageAction,
+          AntiCaptchaHandler
+        );
+        if (resultado.sucesso) {
+          logCaptcha.Servico = 'AntiCaptcha';
+          logCaptcha.CaptchaBody = resultado.body;
+          new LogCaptcha(logCaptcha).save();
+          return resultado;
+        }
+        tentativas++;
+        console.log(`\t\t${resultado.detalhes[0].errorCode}`);
+        await sleep(100);
+        // } while (tentativas < maxTentativas);
+      } while (true);
+    }
+
+    let imagetyperzDisponivel = await ImageTyperZHandler.saldo()
+      .then((res) => (Number(res) > 0.7 ? Number(res) : false))
+      .catch((e) => false);
+
+    console.log(imagetyperzDisponivel);
+    if (imagetyperzDisponivel) {
+      do {
+        console.log(
+          `\tImageTyperZ - ReCaptchaV2 - [TENTATIVA: ${tentativas + 1}]`
+        );
+        resultado = await this.getCaptcha(
+          website,
+          websiteKey,
+          pageAction,
+          ImageTyperZHandler
+        );
+        if (resultado.sucesso) {
+          logCaptcha.Servico = 'imagetyperz';
+          logCaptcha.CaptchaBody = resultado.body;
+          console.log(logCaptcha);
+          new LogCaptcha(logCaptcha).save();
+          return resultado;
+        }
+        tentativas++;
+        console.log(`\t\t${resultado.detalhes[0].errorCode}`);
+        await sleep(100);
+      } while (true);
+    }
+
     return resultado;
   }
 
@@ -565,10 +737,10 @@ module.exports.CaptchaHandler = class CaptchaHandler {
       detalhes: [],
       body: {},
     };
+    /**@type {RespostaResvolveV2}*/
     let captcha = await tipoCaptcha.resolverV2(website, websiteKey, pageAction);
 
     if (captcha.sucesso) {
-      // data padrão vindo de 1970
       captcha.body.createTime = new Date(captcha.body.createTime);
       captcha.body.endTime = new Date(captcha.body.endTime);
       resultado.sucesso = true;
@@ -640,3 +812,4 @@ module.exports.CaptchaHandler = class CaptchaHandler {
 
 module.exports.antiCaptchaHandler = antiCaptchaHandler;
 module.exports.AntiCaptchaAPI = AntiCaptchaHandler;
+module.exports.ImageTyperZHandler = ImageTyperZHandler;

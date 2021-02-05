@@ -556,11 +556,11 @@ class ImageTyperZHandler {
 
     let captchaId = await imagetyperzapi.submit_recaptcha(options);
 
-    console.log({ captchaId });
+    // console.log({ captchaId });
 
     do {
       await sleep(espera);
-
+      console.log('Tentativa', tentativa, 'de recuperar captcha');
       /**@type imagetyperz_resposta_api*/
       let respostaCaptcha = await imagetyperzapi.retrieve_response(captchaId);
 
@@ -586,7 +586,7 @@ class ImageTyperZHandler {
       resposta.detalhes = 'Tentativas excedidas';
     }
 
-    console.log(resposta);
+    // console.log(resposta);
     return resposta;
   }
 
@@ -671,12 +671,12 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     // tentativas = 0;
 
     let anticaptchaDisponivel = await AntiCaptchaHandler.saldo()
-      .then((res) => (res.balance > 0.7 ? res.balance : false))
+      .then((res) => res.balance > 0.7)
       .catch((e) => false);
 
     if (anticaptchaDisponivel) {
       console.log('Anticaptcha V2 Selecionado');
-      console.log(anticaptchaDisponivel);
+      // console.log(anticaptchaDisponivel);
       do {
         console.log(
           `\tAntiCaptcha - ReCaptchaV2 - [TENTATIVA: ${tentativas + 1}]`
@@ -701,7 +701,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     }
 
     let imagetyperzDisponivel = await ImageTyperZHandler.saldo()
-      .then((res) => (Number(res) > 0.7 ? Number(res) : false))
+      .then((res) => Number(res) > 0.7)
       .catch((e) => false);
 
     console.log(imagetyperzDisponivel);
@@ -719,7 +719,6 @@ module.exports.CaptchaHandler = class CaptchaHandler {
         if (resultado.sucesso) {
           logCaptcha.Servico = 'imagetyperz';
           logCaptcha.CaptchaBody = resultado.body;
-          console.log(logCaptcha);
           new LogCaptcha(logCaptcha).save();
           return resultado;
         }
@@ -835,7 +834,6 @@ module.exports.CaptchaHandler = class CaptchaHandler {
 
     let response = await axios(config);
     let taskId = response.data.replace(/\D/g, '');
-    console.log({ taskId });
 
     if (!taskId) {
       console.log('Não foi possivel recuperar a TaskId');
@@ -869,7 +867,6 @@ module.exports.CaptchaHandler = class CaptchaHandler {
        * @property {imagetyperz_resposta_api} data*/
       let response = await axios(options);
       response.data = response.data[0];
-      console.log(response.data);
       if (response.data.Status === 'Solved') {
         logCaptcha.Servico = 'AntiCaptcha';
         logCaptcha.CaptchaBody = response.data;

@@ -12,7 +12,7 @@ const { getFilas } = require('./get_fila');
 class CriaFilaPJE {
   constructor() {
     // this.robo = new Robo();
-    this.fila = "processo.PJE.extracao.novos.1";
+    this.fila = "processo.PJE.atualizacao.01";
     this.criafila = new CriaFilaJTE();
     this.rabbit = new GerenciadorFila()
     this.mensagens = [];
@@ -41,7 +41,7 @@ class CriaFilaPJE {
     }
     await this.rabbit.enfileirarLoteTRT(this.fila, this.mensagens)
     // this.mensagens = [];
-    await sleep(5000);
+    await sleep(60000);
     // 
     await this.testaFila();
 

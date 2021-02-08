@@ -1,12 +1,13 @@
-const router = require("express").Router();
-const { CaptchaController } = require("../controller/captchaController");
+const router = require('express').Router();
+const { CaptchaController } = require('../controller/captchaController');
 
 router.get('/', (req, res) => {
-    res.send('Não há rota padrao para /api/captcha');
+  res.send('Não há rota padrao para /api/captcha');
 });
 
 router.get('/consumo/contar', CaptchaController.contarQtdConsumo);
 router.get('/consumo/buscar', CaptchaController.buscarConsumo);
 router.post('/consumo', CaptchaController.salvarConsumo);
+router.get('/saldo', CaptchaController.saldo);
 
 module.exports = router;

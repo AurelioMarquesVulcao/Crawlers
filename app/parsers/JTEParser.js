@@ -85,8 +85,10 @@ class JTEParser extends BaseParser {
       }catch(e){
         resultado = [{ data: Helper.data2(parse[0]), tipo: 'N/I' }];  
       }
-      
-      console.log(resultado);
+      if(resultado[0].data == "Invalid Date"){
+        // console.log("erro de data");
+        throw "Erro na captura de Data"
+      }
     } catch (e) {
       resultado = [];
     }

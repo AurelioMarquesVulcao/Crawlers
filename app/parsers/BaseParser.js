@@ -1,26 +1,26 @@
 const removerAcentos = (texto) => {
   if (texto) {
-    texto = texto.normalize("NFKD");
+    texto = texto.normalize('NFKD');
     // texto = Buffer.from(texto, 'ascii');
-    texto = texto.toString("utf8");
-    texto = texto.replace(/[\u0300-\u036f]/g, "");
-    texto = texto.replace(/['"”“‘’º]+/g, "");
-    texto = texto.replace(/N[^\w\s]/gi, "N");
+    texto = texto.toString('utf8');
+    texto = texto.replace(/[\u0300-\u036f]/g, '');
+    texto = texto.replace(/['"”“‘’º]+/g, '');
+    texto = texto.replace(/N[^\w\s]/gi, 'N');
     return texto;
   } else {
-    return "";
+    return '';
   }
 };
 
-if (typeof String.prototype.strip === "undefined") {
-  String.prototype.strip = function() {
-    return String(this).replace(/^\s+|\s+$/g, "");
+if (typeof String.prototype.strip === 'undefined') {
+  String.prototype.strip = function () {
+    return String(this).replace(/^\s+|\s+$/g, '');
   };
 }
 
 module.exports.BaseParser = class BaseParser {
   constructor() {
-    this.cnj = "";
+    this.cnj = '';
     this.isBaixa = false;
     this.hasAudiencia = false;
     this.jsonCapa = {};
@@ -33,62 +33,67 @@ module.exports.BaseParser = class BaseParser {
       'Arquivamento com baixa',
       'Arquivado Definitivamente',
       'Arquivamento',
-      'Baixa Definitiva'
-    ]
-
+      'Baixa Definitiva',
+    ];
   }
 
   filtrarUnicosLista(lista) {
     let listaString = [];
-    lista = lista.map(element => {
+    lista = lista.map((element) => {
       let envString = JSON.stringify(element);
-      if (listaString.indexOf(envString) === -1){
+      if (listaString.indexOf(envString) === -1) {
         listaString.push(envString);
         return element;
       }
       listaString.push(envString);
       return false;
-    })
-    return lista.filter(x => Boolean(x));
+    });
+    return lista.filter((x) => Boolean(x));
+  }
+
+  tratarTexto(texto) {
+    texto = texto.replace(/\n/g, ' ');
+    texto = texto.replace(/\s\s+/g, ' ');
+    return texto;
   }
 };
 
 const tradutor = {
-  "A": "Autor",
-  "Advogada": "Advogado",
-  "Advogado": "Advogado",
-  "Advogadomigracao": "Advogado",
-  "Agdo": "Agravado",
-  "Agravado": "Agravado",
-  "Agte": "Agravante",
-  "Agravante": "Agravante",
-  "Apelado": "Apelado",
-  "Apelante": "Apelante",
-  "Apeldo": "Apelado",
-  "Apelte": "Apelante",
-  "Apdo": "Apelado",
-  "Apte": "Apelante",
-  "Autor": "Autor",
-  "Credor": "Credor",
-  "Devedor": "Devedor",
-  "Embargdo": "Embargado",
-  "Embargte": "Embargante",
-  "Exectdo": "Executado",
-  "Exeqte": "Exequente",
-  "Impetrado": "Impetrado",
-  "Impetrante": "Impetrante",
-  "Interessado": "Interessado",
-  "Perito": "Perito",
-  "Procsoab": "Procurador",
-  "Procurador": "Procurador",
-  "R": "Reu",
-  "Reqdo": "Requerido",
-  "Reqte": "Requerente",
-  "Requerente": "Requerente",
-  "Requerido": "Requerido",
-  "Reu": "Reu",
-  "Suscdo": "Suscitado",
-  "Suscte": "Suscitante"
+  A: 'Autor',
+  Advogada: 'Advogado',
+  Advogado: 'Advogado',
+  Advogadomigracao: 'Advogado',
+  Agdo: 'Agravado',
+  Agravado: 'Agravado',
+  Agte: 'Agravante',
+  Agravante: 'Agravante',
+  Apelado: 'Apelado',
+  Apelante: 'Apelante',
+  Apeldo: 'Apelado',
+  Apelte: 'Apelante',
+  Apdo: 'Apelado',
+  Apte: 'Apelante',
+  Autor: 'Autor',
+  Credor: 'Credor',
+  Devedor: 'Devedor',
+  Embargdo: 'Embargado',
+  Embargte: 'Embargante',
+  Exectdo: 'Executado',
+  Exeqte: 'Exequente',
+  Impetrado: 'Impetrado',
+  Impetrante: 'Impetrante',
+  Interessado: 'Interessado',
+  Perito: 'Perito',
+  Procsoab: 'Procurador',
+  Procurador: 'Procurador',
+  R: 'Reu',
+  Reqdo: 'Requerido',
+  Reqte: 'Requerente',
+  Requerente: 'Requerente',
+  Requerido: 'Requerido',
+  Reu: 'Reu',
+  Suscdo: 'Suscitado',
+  Suscte: 'Suscitante',
 };
 
 /**
@@ -97,7 +102,6 @@ const tradutor = {
  * @returns {string}
  */
 const traduzir = (tipo) => {
-
   // Remove acentos
   tipo = removerAcentos(tipo);
   // Remove caracteres indesejados
@@ -105,7 +109,7 @@ const traduzir = (tipo) => {
   // Capitalize
   const key = tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase();
 
-  if (tradutor[key]){
+  if (tradutor[key]) {
     return tradutor[key];
   }
   return key;

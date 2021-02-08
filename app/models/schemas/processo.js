@@ -15,7 +15,7 @@ const capaSchema = new Schema(
     segredoJustica: Boolean,
     justicaGratuita: Boolean,
     valor: String,
-    audiencias: []
+    audiencias: [],
   },
   { _id: false, versionKey: false }
 );
@@ -53,6 +53,7 @@ const processoSchema = new Schema(
     temAndamentosNovos: Boolean,
     qtdAndamentos: Number,
     origemExtracao: String,
+    metadados: Schema.Types.Mixed,
   },
   {
     versionKey: false,
@@ -76,18 +77,25 @@ const processoSchema = new Schema(
  * @param detalhes.origem
  * @returns {{sequencial: string, numeroProcesso: string, ano: string, orgao: string, numeroProcessoMascara: string, origem: string, tribunal: string, digito: string}}
  */
-processoSchema.statics.formatarDetalhes = function formatarDetalhes({numeroProcessoMascara, numeroProcesso, ano, orgao, tribunal, origem} = {}) {
+processoSchema.statics.formatarDetalhes = function formatarDetalhes({
+  numeroProcessoMascara,
+  numeroProcesso,
+  ano,
+  orgao,
+  tribunal,
+  origem,
+} = {}) {
   return {
     numeroProcessoMascara: ('0000000' + numeroProcessoMascara).slice(-25),
     numeroProcesso: ('0000000' + numeroProcesso).slice(-20),
     sequencial: ('0000000' + numeroProcessoMascara.split(/\D/g)[0]).slice(-7),
-    digito: ('00'+numeroProcessoMascara.split(/\D/g)[1]).slice(-2),
+    digito: ('00' + numeroProcessoMascara.split(/\D/g)[1]).slice(-2),
     ano: ('0000' + ano).slice(-4),
     orgao: ('00' + orgao).slice(-2),
     tribunal: ('00' + tribunal).slice(-2),
     origem: ('0000' + origem).slice(-4),
-  }
-}
+  };
+};
 
 processoSchema.methods.salvar = async function salvar() {
   let processoObject = this.toObject();
@@ -111,8 +119,9 @@ processoSchema.methods.salvar = async function salvar() {
 
   // verificando a quantidade de andamentos dentro do banco
   let doc = await new Promise((resolve, reject) => {
-
-    processoObject.temAndamentosNovos = !(pesquisa && this.qtdAndamentos === pesquisa.qtdAndamentos);
+    processoObject.temAndamentosNovos = !(
+      pesquisa && this.qtdAndamentos === pesquisa.qtdAndamentos
+    );
     let doc = Processo.updateOne(
       { 'detalhes.numeroProcesso': this.detalhes.numeroProcesso },
       processoObject,
@@ -167,24 +176,25 @@ processoSchema.statics.identificarDetalhes = function identificarDetalhes(cnj) {
   return detalhes;
 };
 
-processoSchema.statics.listarProcessos = async function listarProcessos(dias, tribunal, orgao) {
+processoSchema.statics.listarProcessos = async function listarProcessos(
+  dias,
+  tribunal,
+  orgao
+) {
   let numeroProcessos = [];
 
   let query = {
-      dataAtualizacao: {
-        $gte: new Date(new Date().getTime() - dias * 24 * 3600 * 1000),
-      },
-    }
+    dataAtualizacao: {
+      $gte: new Date(new Date().getTime() - dias * 24 * 3600 * 1000),
+    },
+  };
 
-    if (tribunal) query['detalhes.tribunal'] = tribunal;
-    if (orgao) query['detalhes.orgao'] = orgao;
+  if (tribunal) query['detalhes.tribunal'] = tribunal;
+  if (orgao) query['detalhes.orgao'] = orgao;
 
-  let docs = await Processo.find(
-    query,
-    {
-      'detalhes.numeroProcessoMascara': 1,
-    }
-  );
+  let docs = await Processo.find(query, {
+    'detalhes.numeroProcessoMascara': 1,
+  });
 
   docs.forEach((doc) => {
     numeroProcessos.push(doc.detalhes.numeroProcessoMascara);

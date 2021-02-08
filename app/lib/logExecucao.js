@@ -1,10 +1,12 @@
 require('../bootstrap');
+const mongoose = require('mongoose');
 const ExecucaoConsulta = require('../models/schemas/execucao_consulta')
   .ExecucaoConsulta;
 const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila;
 const { enums } = require('../configs/enums');
 
 let mapaEstadoRobo = {
+  MS: enums.nomesRobos.TJMS,
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
   SC: enums.nomesRobos.TJSC,
@@ -43,7 +45,6 @@ module.exports.LogExecucao = class LogExecucao {
    */
   static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
-
     let mensagem = {
       DataEnfileiramento: new Date(),
       NumeroProcesso: consultaPendente.NumeroProcesso,
@@ -61,15 +62,13 @@ module.exports.LogExecucao = class LogExecucao {
         'Mensagem.NumeroProcesso': 1,
       })
       .countDocuments();
-    console.log('vai0');
     if (nomeRobo && !consultasCadastradas) {
-      console.log('vai1');
       nomeFila = nomeFila
         ? nomeFila
         : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
 
       const execucao = {
-        ConsultaCadastradaId: consultaPendente._id,
+        ConsultaCadastradaId: mongoose.ObjectId(consultaPendente._id),
         NomeRobo: nomeRobo,
         Log: [
           {
@@ -91,7 +90,6 @@ module.exports.LogExecucao = class LogExecucao {
         mensagem: `Processo ${mensagem.NumeroProcesso} enviado para a fila.`,
       };
     }
-    console.log('vai2');
     if (!nomeRobo) {
       return {
         sucesso: false,

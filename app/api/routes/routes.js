@@ -16,4 +16,7 @@ router.use('/healthcheck', require('./healthcheck'));
 router.use('/cliente', middlewares.requerClienteApiKey);
 router.use('/cliente', require('./cliente'));
 
+router.use('/consulta', middlewares.requerClienteApiKey);
+router.use('/consulta', require('./consulta'));
+
 module.exports = router;

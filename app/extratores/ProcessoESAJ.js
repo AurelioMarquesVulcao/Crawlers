@@ -37,7 +37,6 @@ class ProcessoESAJ extends ExtratorBase {
     this.detalhes = this.dividirNumeroProcesso(this.numeroProcesso);
 
     this.setLogger();
-    let uuidCaptcha;
 
     try {
       let objResponse;
@@ -46,7 +45,6 @@ class ProcessoESAJ extends ExtratorBase {
       let paginaReturn;
 
       await this.fazerPrimeiroAcesso();
-
       objResponse = await this.acessarPaginaConsulta();
 
       let captchaExiste = this.verificaCaptcha(objResponse.responseBody);
@@ -228,7 +226,7 @@ class ProcessoESAJ extends ExtratorBase {
     this.logger.info('Avaliando a pagina para detectar presença de erros');
 
     const $ = cheerio.load(body);
-    const mensagemRetornoSelector = '#mensagemRetorno'; //TODO checar selector
+    const mensagemRetornoSelector = '#mensagemRetorno';
     let mensagemRetornoText = $(mensagemRetornoSelector).text();
     const tabelaMovimentacoesSelector = '#tabelaTodasMovimentacoes'; //TODO checar selector
     const senhaProcessoSelector = '#senhaProcesso'; //TODO checar selector
@@ -284,6 +282,21 @@ class ProcessoTJMS extends ProcessoESAJ {
     super.setLogger('TJMS');
   }
 }
+
+let msg = {
+  ExecucaoConsultaId: '9fca6e434b326a294e313fb9',
+  ConsultaCadastradaId: '5eda61b337ebc31714400562',
+  DataEnfileiramento: '2020-12-04T17:13:39.324Z',
+  Instancia: '1',
+  NumeroProcesso: '0806920-43.2020.8.12.0002',
+  NumeroOab: '91357MS',
+  SeccionalOab: 'MS',
+};
+
+new ProcessoTJMS()
+  .extrair('0806920-43.2020.8.12.0002', 'XXXXXX', 1, msg)
+  .then((res) => console.log(res))
+  .catch((e) => console.log(e));
 
 module.exports = {
   ProcessoTJMS,

@@ -9,8 +9,6 @@ const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 
-let zip = JSZip();
-
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
 };
@@ -37,6 +35,7 @@ const logarExecucao = async (execucao) => {
       nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJMS}`,
       NumeroDoProcesso: message.NumeroProcesso,
     });
+    let arquivos = [];
     try {
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
@@ -55,30 +54,41 @@ const logarExecucao = async (execucao) => {
 
       logger.info('Preparando arquivo para upload');
       folderPath = Path.resolve(__dirname, '../../downloads');
-      arquivoPath = `${folderPath}/${message.NumeroProcesso.replace(
-        /\D/g,
-        ''
-      )}.zip`;
       if (!resultadoExtracao.sucesso)
         throw new Error(resultadoExtracao.detalhes);
 
-      let data = fs.readFileSync(arquivoPath).toString('base64');
-      logger.info('Arquivo preparado');
+      // verificar todos os arquivos dentro da pasta download
+      // abrir um por um
+      //enviar o conteudo para o bigdata
 
-      logger.info('Enviando resposta ao BigData');
+      // let data = fs.readFileSync(arquivoPath).toString('base64');
+      // logger.info('Arquivo preparado');
+
+      // logger.info('Enviando resposta ao BigData');
 
       if (resultadoExtracao.sucesso) {
+        fs.readdirSync(`${folderPath}/`).forEach((file) =>
+          arquivos.push({
+            path: `${folderPath}/${file}`,
+            nome: file,
+          })
+        );
+
         resposta = {
           NumeroCNJ: message.NumeroProcesso,
           // Instancia: message.Instancia,
-          Documentos: [
-            {
-              DocumentoBody: data,
-              UrlOrigem: '',
-              NomeOrigem: `${message.NumeroProcesso.replace(/\D/g, '')}.pdf`,
-            },
-          ],
+          Documentos: [],
         };
+
+        arquivos.map((arquivo) => {
+          let data = fs.readFileSync(arquivo.path).toString('base64');
+          resposta.Documentos.push({
+            DocumentoBody: data,
+            UrlOrigem: '',
+            NomeOrigem: arquivo.nome,
+          });
+        });
+
         await Helper.feedbackDocumentos(resposta).catch((err) => {
           console.log(err);
           throw new Error(
@@ -115,11 +125,11 @@ const logarExecucao = async (execucao) => {
         NomeRobo: enums.nomesRobos.TJMS,
       });
     } finally {
-      if (fs.existsSync(arquivoPath)) {
-        logger.info('Apagando arquivo temporario');
-        await fs.unlinkSync(arquivoPath);
+      arquivos.map((arquivo) => {
+        logger.info(`Apagando arquivo ${arquivo.nome}`);
+        fs.unlinkSync(`${arquivo.path}`);
         logger.info('Arquivo apagado');
-      }
+      });
 
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);

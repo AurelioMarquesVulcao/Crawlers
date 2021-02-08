@@ -250,6 +250,51 @@ services:
       dockerfile: dockerfile-puppeteer
     command: node workers/TJCE/extracaoPeticao.js
 
+  tjms-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJMS/extracaoOab.js
+
+  tjms-processo-novo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJMS/processoNovos.js
+
+  tjms-processo-atualizacao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJMS/processoAtualizacao.js
+
+  tjms-comarcas:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJMS/extracaoComarcas.js
+
+  tjms-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
+    command: node workers/TJMS/extracaoPeticao.js
+
   processo.jte.extracao.novos.fila.1:
     extends:
       file: common-services.yml

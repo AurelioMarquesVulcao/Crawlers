@@ -402,9 +402,4 @@ class OabTJMS extends OabESAJ {
     super.setLogger();
   }
 }
-
-new OabTJMS()
-  .extrair('4232MS', '601ab3599225ed7086230be4')
-  .then((res) => console.log(res));
-
 module.exports.OabTJMS = OabTJMS;

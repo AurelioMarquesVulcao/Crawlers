@@ -15,7 +15,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     url = '',
     debug = false,
     timeout = 30000,
-    headless = false,
+    headless = true,
     usuario = { username: '', password: '' },
   } = {}) {
     super(url, debug);
@@ -303,7 +303,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       let elements = $('#arvore_principal > ul > li > a');
       let tam = elements.length;
 
-      for (let i = 0; i < tam; i++) {
+      for (let i = 0; i < 1; i++) {
         if (
           elements[i].innerText === 'Decisão' ||
           elements[i].innerText === 'Despachos'
@@ -496,6 +496,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
   async salvarArquivo(nomeArquivo) {
     let path = Path.resolve(__dirname, '../downloads');
     nomeArquivo = nomeArquivo.replace(/\s/g, '_');
+    nomeArquivo = Helper.removerAcento(nomeArquivo);
     let filePath = `${path}/${nomeArquivo}.pdf`;
 
     this.logger.info(
@@ -517,10 +518,10 @@ class PeticaoTJMS extends PeticaoEsaj {
   }
 }
 
-(() => {
-  new PeticaoTJMS()
-    .extrair('0000135-74.2021.8.12.0031', 1)
-    .then((r) => console.log(r));
-})();
+// (() => {
+//   new PeticaoTJMS()
+//     .extrair('0000135-74.2021.8.12.0031', 1)
+//     .then((r) => console.log(r));
+// })();
 
 module.exports.PeticaoTJMS = PeticaoTJMS;

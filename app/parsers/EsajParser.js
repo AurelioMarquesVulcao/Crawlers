@@ -177,6 +177,7 @@ class EsajParser extends BaseParser {
       let data;
       let descricao;
       let observacao;
+      let link;
 
       data = $($(linha).children()[0]).text().strip();
       data = moment(data, 'DD/MM/YYYY').format('YYYY-MM-DD');
@@ -192,12 +193,19 @@ class EsajParser extends BaseParser {
       observacao = this.tratarTexto(observacao);
       observacao = removerAcentos(observacao);
 
+      link = $($(linha).children()[1]).find('a').length
+        ? $($(linha).children()[1]).find('a').attr().href
+        : null;
+
       let andamento = {
         numeroProcesso: numeroProcesso,
         data: data,
         dataInclusao: dataAtual,
         descricao: descricao,
       };
+
+      if (link && /processo\.codigo/.test(link))
+        andamento.link = `${this.url}${link}`;
 
       andamento.observacao = /\w/g.test(observacao) ? observacao : null;
 
@@ -327,7 +335,12 @@ class EsajParser extends BaseParser {
   }
 }
 
-class TJMSParser extends EsajParser {}
+class TJMSParser extends EsajParser {
+  constructor() {
+    super();
+    this.url = 'https://esaj.tjms.jus.br';
+  }
+}
 
 module.exports = {
   TJMSParser,

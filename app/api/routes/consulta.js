@@ -1,6 +1,5 @@
 const router = require('express').Router();
 
-const { json } = require('body-parser');
 const {
   ConsultasCadastradas,
 } = require('../../models/schemas/consultas_cadastradas');
@@ -8,7 +7,7 @@ const {
 /**
  * Retorna o numero do processo no padrão CNJ.
  * @param {String} numProcesso O número do processo que será normalizado.
- * @returns {Stirng} Número no padrão CNJ.
+ * @returns {String} Número no padrão CNJ.
  */
 function normalizarNumProcesso(numProcesso, removerPontuacao = false) {
   numProcesso = numProcesso.toString().replace(/\D/g, '').padStart(20, '0');
@@ -58,9 +57,6 @@ router.post('', async (req, res) => {
   );
   consulta.ClienteId = req.cliente._id;
   consulta.Detalhes = identificarDetalhes(consulta.NumeroProcesso);
-
-  if (!consulta.Detalhes) {
-  }
 
   const errors = consulta.validateSync();
 

@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const ClienteSchema = new mongoose.Schema(
   {
-    Nome: { type: String, required: true },
+    Nome: { type: String, required: true, index: { unique: true } },
     Ativo: { type: Boolean, default: true },
-    ApiKey: { type: String, required: true },
+    ApiKey: { type: String, required: true, index: { unique: true } },
   },
   {
     versionKey: false,

@@ -1,16 +1,18 @@
+const { ProcessoTJMS } = require('./ProcessoESAJ');
+const { OabTJMS } = require('./OabESAJ');
+const { PeticaoTJMS } = require('./PeticaoEsaj');
 const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJSP } = require('./OabTJSP');
 const { OabTJMG } = require('./OabTJMG');
 const { OabTJRS } = require('./OabTJRS');
 const { OabTJSC } = require('./OabTJSC');
 const { ProcessoTJRS } = require('./ProcessoTJRS');
-const { ProcessoTJSP } = require("./ProcessoTJSP");
+const { ProcessoTJSP } = require('./ProcessoTJSP');
 const { ProcessoTJSC } = require('./ProcessoTJSC');
-const { ProcessoTJCE } = require('./ProcessoTJCE')
+const { ProcessoTJCE } = require('./ProcessoTJCE');
 const { ProcJTE } = require('./ProcJTE');
 const { PeticaoTJSP } = require('./PeticaoTJSP');
 const { PeticaoTJRS1 } = require('./PeticaoTJRS1');
-
 
 class ExtratorFactory {
   static getExtrator(fila, isDebug) {
@@ -29,11 +31,17 @@ class ExtratorFactory {
     }
 
     if (/oab.TJRS/.test(fila)) {
-      extrator = new OabTJRS('https://www.tjrs.jus.br/site_php/consulta/index.php', isDebug);
+      extrator = new OabTJRS(
+        'https://www.tjrs.jus.br/site_php/consulta/index.php',
+        isDebug
+      );
     }
 
     if (/processo.TJRS/.test(fila)) {
-      extrator = new ProcessoTJRS('https://www.tjrs.jus.br/site_php/consulta/index.php', isDebug);
+      extrator = new ProcessoTJRS(
+        'https://www.tjrs.jus.br/site_php/consulta/index.php',
+        isDebug
+      );
     }
 
     if (/peticao.TJRS/.test(fila)) {
@@ -48,7 +56,8 @@ class ExtratorFactory {
       extrator = new ProcessoTJSP(isDebug);
     }
 
-    if (/peticao.TJSP/.test(fila)) { // usa puppeteer
+    if (/peticao.TJSP/.test(fila)) {
+      // usa puppeteer
       extrator = new PeticaoTJSP({ headless: true });
     }
 
@@ -67,12 +76,27 @@ class ExtratorFactory {
       );
     }
 
-    if(/processo.TJCE/.test(fila)) {
+    if (/processo.TJCE/.test(fila)) {
       extrator = new ProcessoTJCE('', isDebug);
     }
 
     if (/processo.PJE/.test(fila)) {
-      extrator = new ExtratorTrtPje('https://www.trt1.jus.br/consulta-processual', isDebug);
+      extrator = new ExtratorTrtPje(
+        'https://www.trt1.jus.br/consulta-processual',
+        isDebug
+      );
+    }
+
+    if (/oab.TJMS/.test(fila)) {
+      extrator = new OabTJMS();
+    }
+
+    if (/processo.TJMS/.test(fila)) {
+      extrator = new ProcessoTJMS();
+    }
+
+    if (/peticao.TJMS/.test(fila)) {
+      extrator = new PeticaoTJMS();
     }
     return extrator;
   }

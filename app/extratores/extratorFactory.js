@@ -7,7 +7,7 @@ const { OabTJMG } = require('./OabTJMG');
 const { OabTJRS } = require('./OabTJRS');
 const { OabTJSC } = require('./OabTJSC');
 const { ProcessoTJRS } = require('./ProcessoTJRS');
-const { ProcessoTJSP } = require('./ProcessoTJSP');
+const { ProcessoTJSP } = require('./ProcessoESAJ');
 const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { ProcessoTJCE } = require('./ProcessoTJCE');
 const { ProcJTE } = require('./ProcJTE');
@@ -53,7 +53,7 @@ class ExtratorFactory {
     }
 
     if (/processo.TJSP/.test(fila)) {
-      extrator = new ProcessoTJSP(isDebug);
+      extrator = new ProcessoTJSP();
     }
 
     if (/peticao.TJSP/.test(fila)) {

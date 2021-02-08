@@ -6,6 +6,7 @@ const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Logger } = require('../lib/util');
 const { Robo } = require('../lib/newRobo');
 const parsers = require('../parsers');
+const sleep = require('await-sleep');
 
 const proxy = true;
 
@@ -270,6 +271,19 @@ class ProcessoESAJ extends ExtratorBase {
 
     return Boolean(captcha);
   }
+
+  async getUuidCaptcha() {
+    let objResponse;
+
+    await sleep(200);
+    objResponse = await this.robo.acessar({
+      url: `${this.url}/captchaControleAcesso.do`,
+      method: 'POST',
+      proxy: true,
+    });
+
+    return objResponse.responseBody.uuidCaptcha;
+  }
 }
 
 class ProcessoTJMS extends ProcessoESAJ {
@@ -283,6 +297,19 @@ class ProcessoTJMS extends ProcessoESAJ {
   }
 }
 
+class ProcessoTJSP extends ProcessoESAJ {
+  constructor() {
+    super('https://esaj.tjsp.jus.br/cpopg', false);
+    this.parser = new parsers.TJSPParser();
+    this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
+  }
+
+  async setLogger(tribunal = '') {
+    super.setLogger('TJSP');
+  }
+}
+
 module.exports = {
   ProcessoTJMS,
+  ProcessoTJSP,
 };

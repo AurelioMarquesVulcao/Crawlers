@@ -671,7 +671,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
     // tentativas = 0;
 
     let anticaptchaDisponivel = await AntiCaptchaHandler.saldo()
-      .then((res) => res.balance > 0.7)
+      .then((res) => res > 0)
       .catch((e) => false);
 
     if (anticaptchaDisponivel) {

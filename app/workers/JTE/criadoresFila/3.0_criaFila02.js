@@ -26,6 +26,8 @@ var nomeFila = 'processo.JTE.extracao.novos.2';
     Estados[0].sp15,
     Estados[0].mg,
     Estados[0].ba,
+    Estados[0].pi,
+    Estados[0].mt,
   ];
 
   embaralha(estados);

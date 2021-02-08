@@ -22,8 +22,6 @@ var nomeFila = 'processo.JTE.extracao.novos.4';
   const variaveis = await Variaveis.catch({ codigo: '000001' });
   const Estados = variaveis.variaveis;
   var estados = [
-    // Estados[0].rs,
-    Estados[0].rs,
     Estados[0].pe,
     Estados[0].ce,
     Estados[0].pa,

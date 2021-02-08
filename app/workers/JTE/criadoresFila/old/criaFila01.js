@@ -2,20 +2,20 @@ const mongoose = require("mongoose");
 const cheerio = require('cheerio');
 const re = require('xregexp');
 const sleep = require('await-sleep');
-const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
-const comarcas = require('../../../assets/jte/comarcas');
-const { Variaveis } = require('../../../lib/variaveisRobos');
+const { CriaFilaJTE } = require('../../../../lib/criaFilaJTE');
+const comarcas = require('../../../../assets/jte/comarcas');
+const { Variaveis } = require('../../../../lib/variaveisRobos');
 // const Estados = require('../../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
-const { Helper, Logger } = require('../../../lib/util');
-const desligar = require('../../../assets/jte/horarioRoboJTE.json');
-const { GerenciadorFila } = require("../../../lib/filaHandler");
+const { Helper, Logger } = require('../../../../lib/util');
+const desligar = require('../../../../assets/jte/horarioRoboJTE.json');
+const { GerenciadorFila } = require("../../../../lib/filaHandler");
 
 
 const Fila = new CriaFilaJTE();
 const rabbit = new GerenciadorFila();
-var fila = ".4";  // string de escolha de fila
-var nomeFila = 'processo.JTE.extracao.novos.4';
+var fila = ".1";  // string de escolha de fila
+var nomeFila = 'processo.JTE.extracao.novos.1';
 var desligado = desligar.worker;
 // var estados = [
 //   // Estados.rj,Estados.pr,
@@ -32,12 +32,13 @@ var desligado = desligar.worker;
   let timer;    // tempo entre o envio de cada teste, isso marca o ritmo de envio de processos
   let contador = 0;
   let start = 0;  // cria uma condição que permite que a aplicação inicie ao ligar o worker.
-  const variaveis = await Variaveis.catch({ "codigo": "000001" })
-  const Estados = variaveis.variaveis
+  const variaveis = await Variaveis.catch({ "codigo": "000001" });
+  const Estados = variaveis.variaveis;
   console.log(Estados);
   var estados = [
-    Estados[0].rs, Estados[0].pe, Estados[0].ce, Estados[0].pa,
-    Estados[0].to, Estados[0].am, Estados[0].sc, Estados[0].ac, Estados[0].pb,
+    // Estados.rj,Estados.pr,
+    // Estados.sp2,
+    Estados[0].rj, Estados[0].sp2,
   ];
 
   embaralha(estados)

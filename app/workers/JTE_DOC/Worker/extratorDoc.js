@@ -30,9 +30,9 @@ var listaArquivo = [];
 
 
 // Filas a serem usadas
-const nomeFila = `Fila.axios.JTE`;
-const reConsumo = `Fila.axios.JTE`;
-const filaAxios = "Fila.axios.JTE"
+const nomeFila = `peticao.JTE.extracao.links-01`;
+const reConsumo = `peticao.JTE.extracao.links-01`;
+const filaAxios = "peticao.JTE.extracao.links-01"
 
 var heartBeat = 0; // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
 

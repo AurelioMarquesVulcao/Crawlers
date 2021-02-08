@@ -22,7 +22,13 @@ var nomeFila = 'processo.JTE.extracao.novos.1';
   let start = 0; // cria uma condição que permite que a aplicação inicie ao ligar o worker.
   const variaveis = await Variaveis.catch({ codigo: '000001' });
   const Estados = variaveis.variaveis;
-  var estados = [Estados[0].rj, Estados[0].sp2];
+  var estados = [
+    Estados[0].rj,
+    Estados[0].sp2,
+    Estados[0].se,
+    Estados[0].rn,
+    Estados[0].ms,
+  ];
 
   embaralha(estados);
   // conecta com o Banco de dados...

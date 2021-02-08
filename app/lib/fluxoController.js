@@ -139,39 +139,42 @@ class FluxoController {
    * @return {Promise<boolean>}
    */
   static async cadastrarExecucao(nomeRobo, nomeFila, msg) {
-    let gf = GerenciadorFila();
-    let execucao = {
-      NomeRobo: nomeRobo,
-      Log: [
-        {
-          status: `Execução do robô ${nomeRobo} para consulta ${msg.NumeroProcesso} foi cadastrada com sucesso!`,
-        },
-      ],
-      Instancia: msg.Instancia,
-      Mensagem: [msg],
-    };
+    try {
+      let gf = new GerenciadorFila();
+      let execucao = {
+        NomeRobo: nomeRobo,
+        Log: [
+          {
+            status: `Execução do robô ${nomeRobo} para consulta ${msg.NumeroProcesso} foi cadastrada com sucesso!`,
+          },
+        ],
+        Instancia: msg.Instancia,
+        Mensagem: [msg],
+      };
 
-    let pendentes = await ExecucaoConsulta.find({
-      'mensagem.NomeRobo': nomeRobo,
-      'mensagem.Instancia': msg.Instancia,
-      'mensagem.NumeroProcesso': msg.NumeroProcesso,
-      DataTermino: null,
-    })
-      .limit(1)
-      .countDocuments();
+      let pendentes = await ExecucaoConsulta.findOne({
+        NomeRobo: nomeRobo,
+        'Mensagem.Instancia': msg.Instancia,
+        'Mensagem.NumeroProcesso': msg.NumeroProcesso,
+        DataTermino: null,
+      })
+        // .limit(1)
+        .countDocuments();
 
-    if (pendentes) {
-      console.log(
-        `O processo ${nomeRobo} - ${msg.NumeroProcesso} já cadastrada`
-      );
-      return false;
+      if (pendentes !== 0) {
+        console.log(
+          `O processo ${nomeRobo} - ${msg.NumeroProcesso} já cadastrada`
+        );
+        return false;
+      }
+      await gf.enviar(nomeFila, msg);
+      console.log(execucao);
+      await new ExecucaoConsulta(execucao).save();
+
+      return true;
+    } catch (e) {
+      console.log(e);
     }
-
-    gf.enviar(nomeFila, msg);
-
-    await new ExecucaoConsulta(execucao).save();
-
-    return true;
   }
 
   /**

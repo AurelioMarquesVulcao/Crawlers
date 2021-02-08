@@ -2,17 +2,17 @@ const mongoose = require("mongoose");
 const cheerio = require('cheerio');
 const re = require('xregexp');
 const sleep = require('await-sleep');
-const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
-const comarcas = require('../../../assets/jte/comarcas');
-const { Variaveis } = require('../../../lib/variaveisRobos');
+const { CriaFilaJTE } = require('../../../../lib/criaFilaJTE');
+const comarcas = require('../../../../assets/jte/comarcas');
+const { Variaveis } = require('../../../../lib/variaveisRobos');
 // const Estados = require('../../../assets/jte/comarcascopy.json');
 const { getFilas } = require('./get_fila');
-const { Helper, Logger, Cnj } = require('../../../lib/util');
-const desligar = require('../../../assets/jte/horarioRoboJTE.json');
-const { GerenciadorFila } = require("../../../lib/filaHandler");
+const { Helper, Logger, Cnj } = require('../../../../lib/util');
+const desligar = require('../../../../assets/jte/horarioRoboJTE.json');
+const { GerenciadorFila } = require("../../../../lib/filaHandler");
 const awaitSleep = require("await-sleep");
-const { Processo } = require('../../../models/schemas/processo');
-const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../../models/schemas/jte');
+const { Processo } = require('../../../../models/schemas/processo');
+const { consultaCadastradas, ultimoProcesso, linkDocumento, statusEstadosJTE } = require('../../../../models/schemas/jte');
 
 
 const Fila = new CriaFilaJTE();

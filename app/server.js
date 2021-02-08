@@ -8,7 +8,7 @@ const { enums } = require('./configs/enums');
 
 const routes = require('./api/routes/routes');
 
-const port = process.env.API_PORT || '3133';
+const port = 3300;
 const app = express();
 
 app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
@@ -24,4 +24,5 @@ mongoose.connect(enums.mongo.connString, {
 
 app.listen(port, () => {
   console.log(`API rodando em: http://localhost:${port}`);
+  console.log(`Acessível externamento pela porta ${process.env.API_PORT}`);
 });

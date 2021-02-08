@@ -1,17 +1,17 @@
-const { LogCaptcha } = require("../../models/schemas/logCaptcha");
+const { LogCaptcha } = require('../../models/schemas/logCaptcha');
+const { AntiCaptchaAPI } = require('../../lib/captchaHandler');
 const moment = require('moment');
 
 const captilize = (texto) => {
   return `${texto[0].toUpperCase()}${texto.slice(1)}`;
-}
+};
 
 module.exports.CaptchaController = class CaptchaController {
-
   static async salvarConsumo(req, res) {
-    const response = {status: 500, data: '', error: null};
+    const response = { status: 500, data: '', error: null };
     try {
-      let log = {}
-      log.Servico = "AntiCaptcha";
+      let log = {};
+      log.Servico = 'AntiCaptcha';
       log.Tipo = req.body.Tipo;
       log.Website = req.body.Website;
       log.WebsiteKey = req.body.WebsiteKey;
@@ -26,29 +26,27 @@ module.exports.CaptchaController = class CaptchaController {
         .then(() => {
           response.status = 200;
           response.data = 'Salvo';
-        }).catch(e => {
+        })
+        .catch((e) => {
           throw e;
         });
     } catch (e) {
       console.log(e);
       response.status = 500;
       response.data = '';
-      response.error = e.message;  
+      response.error = e.message;
     } finally {
       res.status(response.status).send(response.data);
     }
-
   }
 
   static async contarQtdConsumo(req, res) {
     const response = { status: 500, data: '', error: null };
     try {
-
-      const context = req.query;      
+      const context = req.query;
       let query = {};
 
-      if (context.tipo)
-        query.Tipo = context.tipo;
+      if (context.tipo) query.Tipo = context.tipo;
 
       const result = await LogCaptcha.countDocuments(query);
       response.status = 200;
@@ -58,37 +56,34 @@ module.exports.CaptchaController = class CaptchaController {
       console.log(e);
       response.status = 500;
       response.data = '';
-      response.error = e.message;  
-    } finally {      
+      response.error = e.message;
+    } finally {
       res.status(response.status).send(response.data);
     }
   }
 
   static async buscarConsumo(req, res) {
-    const response = {status: 500, data: '', error: null};
+    const response = { status: 500, data: '', error: null };
     try {
-
       const context = req.query;
-      const query = { };
+      const query = {};
       let pagina = 0;
       let limite = 100;
 
-      for(let item in context) {
-        if(!/pagina|limite/.test(item)) {
-          if (!/data/.test(item))
-            query[captilize(item)] = context[item];
+      for (let item in context) {
+        if (!/pagina|limite/.test(item)) {
+          if (!/data/.test(item)) query[captilize(item)] = context[item];
           else {
             //montando range de data
             query[captilize(item)] = {
-              $gte : moment(context[item]).format('YYYY-MM-DDT00:00:00.000Z'),
-              $lt : moment(context[item]).add(1, 'days').format('YYYY-MM-DDT00:00:00.000Z')
-            }
+              $gte: moment(context[item]).format('YYYY-MM-DDT00:00:00.000Z'),
+              $lt: moment(context[item])
+                .add(1, 'days')
+                .format('YYYY-MM-DDT00:00:00.000Z'),
+            };
           }
-            
-        } else if (/pagina/.test(item))
-          pagina = parseInt(context[item]);
-        else if (/limite/.test(item))
-          limite = parseInt(context[item]);
+        } else if (/pagina/.test(item)) pagina = parseInt(context[item]);
+        else if (/limite/.test(item)) limite = parseInt(context[item]);
       }
 
       console.log(pagina, limite);
@@ -102,9 +97,31 @@ module.exports.CaptchaController = class CaptchaController {
       console.log(e);
       response.status = 500;
       response.data = '';
-      response.error = e.message;  
+      response.error = e.message;
     } finally {
       res.status(response.status).send(response.data);
     }
   }
-}
+
+  /**
+   * Retorna o saldo disponível para um fornecedor do serviço de quebra de captcha específico.
+   *
+   * @param {*} req
+   * @param {*} res
+   */
+  static async saldo(req, res) {
+    const fornecedor = req.params.fornecedor || 'anticaptcha';
+
+    if (fornecedor === 'anticaptcha') {
+      const saldo = await AntiCaptchaAPI.saldo();
+
+      res.status(200).json({
+        fornecedor,
+        saldo,
+      });
+    } else {
+      res.status(400).send(`Fornecedor ${fornecedor} não foi encontrado.`);
+    }
+    return;
+  }
+};

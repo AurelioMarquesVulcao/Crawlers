@@ -77,7 +77,7 @@ const logarExecucao = async (execucao) => {
       });
     } finally {
       logger.info('Reconhecendo mensagem ao RabbitMQ');
-      // ch.ack(msg);
+      ch.ack(msg);
       logger.info('Mensagem reconhecida');
       logger.info('Finalizando proceso');
       console.log('\n\n\n\n');

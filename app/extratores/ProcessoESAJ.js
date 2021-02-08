@@ -283,21 +283,6 @@ class ProcessoTJMS extends ProcessoESAJ {
   }
 }
 
-let msg = {
-  ExecucaoConsultaId: '9fca6e434b326a294e313fb9',
-  ConsultaCadastradaId: '5eda61b337ebc31714400562',
-  DataEnfileiramento: '2020-12-04T17:13:39.324Z',
-  Instancia: '1',
-  NumeroProcesso: '0806920-43.2020.8.12.0002',
-  NumeroOab: '91357MS',
-  SeccionalOab: 'MS',
-};
-
-new ProcessoTJMS()
-  .extrair('0806920-43.2020.8.12.0002', 'XXXXXX', 1, msg)
-  .then((res) => console.log(res))
-  .catch((e) => console.log(e));
-
 module.exports = {
   ProcessoTJMS,
 };

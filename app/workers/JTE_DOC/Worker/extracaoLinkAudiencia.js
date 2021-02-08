@@ -35,7 +35,7 @@ const util = new Cnj();
 // Filas a serem usadas
 // const nomeFila = `peticao.JTE.extracao`;
 const reConsumo = `peticao.JTE.extracao.${process.argv[2]}`;
-const filaAxios = "Fila.axios.JTE"
+const filaAxios = "peticao.JTE.extracao.links-01"
 
 var estadoAnterior; // Recebe o estado atual que está sendo baixado
 var estadoDaFila; // Recebe o estado da fila

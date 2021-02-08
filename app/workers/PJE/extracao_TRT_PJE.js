@@ -11,11 +11,14 @@ const { Processo } = require('../../models/schemas/processo');
 const { ProcessoTRT } = require('../../models/schemas/pje');
 const { TRTParser } = require('../../parsers/PJEParser');
 const { reloadLogs } = require('pm2');
+const { FluxoController } = require('../../lib/fluxoController');
 
 const parse = new TRTParser();
 var red = '\u001b[31m';
 var blue = '\u001b[34m';
 var reset = '\u001b[0m';
+var log = [];
+var erro= "";
 
 /**
  * Realiza o consumo de mensagens de uma fila de processos
@@ -28,201 +31,222 @@ var reset = '\u001b[0m';
  * @param {String} busca ID do processo que receberá os dados adiconais raspados neste processo.
  */
 (async () => {
-  mongoose.connect(enums.mongo.connString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.connection.on('error', (e) => {
+  try {
+    mongoose.connect(enums.mongo.connString, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    mongoose.connection.on('error', (e) => {
+      console.log(e);
+    });
+  } catch (e) {
     console.log(e);
-  });
-
+    process.exit();
+  }
   //const nomeFila = `fila TRT-RJ`;
   const nomeFila = `processo.PJE.atualizacao.01`;
   const reConsumo = `Reconsumo.processo.PJE.atualizacao.01`;
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
-    var heartBeat = 0;
-    // Desincroniza as requisições do robô
-    let testeSleep = numeroAleatorio(1, 3);
-    await sleep(testeSleep * 1000);
-    // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
-    setInterval(async function () {
-      heartBeat++;
-      if (heartBeat > 700) {
-        console.log(
-          red +
-          '----------------- Fechando o processo por inatividade -------------------' +
-          reset
-        );
-        await mongoose.connection.close();
-        process.exit();
-      }
-    }, 1000);
-    // Variaveis de Robô
-    const dataInicio = new Date();
-    let message = JSON.parse(msg.content.toString());
-    // console.log(message.NumeroProcesso);
-    const numeroEstado = parseInt(
-      Cnj.processoSlice(message.NumeroProcesso).estado
-    );
-    // console.log("---------------------------",numeroEstado,"-------------------------------------");
-    // if (numeroEstado == 15) {
-    //   ch.ack(msg);
-    //   await mongoose.connection.close();
-    //   await sleep(2000);
-    //   process.exit()
-    // } else {
-
-
+    try {
+      let dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
+      var heartBeat = 0;
+      // Desincroniza as requisições do robô
+      let testeSleep = numeroAleatorio(1, 3);
+      await sleep(testeSleep * 1000);
+      // Cria um contador que reinicia o robô caso ele fique inativo por algum tempo.
+      setInterval(async function () {
+        heartBeat++;
+        if (heartBeat > 700) {
+          console.log(
+            red +
+              '----------------- Fechando o processo por inatividade -------------------' +
+              reset
+          );
+          await mongoose.connection.close();
+          process.exit();
+        }
+      }, 1000);
+      // Variaveis de Robô
+      
+      var message = JSON.parse(msg.content.toString());
+      // console.log(message.NumeroProcesso);
+      const numeroEstado = parseInt(
+        Cnj.processoSlice(message.NumeroProcesso).estado
+      );
+      
       let busca = { _id: message._id };
-      let logger = new Logger('info', 'logs/ProcessoTRTPJE/ProcessoTRTPJEInfo', {
-        nomeRobo: enums.nomesRobos.PJE,
-        NumeroDoProcesso: message.NumeroProcesso,
-      });
+      var logger = new Logger(
+        'info',
+        'logs/ProcessoTRTPJE/ProcessoTRTPJEInfo',
+        {
+          nomeRobo: enums.nomesRobos.PJE,
+          NumeroDoProcesso: message.NumeroProcesso,
+        }
+      );
       // Exibe a mensagem a ser consumida como tabela.
       console.table(message);
 
       // Inicio do Robô
-      try {
-        logger.info('Mensagem recebida');
-        logger.info('Iniciando processo de extração');
-        // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-        let extracao = await new ExtratorTrtPje().extrair(
-          message.NumeroProcesso,
-          numeroEstado
-        );
-        logger.info('Extração concluída');
-        logger.info('Iniciando Parse');
-        // console.log(extracao, "extração");
-        // process.exit();
 
-        // tratando a resposta do extrator
-        if (/Reprocessar/.test(extracao)) {
-          await new GerenciadorFila().enviar(reConsumo, message);
-          await sleep(200);
-          // await ch.ack(msg);
-          logger.info(red + 'Tribunal off-line enviando para reprocessamento' + reset);
-          await sleep(200);
-        } else {
-          if (extracao === null) {
-            const error = new Error(
-              'Extração falhou, processo será colocado na fila novamente'
-            );
-            error.code = 'Extração falhou';
-            throw error;
-          } else if (await !extracao) {
-            logger.info('Não recebi extracao');
-            // process.exit();
-          } else if (extracao.segredoJustica === true) {
-            logger.info('Atualizando Jte com os 3 campos adicionais.');
-            resultado = {
-              'capa.segredoJustica': extracao.segredoJustica,
-              'capa.valor': '',
-              'capa.justicaGratuita': null,
-              origemExtracao: 'JTE.TRT',
-            };
-            // console.log(resultado);
-            await Processo.findOneAndUpdate(busca, resultado);
-            console.table({
-              NumeroProcesso: message.NumeroProcesso,
-              'capa.segredoJustica': extracao.segredoJustica,
-              'capa.valor': '',
-              'capa.justicaGratuita': null,
-              origemExtracao: 'JTE.TRT'
-            })
-            console.log(
-              blue +
-              '------------------- Salvo com sucesso -------------------' +
-              reset
-            );
-            logger.info('Processo JTE atualizado para JTE.TRT');
-          } else if (extracao) {
-            logger.info('Processo completo. Vamos processar todas as alterações');
-            resultado = {
-              'capa.segredoJustica': extracao.segredoJustica,
-              'capa.valor': `${extracao.valorDaCausa}`,
-              'capa.justicaGratuita': extracao.justicaGratuita,
-              origemExtracao: 'JTE.TRT',
-            };
-            // console.log(resultado);
-            await Processo.findOneAndUpdate(busca, resultado);
-            console.table({
-              NumeroProcesso: message.NumeroProcesso,
-              'capa.segredoJustica': extracao.segredoJustica,
-              'capa.valor': `${extracao.valorDaCausa}`,
-              'capa.justicaGratuita': extracao.justicaGratuita,
-              origemExtracao: 'JTE.TRT',
-            })
-            console.log(
-              blue +
-              '------------------- Salvo com sucesso -------------------' +
-              reset
-            );
-            logger.info('Processo JTE atualizado para JTE.TRT');
-            logger.info('Parse Iniciado');
-            let dadosProcesso = await parse.parse(extracao);
-            // console.log(await dadosProcesso);
-            logger.info('Parse finalizado');
-            logger.info('Iniciando salvamento da capa do processo');
-            console.log(
-              blue +
-              `---------------------- Tempo de extração é de ${heartBeat} ----------------------` +
-              reset
-            );
-            let teste = await ProcessoTRT.findOne({ "detalhes.numeroProcesso": message.NumeroProcesso })
-            if (!teste) {
-              await dadosProcesso.processo.save();
-            }
-            logger.info('Finalizado salvamento de capa de processo');
-          } else {
-            const error = new Error('Erro não mapeado');
-            error.code = 'Extração falhou';
-            throw error;
-          }
-          logger.info('Processos extraido com sucesso');
+      logger.info('Mensagem recebida');
+      logger.info('Iniciando processo de extração');
+      // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
+      let extracao = await new ExtratorTrtPje().extrair(
+        message.NumeroProcesso,
+        numeroEstado
+      );
+      logger.info('Extração concluída');
+      logger.info('Iniciando Parse');
+      // console.log(extracao, "extração");
+      // process.exit();
+
+      // tratando a resposta do extrator
+      if (/Reprocessar/.test(extracao)) {
+        await new GerenciadorFila().enviar(reConsumo, message);
+        await sleep(200);
+        // await ch.ack(msg);
+        logger.info(
+          red + 'Tribunal off-line enviando para reprocessamento' + reset
+        );
+        await sleep(200);
+      } else {
+        if (extracao === null) {
+          const error = new Error(
+            'Extração falhou, processo será colocado na fila novamente'
+          );
+          error.code = 'Extração falhou';
+          throw error;
+        } else if (await !extracao) {
+          logger.info('Não recebi extracao');
+          // process.exit();
+        } else if (extracao.segredoJustica === true) {
+          logger.info('Atualizando Jte com os 3 campos adicionais.');
+          resultado = {
+            'capa.segredoJustica': extracao.segredoJustica,
+            'capa.valor': '',
+            'capa.justicaGratuita': null,
+            origemExtracao: 'JTE.TRT',
+          };
+          // console.log(resultado);
+          await Processo.findOneAndUpdate(busca, resultado);
+          console.table({
+            NumeroProcesso: message.NumeroProcesso,
+            'capa.segredoJustica': extracao.segredoJustica,
+            'capa.valor': '',
+            'capa.justicaGratuita': null,
+            origemExtracao: 'JTE.TRT',
+          });
           console.log(
             blue +
+              '------------------- Salvo com sucesso -------------------' +
+              reset
+          );
+          logger.info('Processo JTE atualizado para JTE.TRT');
+        } else if (extracao) {
+          logger.info('Processo completo. Vamos processar todas as alterações');
+          resultado = {
+            'capa.segredoJustica': extracao.segredoJustica,
+            'capa.valor': `${extracao.valorDaCausa}`,
+            'capa.justicaGratuita': extracao.justicaGratuita,
+            origemExtracao: 'JTE.TRT',
+          };
+          // console.log(resultado);
+          await Processo.findOneAndUpdate(busca, resultado);
+          console.table({
+            NumeroProcesso: message.NumeroProcesso,
+            'capa.segredoJustica': extracao.segredoJustica,
+            'capa.valor': `${extracao.valorDaCausa}`,
+            'capa.justicaGratuita': extracao.justicaGratuita,
+            origemExtracao: 'JTE.TRT',
+          });
+          console.log(
+            blue +
+              '------------------- Salvo com sucesso -------------------' +
+              reset
+          );
+          logger.info('Processo JTE atualizado para JTE.TRT');
+          logger.info('Parse Iniciado');
+          let dadosProcesso = await parse.parse(extracao);
+          // console.log(await dadosProcesso);
+          logger.info('Parse finalizado');
+          logger.info('Iniciando salvamento da capa do processo');
+          console.log(
+            blue +
+              `---------------------- Tempo de extração é de ${heartBeat} ----------------------` +
+              reset
+          );
+          let teste = await ProcessoTRT.findOne({
+            'detalhes.numeroProcesso': message.NumeroProcesso,
+          });
+          if (!teste) {
+            await dadosProcesso.processo.save();
+          }
+          logger.info('Finalizado salvamento de capa de processo');
+        } else {
+          const error = new Error('Erro não mapeado');
+          error.code = 'Extração falhou';
+          throw error;
+        }
+        logger.info('Processos extraido com sucesso');
+        console.log(
+          blue +
             `---------------------- Tempo de extração é de ${heartBeat} ----------------------` +
             reset
-          );
-          heartBeat = 0;
-          // confirmação de atulização para o BigData
-          await axios({
-            url:
-              `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,
-            method: 'post',
-            headers: {
-              // 'Content-Type': 'application/json',
-              'x-api-key': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw',
-            }
-          })
-            .then((res) => {
-              console.log(res.data);
-            })
-            .catch((err) => {
-              console.log(err);
-              throw err;
-            });
-        }
-      } catch (e) {
-        // console.log(e);
-
-        logger.info('Encontrado erro durante a execução');
-        logger.info(red + `Error: ${e.message}` + reset);
+        );
         heartBeat = 0;
-        // Estou reprocessando automaticamente no fim da fila.
-        await new GerenciadorFila().enviar(nomeFila, message);
-        await sleep(1000);
-        // await new GerenciadorFila().enviar(nomeFila, message);
-        // await new GerenciadorFila().enviar(reConsumo, message);
-      } finally {
-
-        await sleep(1000);
-        logger.info('Reconhecendo mensagem ao RabbitMQ');
-        ch.ack(msg);
-        logger.info('Mensagem reconhecida');
-        logger.info('Finalizando proceso');
+        // confirmação de atulização para o BigData
+        await axios({
+          url: `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,
+          method: 'post',
+          headers: {
+            // 'Content-Type': 'application/json',
+            'x-api-key': 'tk3TqbruYqJdFdW5fqctsurkNcZi5UHIVWUfiWfM7Xw',
+          },
+        })
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((err) => {
+            console.log(err);
+            throw err;
+          });
       }
+      console.log(logger.allLog())
+      await FluxoController.finalizarConsultaPendente({
+        msg: message,
+        dataInicio,
+        dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: 'OK',
+        logs: logger.allLog(),
+        nomeRobo: message.NomeRobo,
+        error: false,
+      });
+    } catch (e) {
+      // console.log(e);
+
+      logger.info('Encontrado erro durante a execução');
+      logger.info(red + `Error: ${e.message}` + reset);
+      heartBeat = 0;
+      // Estou reprocessando automaticamente no fim da fila.
+      await new GerenciadorFila().enviar(nomeFila, message);
+      await FluxoController.finalizarConsultaPendente({
+        msg: message,
+        dataInicio,
+        dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: erro,
+        logs: log,
+        nomeRobo: message.NomeRobo,
+        error: e,
+      });
+      await sleep(1000);
+    } finally {
+      await sleep(1000);
+      logger.info('Reconhecendo mensagem ao RabbitMQ');
+      ch.ack(msg);
+      logger.info('Mensagem reconhecida');
+      logger.info('Finalizando proceso');
+    }
     // }
   });
 })();

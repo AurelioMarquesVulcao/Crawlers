@@ -381,6 +381,9 @@ class Logger {
     this.info(log);
     return this.fileLogger.log(level, `[${moment().format()}] ${log}`);
   }
+  allLog(){
+    return this.logs
+  }
 }
 
 class Cnj {

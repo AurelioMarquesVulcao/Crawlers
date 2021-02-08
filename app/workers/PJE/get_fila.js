@@ -21,7 +21,7 @@ module.exports.getFilas = async () => {
 
             }
             // }).filter(x => x.qtd >= 0 && /^processo\.pje\.extracao/i.test(x.nome))
-        }).filter(x => x.qtd <= 100 && /^processo\.pje\.extracao/i.test(x.nome))
+        }).filter(x => x.qtd <= 100 && /^processo\.PJE\.atualizacao\.01/i.test(x.nome))
         // }).filter(x => x.qtd >= 0 && x.status == 'Aguardando' && /^processo\.pje\.extracao/i.test(x.nome))
     })
 }

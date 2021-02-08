@@ -24,6 +24,20 @@ module.exports.enums = Object.freeze({
     TJCE: 'TJCE',
     TJMS: 'TJMS',
   },
+  tribunalFactory: {
+    TJRS: {
+      tribunal: 21,
+      orgao: 8,
+    },
+    TJSP: {
+      tribunal: 26,
+      orgao: 8,
+    },
+    TJMS: {
+      tribunal: 12,
+      orgao: 8,
+    },
+  },
   tipoConsulta: {
     Oab: 'oab',
     Processo: 'processo',

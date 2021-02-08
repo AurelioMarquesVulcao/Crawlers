@@ -4,9 +4,7 @@ require('../bootstrap');
 const { FluxoController } = require('../lib/fluxoController');
 const axios = require('axios').default;
 const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila;
-const {
-  ConsultasCadastradas,
-} = require('../models/schemas/consultas_cadastradas');
+
 const bigDataAddress = require('../configs/enums').enums.bigdataAddress;
 
 async function feedbackCadastroConsulta(mensagemObj) {

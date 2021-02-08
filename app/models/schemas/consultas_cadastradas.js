@@ -8,6 +8,18 @@ const DetalhesSchema = new mongoose.Schema(
   { _id: false, versionKey: false }
 );
 
+function _agora() {
+  return new Date();
+}
+
+const HistoricoSchema = new mongoose.Schema(
+  {
+    Acao: { type: String, enum: ['Ativar', 'Cancelar'] },
+    Data: { type: Date, default: _agora },
+  },
+  { versionKey: false, _id: false }
+);
+
 const ConsultaCadastroSchema = new mongoose.Schema(
   {
     NumeroOab: {
@@ -57,6 +69,11 @@ const ConsultaCadastroSchema = new mongoose.Schema(
     },
     ClienteId: {
       type: mongoose.SchemaTypes.ObjectId,
+      required: true,
+    },
+    Historico: {
+      type: [HistoricoSchema],
+      default: new Array(),
       required: true,
     },
   },

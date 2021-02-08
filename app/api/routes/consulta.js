@@ -3,6 +3,10 @@ const router = require('express').Router();
 const {
   ConsultasCadastradas,
 } = require('../../models/schemas/consultas_cadastradas');
+const {
+  ConsultaNaoExistenteError,
+  FluxoController,
+} = require('../../lib/fluxoController');
 
 /**
  * Retorna o numero do processo no padrão CNJ.
@@ -10,6 +14,8 @@ const {
  * @returns {String} Número no padrão CNJ.
  */
 function normalizarNumProcesso(numProcesso, removerPontuacao = false) {
+  if (numProcesso === null) return null;
+
   numProcesso = numProcesso.toString().replace(/\D/g, '').padStart(20, '0');
 
   if (removerPontuacao) return numProcesso;
@@ -24,28 +30,6 @@ function normalizarNumProcesso(numProcesso, removerPontuacao = false) {
   return `${sequencial}-${digito}.${ano}.${orgao}.${tribunal}.${comarca}`;
 }
 
-const identificarDetalhes = (cnj) => {
-  let tribunal;
-
-  try {
-    const cnjMascara = normalizarNumProcesso(cnj);
-
-    const numeroMatch = cnjMascara.match(/\.([0-9]{1}\.[0-9]{2})\./);
-
-    if (numeroMatch) {
-      const numeroSplit = numeroMatch[1].split('.');
-      tribunal = {
-        Orgao: parseInt(numeroSplit[0]),
-        Tribunal: parseInt(numeroSplit[1]),
-      };
-    }
-  } catch (e) {
-    throw Error('Não foi possível identificar órgão e tribunal do número CNJ.');
-  }
-
-  return tribunal;
-};
-
 /**
  * Realiza o processo de cadastramento de uma consulta na aplicação.
  */
@@ -56,7 +40,6 @@ router.post('', async (req, res) => {
     true
   );
   consulta.ClienteId = req.cliente._id;
-  consulta.Detalhes = identificarDetalhes(consulta.NumeroProcesso);
 
   const errors = consulta.validateSync();
 
@@ -66,7 +49,7 @@ router.post('', async (req, res) => {
   }
 
   try {
-    await consulta.save();
+    await FluxoController.cadastrarConsulta(consulta);
     res.status(200).json({ detalhes: 'Consulta cadastrada com sucesso' });
     return;
   } catch (e) {
@@ -74,17 +57,12 @@ router.post('', async (req, res) => {
       res.status(200).json({ detalhes: 'Consulta previamente cadastrada' });
       return;
     }
-
-    res
-      .status(500)
-      .json({ detalhes: 'Falha durante registro da consulta.' + e });
-    return;
   }
+
+  res.status(500).json({ detalhes: 'Falha durante registro da consulta.' + e });
 });
 
 router.delete('', async (req, res) => {
-  let resultado;
-
   const consulta = new ConsultasCadastradas(req.body);
   consulta.NumeroProcesso = normalizarNumProcesso(
     consulta.NumeroProcesso,
@@ -92,23 +70,25 @@ router.delete('', async (req, res) => {
   );
   consulta.ClienteId = req.cliente._id;
 
-  const query = {
-    NumeroProcesso: consulta.NumeroProcesso,
-    ClienteId: consulta.ClienteId,
-    TipoConsulta: consulta.TipoConsulta,
-    Instancia: consulta.Instancia,
-  };
+  const errors = consulta.validateSync();
+
+  if (errors) {
+    res.status(400).json(errors);
+    return;
+  }
 
   try {
-    resultado = await ConsultasCadastradas.updateOne(query, {
-      $set: { AtivoParaAtualizacao: false },
-    });
+    await FluxoController.cancelarConsulta(consulta);
+    res.status(200).json({ detalhes: 'Consulta cancelada com sucesso' });
+    return;
   } catch (e) {
+    if (e instanceof ConsultaNaoExistenteError) {
+      res.status(404).json({ detalhes: 'Consulta não localizada' });
+      return;
+    }
     res.status(500).json({ detalhes: e });
     return;
   }
-  res.status(200).json(resultado);
-  return;
 });
 
 module.exports = router;

@@ -8,6 +8,14 @@ const { LogExecucao } = require('../lib/logExecucao');
 const { GerenciadorFila } = require('../lib/filaHandler');
 const sleep = require('await-sleep');
 
+class ConsultaNaoExistenteError extends Error {
+  constructor(consulta) {
+    super(consulta);
+    this.name = this.constructor.name;
+    this.consulta = consulta;
+  }
+}
+
 /**
  * Mensagem que é recebida pela fila cadastro_consulta
  * @typedef {Object} MensagemCadastroConsulta
@@ -49,6 +57,7 @@ class FluxoController {
    */
   static async cadastrarConsulta(msg) {
     let tribunal;
+    let consulta;
 
     const query = {
       NumeroOab: msg.NumeroOab,
@@ -56,6 +65,7 @@ class FluxoController {
       TipoConsulta: msg.TipoConsulta,
       SeccionalOab: msg.SeccionalOab,
       Instancia: msg.Instancia,
+      ClienteId: msg.ClienteId,
     };
 
     if (msg.NumeroProcesso) tribunal = identificarDetalhes(msg.NumeroProcesso);
@@ -64,12 +74,61 @@ class FluxoController {
       msg.Detalhes = tribunal;
     }
 
-    const consulta = await ConsultasCadastradas.findOne(query);
+    consulta = await ConsultasCadastradas.findOne(query);
+
+    if (consulta) {
+      if (!consulta.AtivoParaAtualizacao) {
+        consulta.Historico.push({ Acao: 'Ativar' });
+        consulta.AtivoParaAtualizacao = true;
+        await consulta.save();
+      }
+
+      return consulta;
+    }
+
+    msg.Historico = [{ Acao: 'Ativar' }];
+    consulta = await new ConsultasCadastradas(msg).save();
+
+    return consulta;
+  }
+
+  /**
+   * Realiza o processo de cancelamento da consulta processual (ou de oab) de um cliente.
+   *
+   * @param {MensagemCadastroConsulta} msg Objeto com as informações da consulta sendo cadastrada.
+   *
+   * @returns {Promise<Object>} Registro da consultaCadastrada no Mongo.
+   * @throws {ConsultaNaoExistenteError}
+   */
+  static async cancelarConsulta(msg) {
+    let tribunal;
+    let consulta;
+
+    const query = {
+      NumeroOab: msg.NumeroOab,
+      NumeroProcesso: msg.NumeroProcesso,
+      TipoConsulta: msg.TipoConsulta,
+      SeccionalOab: msg.SeccionalOab,
+      Instancia: msg.Instancia,
+      ClienteId: msg.ClienteId,
+    };
+
+    if (msg.NumeroProcesso) tribunal = identificarDetalhes(msg.NumeroProcesso);
+
+    if (tribunal) {
+      msg.Detalhes = tribunal;
+    }
+
+    consulta = await ConsultasCadastradas.findOne(query);
 
     if (!consulta) {
-      const consultaSalva = await new ConsultasCadastradas(msg).save();
-      msg.CadastroConsultaId = consultaSalva._id;
-      console.log(`Criado documento com _id ${msg.CadastroConsultaId}`);
+      throw new ConsultaNaoExistenteError(query);
+    }
+
+    if (consulta.AtivoParaAtualizacao) {
+      consulta.Historico.push({ Acao: 'Cancelar' });
+      consulta.AtivoParaAtualizacao = false;
+      await consulta.save();
     }
 
     return consulta;
@@ -209,8 +268,6 @@ class FluxoController {
   }
 }
 
-module.exports.FluxoController = FluxoController;
-
 const identificarDetalhes = (cnj) => {
   let tribunal;
 
@@ -235,3 +292,6 @@ const identificarDetalhes = (cnj) => {
 
   return tribunal;
 };
+
+module.exports.FluxoController = FluxoController;
+module.exports.ConsultaNaoExistenteError = ConsultaNaoExistenteError;

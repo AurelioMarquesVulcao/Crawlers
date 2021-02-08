@@ -4,15 +4,10 @@ const Axios = require('axios');
 const HttpsProxyAgent = require('https-proxy-agent');
 const Fs = require('fs');
 const Path = require('path');
-const { path } = require('dotenv/lib/env-options');
 const { LogAWS } = require('../models/schemas/logsEnvioAWS');
 const { Logger } = require('./util');
-const { enums } = require('../configs/enums');
 
-const red = '\u001b[31m';
-const blue = '\u001b[34m';
-const reset = '\u001b[0m';
-var error1 = 0;
+let error1 = 0;
 
 class downloadFiles {
   /**
@@ -23,12 +18,13 @@ class downloadFiles {
    */
   async download(name, link, local) {
     /** Gera um log de execução para ser salvo em arquivo ou exibido no terminal */
-    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
-      nomeRobo: enums.nomesRobos.JTE,
+    const logger = new Logger('info', 'logs/downloads/relatorio.log', {
+      nomeRobo: 'Download',
       NumeroDoProcesso: name,
     });
     const proxy = new HttpsProxyAgent(
-      'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182');
+      'http://proadvproxy:C4fMSSjzKR5v9dzg@proxy-proadv.7lan.net:8182'
+    );
 
     logger.info('Url recebida iniciando o download.');
     try {
@@ -39,7 +35,7 @@ class downloadFiles {
         method: 'GET',
         url: url,
         responseType: 'stream',
-        httpsAgent: proxy
+        httpsAgent: proxy,
       });
       // await console.log(!!Fs.createWriteStream(path));
       response.data.pipe(Fs.createWriteStream(path));
@@ -69,12 +65,12 @@ class downloadFiles {
    */
   async enviarAWS(cnj, lista) {
     /** Gera um log de execução para ser salvo em arquivo ou exibido no terminal */
-    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
-      nomeRobo: enums.nomesRobos.JTE,
+    const logger = new Logger('info', 'logs/downloads/relatorio.log', {
+      nomeRobo: 'Download',
       NumeroDoProcesso: cnj,
     });
     logger.info('Url recebida iniciando o envio.');
-    let resultado;
+    let resultado = null;
     try {
       // console.log(lista);
       //process.exit()
@@ -120,18 +116,15 @@ class downloadFiles {
           logger.info('Envio para AWS foi Falhou !!!');
           throw err;
         });
-      Fs.unlinkSync(lista[0].path)
+      Fs.unlinkSync(lista[0].path);
     } catch (error) {
-      error1++
+      error1++;
       if (error1 < 4) {
-        await new downloadFiles().enviarAWS(cnj, lista)
+        await new downloadFiles().enviarAWS(cnj, lista);
       } else {
         console.log(error);
-        throw "Não foi possível Baixar"
+        throw 'Não foi possível Baixar';
       }
-
-
-
     }
     // Fs.unlinkSync(lista[0].path)
     return resultado;
@@ -140,14 +133,14 @@ class downloadFiles {
   /**
    * Converte o documento html em documento pdf para envio para aws
    * @param {string} cnj Nome que será dado ao arquivo baixado
-   * @param {string} link Url do aquivo que será baixado
+   * @param {string} local local do aquivo que será baixado
    * @param {string} html local onde será salvo os arquivos ex.: /app/downloads
    */
   async covertePDF(cnj, local, html) {
     let url = false;
     let path = `${local}/${cnj}`;
     //var html = ""
-    var options = { format: 'A4' };
+    let options = { format: 'A4' };
 
     pdf.create(html, options).toFile(path, function (err, res) {
       if (err) return console.log(err);
@@ -159,24 +152,20 @@ class downloadFiles {
   /**
    * Salva log do envio para AWS no banco de dados.
    * @param {string} robo Quem está salvando na AWS os aquivos.
-   * @param {string} statusCode Status code inviado pela API de enfia AWS.
+   * @param {number} statusCode Status code inviado pela API de enfia AWS.
    * @param {object} conteudo Arquivos salvos na AWS e numero de Processo.
    */
   async saveLog(robo, statusCode, conteudo) {
     /** Gera um log de execução para ser salvo em arquivo ou exibido no terminal */
-    const logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
-      nomeRobo: enums.nomesRobos.JTE,
+    const logger = new Logger('info', 'logs/downloads/relatorio.log', {
+      nomeRobo: 'Download',
       // NumeroDoProcesso: cnj,
     });
 
     logger.info('Iniciando salvamento do log no banco de dados.');
     try {
       let envio;
-      if (statusCode == 200) {
-        envio = true;
-      } else {
-        envio = false;
-      }
+      envio = statusCode === 200;
 
       let log = {
         enfio: envio,

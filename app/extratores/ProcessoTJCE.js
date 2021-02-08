@@ -3,7 +3,7 @@ const sleep = require('await-sleep');
 const cheerio = require('cheerio');
 const { TJCEParser } = require('../parsers/TJCEParser');
 const { CaptchaHandler } = require('../lib/captchaHandler');
-const { Andamento } = require('../models/schemas/andamento')
+const { Andamento } = require('../models/schemas/andamento');
 const { Logger } = require('../lib/util');
 const { Processo } = require('../models/schemas/processo');
 const { Robo } = require('../lib/newRobo');
@@ -15,7 +15,7 @@ class ProcessoTJCE {
     this.robo = new Robo();
     this.url = 'http://esaj.tjce.jus.br/cpopg/';
     this.parser = new TJCEParser();
-    this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3'
+    this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3';
   }
 
   async extrair(numeroProcesso, msg = null) {
@@ -39,7 +39,7 @@ class ProcessoTJCE {
       let primeiroAcesso;
       let limite = 5;
       let gResponse;
-      let paginaReturn
+      let paginaReturn;
       let resultado;
       let extracao;
 
@@ -64,19 +64,21 @@ class ProcessoTJCE {
 
         gResponse = await this.resolverCaptcha();
 
-        objResponse = await this.acessandoPaginaProcesso(uuidCaptcha, gResponse);
+        objResponse = await this.acessandoPaginaProcesso(
+          uuidCaptcha,
+          gResponse
+        );
 
-        paginaReturn = this.avaliaPagina(objResponse.responseBody)
+        paginaReturn = this.avaliaPagina(objResponse.responseBody);
 
         if (!paginaReturn.sucesso) {
-          tentativa ++
+          tentativa++;
           continue;
         }
 
         extracao = await this.parser.parse(objResponse.responseBody);
         break;
-
-      } while(tentativa === limite)
+      } while (tentativa === limite);
 
       if (tentativa === limite)
         throw new Error('Limite de tentativas excedidos');
@@ -150,12 +152,12 @@ class ProcessoTJCE {
       'Sec-Fetch-Mode': 'navigate',
       Referer: `${this.url}/open.do`,
       'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-    })
+    });
 
     return await this.robo.acessar({
       url: `${this.url}/open.do`,
       method: 'GET',
-      proxy: true
+      proxy: true,
     });
   }
 
@@ -200,8 +202,8 @@ class ProcessoTJCE {
     objResponse = await this.robo.acessar({
       url: `${this.url}/captchaControleAcesso.do`,
       method: 'POST',
-      proxy: true
-    })
+      proxy: true,
+    });
 
     return objResponse.responseBody.uuidCaptcha;
   }
@@ -211,14 +213,21 @@ class ProcessoTJCE {
    * @returns {Promise<String>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJCE', {numeroDoProcesso: this.detalhes.numeroProcessoMascara});
+    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJCE', {
+      numeroDoProcesso: this.detalhes.numeroProcessoMascara,
+    });
 
     this.logger.info('Tentando resolver captcha');
-    let captcha = await ch.resolveRecaptchaV2(`${this.url}/open.do`, this.dataSiteKey, '/')
-      .catch(err => {throw err})
+    let captcha = await ch
+      .resolveRecaptchaV2(`${this.url}/open.do`, this.dataSiteKey, '/')
+      .catch((err) => {
+        throw err;
+      });
 
-    if(!captcha.sucesso) {
-      throw new Error('Falha na resposta. Não foi possivel recuperar a resposta para o captcha');
+    if (!captcha.sucesso) {
+      throw new Error(
+        'Falha na resposta. Não foi possivel recuperar a resposta para o captcha'
+      );
     }
 
     this.logger.info('Retornada resposta da API');
@@ -251,10 +260,10 @@ class ProcessoTJCE {
           .numeroProcessoMascara,
         'dadosConsulta.valorConsulta': '',
         uuidCaptcha: uuid,
-        "g-recaptcha-response": gResponse
+        'g-recaptcha-response': gResponse,
       },
       proxy: proxy,
-      encoding: 'utf8'
+      encoding: 'utf8',
     };
 
     return await this.robo.acessar(options);
@@ -274,23 +283,38 @@ class ProcessoTJCE {
     const tabelaMovimentacoesSelector = '#tabelaTodasMovimentacoes'; //TODO checar selector
     const senhaProcessoSelector = '#senhaProcesso'; //TODO checar selector
 
-    if (/Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(mensagemRetornoText)) {
-      this.logger.info('Não existem informações disponíveis para o processo informado.');
+    if (
+      /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(
+        mensagemRetornoText
+      )
+    ) {
+      this.logger.info(
+        'Não existem informações disponíveis para o processo informado.'
+      );
       throw new Error('Não encontrados');
     }
 
-    if ($(senhaProcessoSelector).length && $(tabelaMovimentacoesSelector).length === 0) {
-      this.logger.info('Se for uma parte ou interessado, digite a senha do processo')
+    if (
+      $(senhaProcessoSelector).length &&
+      $(tabelaMovimentacoesSelector).length === 0
+    ) {
+      this.logger.info(
+        'Se for uma parte ou interessado, digite a senha do processo'
+      );
       throw new Error('Senha necessaria');
     }
 
     if ($(tabelaMovimentacoesSelector).length === 0) {
       this.logger.info('Não foi encontrada a tabela de movimentação');
-      return {sucesso: false, causa: 'Erro de acesso', detalhes: 'Não foi encontrada a tabela de movimentações'}
+      return {
+        sucesso: false,
+        causa: 'Erro de acesso',
+        detalhes: 'Não foi encontrada a tabela de movimentações',
+      };
     }
 
     this.logger.info('Não foram encontrados erros');
-    return {sucesso: true}
+    return { sucesso: true };
   }
 }
 

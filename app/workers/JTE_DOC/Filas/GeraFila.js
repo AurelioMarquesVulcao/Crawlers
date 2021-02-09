@@ -54,7 +54,7 @@ async function worker() {
       // Cria Fila PJE
       await PJE(message);
       // Cria Fila JTE
-      // await JTE(message);
+      await JTE(message);
 
       // ch.ack(msg);
       // await sleep(20000);
@@ -63,10 +63,10 @@ async function worker() {
     });
   } catch (e) {
     console.log(e);
-    await sleep(3000);
-    process.exit();
+    // await sleep(3000);
+    // process.exit();
     // Não feche a mensagem em caso de erro !
-    // ch.ack(msg);
+    ch.ack(msg);
   }
 }
 

@@ -27,8 +27,6 @@ module.exports.LogExecucao = class LogExecucao {
     delete execucao['logs'];
     
     let id = execucao.Mensagem.ExecucaoConsultaId
-    console.log(id)
-    // process.exit()
     await ExecucaoConsulta.updateOne(
       { _id: id },
       {

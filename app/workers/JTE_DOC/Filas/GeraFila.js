@@ -9,6 +9,7 @@ const { Extracao } = require('../../../models/schemas/extracao');
 const { Logger, Cnj, Helper } = require('../../../lib/util');
 const { LogExecucao } = require('../../../lib/logExecucao');
 const { Andamento } = require('../../../models/schemas/andamento');
+const { ExecucaoConsulta } = require('../../../models/schemas/execucao_consulta');
 const { JTEParser } = require('../../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
@@ -45,7 +46,7 @@ async function worker() {
   }
   try {
     // tudo que está abaixo é acionado para cada consumer na fila.
-    await new GerenciadorFila(false, 10).consumir(nomeFila, async (ch, msg) => {
+    await new GerenciadorFila(false, 20).consumir(nomeFila, async (ch, msg) => {
       let message = JSON.parse(msg.content.toString());
       console.table(message);
       // Cria Fila PJE
@@ -92,8 +93,14 @@ async function PJE(message) {
       message2
     );
     if (!execucao) {
+      let log = await ExecucaoConsulta.findOne({
+        NomeRobo: message2.NomeRobo,
+        'Mensagem.Instancia': message2.Instancia,
+        'Mensagem.NumeroProcesso': message2.NumeroProcesso,
+        DataTermino: null,
+      })
       console.log('Reenfileirado a força');
-      await new GerenciadorFila().enviar(nomeFilaPJE, message2);
+      await new GerenciadorFila().enviar(nomeFilaPJE, log.Mensagem);
     }
   } catch (e) {
     console.log(e);

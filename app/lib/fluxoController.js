@@ -143,7 +143,9 @@ class FluxoController {
   static async cadastrarExecucao(nomeRobo, nomeFila, msg) {
     try {
       let gf = new GerenciadorFila();
-      let execucao = {
+      let execucao = new ExecucaoConsulta({
+        DataInicio: null,
+        DataTermino: null,
         NomeRobo: nomeRobo,
         Log: [
           {
@@ -152,7 +154,7 @@ class FluxoController {
         ],
         Instancia: msg.Instancia,
         Mensagem: [msg],
-      };
+      });
 
       let pendentes = await ExecucaoConsulta.findOne({
         NomeRobo: nomeRobo,
@@ -169,38 +171,14 @@ class FluxoController {
         );
         return false;
       }
-      
-      console.log(execucao);
+
+      execucao.Mensagem[0]['ExecucaoConsultaId'] = execucao._id;
+      execucao.Mensagem[0]['ConsultaCadastradaId'] = null;
+      execucao.Mensagem[0]['DataEnfileiramento'] = execucao.DataEnfileiramento;
+
       await new ExecucaoConsulta(execucao).save();
 
-      let pegaID = await ExecucaoConsulta.findOne({
-        NomeRobo: nomeRobo,
-        'Mensagem.Instancia': msg.Instancia,
-        'Mensagem.NumeroProcesso': msg.NumeroProcesso,
-        DataTermino: null,
-      });
-      let {
-        Instancia,
-        NumeroProcesso,
-        NovosProcessos,
-        // ExecucaoConsultaId,
-        // ConsultaCadastradaId,
-        NomeRobo,
-      } = msg;
-      let newMsg = {
-        Instancia,
-        NumeroProcesso,
-        NovosProcessos,
-        ExecucaoConsultaId: pegaID._id,
-        ConsultaCadastradaId: pegaID._id,
-        DataEnfileiramento:pegaID.DataEnfileiramento,
-        NomeRobo,
-      };
-      await ExecucaoConsulta.findOneAndUpdate(
-        { _id: pegaID._id },
-        { Mensagem: [newMsg] }
-      );
-      await gf.enviar(nomeFila, newMsg);
+      await gf.enviar(nomeFila, execucao.Mensagem[0]);
 
       return true;
     } catch (e) {

@@ -167,7 +167,7 @@ class ProcessoESAJ extends ExtratorBase {
    * @returns {Promise<String>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJMS', {
+    const ch = new CaptchaHandler(5, 10000, this.constructor.name, {
       numeroDoProcesso: this.detalhes.numeroProcessoMascara,
       numeroDaOab: null,
     });
@@ -292,7 +292,7 @@ class ProcessoTJMS extends ProcessoESAJ {
     this.parser = new parsers.TJMSParser();
   }
 
-  async setLogger(tribunal = '') {
+  setLogger(tribunal = '') {
     super.setLogger('TJMS');
   }
 }
@@ -304,12 +304,25 @@ class ProcessoTJSP extends ProcessoESAJ {
     this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
   }
 
-  async setLogger(tribunal = '') {
+  setLogger(tribunal = '') {
     super.setLogger('TJSP');
+  }
+}
+
+class ProcessoTJSC extends ProcessoESAJ {
+  constructor() {
+    super('https://esaj.tjsc.jus.br/cpopg', false);
+    this.parser = new parsers.TJSCParser();
+    this.dataSiteKey = '6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL';
+  }
+
+  setLogger(tribunal) {
+    super.setLogger('TJSC');
   }
 }
 
 module.exports = {
   ProcessoTJMS,
   ProcessoTJSP,
+  ProcessoTJSC,
 };

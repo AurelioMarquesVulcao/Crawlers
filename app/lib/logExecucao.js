@@ -79,7 +79,6 @@ module.exports.LogExecucao = class LogExecucao {
       };
 
       if (consultaPendente._id) {
-        console.log(consultaPendente);
         execucao.ConsultaCadastradaId = mongoose.Types.ObjectId(
           consultaPendente._id
         );

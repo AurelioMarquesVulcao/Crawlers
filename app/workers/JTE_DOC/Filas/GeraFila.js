@@ -17,6 +17,8 @@ const { Log } = require('../../../models/schemas/logsEnvioAWS');
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 const { Processo } = require('../../../models/schemas/processo');
 const { FluxoController } = require('../../../lib/fluxoController');
+const { log } = require('winston');
+const { ObjectID } = require('mongodb');
 
 const nomeFila = `peticao.JTE.extracao`;
 const nomeFilaPJE = `processo.PJE.atualizacao.01`;

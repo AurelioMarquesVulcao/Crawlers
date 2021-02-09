@@ -49,7 +49,7 @@ var erro= "";
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
     try {
-      let dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
+      var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
       var heartBeat = 0;
       // Desincroniza as requisições do robô
       let testeSleep = numeroAleatorio(1, 3);
@@ -213,6 +213,15 @@ var erro= "";
           });
       }
       console.log(logger.allLog())
+      console.log({
+        msg: message,
+        dataInicio,
+        dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: 'OK',
+        logs: logger.allLog(),
+        nomeRobo: message.NomeRobo,
+        // error: false,
+      })
       await FluxoController.finalizarConsultaPendente({
         msg: message,
         dataInicio,
@@ -220,7 +229,7 @@ var erro= "";
         status: 'OK',
         logs: logger.allLog(),
         nomeRobo: message.NomeRobo,
-        error: false,
+        // error: false,
       });
     } catch (e) {
       // console.log(e);
@@ -234,10 +243,10 @@ var erro= "";
         msg: message,
         dataInicio,
         dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
-        status: erro,
-        logs: log,
+        status: `Error`,
+        logs: logger.allLog(),
         nomeRobo: message.NomeRobo,
-        error: e,
+        error: `Error: ${e.message}`,
       });
       await sleep(1000);
     } finally {

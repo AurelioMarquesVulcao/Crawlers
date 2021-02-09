@@ -220,6 +220,7 @@ class ExtratorTrtPje {
           this.logger.info(
             'Não foi possivél resolver o Captcha corretamente, reiniciando o processo!'
           );
+          // throw 'Não foi possivél resolver o Captcha corretamente, reiniciando o processo!'
           process.exit();
         }
         return texto

@@ -1,12 +1,14 @@
-require('../bootstrap');
+const mongoose = require('mongoose');
 const moment = require('moment');
+const sleep = require('await-sleep');
+require('../bootstrap');
+
 const { ExecucaoConsulta } = require('../models/schemas/execucao_consulta');
 const {
   ConsultasCadastradas,
 } = require('../models/schemas/consultas_cadastradas');
 const { LogExecucao } = require('../lib/logExecucao');
 const { GerenciadorFila } = require('../lib/filaHandler');
-const sleep = require('await-sleep');
 
 /**
  * Mensagem que é recebida pela fila cadastro_consulta
@@ -167,9 +169,38 @@ class FluxoController {
         );
         return false;
       }
-      await gf.enviar(nomeFila, msg);
+      
       console.log(execucao);
       await new ExecucaoConsulta(execucao).save();
+
+      let pegaID = await ExecucaoConsulta.findOne({
+        NomeRobo: nomeRobo,
+        'Mensagem.Instancia': msg.Instancia,
+        'Mensagem.NumeroProcesso': msg.NumeroProcesso,
+        DataTermino: null,
+      });
+      let {
+        Instancia,
+        NumeroProcesso,
+        NovosProcessos,
+        // ExecucaoConsultaId,
+        // ConsultaCadastradaId,
+        NomeRobo,
+      } = msg;
+      let newMsg = {
+        Instancia,
+        NumeroProcesso,
+        NovosProcessos,
+        ExecucaoConsultaId: pegaID._id,
+        ConsultaCadastradaId: pegaID._id,
+        DataEnfileiramento:pegaID.DataEnfileiramento,
+        NomeRobo,
+      };
+      await ExecucaoConsulta.findOneAndUpdate(
+        { _id: pegaID._id },
+        { Mensagem: [newMsg] }
+      );
+      await gf.enviar(nomeFila, newMsg);
 
       return true;
     } catch (e) {

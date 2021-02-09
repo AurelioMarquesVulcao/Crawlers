@@ -1,18 +1,15 @@
-const { ProcessoTJMS } = require('./ProcessoESAJ');
 const { OabTJMS } = require('./OabESAJ');
-const { PeticaoTJMS } = require('./PeticaoEsaj');
 const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJSP } = require('./OabTJSP');
 const { OabTJMG } = require('./OabTJMG');
 const { OabTJRS } = require('./OabTJRS');
 const { OabTJSC } = require('./OabTJSC');
 const { ProcessoTJRS } = require('./ProcessoTJRS');
-const { ProcessoTJSP } = require('./ProcessoESAJ');
-const { ProcessoTJSC } = require('./ProcessoTJSC');
 const { ProcessoTJCE } = require('./ProcessoTJCE');
 const { ProcJTE } = require('./ProcJTE');
 const { PeticaoTJSP } = require('./PeticaoTJSP');
 const { PeticaoTJRS1 } = require('./PeticaoTJRS1');
+const extratores = require('./index');
 
 class ExtratorFactory {
   static getExtrator(fila, isDebug) {
@@ -27,7 +24,8 @@ class ExtratorFactory {
     }
 
     if (/oab.TJSP/.test(fila)) {
-      extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg', isDebug);
+      // extrator = new OabTJSP('https://esaj.tjsp.jus.br/cpopg', isDebug);
+      extrator = new extratores.OabTJSP();
     }
 
     if (/oab.TJRS/.test(fila)) {
@@ -53,7 +51,7 @@ class ExtratorFactory {
     }
 
     if (/processo.TJSP/.test(fila)) {
-      extrator = new ProcessoTJSP();
+      extrator = new extratores.ProcessoTJSP();
     }
 
     if (/peticao.TJSP/.test(fila)) {
@@ -66,7 +64,7 @@ class ExtratorFactory {
     }
 
     if (/processo.TJSC/.test(fila)) {
-      extrator = new ProcessoTJSC('https://esaj.tjsc.jus.br/cpopg', isDebug);
+      extrator = new extratores.ProcessoTJSC();
     }
 
     if (/oab.TJMG/.test(fila)) {
@@ -92,11 +90,11 @@ class ExtratorFactory {
     }
 
     if (/processo.TJMS/.test(fila)) {
-      extrator = new ProcessoTJMS();
+      extrator = new extratores.ProcessoTJMS();
     }
 
     if (/peticao.TJMS/.test(fila)) {
-      extrator = new PeticaoTJMS();
+      extrator = new extratores.PeticaoTJMS();
     }
     return extrator;
   }

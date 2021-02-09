@@ -56,7 +56,7 @@ class ExtratorFactory {
 
     if (/peticao.TJSP/.test(fila)) {
       // usa puppeteer
-      extrator = new PeticaoTJSP({ headless: true });
+      extrator = new extratores.PeticaoTJSP();
     }
 
     if (/oab.TJSC/.test(fila)) {

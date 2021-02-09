@@ -524,4 +524,4 @@ class PeticaoTJMS extends PeticaoEsaj {
 //     .then((r) => console.log(r));
 // })();
 
-module.exports.PeticaoTJMS = PeticaoTJMS;
+module.exports = { PeticaoTJMS };

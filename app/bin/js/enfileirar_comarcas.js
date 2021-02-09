@@ -26,7 +26,10 @@ const enfileirar_comarcas = async () => {
     };
   });
 
-  await new GerenciadorFila().enviarLista('comarcas.TJMS.extracao', comarcas);
+  await new GerenciadorFila().enviarLista(
+    `comarcas.${tribunalArgv}.extracao`,
+    comarcas
+  );
 
   await sleep(15000);
 

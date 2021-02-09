@@ -102,7 +102,6 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSC/extracaoComarcas.js
 
-<<<<<<< HEAD
   # worker-tjmg-oab:
   #   extends:
   #     file: common-services.yml
@@ -139,9 +138,6 @@ services:
   #       max-size: "5m"
   #       max-file: "2"
 
-=======
-  
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
   worker-tjba-portal:
     extends:
       file: common-services.yml
@@ -151,12 +147,7 @@ services:
       dockerfile: dockerfile-node
     mem_limit: 1000M
     mem_reservation: 1000M
-<<<<<<< HEAD
-    command: pm2 start workers/TJBAPortal/processDocker01.yml --no-daemon
-=======
     command: pm2-runtime workers/TJBAPortal/processDocker01.yml --no-daemon
-    
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
 
   worker-tjsp-oab:
     extends:
@@ -419,25 +410,8 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '5m'
         max-file: '2'
-
-  # novos-processos-jte-all:
-  #   extends:
-  #     file: common-services.yml
-  #     service: base_node
-  #   command: pm2 start workers/JTE/criaFilaNovosTodosEstados.js --no-daemon
-  #   restart: always
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
-=======
-        max-size: "5m"
-        max-file: "2"       
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
 
   processo.jte.extracao.novos.1:
     extends:
@@ -466,17 +440,12 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-<<<<<<< HEAD
-    command: pm2 start workers/JTE/processDocker02.yml --no-daemon
-=======
-    command: pm2-runtime workers/JTE/processDocker02.yml --no-daemon 
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
+    command: pm2-runtime workers/JTE/processDocker02.yml --no-daemon
     logging:
       driver: 'json-file'
       options:
         max-size: '10m'
         max-file: '5'
-
 
   processo.jte.extracao.novos.3:
     extends:
@@ -504,11 +473,7 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-<<<<<<< HEAD
-    command: pm2 start workers/JTE/processDocker04.yml --no-daemon
-=======
-    command: pm2-runtime workers/JTE/processDocker04.yml --no-daemon 
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
+    command: pm2-runtime workers/JTE/processDocker04.yml --no-daemon
     logging:
       driver: 'json-file'
       options:
@@ -524,11 +489,7 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-<<<<<<< HEAD
-    command: pm2 start workers/JTE/reprocessamento.yml --no-daemon
-=======
-    command: pm2-runtime workers/JTE/reprocessamento.yml --no-daemon 
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
+    command: pm2-runtime workers/JTE/reprocessamento.yml --no-daemon
     logging:
       driver: 'json-file'
       options:
@@ -556,11 +517,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-<<<<<<< HEAD
-    command: pm2 start workers/JTEMonitoria/verificaUltimoProcesso.js --no-daemon
-=======
-    command: pm2-runtime workers/jteMonitoria/verificaUltimoProcesso.js --no-daemon 
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
+    command: pm2-runtime workers/jteMonitoria/verificaUltimoProcesso.js --no-daemon
     logging:
       driver: 'json-file'
       options:
@@ -574,11 +531,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-<<<<<<< HEAD
-    command: pm2 start workers/JTEMonitoria/workerCnjSequencial.js --no-daemon
-=======
-    command: pm2-runtime workers/jteMonitoria/workerCnjSequencial.js --no-daemon 
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
+    command: pm2-runtime workers/jteMonitoria/workerCnjSequencial.js --no-daemon
     logging:
       driver: 'json-file'
       options:
@@ -592,11 +545,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-<<<<<<< HEAD
-    command: pm2 start workers/JTEMonitoria/comcarcas7dias.js --no-daemon
-=======
-    command: pm2-runtime workers/jteMonitoria/comcarcas7dias.js --no-daemon 
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
+    command: pm2-runtime workers/jteMonitoria/comcarcas7dias.js --no-daemon
     logging:
       driver: 'json-file'
       options:
@@ -610,11 +559,7 @@ services:
     build:
       dockerfile: Dockerfile
     restart: always
-<<<<<<< HEAD
-    command: pm2 start bin/js/limpaCoreDocker.js --no-daemon
-=======
-    command: pm2-runtime bin/js/limpaCoreDocker.js --no-daemon 
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
+    command: pm2-runtime bin/js/limpaCoreDocker.js --no-daemon
     logging:
       driver: 'json-file'
       options:
@@ -648,17 +593,10 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
 
-  worker-jte-doc03:
-=======
-        max-size: "10m"
-        max-file: "5"
-  
   peticao.jte.extracao.03:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -700,15 +638,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc06:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.06:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -720,15 +652,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc07:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.07:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -740,15 +666,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc08:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.08:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -760,15 +680,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc09:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.09:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -780,15 +694,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc10:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.10:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -800,15 +708,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc11:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.11:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -820,15 +722,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc12:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.12:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -840,15 +736,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc13:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.13:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -860,15 +750,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc14:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.14:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -880,15 +764,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc15:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.15:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -900,15 +778,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc16:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.16:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -920,15 +792,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc17:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.17:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -940,15 +806,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc18:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.18:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -960,15 +820,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc19:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.19:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -980,15 +834,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc21:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.21:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -1000,15 +848,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc20:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.20:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -1020,15 +862,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc22:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.22:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -1040,15 +876,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc23:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.23:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -1060,15 +890,9 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-  worker-jte-doc24:
-=======
-        max-size: "10m"
-        max-file: "5"
   peticao.jte.extracao.24:
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496
     extends:
       file: common-servicesDoc.yml
       service: base_node
@@ -1080,10 +904,5 @@ services:
     logging:
       driver: 'json-file'
       options:
-<<<<<<< HEAD
         max-size: '10m'
         max-file: '5'
-=======
-        max-size: "10m"
-        max-file: "5"
->>>>>>> 4487512427f795a75a6964e98c68b59d6d905496

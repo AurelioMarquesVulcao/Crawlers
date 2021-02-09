@@ -15,7 +15,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     url = '',
     debug = false,
     timeout = 30000,
-    headless = false,
+    headless = true,
     usuario = { username: '', password: '' },
   } = {}) {
     super(url, debug);
@@ -224,7 +224,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
         let aTags = document.querySelectorAll(
           '.esajCelulaDescricaoServicos > a'
         );
-        let searchText = /Consultas?\sProcessua(l|is)/;
+        let searchText = /(Consultas?\sProcessua(l|is)|(Consultas?))/;
         let found;
 
         for (let i = 0; i < aTags.length; i++) {
@@ -243,7 +243,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
         let aTags = document.querySelectorAll(
           '.esajCelulaDescricaoServicos > a'
         );
-        let searchText = /Consulta\sde\sProcessos\sdo\s1.Grau/;
+        let searchText = /Consulta\sde\sProcessos\sd\w\s1.\s?Grau/;
         let found;
 
         for (let i = 0; i < aTags.length; i++) {

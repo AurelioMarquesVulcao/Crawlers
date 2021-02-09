@@ -68,7 +68,6 @@ module.exports.LogExecucao = class LogExecucao {
         : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
 
       const execucao = {
-        ConsultaCadastradaId: mongoose.ObjectId(consultaPendente._id),
         NomeRobo: nomeRobo,
         Log: [
           {
@@ -78,10 +77,19 @@ module.exports.LogExecucao = class LogExecucao {
         Instancia: mensagem.Instancia,
         Mensagem: [mensagem],
       };
+
+      if (consultaPendente._id) {
+        console.log(consultaPendente);
+        execucao.ConsultaCadastradaId = mongoose.Types.ObjectId(
+          consultaPendente._id
+        );
+        mensagem.ConsultaCadastradaId = consultaPendente._id;
+      }
+
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();
       mensagem.ExecucaoConsultaId = ex._id;
-      mensagem.ConsultaCadastradaId = consultaPendente._id;
+
       gf.enviar(nomeFila, mensagem);
 
       return {

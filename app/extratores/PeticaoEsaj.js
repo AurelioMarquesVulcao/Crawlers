@@ -51,12 +51,6 @@ class PeticaoEsaj extends ExtratorPuppeteer {
    */
   async extrair(numeroProcesso, instancia = 1) {
     instancia = Number(instancia);
-    // await new CredenciaisAdvogados({
-    //   login: '103.890.517-64',
-    //   senha: 'Senh@TJ123',
-    //   estado: 'MS',
-    //   nome: 'Karine Impacta Teste',
-    // }).salvar();
 
     this.resposta = { numeroProcesso: numeroProcesso };
     this.numeroProcesso = numeroProcesso;
@@ -67,6 +61,8 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     this.numeroProcessoDetalhes = this.dividirNumeroProcesso(
       this.numeroProcesso
     );
+
+    let documentosSalvos;
 
     this.logger = new Logger('info', 'logs/TJCE/peticao.log', {
       nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJMS}`,
@@ -127,18 +123,13 @@ class PeticaoEsaj extends ExtratorPuppeteer {
 
         await this.fecharOutrasPaginas();
 
-        await this.baixarDocumentos(); //TODO descomentar essa parte =)
-
-        // await this.resgataDocumentos(); //TODO alterar essa função para resgatar todos os links de donwloads sem necessariamente ativar o download pelo chrome
-        // await sleep(100);
-        //
-        // await this.aguardaDownload();
-        // await sleep(100);
+        documentosSalvos = await this.baixarDocumentos();
 
         count++;
       } while (count < tam);
 
       this.resposta.sucesso = true;
+      this.nProcessos = documentosSalvos;
       this.logger.log(
         'info',
         `Finalizado processo de extração de documentos ${this.numeroProcesso}`
@@ -221,9 +212,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       '.'
     );
     numeroProcesso = numeroProcesso.replace(/\W/gm, '');
-    let url;
     this.logger.info(`Escolhendo url para ${instancia}`);
-    url = `${this.url}/show.do`;
 
     this.logger.info(
       `Acessando pagina de consulta da ${this.instancia}a instancia`
@@ -303,7 +292,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       let elements = $('#arvore_principal > ul > li > a');
       let tam = elements.length;
 
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < tam; i++) {
         if (
           elements[i].innerText === 'Decisão' ||
           elements[i].innerText === 'Despachos'

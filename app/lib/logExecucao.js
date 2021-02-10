@@ -25,8 +25,10 @@ module.exports.LogExecucao = class LogExecucao {
     delete execucao['status'];
     delete execucao['error'];
     delete execucao['logs'];
+    
+    let id = execucao.Mensagem.ExecucaoConsultaId
     await ExecucaoConsulta.updateOne(
-      { _id: execucao.Mensagem.ExecucaoConsultaId },
+      { _id: id },
       {
         ...execucao,
         Log: log,

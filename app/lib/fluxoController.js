@@ -1,12 +1,14 @@
-require('../bootstrap');
+const mongoose = require('mongoose');
 const moment = require('moment');
+const sleep = require('await-sleep');
+require('../bootstrap');
+
 const { ExecucaoConsulta } = require('../models/schemas/execucao_consulta');
 const {
   ConsultasCadastradas,
 } = require('../models/schemas/consultas_cadastradas');
 const { LogExecucao } = require('../lib/logExecucao');
 const { GerenciadorFila } = require('../lib/filaHandler');
-const sleep = require('await-sleep');
 
 class ConsultaNaoExistenteError extends Error {
   constructor(consulta) {
@@ -200,7 +202,9 @@ class FluxoController {
   static async cadastrarExecucao(nomeRobo, nomeFila, msg) {
     try {
       let gf = new GerenciadorFila();
-      let execucao = {
+      let execucao = new ExecucaoConsulta({
+        DataInicio: null,
+        DataTermino: null,
         NomeRobo: nomeRobo,
         Log: [
           {
@@ -209,7 +213,7 @@ class FluxoController {
         ],
         Instancia: msg.Instancia,
         Mensagem: [msg],
-      };
+      });
 
       let pendentes = await ExecucaoConsulta.findOne({
         NomeRobo: nomeRobo,
@@ -226,9 +230,14 @@ class FluxoController {
         );
         return false;
       }
-      await gf.enviar(nomeFila, msg);
-      console.log(execucao);
+
+      execucao.Mensagem[0]['ExecucaoConsultaId'] = execucao._id;
+      execucao.Mensagem[0]['ConsultaCadastradaId'] = null;
+      execucao.Mensagem[0]['DataEnfileiramento'] = execucao.DataEnfileiramento;
+
       await new ExecucaoConsulta(execucao).save();
+
+      await gf.enviar(nomeFila, execucao.Mensagem[0]);
 
       return true;
     } catch (e) {

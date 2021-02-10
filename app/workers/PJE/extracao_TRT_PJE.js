@@ -18,7 +18,7 @@ var red = '\u001b[31m';
 var blue = '\u001b[34m';
 var reset = '\u001b[0m';
 var log = [];
-var erro= "";
+var erro = '';
 
 /**
  * Realiza o consumo de mensagens de uma fila de processos
@@ -49,7 +49,7 @@ var erro= "";
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
     try {
-      let dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
+      var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
       var heartBeat = 0;
       // Desincroniza as requisições do robô
       let testeSleep = numeroAleatorio(1, 3);
@@ -68,13 +68,13 @@ var erro= "";
         }
       }, 1000);
       // Variaveis de Robô
-      
+
       var message = JSON.parse(msg.content.toString());
       // console.log(message.NumeroProcesso);
       const numeroEstado = parseInt(
         Cnj.processoSlice(message.NumeroProcesso).estado
       );
-      
+
       let busca = { _id: message._id };
       var logger = new Logger(
         'info',
@@ -92,15 +92,14 @@ var erro= "";
       logger.info('Mensagem recebida');
       logger.info('Iniciando processo de extração');
       // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-      let extracao = await new ExtratorTrtPje().extrair(
+      let extrator = new ExtratorTrtPje();
+      let extracao = await extrator.extrair(
         message.NumeroProcesso,
         numeroEstado
       );
+      logger.addLog(extrator.allLogs());
       logger.info('Extração concluída');
       logger.info('Iniciando Parse');
-      // console.log(extracao, "extração");
-      // process.exit();
-
       // tratando a resposta do extrator
       if (/Reprocessar/.test(extracao)) {
         await new GerenciadorFila().enviar(reConsumo, message);
@@ -195,7 +194,9 @@ var erro= "";
             reset
         );
         heartBeat = 0;
+
         // confirmação de atulização para o BigData
+        logger.info('Confirmando envio para o Big Data');
         await axios({
           url: `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,
           method: 'post',
@@ -211,8 +212,8 @@ var erro= "";
             console.log(err);
             throw err;
           });
+        logger.info('Envio para o Big Data confirmado');
       }
-      console.log(logger.allLog())
       await FluxoController.finalizarConsultaPendente({
         msg: message,
         dataInicio,
@@ -220,11 +221,14 @@ var erro= "";
         status: 'OK',
         logs: logger.allLog(),
         nomeRobo: message.NomeRobo,
-        error: false,
+        // error: false,
       });
     } catch (e) {
+      if (/Captcha/i.test(e)) {
+        process.exit();
+      }
       // console.log(e);
-
+      this.e = e;
       logger.info('Encontrado erro durante a execução');
       logger.info(red + `Error: ${e.message}` + reset);
       heartBeat = 0;
@@ -233,9 +237,9 @@ var erro= "";
       await FluxoController.finalizarConsultaPendente({
         msg: message,
         dataInicio,
-        dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
-        status: erro,
-        logs: log,
+        // dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: `Error: ${e.message}`,
+        logs: logger.allLog(),
         nomeRobo: message.NomeRobo,
         error: e,
       });

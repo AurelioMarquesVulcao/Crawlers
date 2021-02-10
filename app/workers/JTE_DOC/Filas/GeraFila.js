@@ -9,6 +9,9 @@ const { Extracao } = require('../../../models/schemas/extracao');
 const { Logger, Cnj, Helper } = require('../../../lib/util');
 const { LogExecucao } = require('../../../lib/logExecucao');
 const { Andamento } = require('../../../models/schemas/andamento');
+const {
+  ExecucaoConsulta,
+} = require('../../../models/schemas/execucao_consulta');
 const { JTEParser } = require('../../../parsers/JTEParser');
 const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
@@ -17,6 +20,8 @@ const { Log } = require('../../../models/schemas/logsEnvioAWS');
 const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 const { Processo } = require('../../../models/schemas/processo');
 const { FluxoController } = require('../../../lib/fluxoController');
+const { log } = require('winston');
+const { ObjectID } = require('mongodb');
 
 const nomeFila = `peticao.JTE.extracao`;
 const nomeFilaPJE = `processo.PJE.atualizacao.01`;
@@ -43,13 +48,13 @@ async function worker() {
   }
   try {
     // tudo que está abaixo é acionado para cada consumer na fila.
-    await new GerenciadorFila(false, 10).consumir(nomeFila, async (ch, msg) => {
+    await new GerenciadorFila(false, 2000).consumir(nomeFila, async (ch, msg) => {
       let message = JSON.parse(msg.content.toString());
       console.table(message);
       // Cria Fila PJE
       await PJE(message);
       // Cria Fila JTE
-      // await JTE(message);
+      await JTE(message);
 
       // ch.ack(msg);
       // await sleep(20000);
@@ -58,10 +63,10 @@ async function worker() {
     });
   } catch (e) {
     console.log(e);
-    // await sleep(1000);
-    process.exit();
+    // await sleep(3000);
+    // process.exit();
     // Não feche a mensagem em caso de erro !
-    // ch.ack(msg);
+    ch.ack(msg);
   }
 }
 
@@ -71,13 +76,13 @@ async function geraPje(message) {
   });
   let id = processo._id;
   let message2 = {
-    Instancia: null,
     NumeroProcesso: message.NumeroProcesso,
     NovosProcessos: true,
     _id: id,
+    Instancia: null,
     NomeRobo: nomeFilaPJE.toLowerCase(),
   };
-  console.log(message2);
+  // console.log(message2);
   return message2;
 }
 
@@ -90,8 +95,14 @@ async function PJE(message) {
       message2
     );
     if (!execucao) {
+      let log = await ExecucaoConsulta.findOne({
+        NomeRobo: message2.NomeRobo,
+        'Mensagem.Instancia': message2.Instancia,
+        'Mensagem.NumeroProcesso': message2.NumeroProcesso,
+        DataTermino: null,
+      });
       console.log('Reenfileirado a força');
-      await new GerenciadorFila().enviar(nomeFilaPJE, message2);
+      await new GerenciadorFila().enviar(nomeFilaPJE, log.Mensagem);
     }
   } catch (e) {
     console.log(e);
@@ -103,14 +114,23 @@ async function JTE(message) {
     let numeroProcesso = message.NumeroProcesso;
     let estadoProcesso = Cnj.processoSlice(numeroProcesso).estado;
     let fila = `peticao.JTE.extracao.${estadoProcesso}`;
+    // Incluido dados obrigatórios na mensgem
+    message['Instancia'] = null;
+    message['NomeRobo'] = fila.toLowerCase();
     let execucao = await FluxoController.cadastrarExecucao(
       fila.toLowerCase(),
       fila,
       message
     );
     if (!execucao) {
+      let log = await ExecucaoConsulta.findOne({
+        NomeRobo: message2.NomeRobo,
+        'Mensagem.Instancia': message2.Instancia,
+        'Mensagem.NumeroProcesso': message2.NumeroProcesso,
+        DataTermino: null,
+      });
       console.log('Reenfileirado a força');
-      await new GerenciadorFila().enviar(fila, message);
+      await new GerenciadorFila().enviar(nomeFilaPJE, log.Mensagem);
     }
   } catch (e) {
     console.log(e);

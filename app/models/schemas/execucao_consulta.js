@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const ExecucaoSchema = new mongoose.Schema({
-  ConsultaCadastradaId: {
+    ConsultaCadastradaId: {
     type: mongoose.Types.ObjectId,
   },
   DataEnfileiramento: { type: Date, default: new Date() },

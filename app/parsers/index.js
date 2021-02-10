@@ -1,5 +1,5 @@
-const { TJMSParser } = require('./EsajParser');
+const parserEsaj = require('./EsajParser');
 
 module.exports = {
-  TJMSParser,
+  ...parserEsaj,
 };

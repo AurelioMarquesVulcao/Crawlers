@@ -6,6 +6,7 @@ const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Logger } = require('../lib/util');
 const { Robo } = require('../lib/newRobo');
 const parsers = require('../parsers');
+const sleep = require('await-sleep');
 
 const proxy = true;
 
@@ -166,7 +167,7 @@ class ProcessoESAJ extends ExtratorBase {
    * @returns {Promise<String>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, 'ProcessoTJMS', {
+    const ch = new CaptchaHandler(5, 10000, this.constructor.name, {
       numeroDoProcesso: this.detalhes.numeroProcessoMascara,
       numeroDaOab: null,
     });
@@ -270,6 +271,19 @@ class ProcessoESAJ extends ExtratorBase {
 
     return Boolean(captcha);
   }
+
+  async getUuidCaptcha() {
+    let objResponse;
+
+    await sleep(200);
+    objResponse = await this.robo.acessar({
+      url: `${this.url}/captchaControleAcesso.do`,
+      method: 'POST',
+      proxy: true,
+    });
+
+    return objResponse.responseBody.uuidCaptcha;
+  }
 }
 
 class ProcessoTJMS extends ProcessoESAJ {
@@ -278,11 +292,37 @@ class ProcessoTJMS extends ProcessoESAJ {
     this.parser = new parsers.TJMSParser();
   }
 
-  async setLogger(tribunal = '') {
+  setLogger(tribunal = '') {
     super.setLogger('TJMS');
+  }
+}
+
+class ProcessoTJSP extends ProcessoESAJ {
+  constructor() {
+    super('https://esaj.tjsp.jus.br/cpopg', false);
+    this.parser = new parsers.TJSPParser();
+    this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
+  }
+
+  setLogger(tribunal = '') {
+    super.setLogger('TJSP');
+  }
+}
+
+class ProcessoTJSC extends ProcessoESAJ {
+  constructor() {
+    super('https://esaj.tjsc.jus.br/cpopg', false);
+    this.parser = new parsers.TJSCParser();
+    this.dataSiteKey = '6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL';
+  }
+
+  setLogger(tribunal) {
+    super.setLogger('TJSC');
   }
 }
 
 module.exports = {
   ProcessoTJMS,
+  ProcessoTJSP,
+  ProcessoTJSC,
 };

@@ -124,6 +124,7 @@ class EsajParser extends BaseParser {
    * @return {{assunto: [string], classe: string, foro: string, vara: string}}
    */
   extrairCapa($) {
+    let uf = this.uf;
     let classe = this.extrairClasse($);
     let assunto = this.extrairAssunto($);
     let foro = this.extrairForo($);
@@ -339,9 +340,28 @@ class TJMSParser extends EsajParser {
   constructor() {
     super();
     this.url = 'https://esaj.tjms.jus.br';
+    this.uf = 'MS';
+  }
+}
+
+class TJSPParser extends EsajParser {
+  constructor() {
+    super();
+    this.url = 'http://esaj.tjsp.jus.br';
+    this.uf = 'SP';
+  }
+}
+
+class TJSCParser extends EsajParser {
+  constructor() {
+    super();
+    this.url = 'http://esaj.tjsc.jus.br';
+    this.uf = 'SC';
   }
 }
 
 module.exports = {
   TJMSParser,
+  TJSPParser,
+  TJSCParser,
 };

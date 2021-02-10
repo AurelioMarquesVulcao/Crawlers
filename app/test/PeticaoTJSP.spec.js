@@ -1,16 +1,14 @@
-const { PeticaoTJSP } = require('../extratores/PeticaoTJSP');
+const { PeticaoTJSP } = require('../extratores');
 
 describe('PeticaoTJSP Worker', async () => {
   console.log('1 Instancia | Caso Perfeito');
-  const teste = new PeticaoTJSP({ debug: false, headless: false }).extrair(
-    '1011131-88.2018.8.26.0562',
-    1
-  ).then(teste => {
-    console.log("Terminado");
-    delete teste['logs'];
-    console.log(teste);
-  });
-
+  const teste = new PeticaoTJSP({ debug: false, headless: false })
+    .extrair('1011131-88.2018.8.26.0562', 1)
+    .then((teste) => {
+      console.log('Terminado');
+      delete teste['logs'];
+      console.log(teste);
+    });
 
   // console.log('1 Instancia | Multiplos resultados na pesquisa');
   // const teste = await new PeticaoTJSP({ debug: true, headless: false }).extrair(
@@ -47,6 +45,4 @@ describe('PeticaoTJSP Worker', async () => {
   //   '1200907-79.2019.8.26.0102',
   //   3
   // );
-
-
 });

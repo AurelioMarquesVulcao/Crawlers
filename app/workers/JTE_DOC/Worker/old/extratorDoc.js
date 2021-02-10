@@ -3,16 +3,16 @@ const cheerio = require('cheerio');
 const shell = require('shelljs');
 const sleep = require('await-sleep');
 
-const { enums } = require('../../../configs/enums');
-const { GerenciadorFila } = require('../../../lib/filaHandler');
+const { enums } = require('../../../../configs/enums');
+const { GerenciadorFila } = require('../../../../lib/filaHandler');
 // const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Logger, Cnj, Helper } = require('../../../lib/util');
-const { LogExecucao } = require('../../../lib/logExecucao');
+const { Logger, Cnj, Helper } = require('../../../../lib/util');
+const { LogExecucao } = require('../../../../lib/logExecucao');
 // const { ExtratorBase } = require('../../extratores/extratores');
-const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
-const { downloadFiles } = require('../../../lib/downloadFiles');
-const { Log } = require('../../../models/schemas/logsEnvioAWS');
-const desligado = require('../../../assets/jte/horarioRoboJTE.json');
+const { CriaFilaJTE } = require('../../../../lib/criaFilaJTE');
+const { downloadFiles } = require('../../../../lib/downloadFiles');
+const { Log } = require('../../../../models/schemas/logsEnvioAWS');
+const desligado = require('../../../../assets/jte/horarioRoboJTE.json');
 
 /**
  * Logger para console e arquivo

@@ -20,7 +20,7 @@ setInterval(function () {
     process.exit();
   }
   // }
-  console.log(heartBeat, "Segundos");
+  // console.log(heartBeat, "Segundos");
 }, 1000);
 
 // Senhas de login no tribunal
@@ -58,7 +58,7 @@ class RoboPuppeteer3 {
   constructor() {
     this.logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
-      // NumeroDoProcesso: cnj,
+      NumeroDoProcesso: "Puppeteer",
       // this.
     });
   }
@@ -456,12 +456,16 @@ class RoboPuppeteer3 {
  * Cern da extração de documentos. È aqui que será aberto cada documento e capturado cada link
  */
   async pegaInicial() {
+    // this.logger.info('');
+    this.logger.info('Iniciando extração dos links de documentos');
     try {
       let iniciaisArray = await (await this.numerosIniciaisLaco()).numero2;
       let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
-      console.log('Arquivos simples ' + iniciaisArray);
+      this.logger.info(`Arquivos simples  + ${iniciaisArray}`);
+      // console.log('Arquivos simples ' + iniciaisArray);
       numeroDocumentosTotal + iniciaisArray.length;
-      console.log('Arquivos paginados ' + iniciaisMultiplas);
+      this.logger.info(`'Arquivos paginados ' + ${iniciaisMultiplas}`);
+      // console.log('Arquivos paginados ' + iniciaisMultiplas);
 
       this.logger.info(`Iniciando captura de documentos Multiplos`);
       // entra na terceira forma de apresentação de documentos.

@@ -1,6 +1,4 @@
 const cheerio = require('cheerio');
-// const moment = require('moment');
-// const re = require('xregexp');
 const { enums } = require('../configs/enums');
 const fs = require('fs');
 
@@ -9,9 +7,6 @@ const { Processo } = require('../models/schemas/processo');
 const { Andamento } = require('../models/schemas/andamento');
 const { replace } = require('xregexp');
 const { Helper } = require('../lib/util');
-// const obj = fs.readFileSync(
-//   'app/assets/jte/obj.html', 'utf8'
-// );
 
 class JTEParser extends BaseParser {
   /**
@@ -30,7 +25,7 @@ class JTEParser extends BaseParser {
     // extrai vara/ comarca/ e 1 distribuição
     let primeiraDistribuicao = this.extraiDadosDosAndametos(
       $, dadosAndamento, contador);
-    // console.log(primeiraDistribuicao);
+    
     let dadosProcesso = new Processo({
       capa: this.capa($, cnj, primeiraDistribuicao),
       oabs: this.removeVazios(this.Oabs($)),
@@ -65,8 +60,7 @@ class JTEParser extends BaseParser {
       instancia: this.instancia($),
       audiencias: this.audiencias($),
     };
-    // console.log(capa);
-    return capa;
+        return capa;
   }
 
   audiencias($) {
@@ -78,23 +72,19 @@ class JTEParser extends BaseParser {
         parse = this.removeVazios(
           $('#mat-tab-content-0-0 > div > detalhes-aba-geral > div > div:nth-child(14)').text().split('\n'));
       }
-      console.log("----------------- estou aqui ----------------");
-      console.log(parse);
-      try{
+            try{
         resultado = [{ data: Helper.data2(parse[1]), tipo: 'N/I' }];
       }catch(e){
         resultado = [{ data: Helper.data2(parse[0]), tipo: 'N/I' }];  
       }
       if(resultado[0].data == "Invalid Date"){
-        // console.log("erro de data");
         throw "Erro na captura de Data"
       }
     } catch (e) {
       resultado = [];
     }
 
-    // console.log(resultado);
-    // process.exit();
+    
     return resultado;
   }
 
@@ -151,7 +141,7 @@ class JTEParser extends BaseParser {
       resultado.push(advogados[i]);
     }
 
-    //console.log(resultado);
+    
     return resultado;
   }
 
@@ -177,7 +167,7 @@ class JTEParser extends BaseParser {
     });
     resultado = this.removeVazios(resultado);
     if (!resultado) return 'Assunto nao Especificado';
-    // console.log(resultado);
+    
     if (resultado.length == 0) {
       resultado = '';
       // throw "Não pegou assunto, reprocessar"
@@ -237,11 +227,11 @@ class JTEParser extends BaseParser {
           dados = andamentos[i].descricao;
         data = andamentos[i].data;
       }
-      //console.log(dados);
+      
       try {
         if (!!dados) {
           let vara = dados.split('-')[1].split('de')[0].trim();
-          //console.log(dados.split(/ DE /gmi)[1].replace(')', '').trim());
+          
           let comarca = dados.split(/ DE /gim)[1].replace(')', '').trim();
           let primeiraDistribuicao = data;
           return {
@@ -298,7 +288,6 @@ class JTEParser extends BaseParser {
       resultado = { vara, comarca };
     }
 
-    console.log(resultado);
     return resultado;
   }
 
@@ -316,7 +305,7 @@ class JTEParser extends BaseParser {
       // The result can be accessed through the `m`-variable.
       m.forEach((match, groupIndex) => {
         resultado.push(`${match}`);
-        // console.log(`Found match, group ${groupIndex}: ${match}`);
+        
       });
     }
     return resultado;
@@ -326,7 +315,7 @@ class JTEParser extends BaseParser {
     $('detalhes-aba-geral p').each(async function (element) {
       let datas = $(this).text().split('\n');
       // resultado.push(datas[0].split('-')[0].trim())
-      // console.log(resultado);
+      
       resultado = datas[0].split('-')[0].trim();
       if (resultado.match(/([0-9]{1})/)) {
         resultado = resultado.match(/([0-9]{1})/)[1];
@@ -420,8 +409,7 @@ class JTEParser extends BaseParser {
     let data = this.extraiDataAndamento($);
 
     for (let j = 0; j < texto.length; j++) {
-      // console.log(texto[j]);
-      // console.log(data[j]);
+      
       let obj = {
         descricao: this.removeVazios(texto[j])[0],
         data: this.ajustaData(this.removeVazios(data[j])[0]),
@@ -461,7 +449,7 @@ class JTEParser extends BaseParser {
     $('ion-item p').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos);
-      // console.log(andamentos.length);
+      
       if (andamentos.length > 0) {
         dados.push(andamentos);
       }
@@ -496,7 +484,7 @@ class JTEParser extends BaseParser {
     $('ion-text h4').each(async function (element) {
       let andamentos = $(this).text().split('\n');
       andamentos = new JTEParser().removeVazios(andamentos);
-      // console.log(andamentos.length);
+      
       if (andamentos.length > 0) resultado.push(andamentos);
     });
     return resultado;

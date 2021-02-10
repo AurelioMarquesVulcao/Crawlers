@@ -30,13 +30,13 @@ class CriaFilaPJE {
     console.log(data);
     let estado = [];
     console.log('Fila concluída. Iniciando criador de fila.');
-    
-    // Para realizar textes.
-    
+
+    // Para realizar testes.
+
     // await ExecucaoConsulta.deleteMany({
     //   NomeRobo: this.fila.toLowerCase(),
     // });
-    
+
     for (let i = 1; i < 25; i++) {
       if (i != 15) {
         await this.atualizaProcessosFila(0, i, data)[0];
@@ -46,15 +46,13 @@ class CriaFilaPJE {
     await ExecucaoConsulta.deleteMany({
       NomeRobo: this.fila.toLowerCase(),
     });
-    for (let ii = 0;ii<this.mensagens.length;ii++){
+    for (let ii = 0; ii < this.mensagens.length; ii++) {
       await FluxoController.cadastrarExecucao(
         this.fila.toLowerCase(),
         this.fila,
         this.mensagens[ii]
       );
     }
-    
-    
 
     // função descontinuada.
     // await this.rabbit.enfileirarLoteTRT(this.fila, this.mensagens);

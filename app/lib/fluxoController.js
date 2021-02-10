@@ -232,7 +232,7 @@ class FluxoController {
       }
 
       execucao.Mensagem[0]['ExecucaoConsultaId'] = execucao._id;
-      execucao.Mensagem[0]['ConsultaCadastradaId'] = null;
+      // execucao.Mensagem[0]['ConsultaCadastradaId'] = null;
       execucao.Mensagem[0]['DataEnfileiramento'] = execucao.DataEnfileiramento;
 
       await new ExecucaoConsulta(execucao).save();

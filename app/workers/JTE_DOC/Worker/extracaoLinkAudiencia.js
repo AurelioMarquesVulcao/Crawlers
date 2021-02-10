@@ -6,6 +6,7 @@ const sleep = require('await-sleep');
 const { Andamento } = require('../../../models/schemas/andamento');
 const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
 const { enums } = require('../../../configs/enums');
+const { FluxoController } = require('../../../lib/fluxoController');
 const { Extracao } = require('../../../models/schemas/extracao');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
 const { Logger, Cnj, Helper } = require('../../../lib/util');
@@ -28,6 +29,7 @@ var logadoParaIniciais = false; // Marca se estamos logados para baixar document
 var contadorErros = 0; // Conta a quantidade de erros para reiniciar a aplicação
 var catchError = 0; // Captura erros;
 var start = 0; // server de marcador para as funções que devem carregar na inicialização
+var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
 
 (async () => {
   setInterval(async function () {
@@ -73,6 +75,7 @@ async function worker(nomeFila) {
         nomeRobo: enums.nomesRobos.JTE,
         NumeroDoProcesso: message.NumeroProcesso,
       });
+      console.table(message);
       logger.info('Mensagem recebida');
 
       contadorErros++;
@@ -109,6 +112,7 @@ async function worker(nomeFila) {
         var resultadoExtracao = {};
         let numeroProcesso = message.NumeroProcesso;
 
+        puppet.resetLogs();
         // loga no tribunal de arranque se for a primeira chamada da fila
         if (start == 1) {
           logger.info('Iniciando processo de logar no tribunal');
@@ -124,6 +128,7 @@ async function worker(nomeFila) {
           try {
             logger.info('Iniciando User Login');
             await puppet.loga();
+            logger.addLog(puppet.allLogs());
           } catch (e) {
             logger.info('User Login Falhou!');
             console.log('entrando no fluxo2');
@@ -235,18 +240,30 @@ async function worker(nomeFila) {
         if (message.inicial == true) {
           logger.info('Vou baixar link das iniciais');
           console.log('---------- Vou baixar link das iniciais-------');
+          puppet.resetLogs();
           let link = await puppet.pegaInicial();
+
+          logger.addLog(puppet.allLogs());
           logger.info('Iniciais baixadas com sucesso');
           logger.info('Enviando link dos documentos para a fila');
           for (let w = 0; w < link.length; w++) {
+            link[w]['NumeroProcesso'] = `${link[w].numeroProcesso}-${w}`;
+            link[w]['NomeRobo'] = filaAxios.toLowerCase();
+            link[w]['Instancia'] = message.Instancia;
             if (link[w]) {
               if (link[w].tipo != 'HTML') {
                 // Criando fila para Download de documentos
-                await new GerenciadorFila().enviar(
+                let execucao = await FluxoController.cadastrarExecucao(
+                  filaAxios.toLowerCase(),
                   filaAxios,
-                  JSON.stringify(link[w])
+                  link[w]
                 );
-                console.log('valor do laço é', w, JSON.stringify(link[w]));
+                // await new GerenciadorFila().enviar(
+                //   filaAxios,
+                //   JSON.stringify(link[w])
+                // );
+                // console.log('valor do laço é', w, JSON.stringify(link[w]));
+                logger.info(`Enviando link ${w + 1}`);
               }
             }
             await sleep(300);
@@ -280,8 +297,6 @@ async function worker(nomeFila) {
           message.SeccionalProcesso
         );
         logger.info('Resultado da extracao salva');
-
-        
       }
 
       //---------------------------------------------------------envio do big data tem que ser desativado ao trabalhar externo--------------------------------------------
@@ -307,12 +322,22 @@ async function worker(nomeFila) {
           console.log(err);
           throw err;
         });
-        logger.info('Resposta enviada com sucesso ao BigData');
+      logger.info('Resposta enviada com sucesso ao BigData');
       // ch.ack(msg);
 
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
-      console.log(logger.allLog());
+      // console.log(logger.allLog());
+
+      await FluxoController.finalizarConsultaPendente({
+        msg: message,
+        dataInicio,
+        dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: 'OK',
+        logs: logger.allLog(),
+        nomeRobo: message.NomeRobo,
+        // error: false,
+      });
     } catch (e) {
       catchError++;
       console.log(e);
@@ -337,9 +362,17 @@ async function worker(nomeFila) {
       }
       logger.info(`Error: ${e.message}`);
       logger.info('Reenviando mensagem ao RabbitMQ');
+      await FluxoController.finalizarConsultaPendente({
+        msg: message,
+        dataInicio,
+        // dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: `Error: ${e.message}`,
+        logs: logger.allLog(),
+        nomeRobo: message.NomeRobo,
+        error: e,
+      });
 
       // ch.ack(msg);
-
       logger.info('Mensagem enviada ao reprocessamento');
       logger.info('\033[31m' + 'Finalizando processo de extração');
     }

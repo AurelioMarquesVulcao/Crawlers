@@ -542,10 +542,18 @@ class PeticaoTJSP extends PeticaoEsaj {
   }
 }
 
+class PeticaoTJSC extends PeticaoEsaj {
+  constructor() {
+    super({ url: 'https://esaj.tjsc.jus.br/cpopg' });
+    this.estado = 'SC';
+    this.tribunal = 'TJSC';
+  }
+}
+
 // (() => {
 //   new PeticaoTJMS()
 //     .extrair('0000135-74.2021.8.12.0031', 1)
 //     .then((r) => console.log(r));
 // })();
 
-module.exports = { PeticaoTJMS, PeticaoTJSP };
+module.exports = { PeticaoTJMS, PeticaoTJSP, PeticaoTJSC };

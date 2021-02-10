@@ -419,7 +419,21 @@ class OabTJSP extends OabESAJ {
   }
 }
 
+class OabTJSC extends OabESAJ {
+  constructor() {
+    super('https://esaj.tjsc.jus.br/cpopg', false);
+    this.dataSiteKey = '6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL';
+    this.tribunal = 'TJSC';
+    this.estado = 'SC';
+  }
+
+  setLogger() {
+    super.setLogger();
+  }
+}
+
 module.exports = {
   OabTJMS,
   OabTJSP,
+  OabTJSC,
 };

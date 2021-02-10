@@ -1,14 +1,15 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
 const Path = require('path');
-const sleep = require('await-sleep')
+const sleep = require('await-sleep');
 const { enums } = require('../../configs/enums');
-const { Logger } = require('../../lib/util')
-const { Extracao } = require('../../models/schemas/extracao')
+const { Logger } = require('../../lib/util');
+const { Extracao } = require('../../models/schemas/extracao');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Helper } = require('../../lib/util')
+const { Helper } = require('../../lib/util');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { PeticaoTJSCEsaj } = require('../../extratores/PeticaoTJSCEsaj');
+const extratores = require('../../extratores');
 
 (() => {
   mongoose.connect(enums.mongo.connString, {
@@ -38,7 +39,7 @@ const { PeticaoTJSCEsaj } = require('../../extratores/PeticaoTJSCEsaj');
 
     try {
       logger.info('Mensagem recebida');
-      const extrator = new PeticaoTJSCEsaj()
+      const extrator = new extratores.PeticaoTJSC();
 
       logger.info('Iniciando processo de extração');
       const resultadoExtracao = await extrator.extrair(message.NumeroProcesso);
@@ -108,8 +109,15 @@ const { PeticaoTJSCEsaj } = require('../../extratores/PeticaoTJSCEsaj');
       logger.log('error', e);
       console.log(e);
       logger.info('Finalizando operação');
-      if (/Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(e.message)) {
-        new GerenciadorFila().enviar('peticao.TJSC.extracao.eproc', JSON.stringify(message));
+      if (
+        /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/.test(
+          e.message
+        )
+      ) {
+        new GerenciadorFila().enviar(
+          'peticao.TJSC.extracao.eproc',
+          JSON.stringify(message)
+        );
       }
       // await logarExecucao({
       //   LogConsultaId: message.LogConsultaId,
@@ -122,7 +130,7 @@ const { PeticaoTJSCEsaj } = require('../../extratores/PeticaoTJSCEsaj');
       //   NomeRobo: enums.nomesRobos.TJSC,
       // });
     } finally {
-      console.log({arquivoPath})
+      console.log({ arquivoPath });
       if (fs.existsSync(arquivoPath)) {
         logger.info('Apagando arquivo temporario');
         await fs.unlinkSync(arquivoPath);
@@ -132,7 +140,7 @@ const { PeticaoTJSCEsaj } = require('../../extratores/PeticaoTJSCEsaj');
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
-      console.log('\n'+'='.repeat(process.stdout.columns)+'\n');
+      console.log('\n' + '='.repeat(process.stdout.columns) + '\n');
       await sleep(2000);
     }
   });

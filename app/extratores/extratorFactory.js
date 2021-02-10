@@ -2,7 +2,6 @@ const { OabTJMS } = require('./OabESAJ');
 const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJMG } = require('./OabTJMG');
 const { OabTJRS } = require('./OabTJRS');
-const { OabTJSC } = require('./OabTJSC');
 const { ProcessoTJRS } = require('./ProcessoTJRS');
 const { ProcessoTJCE } = require('./ProcessoTJCE');
 const { ProcJTE } = require('./ProcJTE');
@@ -58,7 +57,8 @@ class ExtratorFactory {
     }
 
     if (/oab.TJSC/.test(fila)) {
-      extrator = new OabTJSC('https://esaj.tjsc.jus.br/cpopg', isDebug);
+      // extrator = new OabTJSC('https://esaj.tjsc.jus.br/cpopg', isDebug);
+      extrator = new extratores.OabTJSC();
     }
 
     if (/processo.TJSC/.test(fila)) {

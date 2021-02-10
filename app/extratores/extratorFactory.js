@@ -1,13 +1,11 @@
 const { OabTJMS } = require('./OabESAJ');
 const { OabTJBAPortal } = require('./OabTJBAPortal');
-const { OabTJSP } = require('./OabTJSP');
 const { OabTJMG } = require('./OabTJMG');
 const { OabTJRS } = require('./OabTJRS');
 const { OabTJSC } = require('./OabTJSC');
 const { ProcessoTJRS } = require('./ProcessoTJRS');
 const { ProcessoTJCE } = require('./ProcessoTJCE');
 const { ProcJTE } = require('./ProcJTE');
-const { PeticaoTJSP } = require('./PeticaoTJSP');
 const { PeticaoTJRS1 } = require('./PeticaoTJRS1');
 const extratores = require('./index');
 

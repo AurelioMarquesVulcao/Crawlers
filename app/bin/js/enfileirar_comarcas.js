@@ -16,7 +16,7 @@ const enfileirar_comarcas = async () => {
   };
 
   let comarcas = await Comarca.find(query);
-
+  console.log({ comarcas: comarcas.length });
   comarcas = comarcas.map((c) => {
     return {
       _id: c._id,

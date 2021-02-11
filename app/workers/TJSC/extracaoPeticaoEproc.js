@@ -1,10 +1,10 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
 const Path = require('path');
-const sleep = require('await-sleep')
+const sleep = require('await-sleep');
 const { enums } = require('../../configs/enums');
-const { Logger } = require('../../lib/util')
-const { Extracao } = require('../../models/schemas/extracao')
+const { Logger } = require('../../lib/util');
+const { Extracao } = require('../../models/schemas/extracao');
 const { PeticaoTJSCEproc } = require('../../extratores/PeticaoTJSCEproc');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 
@@ -96,8 +96,8 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: 'OK',
-        logs: logger.logs,
+        Status: 'OK',
+        Logs: logger.logs,
         nomeRobo: 'PeticaoTJSC',
       });
     } catch (e) {
@@ -124,7 +124,7 @@ const { GerenciadorFila } = require('../../lib/filaHandler');
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');
-      console.log('\n'+'='.repeat(process.stdout.columns)+'\n');
+      console.log('\n' + '='.repeat(process.stdout.columns) + '\n');
       await sleep(2000);
     }
   });

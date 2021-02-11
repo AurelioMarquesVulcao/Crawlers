@@ -91,7 +91,6 @@ const logarExecucao = async (execucao) => {
         }
 
         logger.info('Resposta enviada ao BigData');
-
       }
 
       logger.info('Finalizando processo');
@@ -99,8 +98,8 @@ const logarExecucao = async (execucao) => {
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: 'OK',
-        logs: logger.logs,
+        Status: 'OK',
+        Logs: logger.logs,
         NomeRobo: 'PeticaoTJCE',
       });
     } catch (e) {
@@ -112,9 +111,9 @@ const logarExecucao = async (execucao) => {
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: e.message,
-        error: e.stack.replace(/\n+/, ' ').trim(),
-        logs: logger.logs,
+        Status: e.message,
+        Error: e.stack.replace(/\n+/, ' ').trim(),
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJCE,
       });
     } finally {

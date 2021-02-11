@@ -95,7 +95,6 @@ class ProcessoESAJ extends ExtratorBase {
       this.resposta.resultado = resultado;
       this.resposta.sucesso = true;
     } catch (e) {
-      console.log(e);
       this.logger.log('error', `${e}`);
       this.resposta.sucesso = false;
       this.resposta.detalhes = e.message;

@@ -37,6 +37,10 @@ module.exports.enums = Object.freeze({
       tribunal: 12,
       orgao: 8,
     },
+    TJSC: {
+      tribunal: 24,
+      orgao: 8,
+    },
   },
   tipoConsulta: {
     Oab: 'oab',

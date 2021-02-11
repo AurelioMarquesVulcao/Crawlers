@@ -15,6 +15,18 @@ let mapaEstadoRobo = {
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {
+  /**
+   * @param {Object} execucao
+   * @param {String} execucao.LogConsultaId
+   * @param {Object} execucao.Mensagem
+   * @param {Date} execucao.DataInicio
+   * @param {Date} execucao.DataTermino
+   * @param {String} execucao.Status
+   * @param {String|null} execucao.Error
+   * @param {[String]} execucao.Logs
+   * @param {String} execucao.NomeRobo
+   * @return {Promise<void>}
+   */
   static async salvar(execucao) {
     const log = {
       status: execucao.Status,
@@ -25,8 +37,8 @@ module.exports.LogExecucao = class LogExecucao {
     delete execucao['status'];
     delete execucao['error'];
     delete execucao['logs'];
-    
-    let id = execucao.Mensagem.ExecucaoConsultaId
+
+    let id = execucao.Mensagem.ExecucaoConsultaId;
     await ExecucaoConsulta.updateOne(
       { _id: id },
       {

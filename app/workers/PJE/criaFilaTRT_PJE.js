@@ -37,23 +37,32 @@ class CriaFilaPJE {
     //   NomeRobo: this.fila.toLowerCase(),
     // });
 
+    // for (let i = 1; i < 3; i++) {
     for (let i = 1; i < 25; i++) {
       if (i != 15) {
         await this.atualizaProcessosFila(0, i, data)[0];
         await sleep(3000);
       }
     }
-    await ExecucaoConsulta.deleteMany({
-      NomeRobo: this.fila.toLowerCase(),
-    });
-    for (let ii = 0; ii < this.mensagens.length; ii++) {
+    // await ExecucaoConsulta.deleteMany({
+    //   NomeRobo: this.fila.toLowerCase(),
+    // });
+    // for (let ii = 0; ii < this.mensagens.length; ii++) {
+    //   await FluxoController.cadastrarExecucao(
+    //     this.fila.toLowerCase(),
+    //     this.fila,
+    //     this.mensagens[ii]
+    //   );
+    // }
+
+    
       await FluxoController.cadastrarExecucao(
         this.fila.toLowerCase(),
         this.fila,
-        this.mensagens[ii]
+        this.mensagens
       );
-    }
-
+      await sleep(30000);
+      // process.exit()
     // função descontinuada.
     // await this.rabbit.enfileirarLoteTRT(this.fila, this.mensagens);
 

@@ -200,50 +200,115 @@ class FluxoController {
    * @return {Promise<boolean>}
    */
   static async cadastrarExecucao(nomeRobo, nomeFila, msg) {
-    try {
+    // Foi necessario criar verificador de ARRAY para enfileriar em lotes
+    // os worker's de busca de processos novos.
+    // não há alterações no else.
+    if (Array.isArray(msg)) {
       let gf = new GerenciadorFila();
-      msg['Tentativas'] = 0;
-      let execucao = new ExecucaoConsulta({
-        DataInicio: null,
-        DataTermino: null,
-        Tentativas: 0,
-        NomeRobo: nomeRobo,
-        Log: [
-          {
-            status: `Execução do robô ${nomeRobo} para consulta ${msg.NumeroProcesso} foi cadastrada com sucesso!`,
-          },
-        ],
-        Instancia: msg.Instancia,
-        Mensagem: [msg],
-      });
+      let lote = [];
+      for (let i = 0; i < msg.length; i++) {
+        try {
+          msg[i]['Tentativas'] = 0;
+          let execucao = new ExecucaoConsulta({
+            DataInicio: null,
+            DataTermino: null,
+            Tentativas: 0,
+            NomeRobo: nomeRobo,
+            Log: [
+              {
+                status: `Execução do robô ${nomeRobo} para consulta ${msg[i].NumeroProcesso} foi cadastrada com sucesso!`,
+              },
+            ],
+            Instancia: msg[i].Instancia,
+            Mensagem: [msg[i]],
+          });
+          let pendentes = await ExecucaoConsulta.findOne({
+            NomeRobo: nomeRobo,
+            'Mensagem.Instancia': msg[i].Instancia,
+            'Mensagem.NumeroProcesso': msg[i].NumeroProcesso,
+            DataTermino: null,
+          }).countDocuments();
 
-      let pendentes = await ExecucaoConsulta.findOne({
-        NomeRobo: nomeRobo,
-        'Mensagem.Instancia': msg.Instancia,
-        'Mensagem.NumeroProcesso': msg.NumeroProcesso,
-        DataTermino: null,
-      })
-        // .limit(1)
-        .countDocuments();
+          if (pendentes !== 0) {
+            console.log(
+              `O processo ${nomeRobo} - ${msg[i].NumeroProcesso} já cadastrada`
+            );
 
-      if (pendentes !== 0) {
-        console.log(
-          `O processo ${nomeRobo} - ${msg.NumeroProcesso} já cadastrada`
-        );
-        return false;
+            if (execucao.Mensagem[0].NovosProcessos == true) {
+              let pendentes = await ExecucaoConsulta.findOne({
+                NomeRobo: nomeRobo,
+                'Mensagem.Instancia': msg[i].Instancia,
+                'Mensagem.NumeroProcesso': msg[i].NumeroProcesso,
+                DataTermino: null,
+              });
+              // console.log(pendentes);
+              lote.push(pendentes.Mensagem[0]);
+            }
+          } else {
+            execucao.Mensagem[0]['ExecucaoConsultaId'] = execucao._id;
+            execucao.Mensagem[0]['DataEnfileiramento'] =
+              execucao.DataEnfileiramento;
+            await new ExecucaoConsulta(execucao).save();
+            lote.push(execucao.Mensagem[0]);
+          }
+        } catch (e) {
+          console.log(e);
+        }
       }
+      await gf.enfileirarLote(nomeFila, lote);
+    } else {
+      try {
+        let gf = new GerenciadorFila();
+        msg['Tentativas'] = 0;
+        let execucao = new ExecucaoConsulta({
+          DataInicio: null,
+          DataTermino: null,
+          Tentativas: 0,
+          NomeRobo: nomeRobo,
+          Log: [
+            {
+              status: `Execução do robô ${nomeRobo} para consulta ${msg.NumeroProcesso} foi cadastrada com sucesso!`,
+            },
+          ],
+          Instancia: msg.Instancia,
+          Mensagem: [msg],
+        });
 
-      execucao.Mensagem[0]['ExecucaoConsultaId'] = execucao._id;
-      // execucao.Mensagem[0]['ConsultaCadastradaId'] = null;
-      execucao.Mensagem[0]['DataEnfileiramento'] = execucao.DataEnfileiramento;
+        let pendentes = await ExecucaoConsulta.findOne({
+          NomeRobo: nomeRobo,
+          'Mensagem.Instancia': msg.Instancia,
+          'Mensagem.NumeroProcesso': msg.NumeroProcesso,
+          DataTermino: null,
+        })
+          // .limit(1)
+          .countDocuments();
 
-      await new ExecucaoConsulta(execucao).save();
+        if (pendentes !== 0) {
+          console.log(
+            `O processo ${nomeRobo} - ${msg.NumeroProcesso} já cadastrada`
+          );
+          if (execucao.Mensagem[0].NovosProcessos == true) {
+            let pendentes = await ExecucaoConsulta.findOne({
+              NomeRobo: nomeRobo,
+              'Mensagem.Instancia': msg.Instancia,
+              'Mensagem.NumeroProcesso': msg.NumeroProcesso,
+              DataTermino: null,
+            });
+            await gf.enviar(nomeFila, pendentes.Mensagem[0]);
+          }
+          return false;
+        }
 
-      await gf.enviar(nomeFila, execucao.Mensagem[0]);
-
-      return true;
-    } catch (e) {
-      console.log(e);
+        execucao.Mensagem[0]['ExecucaoConsultaId'] = execucao._id;
+        // execucao.Mensagem[0]['ConsultaCadastradaId'] = null;
+        execucao.Mensagem[0]['DataEnfileiramento'] =
+          execucao.DataEnfileiramento;
+        await new ExecucaoConsulta(execucao).save();
+        await gf.enviar(nomeFila, execucao.Mensagem[0]);
+        return true;
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
@@ -267,7 +332,6 @@ class FluxoController {
     nomeRobo,
     error,
   }) {
-    
     let execucao = {
       Mensagem: msg,
       DataInicio: dataInicio,

@@ -41,9 +41,7 @@ const logarExecucao = async (execucao) => {
       let resposta;
 
       logger.info('Iniciando processo de extração');
-      const resultadoExtracao = await extrator.extrair(
-        message.NumeroProcesso,
-      );
+      const resultadoExtracao = await extrator.extrair(message.NumeroProcesso);
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       await Extracao.criarExtracao(
@@ -94,8 +92,8 @@ const logarExecucao = async (execucao) => {
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: 'OK',
-        logs: logger.logs,
+        Status: 'OK',
+        Logs: logger.logs,
         NomeRobo: 'PeticaoTJRS',
       });
     } catch (e) {
@@ -108,9 +106,9 @@ const logarExecucao = async (execucao) => {
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: e.message,
-        error: e.stack.replace(/\n+/, ' ').trim(),
-        logs: logger.logs,
+        Status: e.message,
+        Error: e.stack.replace(/\n+/, ' ').trim(),
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJRS,
       });
     } finally {

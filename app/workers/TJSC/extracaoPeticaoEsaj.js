@@ -26,6 +26,8 @@ const extratores = require('../../extratores');
 
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
+    ch.ack(msg);
+    process.exit();
     const message = JSON.parse(msg.content.toString());
 
     console.table(message);
@@ -100,8 +102,8 @@ const extratores = require('../../extratores');
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: 'OK',
-        logs: logger.logs,
+        Status: 'OK',
+        Logs: logger.logs,
         nomeRobo: 'PeticaoTJSC',
       });
     } catch (e) {

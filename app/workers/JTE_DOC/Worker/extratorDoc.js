@@ -3,28 +3,25 @@ const cheerio = require('cheerio');
 const shell = require('shelljs');
 const sleep = require('await-sleep');
 
-const { enums } = require('../../../../configs/enums');
-const { GerenciadorFila } = require('../../../../lib/filaHandler');
+const { enums } = require('../../../configs/enums');
+const { FluxoController } = require('../../../lib/fluxoController');
+const { GerenciadorFila } = require('../../../lib/filaHandler');
 // const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Logger, Cnj, Helper } = require('../../../../lib/util');
-const { LogExecucao } = require('../../../../lib/logExecucao');
+const { Logger, Cnj, Helper } = require('../../../lib/util');
+const { LogExecucao } = require('../../../lib/logExecucao');
 // const { ExtratorBase } = require('../../extratores/extratores');
-const { CriaFilaJTE } = require('../../../../lib/criaFilaJTE');
-const { downloadFiles } = require('../../../../lib/downloadFiles');
-const { Log } = require('../../../../models/schemas/logsEnvioAWS');
-const desligado = require('../../../../assets/jte/horarioRoboJTE.json');
+const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
+const { downloadFiles } = require('../../../lib/downloadFiles');
+const { Log } = require('../../../models/schemas/logsEnvioAWS');
+const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 
 /**
  * Logger para console e arquivo
  */
-let logger;
 const purple = '\u001b[35m';
 const blue = '\u001b[34m';
 const reset = '\u001b[0m';
 
-const logarExecucao = async (execucao) => {
-  await LogExecucao.salvar(execucao);
-};
 const fila = new CriaFilaJTE();
 var listaArquivo = [];
 
@@ -93,9 +90,14 @@ async function worker(nomeFila) {
 
   // tudo que está abaixo é acionado para cada consumer na fila.
   await new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
+    var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
     try {
       await sleep(2000);
-      let message = JSON.parse(msg.content.toString());
+      var message = JSON.parse(msg.content.toString());
+      var logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
+        nomeRobo: enums.nomesRobos.JTE,
+        NumeroDoProcesso: message.NumeroProcesso,
+      });
       // let message = {
       //   numeroProcesso: '1001359-62.2020.5.02.0720',
       //   data: '27/11/2020 14:00:06',
@@ -122,10 +124,7 @@ async function worker(nomeFila) {
         let links = message.link
         let tipo = message.tipo
 
-        let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
-          nomeRobo: enums.nomesRobos.JTE,
-          NumeroDoProcesso: message.NumeroProcesso,
-        });
+        
 
         logger.info('Mensagem recebida');
 
@@ -134,8 +133,8 @@ async function worker(nomeFila) {
         for (let w = 0; w < 1; w++) {
           // Criando fila para Download de documentos
 
-          // let local = '/home/aurelio/crawlers-bigdata/app/downloads';
-          let local = '/app/downloads';
+          let local = '/home/aurelio/crawlers-bigdata/app/downloads';
+          // let local = '/app/downloads';
 
           if (tipo != 'HTML') {
             await new downloadFiles().download(nome, links, local);
@@ -177,20 +176,41 @@ async function worker(nomeFila) {
 
         console.log(purple + '  ------------ Tempo de para baixar o processo é de ' + heartBeat + ' segundos -------------' + reset);
         heartBeat = 0;
-        ch.ack(msg);
+        
         console.log('------- Estamos com : ' + catchError + ' erros ------- ');
         logger.info(blue + 'Finalizando processo de extração' + reset);
-        desligaAgendado();
+        
       }
+      await FluxoController.finalizarConsultaPendente({
+        msg: message,
+        dataInicio,
+        dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: 'OK',
+        logs: logger.allLog(),
+        nomeRobo: message.NomeRobo,
+        // error: false,
+      });
+      ch.ack(msg);
     } catch (e) {
       catchError++;
-      console.log(e);
+      // console.log(e);
 
+      
       // Salva meus erros nos logs
-      logger.log('info', numeroProcesso + ' ' + e);
+      // logger.log('info', numeroProcesso + ' ' + e);
       console.log('-------------- estamos com : ' + catchError + ' erros ------- ');
 
       // envia a mensagem para a fila de reprocessamento
+
+      await FluxoController.finalizarConsultaPendente({
+        msg: message,
+        dataInicio,
+        // dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: `Error: ${e.message}`,
+        logs: logger.allLog(),
+        nomeRobo: message.NomeRobo,
+        error: e,
+      });
 
       new GerenciadorFila().enviar(nomeFila, message);
 
@@ -199,10 +219,11 @@ async function worker(nomeFila) {
       // trata erro especifico para falha na extração
       logger.info(`Error: ${e.message}`);
       logger.info('Reenviando mensagem ao RabbitMQ');
+      
       ch.ack(msg);
       logger.info('Mensagem enviada ao reprocessamento');
       logger.info(blue + 'Finalizando processo de extração' + reset);
-      desligaAgendado();
+      
     }
   });
 }

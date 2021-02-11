@@ -202,9 +202,11 @@ class FluxoController {
   static async cadastrarExecucao(nomeRobo, nomeFila, msg) {
     try {
       let gf = new GerenciadorFila();
+      msg['Tentativas'] = 0;
       let execucao = new ExecucaoConsulta({
         DataInicio: null,
         DataTermino: null,
+        Tentativas: 0,
         NomeRobo: nomeRobo,
         Log: [
           {
@@ -265,6 +267,7 @@ class FluxoController {
     nomeRobo,
     error,
   }) {
+    
     let execucao = {
       Mensagem: msg,
       DataInicio: dataInicio,

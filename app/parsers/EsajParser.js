@@ -551,8 +551,18 @@ class TJSCParser extends EsajParser {
   }
 }
 
+// class TJCEParser extends EsajParser {
+//   constructor() {
+//     super();
+//     this.url = 'https://esaj.tjms.jus.br';
+//     this.uf = 'MS';
+//     this.origemExtracao = 'ProcessoTJMS';
+//   }
+// }
+
 module.exports = {
   TJMSParser,
   TJSPParser,
   TJSCParser,
+  // TJCEParser,
 };

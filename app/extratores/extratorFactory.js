@@ -73,7 +73,7 @@ class ExtratorFactory {
     }
 
     if (/processo.TJCE/.test(fila)) {
-      extrator = new ProcessoTJCE('', isDebug);
+      extrator = new extratores.ProcessoTJCE();
     }
 
     if (/processo.PJE/.test(fila)) {

@@ -15,7 +15,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     url = '',
     debug = false,
     timeout = 30000,
-    headless = true,
+    headless = false,
     usuario = { username: '', password: '' },
   } = {}) {
     super(url, debug);
@@ -243,7 +243,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
         let aTags = document.querySelectorAll(
           '.esajCelulaDescricaoServicos > a'
         );
-        let searchText = /Consulta\sde\sProcessos\sd\w\s1.\s?Grau/;
+        let searchText = /Consulta\sde\sProcessos\s((d\w)|(-))\s1.\s?Grau/;
         let found;
 
         for (let i = 0; i < aTags.length; i++) {
@@ -545,6 +545,7 @@ class PeticaoTJSP extends PeticaoEsaj {
 class PeticaoTJSC extends PeticaoEsaj {
   constructor() {
     super({ url: 'https://esaj.tjsc.jus.br/cpopg' });
+    this.loginUrl = 'https://esaj.tjsc.jus.br/sajcas/login';
     this.estado = 'SC';
     this.tribunal = 'TJSC';
   }

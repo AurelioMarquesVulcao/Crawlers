@@ -15,7 +15,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     url = '',
     debug = false,
     timeout = 30000,
-    headless = false,
+    headless = true,
     usuario = { username: '', password: '' },
   } = {}) {
     super(url, debug);

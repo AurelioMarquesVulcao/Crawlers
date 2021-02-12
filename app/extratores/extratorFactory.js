@@ -79,6 +79,10 @@ class ExtratorFactory {
       extrator = new extratores.OabTJCE();
     }
 
+    if (/peticao.TJCE/.test(fila)) {
+      extrator = new extratores.PeticaoTJCE();
+    }
+
     if (/processo.PJE/.test(fila)) {
       extrator = new ExtratorTrtPje(
         'https://www.trt1.jus.br/consulta-processual',

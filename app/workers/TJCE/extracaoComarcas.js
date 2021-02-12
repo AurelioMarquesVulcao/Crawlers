@@ -1,10 +1,9 @@
-// workers/TJCE/extracaoComarcas.js
 const mongoose = require('mongoose');
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const sleep = require('await-sleep');
 const { CnjValidator } = require('../../lib/util');
-const { ProcessoTJCE } = require('../../extratores/ProcessoTJCE');
+const extratores = require('../../extratores');
 const Comarca = require('../../models/schemas/comarcas');
 const moment = require('moment');
 
@@ -26,13 +25,16 @@ const moment = require('moment');
     console.table(message);
 
     if (!/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/.test(message.UltimoProcesso)) {
-      message.UltimoProcesso = ('000000'+message.UltimoProcesso).slice(-20)
-      message.UltimoProcesso = message.UltimoProcesso.replace(/(\d{7})(\d{2})(\d{4})(\d)(\d{2})(\d{4})/, '$1-$2.$3.$4.$5.$6');
+      message.UltimoProcesso = ('000000' + message.UltimoProcesso).slice(-20);
+      message.UltimoProcesso = message.UltimoProcesso.replace(
+        /(\d{7})(\d{2})(\d{4})(\d)(\d{2})(\d{4})/,
+        '$1-$2.$3.$4.$5.$6'
+      );
     }
 
     await comarca.setStatus(2);
 
-    let ultimo=false;
+    let ultimo = false;
     let continuar;
     let processados = 0;
     let inicio = moment();
@@ -94,10 +96,7 @@ async function extrairNumeros(message, ultimo) {
   ultimoNumero = ultimoNumero.split(/\D/g);
 
   do {
-    let extrator = new ProcessoTJCE(
-      'https://www.tjrs.jus.br/site_php/consulta/index.php',
-      false
-    );
+    let extrator = new extratores.ProcessoTJCE();
     sequencial = `${Number(ultimoNumero[0]) + count}`;
 
     let mod = CnjValidator.calcula_mod97(
@@ -107,7 +106,7 @@ async function extrairNumeros(message, ultimo) {
       ultimoNumero[5]
     );
     numero = `${sequencial}-${mod}.${ultimoNumero[2]}.${ultimoNumero[3]}.${ultimoNumero[4]}.${ultimoNumero[5]}`;
-    numero = ('000000'+numero).slice(-25)
+    numero = ('000000' + numero).slice(-25);
     extracao = await extrator.extrair(numero, null, 1);
 
     // console.log({ count, sequencial,ultimoNumero, numero, mod })
@@ -123,7 +122,7 @@ async function extrairNumeros(message, ultimo) {
     // console.log({detalhes: extracao.detalhes});
     // console.log({sucesso: extracao.sucesso});
 
-    if (!extracao.sucesso && (extracao.detalhes !== 'Senha necessaria'))
+    if (!extracao.sucesso && extracao.detalhes !== 'Senha necessaria')
       erroEncontrado = !extracao.sucesso;
 
     // console.log({erroEncontrado})

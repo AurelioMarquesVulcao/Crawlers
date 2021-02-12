@@ -243,7 +243,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
         let aTags = document.querySelectorAll(
           '.esajCelulaDescricaoServicos > a'
         );
-        let searchText = /Consulta\sde\sProcessos\s((d\w)|(-))\s1.\s?Grau/;
+        let searchText = /(Consulta\sde\s)?Processos\s((d\w)|(-))\s1.\s?Grau/;
         let found;
 
         for (let i = 0; i < aTags.length; i++) {
@@ -423,8 +423,10 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     let documentoSalvo = [];
     for (let i = 1, tam = todosDocumentos.length; i <= tam; i++) {
       let selector = `#arvore_principal > ul > li:nth-child(${i}) > a`;
-      if (/(Decisão)|(Despachos?)|(Ato\sOrdinatório)/.test($(selector).text()))
-        break;
+      let texto = $(selector).text();
+      if (/(Decisão)|(Despachos?)/.test(texto)) break; // caminho perfeito
+      if (/Ato\sOrdinatório/.test(texto)) break; // desvio
+      if (/Contestação/.test(texto)) break; //Fora do padrão normal
       documentos.push(selector);
     }
 
@@ -439,6 +441,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       downloadPath: this.filePath,
     });
 
+    this.arquivosNome = [];
     for (let i = 0, tam = documentos.length; i < tam; i++) {
       let resposta = await this.downloadAndSave(documentos[i], $);
       documentoSalvo.push(resposta);
@@ -512,6 +515,9 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     nomeArquivo = nomeArquivo.replace(/\s/g, '_');
     nomeArquivo = nomeArquivo.replace(/(\.)|(\/)/g, '_');
     nomeArquivo = Helper.removerAcento(nomeArquivo);
+    this.arquivosNome.push(nomeArquivo);
+    let qtd = this.arquivosNome.filter((e) => e === nomeArquivo).length;
+    nomeArquivo = qtd > 1 ? `${nomeArquivo}_${qtd}` : nomeArquivo;
     let filePath = `${path}/${nomeArquivo}.pdf`;
 
     this.logger.info(
@@ -551,10 +557,19 @@ class PeticaoTJSC extends PeticaoEsaj {
   }
 }
 
+class PeticaoTJCE extends PeticaoEsaj {
+  constructor() {
+    super({ url: 'https://esaj.tjce.jus.br/cpopg' });
+    this.loginUrl = 'https://esaj.tjce.jus.br/sajcas/login';
+    this.estado = 'CE';
+    this.tribunal = 'TJCE';
+  }
+}
+
 // (() => {
 //   new PeticaoTJMS()
 //     .extrair('0000135-74.2021.8.12.0031', 1)
 //     .then((r) => console.log(r));
 // })();
 
-module.exports = { PeticaoTJMS, PeticaoTJSP, PeticaoTJSC };
+module.exports = { PeticaoTJMS, PeticaoTJSP, PeticaoTJSC, PeticaoTJCE };

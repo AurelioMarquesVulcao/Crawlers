@@ -3,7 +3,6 @@ const { OabTJBAPortal } = require('./OabTJBAPortal');
 const { OabTJMG } = require('./OabTJMG');
 const { OabTJRS } = require('./OabTJRS');
 const { ProcessoTJRS } = require('./ProcessoTJRS');
-const { ProcessoTJCE } = require('./ProcessoTJCE');
 const { ProcJTE } = require('./ProcJTE');
 const { PeticaoTJRS1 } = require('./PeticaoTJRS1');
 const extratores = require('./index');
@@ -73,7 +72,15 @@ class ExtratorFactory {
     }
 
     if (/processo.TJCE/.test(fila)) {
-      extrator = new ProcessoTJCE('', isDebug);
+      extrator = new extratores.ProcessoTJCE();
+    }
+
+    if (/oab.TJCE/.test(fila)) {
+      extrator = new extratores.OabTJCE();
+    }
+
+    if (/peticao.TJCE/.test(fila)) {
+      extrator = new extratores.PeticaoTJCE();
     }
 
     if (/processo.PJE/.test(fila)) {

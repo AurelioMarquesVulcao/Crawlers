@@ -6,6 +6,7 @@ const { CaptchaHandler } = require('../lib/captchaHandler');
 const { Logger } = require('../lib/util');
 const { Robo } = require('../lib/newRobo');
 const parsers = require('../parsers');
+const { TJCEParser } = require('../parsers/TJCEParser'); // Usando o parser antigo pq a pagina é completamente diferente
 const sleep = require('await-sleep');
 
 const proxy = true;
@@ -320,8 +321,21 @@ class ProcessoTJSC extends ProcessoESAJ {
   }
 }
 
+class ProcessoTJCE extends ProcessoESAJ {
+  constructor() {
+    super('http://esaj.tjce.jus.br/cpopg');
+    this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3';
+    this.parser = new TJCEParser(); // TODO quando o site mudar (provavelmente em breve) aplicar o novo parser
+  }
+
+  setLogger(tribunal) {
+    super.setLogger('TJCE');
+  }
+}
+
 module.exports = {
   ProcessoTJMS,
   ProcessoTJSP,
   ProcessoTJSC,
+  ProcessoTJCE,
 };

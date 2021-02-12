@@ -834,7 +834,10 @@ class RoboPuppeteer3 {
     // teste validade link;
     try {
       if (link.link) {
+        // console.log(heartBeat);
         this.logger.info(`Já capturamos  ${controlaLink.length} Links válidos`);
+        heartBeat = 0;
+        // console.log(heartBeat);
         // console.log('O numero de links capturados é...', controlaLink.length);
         // console.log(' O Link é válido e foi capturado');
         if (controlaLink.length == 0) {

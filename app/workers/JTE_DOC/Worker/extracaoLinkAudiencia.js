@@ -69,7 +69,7 @@ async function worker(nomeFila) {
   // tudo que está abaixo é acionado para cada consumer na fila.
   await new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     try {
-      let message = JSON.parse(msg.content.toString());
+      var message = JSON.parse(msg.content.toString());
       let numeroProcesso = message.NumeroProcesso;
       let logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
         nomeRobo: enums.nomesRobos.JTE,
@@ -247,11 +247,11 @@ async function worker(nomeFila) {
           logger.info('Iniciais baixadas com sucesso');
           logger.info('Enviando link dos documentos para a fila');
           for (let w = 0; w < link.length; w++) {
-            link[w]['NumeroProcesso'] = `${link[w].numeroProcesso}-${w}`;
-            link[w]['NomeRobo'] = filaAxios.toLowerCase();
-            link[w]['Instancia'] = message.Instancia;
             if (link[w]) {
               if (link[w].tipo != 'HTML') {
+                link[w]['NumeroProcesso'] = `${link[w].numeroProcesso}-${w}`;
+                link[w]['NomeRobo'] = filaAxios.toLowerCase();
+                link[w]['Instancia'] = message.Instancia;
                 // Criando fila para Download de documentos
                 let execucao = await FluxoController.cadastrarExecucao(
                   filaAxios.toLowerCase(),
@@ -323,7 +323,7 @@ async function worker(nomeFila) {
           throw err;
         });
       logger.info('Resposta enviada com sucesso ao BigData');
-      // ch.ack(msg);
+      ch.ack(msg);
 
       console.log('------- Estamos com : ' + catchError + ' erros ------- ');
       logger.info('\033[0;34m' + 'Finalizado processo de extração');
@@ -372,7 +372,7 @@ async function worker(nomeFila) {
         error: e,
       });
 
-      // ch.ack(msg);
+      ch.ack(msg);
       logger.info('Mensagem enviada ao reprocessamento');
       logger.info('\033[31m' + 'Finalizando processo de extração');
     }

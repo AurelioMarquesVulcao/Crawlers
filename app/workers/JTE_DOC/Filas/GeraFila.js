@@ -48,18 +48,18 @@ async function worker() {
   }
   try {
     // tudo que está abaixo é acionado para cada consumer na fila.
-    await new GerenciadorFila(false, 2).consumir(nomeFila, async (ch, msg) => {
+    await new GerenciadorFila(false, 2000).consumir(nomeFila, async (ch, msg) => {
       let message = JSON.parse(msg.content.toString());
       message['Instancia'] = message.instancia;
       delete message["instancia"]
       console.table(message);
       // Cria Fila PJE
-      // await PJE(message);
+      await PJE(message);
       // Cria Fila JTE
       await JTE(message);
 
       // ch.ack(msg);
-      // await sleep(20000);
+      await sleep(20000);
       await sleep(1000);
       process.exit();
     });

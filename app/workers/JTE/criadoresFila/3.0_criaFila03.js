@@ -19,7 +19,7 @@ var nomeFila = 'processo.JTE.extracao.novos.3';
 
 (async () => {
   let contador = 0;
-  const variaveis = await Variaveis.catch({ codigo: '000001' });
+  const variaveis = await Variaveis.catch({ codigo: 2 });
   const Estados = variaveis.variaveis;
   var estados = [
     // Estados[0].ms,

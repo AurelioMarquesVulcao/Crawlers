@@ -37,8 +37,15 @@ module.exports.LogExecucao = class LogExecucao {
     delete execucao['status'];
     delete execucao['error'];
     delete execucao['logs'];
-
-    let id = execucao.Mensagem.ExecucaoConsultaId;
+    
+    let id = execucao.Mensagem.ExecucaoConsultaId
+    let find = await ExecucaoConsulta.findOne({ _id: id });
+    if (!find.Tentativas){
+      execucao["Tentativas"]=0;
+    }
+    if(find.Tentativas >=0){
+      execucao["Tentativas"]=find.Tentativas+1
+    }
     await ExecucaoConsulta.updateOne(
       { _id: id },
       {

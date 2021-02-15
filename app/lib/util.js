@@ -390,6 +390,10 @@ class Logger {
   allLog() {
     return this.logs;
   }
+  resetLog() {
+    this.logs=[]
+  }
+
   addLog(logs) {
     for (let i = 0; i < logs.length; i++) {
       this.logs.push(logs[i]);

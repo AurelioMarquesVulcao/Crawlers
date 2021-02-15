@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const variaveisSchema = new mongoose.Schema({
   aplicacao: String,
-  codigo: String,
+  codigo: Number,
   origem: String,
   variaveis: [],
 })

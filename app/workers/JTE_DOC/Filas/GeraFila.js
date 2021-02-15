@@ -50,6 +50,8 @@ async function worker() {
     // tudo que está abaixo é acionado para cada consumer na fila.
     await new GerenciadorFila(false, 2000).consumir(nomeFila, async (ch, msg) => {
       let message = JSON.parse(msg.content.toString());
+      message['Instancia'] = message.instancia;
+      delete message["instancia"]
       console.table(message);
       // Cria Fila PJE
       await PJE(message);
@@ -57,7 +59,7 @@ async function worker() {
       await JTE(message);
 
       // ch.ack(msg);
-      // await sleep(20000);
+      await sleep(20000);
       await sleep(1000);
       process.exit();
     });
@@ -66,7 +68,7 @@ async function worker() {
     // await sleep(3000);
     // process.exit();
     // Não feche a mensagem em caso de erro !
-    ch.ack(msg);
+    // ch.ack(msg);
   }
 }
 
@@ -79,7 +81,7 @@ async function geraPje(message) {
     NumeroProcesso: message.NumeroProcesso,
     NovosProcessos: true,
     _id: id,
-    Instancia: null,
+    Instancia: message.Instancia,
     NomeRobo: nomeFilaPJE.toLowerCase(),
   };
   // console.log(message2);
@@ -115,7 +117,7 @@ async function JTE(message) {
     let estadoProcesso = Cnj.processoSlice(numeroProcesso).estado;
     let fila = `peticao.JTE.extracao.${estadoProcesso}`;
     // Incluido dados obrigatórios na mensgem
-    message['Instancia'] = null;
+    // message['Instancia'] = null;
     message['NomeRobo'] = fila.toLowerCase();
     let execucao = await FluxoController.cadastrarExecucao(
       fila.toLowerCase(),
@@ -124,9 +126,9 @@ async function JTE(message) {
     );
     if (!execucao) {
       let log = await ExecucaoConsulta.findOne({
-        NomeRobo: message2.NomeRobo,
-        'Mensagem.Instancia': message2.Instancia,
-        'Mensagem.NumeroProcesso': message2.NumeroProcesso,
+        NomeRobo: message.NomeRobo,
+        'Mensagem.Instancia': message.Instancia,
+        'Mensagem.NumeroProcesso': message.NumeroProcesso,
         DataTermino: null,
       });
       console.log('Reenfileirado a força');

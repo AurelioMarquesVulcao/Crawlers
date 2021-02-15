@@ -7,6 +7,7 @@ const ExecucaoSchema = new mongoose.Schema({
   DataEnfileiramento: { type: Date, default: new Date() },
   DataInicio: { type: Date, required: false },
   DataTermino: { type: Date, required: false },
+  Tentativas: { type: Number, required: false },
   Log: { type: Array, default: new Array() },
   Mensagem: { type: Array, default: new Array() },
   Instancia: { type: Number },

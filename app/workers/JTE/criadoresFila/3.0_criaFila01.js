@@ -20,7 +20,7 @@ var nomeFila = 'processo.JTE.extracao.novos.1';
 (async () => {
   let contador = 0;
   let start = 0; // cria uma condição que permite que a aplicação inicie ao ligar o worker.
-  const variaveis = await Variaveis.catch({ codigo: '000001' });
+  const variaveis = await Variaveis.catch({ codigo: 2 });
   const Estados = variaveis.variaveis;
   var estados = [
     Estados[0].rj,

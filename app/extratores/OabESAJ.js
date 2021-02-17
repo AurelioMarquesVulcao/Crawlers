@@ -17,9 +17,11 @@ class OabESAJ extends ExtratorBase {
   }
 
   async extrair(numeroOab, cadastroConsultaId) {
-    this.numeroOab = numeroOab;
+    this.numeroOab = /\w{2}/.test(numeroOab)
+      ? numeroOab
+      : `${numeroOab}${this.estado}`;
     this.setLogger();
-    this.setCadastroConsulta(numeroOab, cadastroConsultaId);
+    this.setCadastroConsulta(cadastroConsultaId);
 
     console.log(this.cadastroConsulta);
     let objResponse;
@@ -197,7 +199,7 @@ class OabESAJ extends ExtratorBase {
    * @return {Promise<*>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, `Processo${this.tribunal}`, {
+    const ch = new CaptchaHandler(5, 10000, this.constructor.name, {
       numeroDoProcesso: this.numeroProcesso,
     });
 
@@ -241,8 +243,8 @@ class OabESAJ extends ExtratorBase {
     };
 
     if (uuid && gResponse) {
-      options.uuidCaptcha = uuid;
-      options['g-recaptcha-response'] = gResponse;
+      options.queryString.uuidCaptcha = uuid;
+      options.queryString['g-recaptcha-response'] = gResponse;
     }
 
     return await this.robo.acessar(options);
@@ -288,11 +290,12 @@ class OabESAJ extends ExtratorBase {
   extrairProcessos(body) {
     const $ = cheerio.load(body);
 
-    let divLinkProcesso = $('.nuProcesso');
+    let divLinkProcesso = $('a.linkProcesso');
     let processos = [];
 
     divLinkProcesso.map((index, div) => {
-      processos.push($(div).children()[0].children[0].data.trim());
+      let numero = $(div).text();
+      processos.push(numero.trim());
     });
 
     return processos;
@@ -306,7 +309,7 @@ class OabESAJ extends ExtratorBase {
   verificaProximaPagina(body) {
     this.logger.info('Verificando a existencia de outra pagina');
     const $ = cheerio.load(body);
-    let proximaPagina = $('a[title="Próxima página"]');
+    let proximaPagina = $('[title="Próxima página"]');
 
     if (proximaPagina.length) {
       return proximaPagina[0].attribs.href;
@@ -325,7 +328,7 @@ class OabESAJ extends ExtratorBase {
     let objResponse;
 
     let options = {
-      url: `http://esaj.${this.tribunal.toLowerCase()}.jus.br${link}`,
+      url: `https://esaj.${this.tribunal.toLowerCase()}.jus.br${link}`,
       method: 'GET',
       proxy: proxy,
       encoding: 'utf8',
@@ -402,4 +405,45 @@ class OabTJMS extends OabESAJ {
     super.setLogger();
   }
 }
-module.exports.OabTJMS = OabTJMS;
+
+class OabTJSP extends OabESAJ {
+  constructor() {
+    super('https://esaj.tjsp.jus.br/cpopg', false);
+    this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
+    this.tribunal = 'TJSP';
+    this.estado = 'SP';
+  }
+
+  setLogger() {
+    super.setLogger();
+  }
+}
+
+class OabTJSC extends OabESAJ {
+  constructor() {
+    super('https://esaj.tjsc.jus.br/cpopg', false);
+    this.dataSiteKey = '6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL';
+    this.tribunal = 'TJSC';
+    this.estado = 'SC';
+  }
+
+  setLogger() {
+    super.setLogger();
+  }
+}
+
+class OabTJCE extends OabESAJ {
+  constructor() {
+    super('https://esaj.tjce.jus.br/cpopg', false);
+    this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3';
+    this.tribunal = 'TJCE';
+    this.estado = 'SC';
+  }
+}
+
+module.exports = {
+  OabTJMS,
+  OabTJSP,
+  OabTJSC,
+  OabTJCE,
+};

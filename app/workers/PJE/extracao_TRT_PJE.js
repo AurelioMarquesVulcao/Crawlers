@@ -5,6 +5,7 @@ const axios = require('axios');
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
+const { ExecucaoConsulta } = require('../../models/schemas/execucao_consulta');
 const { Cnj, Logger } = require('../../lib/util');
 const { ExtratorTrtPje } = require('../../extratores/processoPJE');
 const { Processo } = require('../../models/schemas/processo');
@@ -18,7 +19,7 @@ var red = '\u001b[31m';
 var blue = '\u001b[34m';
 var reset = '\u001b[0m';
 var log = [];
-var erro= "";
+var erro = '';
 
 /**
  * Realiza o consumo de mensagens de uma fila de processos
@@ -49,7 +50,7 @@ var erro= "";
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
     try {
-      let dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
+      var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
       var heartBeat = 0;
       // Desincroniza as requisições do robô
       let testeSleep = numeroAleatorio(1, 3);
@@ -68,13 +69,24 @@ var erro= "";
         }
       }, 1000);
       // Variaveis de Robô
-      
+
       var message = JSON.parse(msg.content.toString());
       // console.log(message.NumeroProcesso);
       const numeroEstado = parseInt(
         Cnj.processoSlice(message.NumeroProcesso).estado
       );
-      
+
+      // Valida o numero de tentativas
+      let id = message.ExecucaoConsultaId;
+      let find = await ExecucaoConsulta.findOne({ _id: id });
+      if (find.Tentativas > 3 && message.NovosProcessos == true) {
+        // console.log("matei a mensagem");
+        ch.ack(msg);
+      }
+
+      // console.log(message.Tentativas);
+      message.Tentativas = find.Tentativas + 1;
+      // console.log(message.Tentativas);
       let busca = { _id: message._id };
       var logger = new Logger(
         'info',
@@ -92,15 +104,14 @@ var erro= "";
       logger.info('Mensagem recebida');
       logger.info('Iniciando processo de extração');
       // const extrator = ExtratorFactory.getExtrator(nomeFila, true);
-      let extracao = await new ExtratorTrtPje().extrair(
+      let extrator = new ExtratorTrtPje();
+      let extracao = await extrator.extrair(
         message.NumeroProcesso,
         numeroEstado
       );
+      logger.addLog(extrator.allLogs());
       logger.info('Extração concluída');
       logger.info('Iniciando Parse');
-      // console.log(extracao, "extração");
-      // process.exit();
-
       // tratando a resposta do extrator
       if (/Reprocessar/.test(extracao)) {
         await new GerenciadorFila().enviar(reConsumo, message);
@@ -195,7 +206,9 @@ var erro= "";
             reset
         );
         heartBeat = 0;
+
         // confirmação de atulização para o BigData
+        logger.info('Confirmando envio para o Big Data');
         await axios({
           url: `http://172.16.16.3:8083/callback/crawlersBigData/capaAtualizada/${message.NumeroProcesso}`,
           method: 'post',
@@ -211,8 +224,8 @@ var erro= "";
             console.log(err);
             throw err;
           });
+        logger.info('Envio para o Big Data confirmado');
       }
-      console.log(logger.allLog())
       await FluxoController.finalizarConsultaPendente({
         msg: message,
         dataInicio,
@@ -220,28 +233,65 @@ var erro= "";
         status: 'OK',
         logs: logger.allLog(),
         nomeRobo: message.NomeRobo,
-        error: false,
+        // error: false,
       });
+      // ch.ack(msg);
     } catch (e) {
-      // console.log(e);
+      // Corrige o problema de erro de capcha, que impedia o worker de resolver captcha corretamente após errar 1 vez
+      if (
+        logger
+          .allLog()
+          .filter((y) => /Ocorreu.um.problema.na.solu..o.do.Captcha/i.test(y))
+      ) {
+        logger.info(
+          'Não foi possivél resolver o Captcha corretamente, reiniciando o processo!'
+        );
+        await FluxoController.finalizarConsultaPendente({
+          msg: message,
+          dataInicio,
+          // dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+          status: `Error: ${e.message}`,
+          logs: logger.allLog(),
+          nomeRobo: message.NomeRobo,
+          error: e,
+        });
+        // console.log(message);
+        await mongoose.connection.close();
+        
+        console.log(
+          '------------------------------errro Captcha-----------------------------'
+          );
+          // ch.ack(msg);
+          // await new GerenciadorFila().enviar(nomeFila, message);
 
+        process.exit();
+      }
+      // if (/Captcha/i.test(e)) {
+
+      //   process.exit();
+      // }
+      // console.log(e);
+      this.e = e;
       logger.info('Encontrado erro durante a execução');
       logger.info(red + `Error: ${e.message}` + reset);
       heartBeat = 0;
       // Estou reprocessando automaticamente no fim da fila.
+      console.log(message);
       await new GerenciadorFila().enviar(nomeFila, message);
+
       await FluxoController.finalizarConsultaPendente({
         msg: message,
         dataInicio,
-        dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
-        status: erro,
-        logs: log,
+        // dataTermino: new Date(Date.now() - 1000 * 3 * 60 * 60),
+        status: `Error: ${e.message}`,
+        logs: logger.allLog(),
         nomeRobo: message.NomeRobo,
         error: e,
       });
-      await sleep(1000);
+
+      await sleep(300);
     } finally {
-      await sleep(1000);
+      await sleep(300);
       logger.info('Reconhecendo mensagem ao RabbitMQ');
       ch.ack(msg);
       logger.info('Mensagem reconhecida');

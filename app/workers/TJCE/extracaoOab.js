@@ -27,7 +27,7 @@ const logarExecucao = async (execucao) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     console.table(message);
-    let logger = new Logger('info', 'logs/OabTJRS/OabTJRSInfo.log', {
+    let logger = new Logger('info', 'logs/TJCE/oab.log', {
       nomeRobo: `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJRS}`,
       NumeroOab: message.NumeroOab,
     });
@@ -50,38 +50,27 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      // logger.info('Enviando resposta ao BigData');
-      // await Helper.enviarFeedback(
-      //   extracao.prepararEnvio()
-      // ).catch((err) => {
-      //   console.log(err);
-      //   throw new Error(
-      //     `OabTJRS - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-      //   );
-      // });
-      // logger.info('Resposta enviada ao BigData');
       logger.info('Finalizando processo');
       await logarExecucao({
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: 'OK',
-        logs: logger.logs,
+        Status: 'OK',
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJRS,
       });
-
     } catch (e) {
       logger.info('Encontrado erro durante a execução');
-      logger.log('error',e);
+      logger.log('error', e);
       logger.info('Finalizando proceso');
       await logarExecucao({
         LogConsultaId: message.LogConsultaId,
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: e.message,
-        error: e.stack.replace(/\n+/, ' ').trim(),
-        logs: logger.logs,
+        Status: e.message,
+        Error: e.stack.replace(/\n+/, ' ').trim(),
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJRS,
       });
     } finally {

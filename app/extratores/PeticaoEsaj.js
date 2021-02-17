@@ -51,12 +51,6 @@ class PeticaoEsaj extends ExtratorPuppeteer {
    */
   async extrair(numeroProcesso, instancia = 1) {
     instancia = Number(instancia);
-    // await new CredenciaisAdvogados({
-    //   login: '103.890.517-64',
-    //   senha: 'Senh@TJ123',
-    //   estado: 'MS',
-    //   nome: 'Karine Impacta Teste',
-    // }).salvar();
 
     this.resposta = { numeroProcesso: numeroProcesso };
     this.numeroProcesso = numeroProcesso;
@@ -68,8 +62,10 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       this.numeroProcesso
     );
 
-    this.logger = new Logger('info', 'logs/TJCE/peticao.log', {
-      nomeRobo: `${enums.tipoConsulta.Peticao}.${enums.nomesRobos.TJMS}`,
+    let documentosSalvos;
+
+    this.logger = new Logger('info', `logs/${this.tribunal}/peticao.log`, {
+      nomeRobo: `${enums.tipoConsulta.Peticao}.${this.tribunal}`,
       NumeroDoProcesso: numeroProcesso,
     });
     try {
@@ -127,18 +123,13 @@ class PeticaoEsaj extends ExtratorPuppeteer {
 
         await this.fecharOutrasPaginas();
 
-        await this.baixarDocumentos(); //TODO descomentar essa parte =)
-
-        // await this.resgataDocumentos(); //TODO alterar essa função para resgatar todos os links de donwloads sem necessariamente ativar o download pelo chrome
-        // await sleep(100);
-        //
-        // await this.aguardaDownload();
-        // await sleep(100);
+        documentosSalvos = await this.baixarDocumentos();
 
         count++;
       } while (count < tam);
 
       this.resposta.sucesso = true;
+      this.nProcessos = documentosSalvos;
       this.logger.log(
         'info',
         `Finalizado processo de extração de documentos ${this.numeroProcesso}`
@@ -221,9 +212,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       '.'
     );
     numeroProcesso = numeroProcesso.replace(/\W/gm, '');
-    let url;
     this.logger.info(`Escolhendo url para ${instancia}`);
-    url = `${this.url}/show.do`;
 
     this.logger.info(
       `Acessando pagina de consulta da ${this.instancia}a instancia`
@@ -231,16 +220,40 @@ class PeticaoEsaj extends ExtratorPuppeteer {
 
     await Promise.all([
       this.page.waitForNavigation(),
-      this.page.click(
-        '#esajConteudoHome > table:nth-child(10) > tbody > tr > td.esajCelulaDescricaoServicos > a'
-      ),
+      this.page.evaluate(() => {
+        let aTags = document.querySelectorAll(
+          '.esajCelulaDescricaoServicos > a'
+        );
+        let searchText = /(Consultas?\sProcessua(l|is)|(Consultas?))/;
+        let found;
+
+        for (let i = 0; i < aTags.length; i++) {
+          if (searchText.test(aTags[i].textContent)) {
+            found = aTags[i];
+            break;
+          }
+        }
+        found.click();
+      }),
     ]);
 
     await Promise.all([
       this.page.waitForNavigation(),
-      this.page.click(
-        '#esajConteudoHome > table:nth-child(3) > tbody > tr > td.esajCelulaDescricaoServicos > a'
-      ),
+      this.page.evaluate(() => {
+        let aTags = document.querySelectorAll(
+          '.esajCelulaDescricaoServicos > a'
+        );
+        let searchText = /(Consulta\sde\s)?Processos\s((d\w)|(-))\s1.\s?Grau/;
+        let found;
+
+        for (let i = 0; i < aTags.length; i++) {
+          if (searchText.test(aTags[i].textContent)) {
+            found = aTags[i];
+            break;
+          }
+        }
+        found.click();
+      }),
     ]);
 
     // await this.acessar(url, this.pageOptions, false);
@@ -303,7 +316,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       let elements = $('#arvore_principal > ul > li > a');
       let tam = elements.length;
 
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < tam; i++) {
         if (
           elements[i].innerText === 'Decisão' ||
           elements[i].innerText === 'Despachos'
@@ -410,7 +423,10 @@ class PeticaoEsaj extends ExtratorPuppeteer {
     let documentoSalvo = [];
     for (let i = 1, tam = todosDocumentos.length; i <= tam; i++) {
       let selector = `#arvore_principal > ul > li:nth-child(${i}) > a`;
-      if (/(Decisão)|(Despachos?)/.test($(selector).text())) break;
+      let texto = $(selector).text();
+      if (/(Decisão)|(Despachos?)/.test(texto)) break; // caminho perfeito
+      if (/Ato\sOrdinatório/.test(texto)) break; // desvio
+      if (/Contestação/.test(texto)) break; //Fora do padrão normal
       documentos.push(selector);
     }
 
@@ -425,6 +441,7 @@ class PeticaoEsaj extends ExtratorPuppeteer {
       downloadPath: this.filePath,
     });
 
+    this.arquivosNome = [];
     for (let i = 0, tam = documentos.length; i < tam; i++) {
       let resposta = await this.downloadAndSave(documentos[i], $);
       documentoSalvo.push(resposta);
@@ -496,7 +513,11 @@ class PeticaoEsaj extends ExtratorPuppeteer {
   async salvarArquivo(nomeArquivo) {
     let path = Path.resolve(__dirname, '../downloads');
     nomeArquivo = nomeArquivo.replace(/\s/g, '_');
+    nomeArquivo = nomeArquivo.replace(/(\.)|(\/)/g, '_');
     nomeArquivo = Helper.removerAcento(nomeArquivo);
+    this.arquivosNome.push(nomeArquivo);
+    let qtd = this.arquivosNome.filter((e) => e === nomeArquivo).length;
+    nomeArquivo = qtd > 1 ? `${nomeArquivo}_${qtd}` : nomeArquivo;
     let filePath = `${path}/${nomeArquivo}.pdf`;
 
     this.logger.info(
@@ -518,10 +539,37 @@ class PeticaoTJMS extends PeticaoEsaj {
   }
 }
 
+class PeticaoTJSP extends PeticaoEsaj {
+  constructor() {
+    super({ url: 'https://esaj.tjsp.jus.br/cpopg' });
+    this.loginUrl = 'https://esaj.tjsp.jus.br/sajcas/login';
+    this.estado = 'SP';
+    this.tribunal = 'TJSP';
+  }
+}
+
+class PeticaoTJSC extends PeticaoEsaj {
+  constructor() {
+    super({ url: 'https://esaj.tjsc.jus.br/cpopg' });
+    this.loginUrl = 'https://esaj.tjsc.jus.br/sajcas/login';
+    this.estado = 'SC';
+    this.tribunal = 'TJSC';
+  }
+}
+
+class PeticaoTJCE extends PeticaoEsaj {
+  constructor() {
+    super({ url: 'https://esaj.tjce.jus.br/cpopg' });
+    this.loginUrl = 'https://esaj.tjce.jus.br/sajcas/login';
+    this.estado = 'CE';
+    this.tribunal = 'TJCE';
+  }
+}
+
 // (() => {
 //   new PeticaoTJMS()
 //     .extrair('0000135-74.2021.8.12.0031', 1)
 //     .then((r) => console.log(r));
 // })();
 
-module.exports.PeticaoTJMS = PeticaoTJMS;
+module.exports = { PeticaoTJMS, PeticaoTJSP, PeticaoTJSC, PeticaoTJCE };

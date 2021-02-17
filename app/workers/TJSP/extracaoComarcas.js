@@ -3,7 +3,7 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const sleep = require('await-sleep');
 const { CnjValidator } = require('../../lib/util');
-const { ProcessoTJSP } = require('../../extratores/temp_processo_tjsp');
+const extratores = require('../../extratores');
 const Comarca = require('../../models/schemas/comarcas');
 const moment = require('moment');
 
@@ -26,7 +26,7 @@ const moment = require('moment');
 
     await comarca.setStatus(2);
 
-    let ultimo=false;
+    let ultimo = false;
     let continuar;
     let processados = 0;
     let inicio = moment();
@@ -90,7 +90,7 @@ async function extrairNumeros(message, ultimo) {
 
   do {
     // console.log({count})
-    let extrator = new ProcessoTJSP('',false);
+    let extrator = new extratores.ProcessoTJSP();
 
     sequencial = `${Number(ultimoNumero[0]) + count}`;
     // console.log({ sequencial })
@@ -106,7 +106,7 @@ async function extrairNumeros(message, ultimo) {
     extracao = await extrator.extrair(numero, null, 1);
 
     // console.log({ count, sequencial,ultimoNumero, numero, mod })
-
+    console.log('='.repeat(process.stdout.columns));
     if (erroEncontrado && !extracao.sucesso) {
       return { continuar: false, ultimo: anterior, count: count - 1 };
     }
@@ -118,7 +118,7 @@ async function extrairNumeros(message, ultimo) {
     // console.log({detalhes: extracao.detalhes});
     // console.log({sucesso: extracao.sucesso});
 
-    if (!extracao.sucesso && (extracao.detalhes !== 'Senha necessaria'))
+    if (!extracao.sucesso && extracao.detalhes !== 'Senha necessaria')
       erroEncontrado = !extracao.sucesso;
 
     // console.log({erroEncontrado})

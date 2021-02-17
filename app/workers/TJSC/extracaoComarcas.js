@@ -3,7 +3,7 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const sleep = require('await-sleep');
 const { CnjValidator } = require('../../lib/util');
-const { ProcessoTJSC } = require('../../extratores/ProcessoTJSC');
+const extratores = require('../../extratores');
 const Comarca = require('../../models/schemas/comarcas');
 const moment = require('moment');
 
@@ -26,7 +26,7 @@ const moment = require('moment');
 
     await comarca.setStatus(2);
 
-    let ultimo=false;
+    let ultimo = false;
     let continuar;
     let processados = 0;
     let inicio = moment();
@@ -88,7 +88,10 @@ async function extrairNumeros(message, ultimo) {
   ultimoNumero = ultimoNumero.split(/\D/g);
 
   do {
-    let extrator = new ProcessoTJSC('https://esaj.tjsc.jus.br/cpopg', false);
+    let extrator = new extratores.ProcessoTJSC(
+      'https://esaj.tjsc.jus.br/cpopg',
+      false
+    );
 
     sequencial = `${Number(ultimoNumero[0]) + count}`;
 
@@ -116,7 +119,7 @@ async function extrairNumeros(message, ultimo) {
     // console.log({detalhes: extracao.detalhes});
     // console.log({sucesso: extracao.sucesso});
 
-    if (!extracao.sucesso && (extracao.detalhes !== 'Senha necessaria'))
+    if (!extracao.sucesso && extracao.detalhes !== 'Senha necessaria')
       erroEncontrado = !extracao.sucesso;
 
     // console.log({erroEncontrado})

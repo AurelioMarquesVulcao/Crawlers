@@ -32,7 +32,7 @@ class EsajParser extends BaseParser {
       envolvidos,
       oabs,
       qtdAndamentos: andamentos.length,
-      origemExtracao: 'ProcessoTJMS',
+      origemExtracao: this.origemExtracao,
       status,
       isBaixa,
       metadados,
@@ -124,13 +124,14 @@ class EsajParser extends BaseParser {
    * @return {{assunto: [string], classe: string, foro: string, vara: string}}
    */
   extrairCapa($) {
+    let uf = this.uf;
     let classe = this.extrairClasse($);
     let assunto = this.extrairAssunto($);
     let foro = this.extrairForo($);
     let vara = this.extrairVara($);
     let audiencia = this.extrairAudiencias($);
 
-    return { classe, assunto, foro, vara };
+    return { classe, assunto, foro, vara, uf, audiencia };
   }
 
   extrairClasse($) {
@@ -339,9 +340,229 @@ class TJMSParser extends EsajParser {
   constructor() {
     super();
     this.url = 'https://esaj.tjms.jus.br';
+    this.uf = 'MS';
+    this.origemExtracao = 'ProcessoTJMS';
   }
 }
 
+class TJSPParser extends EsajParser {
+  constructor() {
+    super();
+    this.url = 'http://esaj.tjsp.jus.br';
+    this.uf = 'SP';
+    this.origemExtracao = 'ProcessoTJSP';
+  }
+}
+
+class TJSCParser extends EsajParser {
+  constructor() {
+    super();
+    this.url = 'http://esaj.tjsc.jus.br';
+    this.uf = 'SC';
+    this.origemExtracao = 'ProcessoTJSC';
+  }
+
+  extrairDetalhes($) {
+    let selector =
+      'body > div.unj-entity-header > div.unj-entity-header__summary > div > ' +
+      'div:nth-child(1) > div > span.unj-larger-1';
+    let numeroProcesso = $(selector).text().trim();
+
+    return Processo.identificarDetalhes(numeroProcesso);
+  }
+
+  extrairForo($) {
+    let comarca;
+
+    comarca = $(
+      'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-2.mb-2 > div'
+    )
+      .text()
+      .strip();
+
+    if (comarca === '') {
+      comarca = $(
+        'body > div.div-conteudo.container.unj-mb-40 > table:nth-child(12) > tbody > tr > td:nth-child(2)'
+      )
+        .text()
+        .strip();
+    }
+
+    return comarca;
+  }
+
+  extrairAssunto($) {
+    let assuntos = [];
+    let assunto;
+
+    assunto = $(
+      'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-lg-2.col-xl-3.mb-3 > div'
+    )
+      .text()
+      .strip();
+    if (assunto === '') {
+      assunto = $(
+        'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div.col-md-4 > div > span'
+      )
+        .text()
+        .strip();
+    }
+
+    assuntos.push(assunto);
+    return assuntos;
+  }
+
+  extrairClasse($) {
+    let classe;
+
+    classe = removerAcentos(
+      $(
+        'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div:nth-child(1) > div'
+      )
+        .text()
+        .strip()
+    );
+
+    return classe;
+  }
+
+  extrairEnvolvidos($) {
+    let envolvidos = [];
+    let table;
+    let selector;
+
+    table = $('#tableTodasPartes > tbody > tr');
+    selector = '#tableTodasPartes';
+    if (table.length === 0) {
+      table = $('#tablePartesPrincipais > tbody > tr');
+      selector = '#tablePartesPrincipais';
+    }
+
+    // pegar personagens
+    table.map((index) => {
+      let envolvido = { tipo: '', nome: '' };
+      let advogados;
+
+      // Extracao
+      envolvido.tipo = $(
+        `${selector} > tbody > tr:nth-child(${
+          index + 1
+        }) > td:nth-child(1).label > span`
+      )[0].children[0].data.strip();
+      envolvido.nome = $(
+        `${selector} > tbody > tr:nth-child(${index + 1}) > td:nth-child(2)`
+      )[0].children[0].data.strip();
+      advogados = this.recuperaAdvogados(index, $, selector);
+
+      // Tratamento
+      envolvido.tipo = envolvido.tipo.replace(':', '').split(/\W/)[0];
+      envolvido.tipo = traduzir(envolvido.tipo);
+      // if (tradutor[envolvido.tipo]) envolvido.tipo = tradutor[envolvido.tipo];
+      envolvido.nome = removerAcentos(envolvido.nome.trim());
+
+      // Atribuição
+      envolvidos.push(envolvido);
+
+      if (advogados) envolvidos = [...envolvidos, ...advogados];
+    });
+
+    // pegar os advogados
+
+    envolvidos = this.filtrarUnicosLista(envolvidos);
+
+    return envolvidos;
+  }
+
+  recuperaAdvogados(upperIndex, $, selector) {
+    let advogados = [];
+    let linha;
+
+    selector = `${selector} > tbody > tr:nth-child(${
+      upperIndex + 1
+    }) > td:nth-child(2)`;
+
+    linha = $(selector).text();
+    linha = linha.match(/^[\t ]*(?<tipo>\w+):\W+(?<nome>.+)/gm);
+    if (linha) {
+      advogados = linha.map((element, index) => {
+        let regex = `(?<tipo>.+):\\s(?<nome>.+)`;
+        let adv = {
+          tipo: '',
+          nome: '',
+        };
+        let oab;
+        let resultado = re.exec(element.replace('\n', ' '), re(regex));
+        // Extracao
+        if (resultado) {
+          adv.tipo = traduzir(resultado.tipo.strip());
+          adv.nome = resultado.nome.strip();
+
+          oab = $(selector + `> input[type=hidden]:nth-child(${index + 3})`);
+          if (oab.length === 0) {
+            oab = this.resgatarOab(adv.nome, $);
+          } else {
+            oab = oab.attr('value');
+          }
+          // Tratamento
+          adv.nome = removerAcentos(adv.nome);
+          if (oab) adv.nome = `(${oab}) ${adv.nome}`;
+
+          return adv;
+        }
+      });
+    }
+    return advogados.filter((x) => Boolean(x));
+  }
+
+  resgatarOab(nome, $) {
+    let movimentacoesEmTexto;
+    let advMatch;
+    let oab;
+
+    movimentacoesEmTexto = $('#tabelaTodasMovimentacoes').text();
+    advMatch = re.exec(
+      movimentacoesEmTexto,
+      re(`(?<nome>${nome})\\s\\(OAB\\s(?<oab>.+)\\)`)
+    );
+    if (advMatch) {
+      oab = advMatch.oab;
+      //padrao do site: <codigo><tipo?>/<tipo?><seccional>
+      oab = re.exec(
+        oab,
+        re(`(?<codigo>[0-9]+)(?<tipo>[A-Z]?.[A-Z]?)(?<seccional>[A-Z]{2})`)
+      );
+
+      oab = `${oab.codigo}${oab.tipo.replace(/\W/, '')}${oab.seccional}`;
+      return oab;
+    }
+    //Se existir verifica se existe uma oab escrita
+    //Se existir converte esta oab para o modelo <codigo><tipo><seccional>
+    //Retorna oab
+    return null;
+  }
+
+  extrairJuiz($) {
+    let selector =
+      'body > div.unj-entity-header > div.unj-entity-header__summary > div > div:nth-child(2) > div:nth-child(5)';
+    let juiz = this.tratarTexto($(selector).text().strip());
+    juiz = /juiz+/gim.test(juiz) ? juiz : null;
+    juiz = juiz.replace(/juiz/gim, '').strip();
+    return { juiz };
+  }
+}
+
+// class TJCEParser extends EsajParser {
+//   constructor() {
+//     super();
+//     this.url = 'https://esaj.tjms.jus.br';
+//     this.uf = 'MS';
+//     this.origemExtracao = 'ProcessoTJMS';
+//   }
+// }
+
 module.exports = {
   TJMSParser,
+  TJSPParser,
+  TJSCParser,
+  // TJCEParser,
 };

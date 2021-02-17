@@ -65,23 +65,22 @@ const logarExecucao = async (execucao) => {
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: 'OK',
-        logs: logger.logs,
+        Status: 'OK',
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJRS,
       });
-
     } catch (e) {
       logger.info('Encontrado erro durante a execução');
-      logger.log('error',e);
+      logger.log('error', e);
       logger.info('Finalizando proceso');
       await logarExecucao({
         LogConsultaId: message.LogConsultaId,
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: e.message,
-        error: e.stack.replace(/\n+/, ' ').trim(),
-        logs: logger.logs,
+        Status: e.message,
+        Error: e.stack.replace(/\n+/, ' ').trim(),
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJRS,
       });
     } finally {

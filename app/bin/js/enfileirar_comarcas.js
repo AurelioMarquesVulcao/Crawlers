@@ -16,7 +16,7 @@ const enfileirar_comarcas = async () => {
   };
 
   let comarcas = await Comarca.find(query);
-
+  console.log({ comarcas: comarcas.length });
   comarcas = comarcas.map((c) => {
     return {
       _id: c._id,
@@ -26,7 +26,10 @@ const enfileirar_comarcas = async () => {
     };
   });
 
-  await new GerenciadorFila().enviarLista('comarcas.TJMS.extracao', comarcas);
+  await new GerenciadorFila().enviarLista(
+    `comarcas.${tribunalArgv}.extracao`,
+    comarcas
+  );
 
   await sleep(15000);
 

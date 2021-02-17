@@ -1,8 +1,8 @@
 // console.log(process.argv[0],process.argv[1],process.argv[2],process.argv[3]);
 // console.log(process.argv);
 const mongoose = require('mongoose');
-const { LogDownload } = require('../../../models/schemas/jte');
-const { enums } = require('../../../configs/enums');
+const { LogDownload } = require('../../../../models/schemas/jte');
+const { enums } = require('../../../../configs/enums');
 // liga ao banco de dados
 
 

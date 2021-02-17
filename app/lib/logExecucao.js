@@ -15,6 +15,18 @@ let mapaEstadoRobo = {
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {
+  /**
+   * @param {Object} execucao
+   * @param {String} execucao.LogConsultaId
+   * @param {Object} execucao.Mensagem
+   * @param {Date} execucao.DataInicio
+   * @param {Date} execucao.DataTermino
+   * @param {String} execucao.Status
+   * @param {String|null} execucao.Error
+   * @param {[String]} execucao.Logs
+   * @param {String} execucao.NomeRobo
+   * @return {Promise<void>}
+   */
   static async salvar(execucao) {
     const log = {
       status: execucao.Status,
@@ -25,8 +37,17 @@ module.exports.LogExecucao = class LogExecucao {
     delete execucao['status'];
     delete execucao['error'];
     delete execucao['logs'];
+    
+    let id = execucao.Mensagem.ExecucaoConsultaId
+    let find = await ExecucaoConsulta.findOne({ _id: id });
+    if (!find.Tentativas){
+      execucao["Tentativas"]=0;
+    }
+    if(find.Tentativas >=0){
+      execucao["Tentativas"]=find.Tentativas+1
+    }
     await ExecucaoConsulta.updateOne(
-      { _id: execucao.Mensagem.ExecucaoConsultaId },
+      { _id: id },
       {
         ...execucao,
         Log: log,
@@ -68,7 +89,6 @@ module.exports.LogExecucao = class LogExecucao {
         : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
 
       const execucao = {
-        ConsultaCadastradaId: mongoose.ObjectId(consultaPendente._id),
         NomeRobo: nomeRobo,
         Log: [
           {
@@ -78,10 +98,18 @@ module.exports.LogExecucao = class LogExecucao {
         Instancia: mensagem.Instancia,
         Mensagem: [mensagem],
       };
+
+      if (consultaPendente._id) {
+        execucao.ConsultaCadastradaId = mongoose.Types.ObjectId(
+          consultaPendente._id
+        );
+        mensagem.ConsultaCadastradaId = consultaPendente._id;
+      }
+
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();
       mensagem.ExecucaoConsultaId = ex._id;
-      mensagem.ConsultaCadastradaId = consultaPendente._id;
+
       gf.enviar(nomeFila, mensagem);
 
       return {

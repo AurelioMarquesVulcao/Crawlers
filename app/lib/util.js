@@ -387,8 +387,17 @@ class Logger {
     this.info(log);
     return this.fileLogger.log(level, `[${moment().format()}] ${log}`);
   }
-  allLog(){
-    return this.logs
+  allLog() {
+    return this.logs;
+  }
+  resetLog() {
+    this.logs=[]
+  }
+
+  addLog(logs) {
+    for (let i = 0; i < logs.length; i++) {
+      this.logs.push(logs[i]);
+    }
   }
 }
 
@@ -429,11 +438,11 @@ class Cnj {
    * Cria a mensagem a ser enviada para a fila
    * @param {string} numero
    */
-  static criaPostJTE(numero, estado="Principal") {
+  static criaPostJTE(numero, estado = 'Principal') {
     // sequencial true serve para não atualizar a ultima comarmarca baixada no controle de comarcas.
     if (numero.length != 20) {
       if (numero.substr(0, 1) != 0) {
-        numero = numero.replace("0","");
+        numero = numero.replace('0', '');
       } else {
         numero = numero.slice(-20);
       }
@@ -450,10 +459,10 @@ class Cnj {
    */
   static organizaCNJ(ultimoSequencial, Tribunal, unidadeOrigem) {
     // console.log(ultimoSequencial, Tribunal, unidadeOrigem);
-    let sequencial = this.completaNumero(ultimoSequencial, "ultimoSequencial");
-    let tribunal = this.completaNumero(Tribunal, "Tribunal");
-    let origem = this.completaNumero(unidadeOrigem, "unidadeOrigem");
-    return `${sequencial}00${new Date().getFullYear()}5${tribunal}${origem}`
+    let sequencial = this.completaNumero(ultimoSequencial, 'ultimoSequencial');
+    let tribunal = this.completaNumero(Tribunal, 'Tribunal');
+    let origem = this.completaNumero(unidadeOrigem, 'unidadeOrigem');
+    return `${sequencial}00${new Date().getFullYear()}5${tribunal}${origem}`;
   }
 
   /**

@@ -9,8 +9,8 @@ class EsajParser extends BaseParser {
     const $ = cheerio.load(body);
     const dataAtual = moment().format('YYYY-MM-DD');
 
-    let capa = this.extrairCapa($);
     let detalhes = this.extrairDetalhes($);
+    let capa = this.extrairCapa($, detalhes);
     let envolvidos = this.extrairEnvolvidos($);
     let oabs = this.extrairOabs(envolvidos);
     let andamentos = this.extrairAndamentos(
@@ -58,9 +58,7 @@ class EsajParser extends BaseParser {
       let listaNomesEAdvogados = nomeTd.split(/\s*\n\s*\n\s*\n\s*\n\s*\n\s*/);
 
       let listaNomes = listaNomesEAdvogados.filter((e) => {
-        if (!/\w/.test(e)) return false;
-        if (/Advogad[o, a]:\s/gm.test(e)) return false;
-        return true;
+        return !/\w/.test(e) ? false : !/Advogad[o, a]:\s/gm.test(e);
       });
 
       partes = [...partes, ...this.extrairNomeParte(tipo, listaNomes)];
@@ -123,19 +121,31 @@ class EsajParser extends BaseParser {
    * @param {cheerio.load} $
    * @return {{assunto: [string], classe: string, foro: string, vara: string}}
    */
-  extrairCapa($) {
+  extrairCapa($, detalhes) {
     let uf = this.uf;
     let classe = this.extrairClasse($);
+    let comarca = this.extrairComarca($, detalhes);
     let assunto = this.extrairAssunto($);
     let foro = this.extrairForo($);
     let vara = this.extrairVara($);
     let audiencia = this.extrairAudiencias($);
 
-    return { classe, assunto, foro, vara, uf, audiencia };
+    return { classe, comarca, assunto, foro, vara, uf, audiencia };
   }
 
   extrairClasse($) {
     return $('#areaProcesso').text().trim();
+  }
+
+  extrairComarca($, detalhes) {
+    if (this.listaComarcas) return this.listaComarcas[detalhes.origem];
+
+    let comarcaRaw = $('#foroProcesso').text().trim();
+    let comarcaForumRegex = `(?<comarca>.+)\\s-\\s(?<foro>.+)`;
+
+    let comarca = re.exec(comarcaRaw, re(comarcaForumRegex)).comarca;
+
+    return /\w+/g.test(comarca) ? comarca : null;
   }
 
   extrairAssunto($) {
@@ -143,7 +153,9 @@ class EsajParser extends BaseParser {
   }
 
   extrairForo($) {
-    return $('#foroProcesso').text().trim();
+    let foroRaw = $('#foroProcesso').text().trim();
+
+    return /\w+/g.test(foroRaw) ? foroRaw : null;
   }
 
   extrairVara($) {
@@ -213,7 +225,7 @@ class EsajParser extends BaseParser {
       let hash = Andamento.criarHash(andamento);
 
       if (andamentosHash.indexOf(hash) !== -1) {
-        let count = andamentosHash.filter((element) => element == hash).length;
+        let count = andamentosHash.filter((element) => element === hash).length;
         andamento.descricao = `${andamento.descricao} [${count + 1}]`;
       }
 
@@ -271,7 +283,7 @@ class EsajParser extends BaseParser {
   /**
    * Extrai as audiencias do processo
    * @param {cheerio.load} $
-   * @return {*[]|{tipo: (*|jQuery), data: string}[]}
+   * @return {[]}
    */
   extrairAudiencias($) {
     let data = $(
@@ -284,7 +296,6 @@ class EsajParser extends BaseParser {
         'tr.fundoClaro > td'
       )[1]
     ).text();
-    let audiencia;
 
     if (/\d/.test(data) && /\w/.test(tipo)) {
       data = data.strip();
@@ -351,6 +362,7 @@ class TJSPParser extends EsajParser {
     this.url = 'http://esaj.tjsp.jus.br';
     this.uf = 'SP';
     this.origemExtracao = 'ProcessoTJSP';
+    this.listaComarcas = require('../assets/comarcas_sp.json');
   }
 }
 
@@ -560,9 +572,19 @@ class TJSCParser extends EsajParser {
 //   }
 // }
 
+class TJAMParser extends EsajParser {
+  constructor() {
+    super();
+    this.url = 'https://esaj.tjam.jus.br';
+    this.uf = 'AM';
+    this.origemExtracao = 'ProcessoTJAM';
+  }
+}
+
 module.exports = {
   TJMSParser,
   TJSPParser,
   TJSCParser,
   // TJCEParser,
+  TJAMParser,
 };

@@ -143,7 +143,7 @@ class AntiCaptchaHandler {
     if (this.testaErro(objResponse.responseBody).valido) {
       do {
         await sleep(espera);
-
+        console.log(`\tAdquirindo resposta: ${tentativa}/5`);
         objResponse = await robo.acessar({
           url: 'http://api.anti-captcha.com/getTaskResult',
           method: 'POST',
@@ -169,6 +169,7 @@ class AntiCaptchaHandler {
         }
 
         if (objResponse.responseBody.status == 'ready') {
+          console.log('\tCaptcha Pronto');
           return {
             sucesso: true,
             captchaId: captchaId,
@@ -176,6 +177,12 @@ class AntiCaptchaHandler {
             body: objResponse.responseBody,
           };
         }
+        console.log(
+          `\tResposta não esta pronta, aguardando mais ${
+            espera / 1000
+          } segundos`
+        );
+        tentativa++;
       } while (tentativa < 5);
     }
 

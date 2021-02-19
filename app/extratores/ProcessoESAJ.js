@@ -281,8 +281,8 @@ class ProcessoESAJ extends ExtratorBase {
     const $ = cheerio.load(body);
     const mensagemRetornoSelector = '#mensagemRetorno';
     let mensagemRetornoText = $(mensagemRetornoSelector).text();
-    const tabelaMovimentacoesSelector = '#tabelaTodasMovimentacoes'; //TODO checar selector
-    const senhaProcessoSelector = '#senhaProcesso'; //TODO checar selector
+    const tabelaMovimentacoesSelector = '#tabelaTodasMovimentacoes';
+    const senhaProcessoSelector = '#senhaProcesso';
 
     let regex = /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/;
 

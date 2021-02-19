@@ -3,7 +3,7 @@ const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
-const { Logger } = require('../../lib/util');
+const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
 const sleep = require('await-sleep');
 
@@ -22,16 +22,18 @@ const logarExecucao = async (execucao) => {
   });
 
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSP}.extracao.novos`;
+  let execucaoAnterior = {};
 
-  new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+  new GerenciadorFila(null, 1).consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
-    let logger = new Logger('info', 'logs/ProcessoTJSP/ProcessoTJSPInfo.log', {
-      nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSP}`,
-      NumeroOab: message.NumeroProcesso,
+    let logger = new Logger('info', 'logs/TJSP/processo.log', {
+      nomeRobo: `${enums.tipoConsulta.Processo}${enums.nomesRobos.TJSP}`,
+      NumeroDoProcesso: message.NumeroProcesso,
     });
     console.table(message);
     try {
+      console.log({ execucaoAnterior1: execucaoAnterior });
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
@@ -40,8 +42,12 @@ const logarExecucao = async (execucao) => {
         message.NumeroProcesso,
         message.NumeroOab,
         message.Instancia,
-        message
+        message,
+        execucaoAnterior
       );
+      execucaoAnterior = resultadoExtracao.execucaoAnterior;
+      console.log({ execucaoAnterior2: execucaoAnterior });
+
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(
@@ -51,17 +57,6 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      // logger.info('Enviando resposta ao BigData');
-      // await Helper.enviarFeedback(
-      //   extracao.prepararEnvio()
-      // ).catch((err) => {
-      //   console.log(err);
-      //   throw new Error(
-      //     `ProcessoTJSP - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-      //   );
-      // });
-      // logger.info('Resposta enviada ao BigData');
-      console.log('\n\n');
       await logarExecucao({
         Mensagem: message,
         DataInicio: dataInicio,

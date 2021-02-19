@@ -16,62 +16,108 @@ class OabESAJ extends ExtratorBase {
     this.robo = new Robo();
   }
 
-  async extrair(numeroOab, cadastroConsultaId) {
+  async extrair(numeroOab, cadastroConsultaId, execucaoAnterior = {}) {
     this.numeroOab = /\w{2}/.test(numeroOab)
       ? numeroOab
       : `${numeroOab}${this.estado}`;
     this.setLogger();
     this.setCadastroConsulta(cadastroConsultaId);
 
+    this.resposta = {};
+
+    this.resposta.execucaoAnterior = {
+      cookies: '',
+      captchaSettings: '',
+    };
+
     console.log(this.cadastroConsulta);
     let objResponse;
     let primeiroAcesso;
-    // let tentativa = 1;
-    // let limite = 5;
+    let tentativa = 1;
+    let limite = 5;
     let processosList;
+    let erroCaptcha = false;
+
+    let uuidCaptcha;
+    let gResponse;
 
     try {
       primeiroAcesso = await this.fazerPrimeiroAcesso();
 
       if (!primeiroAcesso.sucesso) process.exit(0);
 
-      objResponse = await this.acessarPaginaConsulta();
+      objResponse = await this.acessarPaginaConsulta(execucaoAnterior);
 
       let captchaExiste = this.verificaCaptcha(objResponse.responseBody);
 
-      if (captchaExiste) {
-        this.logger.info('Captcha detectado');
-        // do {
-        this.logger.info(`Tentativa de acesso [${this.tentativa}]`);
+      do {
+        if (captchaExiste) {
+          this.logger.info('Captcha detectado');
+          // do {
+          this.logger.info(`Tentativa de acesso [${this.tentativa}]`);
 
-        let uuidCaptcha = await this.consultarUUID();
-        let gResponse = await this.resolverCaptcha();
+          if (
+            Object.keys(execucaoAnterior).length &&
+            execucaoAnterior.captchaSettings.uuidCaptcha &&
+            execucaoAnterior.captchaSettings.gResponse &&
+            !erroCaptcha
+          ) {
+            this.logger.info('Variaveis de execução anterior foram detectadas');
+            uuidCaptcha = execucaoAnterior.captchaSettings.uuidCaptcha;
+            gResponse = execucaoAnterior.captchaSettings.gResponse;
+          } else {
+            this.logger.info(
+              'Variaveis de execução anterior não foram detectadas'
+            );
+            uuidCaptcha = await this.consultarUUID();
+            gResponse = await this.resolverCaptcha();
+          }
 
-        objResponse = await this.acessarPaginaConsulta(uuidCaptcha, gResponse);
+          this.captchaSettings = { uuidCaptcha, gResponse };
 
-        // break;
-        // } while (tentativa === limite);
-      } else {
-        objResponse = await this.acessarPaginaConsulta();
-      }
+          objResponse = await this.acessarPaginaConsulta2(
+            uuidCaptcha,
+            gResponse
+          );
 
-      processosList = await this.extrairPaginas(objResponse.responseBody);
+          // break;
+          // } while (tentativa === limite);
+        } else {
+          objResponse = await this.acessarPaginaConsulta({});
+        }
+
+        processosList = await this.extrairPaginas(objResponse.responseBody);
+        if (processosList.length > 0) {
+          break;
+        }
+
+        erroCaptcha = true;
+        tentativa++;
+      } while (tentativa < limite);
+
+      if (tentativa === limite)
+        throw new Error('Limite de tentativas excedidos');
+
       processosList = await this.verificaNovos(processosList);
 
       console.log({ processosList: processosList.length });
 
       this.resultado = await this.enfileirarProcessos(processosList);
 
-      this.resposta = {
-        sucesso: true,
-        nProcesso: this.resultados,
-      };
+      this.resposta.sucesso = true;
+      this.resposta.nProcesso = this.resultados;
     } catch (e) {
       console.log(e);
       this.logger.log('error', String(e));
-      this.resposta = { sucesso: false, detalhes: e.message };
+      this.resposta.sucesso = false;
+      this.resposta.detalhes = e.message;
     } finally {
+      this.resposta.execucaoAnterior = {
+        cookies: this.robo.cookies,
+        captchaSettings: this.captchaSettings,
+      };
       this.resposta.logs = this.logger.logs;
+
       return this.resposta;
     }
   }
@@ -157,8 +203,17 @@ class OabESAJ extends ExtratorBase {
    * Acessar pagina de consulta
    * @return {Promise<{Object}>}
    */
-  async acessarPaginaConsulta() {
+  async acessarPaginaConsulta(execucaoAnterior) {
+    let cookies;
     this.logger.info('Entrando na pagina de consulta');
+    console.log(execucaoAnterior);
+
+    if (Object.keys(execucaoAnterior).length && execucaoAnterior.cookies) {
+      console.log('oi');
+      cookies = execucaoAnterior.cookies;
+    }
+
+    if (cookies && Object.keys(cookies).length) this.robo.cookies = cookies;
 
     let options = {
       url: `${this.url}/search.do`,
@@ -199,9 +254,16 @@ class OabESAJ extends ExtratorBase {
    * @return {Promise<*>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, this.constructor.name, {
-      numeroDoProcesso: this.numeroProcesso,
-    });
+    const ch = new CaptchaHandler(
+      5,
+      10000,
+      this.constructor.name,
+      {
+        numeroDaOab: this.numeroOab,
+      },
+      'Oab',
+      this.estado
+    );
 
     this.logger.info('Tentando resolver captcha');
 
@@ -226,7 +288,8 @@ class OabESAJ extends ExtratorBase {
    * @param {string|null} gResponse
    * @return {Promise<{Object}>}
    */
-  async acessarPaginaConsulta(uuid, gResponse) {
+  async acessarPaginaConsulta2(uuid, gResponse) {
+    console.log({ uuid, gResponse });
     this.logger.info('Tentando acessar pagina da consulta de OAB');
     let options = {
       url: `${this.url}/search.do`,
@@ -437,7 +500,7 @@ class OabTJCE extends OabESAJ {
     super('https://esaj.tjce.jus.br/cpopg', false);
     this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3';
     this.tribunal = 'TJCE';
-    this.estado = 'SC';
+    this.estado = 'CE';
   }
 }
 

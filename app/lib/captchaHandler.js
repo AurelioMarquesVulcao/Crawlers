@@ -15,6 +15,7 @@ imagetyperzapi.set_access_key(IMAGETYPERZ_KEY);
 
 const { Robo } = require('../lib/robo');
 const { LogCaptcha } = require('../models/schemas/logCaptcha');
+const { CotaMensal } = require('../models');
 
 const {
   AntiCaptchaResponseException,
@@ -635,13 +636,17 @@ class ImageTyperZHandler {
  * @param {Number} espera tempo de espera entre uma chamada de captcha e outra
  * @param {String} robo nome do robo
  * @param {{numeroDoProcesso: String, numeroDaOab: String}} identificador
+ * @param {string} tipo Processo Peticao Oab
+ * @param {string} uf codigo do estado /[A-Z]{2}/
  */
 module.exports.CaptchaHandler = class CaptchaHandler {
-  constructor(tentativas = 5, espera = 5000, robo, identificador) {
+  constructor(tentativas = 5, espera = 5000, robo, identificador, tipo, uf) {
     this.tentativas = tentativas;
     this.espera = espera;
     this.robo = robo;
     this.identificador = identificador;
+    this.tipo = tipo;
+    this.uf = uf;
   }
 
   async resolveRecaptchaV2(website, websiteKey, pageAction, userAgent) {
@@ -651,6 +656,15 @@ module.exports.CaptchaHandler = class CaptchaHandler {
       sucesso: false,
       detalhes: [],
     };
+
+    this.cota = await CotaMensal.getCotaMensal(this.uf);
+
+    let prosseguirComResolucao = await this.cota.liberarUsoCota();
+
+    if (!prosseguirComResolucao) {
+      console.log('NÃO HÁ DISPONIBILIDADE DE COTA PARA O ESTADO');
+      process.exit();
+    }
 
     let logCaptcha = {
       Tipo: 'ReCaptchaV2',
@@ -698,6 +712,10 @@ module.exports.CaptchaHandler = class CaptchaHandler {
           logCaptcha.Servico = 'AntiCaptcha';
           logCaptcha.CaptchaBody = resultado.body;
           new LogCaptcha(logCaptcha).save();
+          await this.cota.cadastrarConsumo(
+            this.tipo,
+            Number(logCaptcha.CaptchaBody.cost)
+          );
           return resultado;
         }
         tentativas++;
@@ -727,6 +745,7 @@ module.exports.CaptchaHandler = class CaptchaHandler {
           logCaptcha.Servico = 'imagetyperz';
           logCaptcha.CaptchaBody = resultado.body;
           new LogCaptcha(logCaptcha).save();
+          await this.cota.cadastrarConsumo(this.tipo, 0.0021);
           return resultado;
         }
         tentativas++;
@@ -809,6 +828,10 @@ module.exports.CaptchaHandler = class CaptchaHandler {
         logCaptcha.Servico = 'AntiCaptcha';
         logCaptcha.CaptchaBody = response.data;
         new LogCaptcha(logCaptcha).save();
+        await this.cota.cadastrarConsumo(
+          this.tipo,
+          Number(logCaptcha.CaptchaBody.cost)
+        );
         return { sucesso: true, resposta: response.data.solution.text };
       }
     } while (tentativa < 6);
@@ -878,6 +901,10 @@ module.exports.CaptchaHandler = class CaptchaHandler {
         logCaptcha.Servico = 'AntiCaptcha';
         logCaptcha.CaptchaBody = response.data;
         new LogCaptcha(logCaptcha).save();
+        await this.cota.cadastrarConsumo(
+          this.tipo,
+          Number(logCaptcha.CaptchaBody.cost)
+        );
         return { sucesso: true, resposta: response.data.Response };
       }
     } while (tentativa < 6);

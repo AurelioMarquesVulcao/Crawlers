@@ -531,7 +531,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jteMonitoria/workerCnjSequencial.js --no-daemon
+    command: pm2-runtime workers/JTEMonitoria/workerCnjSequencial.js --no-daemon
     logging:
       driver: 'json-file'
       options:

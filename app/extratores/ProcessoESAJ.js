@@ -212,10 +212,17 @@ class ProcessoESAJ extends ExtratorBase {
    * @returns {Promise<String>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, this.constructor.name, {
-      numeroDoProcesso: this.detalhes.numeroProcessoMascara,
-      numeroDaOab: null,
-    });
+    const ch = new CaptchaHandler(
+      5,
+      10000,
+      this.constructor.name,
+      {
+        numeroDoProcesso: this.detalhes.numeroProcessoMascara,
+        numeroDaOab: null,
+      },
+      'Processo',
+      this.uf
+    );
 
     this.logger.info('Tentando resolver captcha');
     /**
@@ -335,6 +342,7 @@ class ProcessoTJMS extends ProcessoESAJ {
   constructor() {
     super('https://esaj.tjms.jus.br/cpopg5', false);
     this.parser = new parsers.TJMSParser();
+    this.uf = 'MS';
   }
 
   setLogger(tribunal = '') {
@@ -347,6 +355,7 @@ class ProcessoTJSP extends ProcessoESAJ {
     super('https://esaj.tjsp.jus.br/cpopg', false);
     this.parser = new parsers.TJSPParser();
     this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
+    this.uf = 'SP';
   }
 
   setLogger(tribunal = '') {
@@ -359,6 +368,7 @@ class ProcessoTJSC extends ProcessoESAJ {
     super('https://esaj.tjsc.jus.br/cpopg', false);
     this.parser = new parsers.TJSCParser();
     this.dataSiteKey = '6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL';
+    this.uf = 'SC';
   }
 
   setLogger(tribunal) {
@@ -371,6 +381,7 @@ class ProcessoTJCE extends ProcessoESAJ {
     super('http://esaj.tjce.jus.br/cpopg', false);
     this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3';
     this.parser = new TJCEParser(); // TODO quando o site mudar (provavelmente em breve) aplicar o novo parser
+    this.uf = 'CE';
   }
 
   setLogger(tribunal) {

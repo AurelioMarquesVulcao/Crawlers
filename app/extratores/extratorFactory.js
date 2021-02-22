@@ -64,6 +64,10 @@ class ExtratorFactory {
       extrator = new extratores.ProcessoTJSC();
     }
 
+    if (/peticao.TJSC/.test(fila)) {
+      extrator = new extratores.PeticaoTJSC()
+    }
+
     if (/oab.TJMG/.test(fila)) {
       extrator = new OabTJMG(
         'https://www4.tjmg.jus.br/juridico/sf/index_oab.jsp',

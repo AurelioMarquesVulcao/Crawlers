@@ -75,7 +75,7 @@ class OabESAJ extends ExtratorBase {
 
           this.captchaSettings = { uuidCaptcha, gResponse };
 
-          objResponse = await this.acessarPaginaConsulta2(
+          objResponse = await this.consultarOab(
             uuidCaptcha,
             gResponse
           );
@@ -100,7 +100,7 @@ class OabESAJ extends ExtratorBase {
 
       processosList = await this.verificaNovos(processosList);
 
-      console.log({ processosList: processosList.length });
+      // console.log({ processosList: processosList.length });
 
       this.resultado = await this.enfileirarProcessos(processosList);
 
@@ -206,10 +206,8 @@ class OabESAJ extends ExtratorBase {
   async acessarPaginaConsulta(execucaoAnterior) {
     let cookies;
     this.logger.info('Entrando na pagina de consulta');
-    console.log(execucaoAnterior);
 
     if (Object.keys(execucaoAnterior).length && execucaoAnterior.cookies) {
-      console.log('oi');
       cookies = execucaoAnterior.cookies;
     }
 
@@ -288,7 +286,7 @@ class OabESAJ extends ExtratorBase {
    * @param {string|null} gResponse
    * @return {Promise<{Object}>}
    */
-  async acessarPaginaConsulta2(uuid, gResponse) {
+  async consultarOab(uuid, gResponse) {
     console.log({ uuid, gResponse });
     this.logger.info('Tentando acessar pagina da consulta de OAB');
     let options = {

@@ -33,7 +33,6 @@ const logarExecucao = async (execucao) => {
     });
     console.table(message);
     try {
-      console.log({ execucaoAnterior1: execucaoAnterior });
       logger.info('Mensagem recebida');
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
 
@@ -45,8 +44,8 @@ const logarExecucao = async (execucao) => {
         message,
         execucaoAnterior
       );
+
       execucaoAnterior = resultadoExtracao.execucaoAnterior;
-      console.log({ execucaoAnterior2: execucaoAnterior });
 
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');

@@ -44,7 +44,7 @@ async function worker() {
       let links = await Fila.getFila(`peticao.jte.extracao.links`);
       let linksQtd = links.map((x) => x.qtd).reduce((x, y) => x + y);
       // process.exit();
-      while (filasQtd >= 7 || linksQtd > 50) {
+      while (filasQtd >= 7 && linksQtd > 50) {
         console.log('A fila não consumiu, Qtd:', filasQtd);
         console.log('O link não consumiu, Qtd:', linksQtd);
         await sleep(60000);
@@ -66,7 +66,6 @@ async function worker() {
 
       // await sleep(20000);
       // await sleep(1000);
-      
     });
   } catch (e) {
     console.log(e);

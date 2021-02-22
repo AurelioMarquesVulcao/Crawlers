@@ -35,7 +35,7 @@ var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
   setInterval(async function () {
     if (start == 0) {
       start = 1;
-      await worker(`peticao.JTE.extracao.${process.argv[2]}`);
+      await worker(nomeFila);
     } else {
     }
   }, 6000);
@@ -127,7 +127,7 @@ async function worker(nomeFila) {
           // if (message.NovosProcessos == true && logadoParaIniciais == false) {
           try {
             logger.info('Iniciando User Login');
-            await puppet.loga();
+            await puppet.loga(nomeFila.toLowerCase());
             logger.addLog(puppet.allLogs());
           } catch (e) {
             logger.info('User Login Falhou!');

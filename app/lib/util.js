@@ -1,10 +1,9 @@
+const axios = require('axios');
 const Crypto = require('crypto-js');
-const winston = require('winston');
 const moment = require('moment');
-const Axios = require('axios');
+const winston = require('winston');
 
 const { Token } = require('../models/schemas/token');
-
 const { enums } = require('../configs/enums');
 const { Robo } = require('../lib/robo');
 
@@ -163,7 +162,7 @@ class Helper {
       data: JSON.stringify(msg),
     };
 
-    return Axios(config)
+    return axios(config)
       .then(function (response) {
         console.log(JSON.stringify(response.data));
       })
@@ -173,7 +172,7 @@ class Helper {
   }
 
   static async downloadImage(url, headers) {
-    return await Axios({
+    return await axios({
       url,
       method: 'GET',
       responseType: 'arraybuffer',
@@ -184,7 +183,7 @@ class Helper {
   }
 
   static async downloadAudio(url, headers) {
-    return await Axios({
+    return await axios({
       url,
       method: 'GET',
       responseType: 'arraybuffer',
@@ -195,7 +194,7 @@ class Helper {
   }
 
   static async downloadFiles(url, headers, method = 'GET') {
-    return await Axios({
+    return await axios({
       url,
       method: method,
       responseType: 'arraybuffer',
@@ -257,6 +256,28 @@ class Helper {
         return -1;
       }
     });
+  }
+  static async getCredencialAdvogado(find) {
+    // const url = 'http://172.16.16.38:3338/credencialAdvogado';
+    const url = 'http://localhost:3304/credencialAdvogado';
+      return (
+        await axios({
+          url: `${url}`,
+          method: 'GET',
+          data: find
+        })
+      ).data;
+  }
+  static async updateCredencialAdvogado(data, _id) {
+    // const url = 'http://172.16.16.38:3338/credencialAdvogado';
+    const url = 'http://localhost:3304/credencialAdvogado';
+    return (
+      await axios({
+        url: `${url}/modificando`,
+        method: 'post',
+        data: { options: 'updateOne', data, _id },
+      })
+    ).data;
   }
 }
 
@@ -327,7 +348,6 @@ class CnjValidator {
 
     return this.valida_mod97(NNNNNNN, DD, AAAA, JTR, OOOO);
   }
-  static async getCredencialAdvogado() {}
 }
 
 /**
@@ -392,7 +412,7 @@ class Logger {
     return this.logs;
   }
   resetLog() {
-    this.logs=[]
+    this.logs = [];
   }
 
   addLog(logs) {

@@ -5,7 +5,7 @@ const shell = require('shelljs');
 require('dotenv/config');
 
 const { JTEParser } = require('../parsers/JTEParser');
-const { Logger } = require('./util');
+const { Logger, Helper } = require('./util');
 const { enums } = require('../configs/enums');
 
 var heartBeat = 0; // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
@@ -57,8 +57,19 @@ class RoboPuppeteer3 {
     this.logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
       NumeroDoProcesso: 'Puppeteer',
-      // this.
     });
+    this.geralogin().then((x) => {
+      this.login = x.login;
+      this.senha = x.senha;
+      this.objLogin = x;
+    });
+  }
+  async geralogin() {
+    let senhas = await Helper.getCredencialAdvogado({ portal: 'JTE' });
+    let senhasValidas = senhas
+      .filter((x) => x.status.errosDoDia == 0)
+      .sort((a, b) => a.utilizado - b.utilizado);
+    return senhasValidas[0];
   }
   allLogs() {
     return this.logger.allLog();
@@ -68,23 +79,29 @@ class RoboPuppeteer3 {
   }
 
   async iniciar() {
+    console.log(await this.geralogin());
+    console.log(this.senha, this.login);
+    // process.exit();
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      // headless: false,
-      headless: true,
+      headless: false,
+      // headless: true,
       slowMo: 50,
       // ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      // args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
       args: [
         '--ignore-certificate-errors',
-        '--no-sandbox',
-        '--headless',
         '--proxy-server=http://proxy-proadv.7lan.net:8182',
       ],
+      // args: [
+      //   '--ignore-certificate-errors',
+      //   '--no-sandbox',
+      //   '--headless',
+      //   '--proxy-server=http://proxy-proadv.7lan.net:8182',
+      // ],
     });
     this.page = await this.browser.newPage();
     await this.page.authenticate({
@@ -142,7 +159,7 @@ class RoboPuppeteer3 {
       'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
     );
     await sleep(timerSleep5);
-    await sleep(timerSleep2);
+    await sleep(10000);
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual');
     await sleep(timerSleep);
@@ -329,14 +346,17 @@ class RoboPuppeteer3 {
     heartBeat = 0;
   }
 
-  async loga() {
+  async loga(robo) {
     this.logger.info('Login iniciado');
     // console.log('Login iniciado');
     await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(5)');
     // this.logger.info('');
     // console.log('clicado no item de login');
     await sleep(3500);
-    await this.page.type('#formLogin > ion-item > ion-input > input', login);
+    await this.page.type(
+      '#formLogin > ion-item > ion-input > input',
+      this.login
+    );
     this.logger.info('Digitando login');
     // console.log('digitando login');
     await sleep(2500);
@@ -344,11 +364,32 @@ class RoboPuppeteer3 {
     // console.log('clicado no primeiro botão');
     await sleep(2500);
     try {
-      await this.page.type('#senha > input', senha);
+      await this.page.type('#senha > input', this.senha);
       this.logger.info('Digitando Senha');
-      // console.log('digitando senha');
+      this.objLogin.status = {
+        ultimoUso: new Date(),
+        robo: robo,
+        status: true,
+        erro: null,
+        errosDoDia: 0,
+      };
+      // pois api ira somar um por padrão;
+      this.objLogin.__v = this.objLogin.__v - 1;
+      this.objLogin.utilizado = this.objLogin.utilizado + 1;
+      await Helper.updateCredencialAdvogado(this.objLogin, this.objLogin._id);
     } catch (e) {
       // Devo salvar no banco um contador de falhas e parar a aplicação.
+      this.objLogin.status = {
+        ultimoUso: new Date(),
+        robo: robo,
+        status: false,
+        erro: e,
+        errosDoDia: 1,
+      };
+      // pois api ira somar um por padrão;
+      this.objLogin.__v = this.objLogin.__v - 1;
+      this.objLogin.utilizado = this.objLogin.utilizado + 1;
+      await Helper.updateCredencialAdvogado(this.objLogin, this.objLogin._id);
     }
 
     await sleep(3500);

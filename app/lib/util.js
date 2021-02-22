@@ -327,6 +327,7 @@ class CnjValidator {
 
     return this.valida_mod97(NNNNNNN, DD, AAAA, JTR, OOOO);
   }
+  static async getCredencialAdvogado() {}
 }
 
 /**

@@ -355,7 +355,7 @@ class RoboPuppeteer3 {
     await this.page.click('#formLogin > ion-toolbar > ion-button');
     this.logger.info('Confirmando Senha');
     // console.log('confirmando senha');
-    await sleep(9000);
+    await sleep(19000);
     await this.page.click('#consultaProcessual > ion-card');
     this.logger.info('Clicando na no botão de Busca');
     // console.log('clicado no botão de busca');

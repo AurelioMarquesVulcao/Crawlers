@@ -40,7 +40,7 @@ async function worker() {
     await new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
       let filasQtd = 3000;
       let linksQtd = 3000;
-      while (filasQtd >= 7 || linksQtd > 50) {
+      while (filasQtd >= 10 || linksQtd > 50) {
         filasQtd = (await Fila.getFila(`peticao\\.JTE\\.extracao\.\\d`)).map((x) => x.qtd).reduce((x, y) => x + y);
         linksQtd = (await Fila.getFila(`peticao.jte.extracao.links`)).map((x) => x.qtd).reduce((x, y) => x + y);
 

@@ -65,7 +65,7 @@ class ExtratorFactory {
     }
 
     if (/peticao.TJSC/.test(fila)) {
-      extrator = new extratores.PeticaoTJSC()
+      extrator = new extratores.PeticaoTJSC();
     }
 
     if (/oab.TJMG/.test(fila)) {

@@ -75,10 +75,7 @@ class OabESAJ extends ExtratorBase {
 
           this.captchaSettings = { uuidCaptcha, gResponse };
 
-          objResponse = await this.consultarOab(
-            uuidCaptcha,
-            gResponse
-          );
+          objResponse = await this.consultarOab(uuidCaptcha, gResponse);
 
           // break;
           // } while (tentativa === limite);

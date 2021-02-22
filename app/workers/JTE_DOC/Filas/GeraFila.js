@@ -38,16 +38,15 @@ async function worker() {
   try {
     // tudo que está abaixo é acionado para cada consumer na fila.
     await new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
-      let filas = await Fila.getFila(`peticao\\.JTE\\.extracao\.\\d`);
-      let filasQtd = filas.map((x) => x.qtd).reduce((x, y) => x + y);
+      let filasQtd = 3000;
+      let linksQtd = 3000;
+      while (filasQtd >= 7 || linksQtd > 50) {
+        filasQtd = (await Fila.getFila(`peticao\\.JTE\\.extracao\.\\d`)).map((x) => x.qtd).reduce((x, y) => x + y);
+        linksQtd = (await Fila.getFila(`peticao.jte.extracao.links`)).map((x) => x.qtd).reduce((x, y) => x + y);
 
-      let links = await Fila.getFila(`peticao.jte.extracao.links`);
-      let linksQtd = links.map((x) => x.qtd).reduce((x, y) => x + y);
-      // process.exit();
-      while (filasQtd >= 7 && linksQtd > 50) {
         console.log('A fila não consumiu, Qtd:', filasQtd);
         console.log('O link não consumiu, Qtd:', linksQtd);
-        await sleep(60000);
+        await sleep(6000);
       }
 
       let message = JSON.parse(msg.content.toString());

@@ -354,6 +354,7 @@ class TJMSParser extends EsajParser {
     this.url = 'https://esaj.tjms.jus.br';
     this.uf = 'MS';
     this.origemExtracao = 'ProcessoTJMS';
+    this.listaComarcas = require('../assets/comarcas_ms.json');
   }
 }
 
@@ -363,7 +364,7 @@ class TJSPParser extends EsajParser {
     this.url = 'http://esaj.tjsp.jus.br';
     this.uf = 'SP';
     this.origemExtracao = 'ProcessoTJSP';
-    this.listaComarcas = require('../assets/comarcas_sp.json');
+    this.listaComarcas = require('../assets/comarcas_sc.json');
   }
 }
 
@@ -373,6 +374,7 @@ class TJSCParser extends EsajParser {
     this.url = 'http://esaj.tjsc.jus.br';
     this.uf = 'SC';
     this.origemExtracao = 'ProcessoTJSC';
+    this.listaComarcas = require('../assets/comarcas_sc.json');
   }
 
   extrairDetalhes($) {
@@ -579,6 +581,7 @@ class TJAMParser extends EsajParser {
     this.url = 'https://esaj.tjam.jus.br';
     this.uf = 'AM';
     this.origemExtracao = 'ProcessoTJAM';
+    this.listaComarcas = require('../assets/comarcas_am.json');
   }
 }
 

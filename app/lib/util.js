@@ -257,20 +257,29 @@ class Helper {
       }
     });
   }
+
+  /**
+   * Busca Crecenial de advogado para ser usada no login dos robôs
+   * @param {object} find Parametro de busca para o mongoDB
+   */
   static async getCredencialAdvogado(find) {
-    // const url = 'http://172.16.16.38:3338/credencialAdvogado';
-    const url = 'http://localhost:3304/credencialAdvogado';
-      return (
-        await axios({
-          url: `${url}`,
-          method: 'GET',
-          data: find
-        })
-      ).data;
+    const url = 'http://172.16.16.38:3338/credencialAdvogado';
+    return (
+      await axios({
+        url: `${url}`,
+        method: 'GET',
+        data: find,
+      })
+    ).data;
   }
+
+  /**
+   * Atualiza credencial após o seu uso pelo robô.
+   * @param {object} data Dados a serem atualizados
+   * @param {_id} _id id de busca da credencial
+   */
   static async updateCredencialAdvogado(data, _id) {
-    // const url = 'http://172.16.16.38:3338/credencialAdvogado';
-    const url = 'http://localhost:3304/credencialAdvogado';
+    const url = 'http://172.16.16.38:3338/credencialAdvogado';
     return (
       await axios({
         url: `${url}/modificando`,
@@ -278,6 +287,100 @@ class Helper {
         data: { options: 'updateOne', data, _id },
       })
     ).data;
+  }
+
+  /**
+   * Busca Variavél no MongoDb para ser usada nas aplicações
+   * @param {object} find Parametro de busca para o mongoDB
+   */
+  static async getVariaveisAmbiente(find) {
+    const url = 'http://172.16.16.38:3338/variaveisAmbiente';
+    return (
+      await axios({
+        url: `${url}`,
+        method: 'GET',
+        data: find,
+      })
+    ).data;
+  }
+
+  /**
+   * Atualiza variavel após o seu uso
+   * @param {object} data Dados a serem atualizados
+   * @param {_id} _id id de busca da credencial
+   */
+  static async updateVariaveisAmbiente(data, _id) {
+    const url = 'http://localhost:3338/variaveisAmbiente';
+    return (
+      await axios({
+        url: `${url}/m`,
+        method: 'post',
+        data: { options: 'updateOne', data, _id },
+      })
+    ).data;
+  }
+
+  /**
+   * Mantem o Robô parado por 3 dias caso ele atinja a cota máxima de erros estipulada.
+   * @param {object} find Nome do robô
+   * @param {Boolean} paraRobo Se quiser forçar a parada imediata do robô use true
+   */
+  static async erroMonitorado(find, paraRobo = false) {
+    try {
+      let { _id, variaveis, origem } = (
+        await Helper.getVariaveisAmbiente(find)
+      )[0];
+
+      let {
+        date,
+        tentativas,
+        containerOn,
+        tentativasPermitidas,
+      } = variaveis[0];
+
+      // Se a ultima vez que o container parou foi a mais de 3 dias ele libera para rodar
+      if (date >= Helper.subtraiDia(3)) {
+        variaveis[0].tentativas = 0;
+        variaveis[0].containerOn = true;
+        await Helper.updateVariaveisAmbiente({ variaveis: variaveis }, _id);
+      }
+      // zera os erros dos dia anterior, para tentar novamente hoje. Caso não tenha ultrapassado o limite
+      if (date >= Helper.subtraiDia(1)) {
+        variaveis[0].tentativas = 0;
+        await Helper.updateVariaveisAmbiente({ variaveis: variaveis }, _id);
+      }
+      // impede o container de continuar rodando.
+      if (tentativas >= tentativasPermitidas || paraRobo === true) {
+        containerOn = false;
+        console.log('aqui');
+        variaveis[0].containerOn = containerOn;
+        variaveis[0].date = new Date();
+        await Helper.updateVariaveisAmbiente({ variaveis: variaveis }, _id);
+        console.log('passou');
+        await axios({
+          url: `http://172.16.16.38:3338/dockerStop`,
+          method: 'POST',
+          data: { servico: origem },
+        });
+      }
+      // Soma 1 ao numero de tentativas
+      variaveis[0].tentativas = tentativas + 1;
+      // console.log(variaveis);
+      await Helper.updateVariaveisAmbiente({ variaveis: variaveis }, _id);
+
+      console.log((await Helper.getVariaveisAmbiente(find))[0]);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  /**
+   * Gera uma data retroativa apartir de hoje
+   * @param {Number} day numero de dias para subtrair
+   */
+  static subtraiDia(day) {
+    let date = new Date();
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate() - day);
   }
 }
 

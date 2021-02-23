@@ -7,6 +7,7 @@ require('dotenv/config');
 const { JTEParser } = require('../parsers/JTEParser');
 const { Logger, Helper } = require('./util');
 const { enums } = require('../configs/enums');
+const { localeData } = require('moment');
 
 var heartBeat = 0; // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
 setInterval(function () {
@@ -65,11 +66,19 @@ class RoboPuppeteer3 {
     });
   }
   async geralogin() {
-    let senhas = await Helper.getCredencialAdvogado({ portal: 'JTE' });
-    let senhasValidas = senhas
-      .filter((x) => x.status.errosDoDia == 0)
-      .sort((a, b) => a.utilizado - b.utilizado);
-    return senhasValidas[0];
+    try {
+      let senhas = await Helper.getCredencialAdvogado({ portal: 'JTE' });
+      let senhasValidas = senhas
+        .filter((x) => {
+          try {
+            return x.status.errosDoDia == 0;
+          } catch (e) {}
+        })
+        .sort((a, b) => a.utilizado - b.utilizado);
+      return senhasValidas[0];
+    } catch (e) {
+      console.log(e);
+    }
   }
   allLogs() {
     return this.logger.allLog();
@@ -347,60 +356,87 @@ class RoboPuppeteer3 {
   }
 
   async loga(robo) {
+    if (!this.login || !this.senha) {
+      await Helper.erroMonitorado({ origem: robo }, true);
+      process.exit()
+    }
     this.logger.info('Login iniciado');
     // console.log('Login iniciado');
     await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(5)');
     // this.logger.info('');
     // console.log('clicado no item de login');
     await sleep(3500);
-    await this.page.type(
-      '#formLogin > ion-item > ion-input > input',
-      this.login
-    );
-    this.logger.info('Digitando login');
-    // console.log('digitando login');
-    await sleep(2500);
-    await this.page.click('#formLogin > ion-toolbar > ion-button');
-    // console.log('clicado no primeiro botão');
-    await sleep(2500);
     try {
+      await this.page.type(
+        '#formLogin > ion-item > ion-input > input',
+        this.login
+      );
+      this.logger.info('Digitando login');
+      // console.log('digitando login');
+      await sleep(2500);
+      await this.page.click('#formLogin > ion-toolbar > ion-button');
+      // console.log('clicado no primeiro botão');
+      await sleep(2500);
       await this.page.type('#senha > input', this.senha);
       this.logger.info('Digitando Senha');
-      this.objLogin.status = {
-        ultimoUso: new Date(),
-        robo: robo,
-        status: true,
-        erro: null,
-        errosDoDia: 0,
-      };
-      // pois api ira somar um por padrão;
-      this.objLogin.__v = this.objLogin.__v - 1;
-      this.objLogin.utilizado = this.objLogin.utilizado + 1;
-      await Helper.updateCredencialAdvogado(this.objLogin, this.objLogin._id);
-    } catch (e) {
-      // Devo salvar no banco um contador de falhas e parar a aplicação.
-      this.objLogin.status = {
-        ultimoUso: new Date(),
-        robo: robo,
-        status: false,
-        erro: e,
-        errosDoDia: 1,
-      };
-      // pois api ira somar um por padrão;
-      this.objLogin.__v = this.objLogin.__v - 1;
-      this.objLogin.utilizado = this.objLogin.utilizado + 1;
-      await Helper.updateCredencialAdvogado(this.objLogin, this.objLogin._id);
-    }
 
-    await sleep(3500);
-    await this.page.click('#formLogin > ion-toolbar > ion-button');
-    this.logger.info('Confirmando Senha');
-    // console.log('confirmando senha');
-    await sleep(19000);
-    await this.page.click('#consultaProcessual > ion-card');
-    this.logger.info('Clicando na no botão de Busca');
-    // console.log('clicado no botão de busca');
-    heartBeat = 0;
+      await sleep(3500);
+      await this.page.click('#formLogin > ion-toolbar > ion-button');
+      this.logger.info('Confirmando Senha');
+      // console.log('confirmando senha');
+      await sleep(19000);
+
+      // Testando a existencia do elemento antes de clicar nele.
+      // if ((await this.page.$('#consultaProcessual > ion-card')) !== null) {
+      //   await this.page.click('#consultaProcessual > ion-card');
+      //   // await this.page.evaluate(() => {
+      //   //   document.querySelector('#consultaProcessual > ion-card').click();
+      //   //   console.log('estou tentando abrir o elemento');
+      //   // });
+      // } else {
+      //   throw "Falha no Loggin Elemento '#consultaProcessual' não foi encontrado"
+      // }
+
+      await this.page.click('#consultaProcessual > ion-card');
+      // await this.page.evaluate(() => {
+      //   document.querySelector('#consultaProcessual > ion-card').click();
+      //   console.log('estou tentando abrir o elemento');
+      // });
+      this.logger.info('Clicando na no botão de Busca');
+      // console.log('clicado no botão de busca');
+      heartBeat = 0;
+      let datas = {
+        status: {
+          ultimoUso: new Date(),
+          robo: robo,
+          status: true,
+          erro: null,
+          errosDoDia: 0,
+        },
+        utilizado: this.objLogin.utilizado + 1,
+      };
+      // pois api ira somar um por padrão;
+      await Helper.updateCredencialAdvogado(datas, this.objLogin._id);
+    } catch (e) {
+      // if (/Node.is.either.not.visible.or.not.an.HTMLElement/.test(e.message)){
+      //   e = "Erro no Loggin de usuario!"
+      // }
+      e = e.stack.replace(/\n+/, ' ').trim();
+      console.log(e);
+      // Devo salvar no banco um contador de falhas e parar a aplicação.
+      let datas = {
+        status: {
+          ultimoUso: new Date(),
+          robo: robo,
+          status: false,
+          erro: `${e}`,
+          errosDoDia: this.objLogin.status.errosDoDia + 1,
+        },
+        utilizado: this.objLogin.utilizado + 1,
+      };
+      // pois api ira somar um por padrão;
+      await Helper.updateCredencialAdvogado(datas, this.objLogin._id);
+    }
   }
 
   async preencheProcesso(numero, contador) {

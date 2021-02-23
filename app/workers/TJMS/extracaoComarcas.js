@@ -135,7 +135,7 @@ async function extrairNumeros(message, ultimo, execucaoAnterior = {}) {
     // console.log({ execucaoAnterior });
 
     if (!extracao.sucesso && extracao.detalhes !== 'Senha necessaria')
-      erroEncontrado = !extracao.sucesso;
+      erroEncontrado = true;
 
     // console.log({erroEncontrado})
     count++;

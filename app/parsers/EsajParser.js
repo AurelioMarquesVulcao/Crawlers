@@ -143,7 +143,8 @@ class EsajParser extends BaseParser {
     let comarcaRaw = $('#foroProcesso').text().trim();
     let comarcaForumRegex = `(?<comarca>.+)\\s-\\s(?<foro>.+)`;
 
-    let comarca = re.exec(comarcaRaw, re(comarcaForumRegex)).comarca;
+    let comarca = re.exec(comarcaRaw, re(comarcaForumRegex));
+    comarca = Boolean(comarca) ? comarca.comarca : null
 
     return /\w+/g.test(comarca) ? comarca : null;
   }

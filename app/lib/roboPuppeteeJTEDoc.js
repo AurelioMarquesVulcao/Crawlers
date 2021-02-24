@@ -54,12 +54,13 @@ var timerSleep5 = 5000;
 var timeOut = 40000;
 
 class RoboPuppeteer3 {
-  constructor() {
+  constructor(find) {
     this.logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
       NumeroDoProcesso: 'Puppeteer',
     });
-    Helper.geraLoginSenha().then((x) => {
+    
+    Helper.geraLoginSenha(find).then((x) => {
       this.login = x.login;
       this.senha = x.senha;
       this.objLogin = x;
@@ -88,8 +89,8 @@ class RoboPuppeteer3 {
   }
 
   async iniciar() {
-    console.log(await this.geralogin());
-    console.log(this.senha, this.login);
+    // console.log(await this.geralogin());
+    // console.log(this.senha, this.login);
     // process.exit();
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({

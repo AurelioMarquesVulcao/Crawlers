@@ -264,6 +264,7 @@ class Helper {
    * @param {object} find Parametro de busca para o mongoDB
    */
   static async getCredencialAdvogado(find) {
+    // const url = 'http://localhost:3338/credencialAdvogado';
     const url = 'http://172.16.16.38:3338/credencialAdvogado';
     return (
       await axios({
@@ -292,7 +293,9 @@ class Helper {
 
   static async geraLoginSenha(find) {
     try {
+      
       let senhas = await Helper.getCredencialAdvogado(find);
+      console.log(senhas);
       senhas.map(async (x) => {
         if (x.status) {
           // console.log(new Date(x.status.ultimoUso));

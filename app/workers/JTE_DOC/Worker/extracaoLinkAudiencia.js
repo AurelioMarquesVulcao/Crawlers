@@ -15,10 +15,14 @@ const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
 const { Processo } = require('../../../models/schemas/processo');
 
 const fila = new CriaFilaJTE();
-const puppet = new RoboPuppeteer3();
+
 const util = new Cnj();
 // Filas a serem usadas
 const nomeFila = `peticao.JTE.extracao.${process.argv[2]}`;
+const puppet = new RoboPuppeteer3({
+  portal: 'JTE',
+  ufCode: parseInt(process.argv[2]),
+});
 const filaAxios = 'peticao.JTE.extracao.links-01';
 
 var estadoAnterior; // Recebe o estado atual que está sendo baixado
@@ -55,17 +59,17 @@ async function worker(nomeFila) {
     // se não tiver conexão com o BigData, sai da aplicação
     process.exit();
   }
-try{
-  // Ligando o puppeteer.
-  await puppet.iniciar();
-  console.log('INICIAR');
-  await sleep(3000);
-  await puppet.acessar('https://jte.csjt.jus.br/');
-  console.log('ACESSAR');
-  await sleep(3000);
-}catch(e){
-  await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() });
-}
+  try {
+    // Ligando o puppeteer.
+    await puppet.iniciar();
+    console.log('INICIAR');
+    await sleep(3000);
+    await puppet.acessar('https://jte.csjt.jus.br/');
+    console.log('ACESSAR');
+    await sleep(3000);
+  } catch (e) {
+    await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() });
+  }
   contador = 0;
 
   // tudo que está abaixo é acionado para cada consumer na fila.
@@ -320,8 +324,8 @@ try{
         .then((res) => {
           console.log(res.data);
         })
-        .catch(async(err) => {
-          await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() })
+        .catch(async (err) => {
+          await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() });
           console.log(err);
           throw err;
         });

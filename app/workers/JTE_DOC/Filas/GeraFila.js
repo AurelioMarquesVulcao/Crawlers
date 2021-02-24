@@ -106,6 +106,9 @@ async function PJE(message) {
         'Mensagem.NumeroProcesso': message2.NumeroProcesso,
         DataTermino: null,
       });
+      if(Array.isArray(log.Mensagem)){
+        log.Mensagem = log.Mensagem[0]
+      }
       console.log('Reenfileirado a força');
       await new GerenciadorFila().enviar(nomeFilaPJE, log.Mensagem);
     }

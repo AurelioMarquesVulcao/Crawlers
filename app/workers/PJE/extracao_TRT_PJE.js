@@ -49,6 +49,8 @@ var erro = '';
   const reConsumo = `Reconsumo.processo.PJE.atualizacao.01`;
 
   new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
+    let logger;
+
     try {
       var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
       var heartBeat = 0;
@@ -72,6 +74,12 @@ var erro = '';
 
       var message = JSON.parse(msg.content.toString());
       // console.log(message.NumeroProcesso);
+      // console.log(message);
+      
+      // tratando erro de enfileiramento
+      if (Array.isArray(message)){
+        message = message[0]
+      }
       const numeroEstado = parseInt(
         Cnj.processoSlice(message.NumeroProcesso).estado
       );
@@ -79,7 +87,7 @@ var erro = '';
       // Valida o numero de tentativas
       let id = message.ExecucaoConsultaId;
       let find = await ExecucaoConsulta.findOne({ _id: id });
-      if (find.Tentativas > 3 && message.NovosProcessos == true) {
+      if (find.Tentativas > 4 && message.NovosProcessos == true) {
         // console.log("matei a mensagem");
         ch.ack(msg);
       }
@@ -88,14 +96,10 @@ var erro = '';
       message.Tentativas = find.Tentativas + 1;
       // console.log(message.Tentativas);
       let busca = { _id: message._id };
-      var logger = new Logger(
-        'info',
-        'logs/ProcessoTRTPJE/ProcessoTRTPJEInfo',
-        {
-          nomeRobo: enums.nomesRobos.PJE,
-          NumeroDoProcesso: message.NumeroProcesso,
-        }
-      );
+      logger = new Logger('info', 'logs/ProcessoTRTPJE/ProcessoTRTPJEInfo', {
+        nomeRobo: enums.nomesRobos.PJE,
+        NumeroDoProcesso: message.NumeroProcesso,
+      });
       // Exibe a mensagem a ser consumida como tabela.
       console.table(message);
 
@@ -237,6 +241,7 @@ var erro = '';
       });
       // ch.ack(msg);
     } catch (e) {
+      console.log(e);
       // Corrige o problema de erro de capcha, que impedia o worker de resolver captcha corretamente após errar 1 vez
       if (
         logger
@@ -257,12 +262,12 @@ var erro = '';
         });
         // console.log(message);
         await mongoose.connection.close();
-        
+
         console.log(
           '------------------------------errro Captcha-----------------------------'
-          );
-          // ch.ack(msg);
-          // await new GerenciadorFila().enviar(nomeFila, message);
+        );
+        // ch.ack(msg);
+        // await new GerenciadorFila().enviar(nomeFila, message);
 
         process.exit();
       }

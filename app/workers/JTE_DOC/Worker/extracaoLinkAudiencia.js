@@ -35,7 +35,7 @@ var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
   setInterval(async function () {
     if (start == 0) {
       start = 1;
-      await worker(`peticao.JTE.extracao.${process.argv[2]}`);
+      await worker(nomeFila);
     } else {
     }
   }, 6000);
@@ -52,10 +52,10 @@ async function worker(nomeFila) {
       console.log(e);
     });
   } catch (e) {
-    // se não tiver conexão com o BigData eu sai da aplicação
+    // se não tiver conexão com o BigData, sai da aplicação
     process.exit();
   }
-
+try{
   // Ligando o puppeteer.
   await puppet.iniciar();
   console.log('INICIAR');
@@ -63,7 +63,9 @@ async function worker(nomeFila) {
   await puppet.acessar('https://jte.csjt.jus.br/');
   console.log('ACESSAR');
   await sleep(3000);
-
+}catch(e){
+  await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() });
+}
   contador = 0;
 
   // tudo que está abaixo é acionado para cada consumer na fila.
@@ -127,7 +129,7 @@ async function worker(nomeFila) {
           // if (message.NovosProcessos == true && logadoParaIniciais == false) {
           try {
             logger.info('Iniciando User Login');
-            await puppet.loga();
+            await puppet.loga(nomeFila.toLowerCase());
             logger.addLog(puppet.allLogs());
           } catch (e) {
             logger.info('User Login Falhou!');
@@ -318,7 +320,8 @@ async function worker(nomeFila) {
         .then((res) => {
           console.log(res.data);
         })
-        .catch((err) => {
+        .catch(async(err) => {
+          await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() })
           console.log(err);
           throw err;
         });

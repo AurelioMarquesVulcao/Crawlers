@@ -5,8 +5,9 @@ const shell = require('shelljs');
 require('dotenv/config');
 
 const { JTEParser } = require('../parsers/JTEParser');
-const { Logger } = require('./util');
+const { Logger, Helper } = require('./util');
 const { enums } = require('../configs/enums');
+const { localeData } = require('moment');
 
 var heartBeat = 0; // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
 setInterval(function () {
@@ -57,8 +58,27 @@ class RoboPuppeteer3 {
     this.logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
       NumeroDoProcesso: 'Puppeteer',
-      // this.
     });
+    Helper.geraLoginSenha().then((x) => {
+      this.login = x.login;
+      this.senha = x.senha;
+      this.objLogin = x;
+    });
+  }
+  async geralogin() {
+    try {
+      let senhas = await Helper.getCredencialAdvogado({ portal: 'JTE' });
+      let senhasValidas = senhas
+        .filter((x) => {
+          try {
+            return x.status.errosDoDia == 0;
+          } catch (e) {}
+        })
+        .sort((a, b) => a.utilizado - b.utilizado);
+      return senhasValidas[0];
+    } catch (e) {
+      console.log(e);
+    }
   }
   allLogs() {
     return this.logger.allLog();
@@ -68,23 +88,29 @@ class RoboPuppeteer3 {
   }
 
   async iniciar() {
+    console.log(await this.geralogin());
+    console.log(this.senha, this.login);
+    // process.exit();
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
-      // headless: false,
-      headless: true,
+      headless: false,
+      // headless: true,
       slowMo: 50,
       // ignoreHTTPSErrors: true,
       //args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=socks4://96.9.77.192:55796']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      // args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
       args: [
         '--ignore-certificate-errors',
-        '--no-sandbox',
-        '--headless',
         '--proxy-server=http://proxy-proadv.7lan.net:8182',
       ],
+      // args: [
+      //   '--ignore-certificate-errors',
+      //   '--no-sandbox',
+      //   '--headless',
+      //   '--proxy-server=http://proxy-proadv.7lan.net:8182',
+      // ],
     });
     this.page = await this.browser.newPage();
     await this.page.authenticate({
@@ -142,7 +168,7 @@ class RoboPuppeteer3 {
       'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
     );
     await sleep(timerSleep5);
-    await sleep(timerSleep2);
+    await sleep(10000);
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual');
     await sleep(timerSleep);
@@ -329,37 +355,87 @@ class RoboPuppeteer3 {
     heartBeat = 0;
   }
 
-  async loga() {
+  async loga(robo) {
+    if (!this.login || !this.senha) {
+      await Helper.erroMonitorado({ origem: robo }, true);
+      process.exit()
+    }
     this.logger.info('Login iniciado');
     // console.log('Login iniciado');
     await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(5)');
     // this.logger.info('');
     // console.log('clicado no item de login');
     await sleep(3500);
-    await this.page.type('#formLogin > ion-item > ion-input > input', login);
-    this.logger.info('Digitando login');
-    // console.log('digitando login');
-    await sleep(2500);
-    await this.page.click('#formLogin > ion-toolbar > ion-button');
-    // console.log('clicado no primeiro botão');
-    await sleep(2500);
     try {
-      await this.page.type('#senha > input', senha);
+      await this.page.type(
+        '#formLogin > ion-item > ion-input > input',
+        this.login
+      );
+      this.logger.info('Digitando login');
+      // console.log('digitando login');
+      await sleep(2500);
+      await this.page.click('#formLogin > ion-toolbar > ion-button');
+      // console.log('clicado no primeiro botão');
+      await sleep(2500);
+      await this.page.type('#senha > input', this.senha);
       this.logger.info('Digitando Senha');
-      // console.log('digitando senha');
-    } catch (e) {
-      // Devo salvar no banco um contador de falhas e parar a aplicação.
-    }
 
-    await sleep(3500);
-    await this.page.click('#formLogin > ion-toolbar > ion-button');
-    this.logger.info('Confirmando Senha');
-    // console.log('confirmando senha');
-    await sleep(9000);
-    await this.page.click('#consultaProcessual > ion-card');
-    this.logger.info('Clicando na no botão de Busca');
-    // console.log('clicado no botão de busca');
-    heartBeat = 0;
+      await sleep(3500);
+      await this.page.click('#formLogin > ion-toolbar > ion-button');
+      this.logger.info('Confirmando Senha');
+      // console.log('confirmando senha');
+      await sleep(19000);
+
+      // Testando a existencia do elemento antes de clicar nele.
+      // if ((await this.page.$('#consultaProcessual > ion-card')) !== null) {
+      //   await this.page.click('#consultaProcessual > ion-card');
+      //   // await this.page.evaluate(() => {
+      //   //   document.querySelector('#consultaProcessual > ion-card').click();
+      //   //   console.log('estou tentando abrir o elemento');
+      //   // });
+      // } else {
+      //   throw "Falha no Loggin Elemento '#consultaProcessual' não foi encontrado"
+      // }
+
+      await this.page.click('#consultaProcessual > ion-card');
+      // await this.page.evaluate(() => {
+      //   document.querySelector('#consultaProcessual > ion-card').click();
+      //   console.log('estou tentando abrir o elemento');
+      // });
+      this.logger.info('Clicando na no botão de Busca');
+      // console.log('clicado no botão de busca');
+      heartBeat = 0;
+      let datas = {
+        status: {
+          ultimoUso: new Date(),
+          robo: robo,
+          status: true,
+          erro: null,
+          errosDoDia: 0,
+        },
+        utilizado: this.objLogin.utilizado + 1,
+      };
+      await Helper.updateCredencialAdvogado(datas, this.objLogin._id);
+    } catch (e) {
+      // if (/Node.is.either.not.visible.or.not.an.HTMLElement/.test(e.message)){
+      //   e = "Erro no Loggin de usuario!"
+      // }
+      e = e.stack.replace(/\n+/, ' ').trim();
+      console.log(e);
+      // Devo salvar no banco um contador de falhas e parar a aplicação.
+      let datas = {
+        status: {
+          ultimoUso: new Date(),
+          robo: robo,
+          status: false,
+          erro: `${e}`,
+          errosDoDia: this.objLogin.status.errosDoDia + 1,
+        },
+        utilizado: this.objLogin.utilizado + 1,
+      };
+      await Helper.updateCredencialAdvogado(datas, this.objLogin._id);
+      await Helper.erroMonitorado({ origem: robo });
+    }
   }
 
   async preencheProcesso(numero, contador) {

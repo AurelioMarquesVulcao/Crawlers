@@ -11,3 +11,13 @@ apps:
     name     : 'worker-05'
   - script   : ./workers/JTE_DOC/limpaCore.js
     name     : 'Limpa'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-06'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-07'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-08'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-09'
+  - script   : ./workers/JTE_DOC/Worker/extratorDoc.js
+    name     : 'worker-10'

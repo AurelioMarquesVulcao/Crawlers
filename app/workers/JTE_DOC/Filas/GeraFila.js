@@ -1,27 +1,16 @@
 const mongoose = require('mongoose');
-const cheerio = require('cheerio');
-const shell = require('shelljs');
 const sleep = require('await-sleep');
 
 const { enums } = require('../../../configs/enums');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
-const { Extracao } = require('../../../models/schemas/extracao');
 const { Logger, Cnj, Helper } = require('../../../lib/util');
-const { LogExecucao } = require('../../../lib/logExecucao');
-const { Andamento } = require('../../../models/schemas/andamento');
 const {
   ExecucaoConsulta,
 } = require('../../../models/schemas/execucao_consulta');
-const { JTEParser } = require('../../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
-const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
-const { downloadFiles } = require('../../../lib/downloadFiles');
 const { Log } = require('../../../models/schemas/logsEnvioAWS');
-const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 const { Processo } = require('../../../models/schemas/processo');
 const { FluxoController } = require('../../../lib/fluxoController');
-const { log } = require('winston');
-const { ObjectID } = require('mongodb');
+const { Fila } = require('./getFila');
 
 const nomeFila = `peticao.JTE.extracao`;
 const nomeFilaPJE = `processo.PJE.atualizacao.01`;
@@ -48,25 +37,39 @@ async function worker() {
   }
   try {
     // tudo que está abaixo é acionado para cada consumer na fila.
-    await new GerenciadorFila(false, 2000).consumir(nomeFila, async (ch, msg) => {
+    await new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
+      let filasQtd = 3000;
+      let linksQtd = 3000;
+      while (filasQtd >= 10 || linksQtd > 50) {
+        filasQtd = (await Fila.getFila(`peticao\\.JTE\\.extracao\.\\d`)).map((x) => x.qtd).reduce((x, y) => x + y);
+        linksQtd = (await Fila.getFila(`peticao.jte.extracao.links`)).map((x) => x.qtd).reduce((x, y) => x + y);
+
+        console.log('A fila não consumiu, Qtd:', filasQtd);
+        console.log('O link não consumiu, Qtd:', linksQtd);
+        await sleep(6000);
+      }
+
       let message = JSON.parse(msg.content.toString());
       message['Instancia'] = message.instancia;
-      delete message["instancia"]
+      delete message['instancia'];
       console.table(message);
       // Cria Fila PJE
       await PJE(message);
       // Cria Fila JTE
       await JTE(message);
 
-      // ch.ack(msg);
-      await sleep(20000);
-      await sleep(1000);
-      process.exit();
+      await sleep(5000);
+
+      // process.exit();
+      ch.ack(msg);
+
+      // await sleep(20000);
+      // await sleep(1000);
     });
   } catch (e) {
     console.log(e);
     // await sleep(3000);
-    // process.exit();
+    process.exit();
     // Não feche a mensagem em caso de erro !
     // ch.ack(msg);
   }
@@ -103,6 +106,9 @@ async function PJE(message) {
         'Mensagem.NumeroProcesso': message2.NumeroProcesso,
         DataTermino: null,
       });
+      if(Array.isArray(log.Mensagem)){
+        log.Mensagem = log.Mensagem[0]
+      }
       console.log('Reenfileirado a força');
       await new GerenciadorFila().enviar(nomeFilaPJE, log.Mensagem);
     }

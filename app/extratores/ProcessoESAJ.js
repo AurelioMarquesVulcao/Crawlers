@@ -300,7 +300,11 @@ class ProcessoESAJ extends ExtratorBase {
       this.logger.info(
         'Se for uma parte ou interessado, digite a senha do processo'
       );
-      throw new Error('Senha necessaria');
+      return {
+        sucesso: false,
+        causa: 'Senha necessaria',
+        detalhes: 'Senha necessaria'
+      }
     }
 
     if ($(tabelaMovimentacoesSelector).length === 0) {

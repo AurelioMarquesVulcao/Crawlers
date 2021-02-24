@@ -6,6 +6,7 @@ const winston = require('winston');
 const { Token } = require('../models/schemas/token');
 const { enums } = require('../configs/enums');
 const { Robo } = require('../lib/robo');
+const awaitSleep = require('await-sleep');
 
 class Helper {
   /**
@@ -289,6 +290,39 @@ class Helper {
     ).data;
   }
 
+  static async geraLoginSenha(find) {
+    try {
+      let senhas = await Helper.getCredencialAdvogado(find);
+      senhas.map(async (x) => {
+        if (x.status) {
+          // console.log(new Date(x.status.ultimoUso));
+          // console.log(new Date(this.subtraiDia(1)));
+          if (new Date(x.status.ultimoUso) > new Date(this.subtraiDia(1))) {
+            let _id = x._id;
+            x.status.errosDoDia = 0;
+            // console.log(x.status.errosDoDia);
+            await Helper.updateCredencialAdvogado(
+              { 'status.errosDoDia': x.status.errosDoDia },
+              _id
+            );
+          }
+        }
+      });
+      await awaitSleep(1000);
+      let senhasValidas = senhas
+      .filter((x) => {
+        try {
+          return x.status.errosDoDia == 0;
+        } catch (e) {}
+      })
+      .sort((a, b) => a.utilizado - b.utilizado);
+      // process.exit();
+      return senhasValidas[0];
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   /**
    * Busca Variavél no MongoDb para ser usada nas aplicações
    * @param {object} find Parametro de busca para o mongoDB
@@ -310,7 +344,8 @@ class Helper {
    * @param {_id} _id id de busca da credencial
    */
   static async updateVariaveisAmbiente(data, _id) {
-    const url = 'http://localhost:3338/variaveisAmbiente';
+    const url = 'http://172.16.16.38:3338/variaveisAmbiente';
+    // const url = 'http://localhost:3338/variaveisAmbiente';
     return (
       await axios({
         url: `${url}/m`,
@@ -338,14 +373,14 @@ class Helper {
         tentativasPermitidas,
       } = variaveis[0];
 
-      // Se a ultima vez que o container parou foi a mais de 3 dias ele libera para rodar
-      if (date >= Helper.subtraiDia(3)) {
+      // Se a ultima vez que o container parou foi a mais de 3 dias ele libera o worker
+      if (new Date(date) >= new Date(Helper.subtraiDia(3))) {
         variaveis[0].tentativas = 0;
         variaveis[0].containerOn = true;
         await Helper.updateVariaveisAmbiente({ variaveis: variaveis }, _id);
       }
       // zera os erros dos dia anterior, para tentar novamente hoje. Caso não tenha ultrapassado o limite
-      if (date >= Helper.subtraiDia(1)) {
+      if (new Date(date) >= new Date(Helper.subtraiDia(1))) {
         variaveis[0].tentativas = 0;
         await Helper.updateVariaveisAmbiente({ variaveis: variaveis }, _id);
       }
@@ -355,6 +390,7 @@ class Helper {
         console.log('aqui');
         variaveis[0].containerOn = containerOn;
         variaveis[0].date = new Date();
+        console.log(variaveis);
         await Helper.updateVariaveisAmbiente({ variaveis: variaveis }, _id);
         console.log('passou');
         await axios({

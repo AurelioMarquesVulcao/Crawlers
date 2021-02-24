@@ -59,7 +59,7 @@ class RoboPuppeteer3 {
       nomeRobo: enums.nomesRobos.JTE,
       NumeroDoProcesso: 'Puppeteer',
     });
-    this.geralogin().then((x) => {
+    Helper.geraLoginSenha().then((x) => {
       this.login = x.login;
       this.senha = x.senha;
       this.objLogin = x;
@@ -384,7 +384,7 @@ class RoboPuppeteer3 {
       await this.page.click('#formLogin > ion-toolbar > ion-button');
       this.logger.info('Confirmando Senha');
       // console.log('confirmando senha');
-      await sleep(19000);
+      await sleep(29000);
 
       // Testando a existencia do elemento antes de clicar nele.
       // if ((await this.page.$('#consultaProcessual > ion-card')) !== null) {
@@ -415,7 +415,6 @@ class RoboPuppeteer3 {
         },
         utilizado: this.objLogin.utilizado + 1,
       };
-      // pois api ira somar um por padrão;
       await Helper.updateCredencialAdvogado(datas, this.objLogin._id);
     } catch (e) {
       // if (/Node.is.either.not.visible.or.not.an.HTMLElement/.test(e.message)){
@@ -434,8 +433,8 @@ class RoboPuppeteer3 {
         },
         utilizado: this.objLogin.utilizado + 1,
       };
-      // pois api ira somar um por padrão;
       await Helper.updateCredencialAdvogado(datas, this.objLogin._id);
+      await Helper.erroMonitorado({ origem: robo });
     }
   }
 

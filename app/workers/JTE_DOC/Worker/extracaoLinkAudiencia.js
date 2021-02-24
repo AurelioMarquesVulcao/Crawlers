@@ -52,10 +52,10 @@ async function worker(nomeFila) {
       console.log(e);
     });
   } catch (e) {
-    // se não tiver conexão com o BigData eu sai da aplicação
+    // se não tiver conexão com o BigData, sai da aplicação
     process.exit();
   }
-
+try{
   // Ligando o puppeteer.
   await puppet.iniciar();
   console.log('INICIAR');
@@ -63,7 +63,9 @@ async function worker(nomeFila) {
   await puppet.acessar('https://jte.csjt.jus.br/');
   console.log('ACESSAR');
   await sleep(3000);
-
+}catch(e){
+  await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() });
+}
   contador = 0;
 
   // tudo que está abaixo é acionado para cada consumer na fila.
@@ -318,7 +320,8 @@ async function worker(nomeFila) {
         .then((res) => {
           console.log(res.data);
         })
-        .catch((err) => {
+        .catch(async(err) => {
+          await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() })
           console.log(err);
           throw err;
         });

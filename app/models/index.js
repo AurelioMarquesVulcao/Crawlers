@@ -4,4 +4,6 @@ module.exports = {
   Comarca: require('./schemas/comarcas').Comarca,
   CredenciaisAdvogados: require('./schemas/credenciaisAdvogados')
     .CredenciaisAdvogados,
+  CotaMensal: require('./schemas/cotaMensal').CotaMensal,
+  CotaEstado: require('./schemas/cotaEstado').CotaEstado,
 };

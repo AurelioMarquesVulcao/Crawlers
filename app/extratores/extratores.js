@@ -32,7 +32,7 @@ class ExtratorBase {
 
   dividirNumeroProcesso(cnj) {
     let cnjRegex = re(
-      `(?<sequencial>\\d{7})\\D?(?<digito>\\d{2})\\D?(?<ano>\\d{4})\\D?(?<tribunal>\\d{1})\\D?(?<orgao>\\d{2})\\D?(?<comarca>\\d{4})`
+      `(?<sequencial>\\d{7})\\D?(?<digito>\\d{2})\\D?(?<ano>\\d{4})\\D?(?<tribunal>\\d{1})\\D?(?<orgao>\\d{1,2})\\D?(?<comarca>\\d{4})`
     );
 
     /**@type cnjDividido*/

@@ -1,4 +1,4 @@
-const Comarca = require('../../models/schemas/comarcas');
+const { Comarca } = require('../../models');
 const { GerenciadorFila } = require('../../lib/filaHandler');
 require('../../bootstrap');
 const { CnjValidator } = require('../../lib/util');

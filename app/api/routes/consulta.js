@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const schemas = require('../schema');
 
 const {
   ConsultasCadastradas,
@@ -31,23 +32,12 @@ function normalizarNumProcesso(numProcesso, removerPontuacao = false) {
 }
 
 /**
- * Realiza o processo de cadastramento de uma consulta na aplicação.
+ * Realiza a tentativa de cadastro de uma consulta.
+ *
+ * @param {Object} consulta
+ * @param {import('axios').AxiosResponse} res
  */
-router.post('', async (req, res) => {
-  const consulta = new ConsultasCadastradas(req.body);
-  consulta.NumeroProcesso = normalizarNumProcesso(
-    consulta.NumeroProcesso,
-    true
-  );
-  consulta.ClienteId = req.cliente._id;
-
-  const errors = consulta.validateSync();
-
-  if (errors) {
-    res.status(400).json(errors);
-    return;
-  }
-
+const _cadastrarConsulta = async (consulta, res) => {
   try {
     await FluxoController.cadastrarConsulta(consulta);
     res.status(200).json({ detalhes: 'Consulta cadastrada com sucesso' });
@@ -60,6 +50,45 @@ router.post('', async (req, res) => {
   }
 
   res.status(500).json({ detalhes: 'Falha durante registro da consulta.' + e });
+};
+
+router.post('/oab', async (req, res) => {
+  const consulta_oab = new schemas.cadastroOabSchema(req.body);
+  consulta_oab.ClienteId = req.cliente._id;
+
+  const errors = consulta_oab.validateSync();
+
+  let consulta = new ConsultasCadastradas(consulta_oab);
+
+  if (errors) {
+    res.status(400).json(errors);
+    return;
+  }
+
+  _cadastrarConsulta(consulta, res);
+});
+
+/**
+ * Realiza o processo de cadastramento de uma consulta na aplicação.
+ */
+router.post('/processo', async (req, res) => {
+  const consulta_processo = new schemas.cadastroNumeroCnjSchema(req.body);
+  consulta_processo.NumeroProcesso = normalizarNumProcesso(
+    consulta_processo.NumeroProcesso,
+    true
+  );
+  consulta_processo.ClienteId = req.cliente._id;
+
+  const errors = consulta_processo.validateSync();
+
+  let consulta = new ConsultasCadastradas(consulta_processo);
+
+  if (errors) {
+    res.status(400).json(errors);
+    return;
+  }
+
+  _cadastrarConsulta(consulta, res);
 });
 
 router.delete('', async (req, res) => {

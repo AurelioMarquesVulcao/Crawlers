@@ -15,10 +15,14 @@ const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
 const { Processo } = require('../../../models/schemas/processo');
 
 const fila = new CriaFilaJTE();
-const puppet = new RoboPuppeteer3();
+
 const util = new Cnj();
 // Filas a serem usadas
 const nomeFila = `peticao.JTE.extracao.${process.argv[2]}`;
+const puppet = new RoboPuppeteer3({
+  portal: 'JTE',
+  ufCode: parseInt(process.argv[2]),
+});
 const filaAxios = 'peticao.JTE.extracao.links-01';
 
 var estadoAnterior; // Recebe o estado atual que está sendo baixado
@@ -35,7 +39,7 @@ var dataInicio = new Date(Date.now() - 1000 * 3 * 60 * 60);
   setInterval(async function () {
     if (start == 0) {
       start = 1;
-      await worker(`peticao.JTE.extracao.${process.argv[2]}`);
+      await worker(nomeFila);
     } else {
     }
   }, 6000);
@@ -52,18 +56,20 @@ async function worker(nomeFila) {
       console.log(e);
     });
   } catch (e) {
-    // se não tiver conexão com o BigData eu sai da aplicação
+    // se não tiver conexão com o BigData, sai da aplicação
     process.exit();
   }
-
-  // Ligando o puppeteer.
-  await puppet.iniciar();
-  console.log('INICIAR');
-  await sleep(3000);
-  await puppet.acessar('https://jte.csjt.jus.br/');
-  console.log('ACESSAR');
-  await sleep(3000);
-
+  try {
+    // Ligando o puppeteer.
+    await puppet.iniciar();
+    console.log('INICIAR');
+    await sleep(3000);
+    await puppet.acessar('https://jte.csjt.jus.br/');
+    console.log('ACESSAR');
+    await sleep(3000);
+  } catch (e) {
+    await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() });
+  }
   contador = 0;
 
   // tudo que está abaixo é acionado para cada consumer na fila.
@@ -127,7 +133,7 @@ async function worker(nomeFila) {
           // if (message.NovosProcessos == true && logadoParaIniciais == false) {
           try {
             logger.info('Iniciando User Login');
-            await puppet.loga();
+            await puppet.loga(nomeFila.toLowerCase());
             logger.addLog(puppet.allLogs());
           } catch (e) {
             logger.info('User Login Falhou!');
@@ -318,7 +324,8 @@ async function worker(nomeFila) {
         .then((res) => {
           console.log(res.data);
         })
-        .catch((err) => {
+        .catch(async (err) => {
+          await Helper.erroMonitorado({ origem: nomeFila.toLowerCase() });
           console.log(err);
           throw err;
         });

@@ -22,7 +22,7 @@ class Fila {
                     (x) =>
                         x.qtd < 100 &&
                         // x.status == 'Aguardando' &&
-                        /^reprocessamentojte/i.test(x.nome)
+                        /jte.reprocessamento/i.test(x.nome)
                 );
         });
     }

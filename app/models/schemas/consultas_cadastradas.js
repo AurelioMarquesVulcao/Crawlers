@@ -40,6 +40,7 @@ const ConsultaCadastroSchema = new mongoose.Schema(
     TipoConsulta: {
       type: String,
       required: true,
+      enum: ['oab', 'processo'],
     },
     DataEnfileiramento: {
       type: Date,

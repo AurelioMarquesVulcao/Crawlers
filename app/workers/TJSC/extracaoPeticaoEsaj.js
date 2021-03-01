@@ -4,8 +4,7 @@ const Path = require('path');
 const fs = require('fs');
 const { enums } = require('../../configs/enums');
 const { GerenciadorFila } = require('../../lib/filaHandler');
-// const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const extratores = require('../../extratores');
+const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
@@ -39,7 +38,7 @@ const logarExecucao = async (execucao) => {
     let arquivos = [];
     try {
       logger.info('Mensagem recebida');
-      const extrator = new extratores.PeticaoTJSC();
+      const extrator = ExtratorFactory.getExtrator(nomeFila, true);
       let resposta;
 
       logger.info('Iniciando processo de extração');

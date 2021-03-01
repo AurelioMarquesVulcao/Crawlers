@@ -22,6 +22,7 @@ const logarExecucao = async (execucao) => {
   });
 
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJMS}.extracao.novos`;
+  let execucaoAnterior = {};
 
   new GerenciadorFila(null, 1).consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
@@ -40,8 +41,12 @@ const logarExecucao = async (execucao) => {
         message.NumeroProcesso,
         message.NumeroOab,
         message.Instancia,
-        message
+        message,
+        execucaoAnterior
       );
+
+      execucaoAnterior = resultadoExtracao.execucaoAnterior;
+
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(

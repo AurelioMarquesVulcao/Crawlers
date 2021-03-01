@@ -22,12 +22,13 @@ const logarExecucao = async (execucao) => {
   });
 
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSC}.extracao.novos`;
+  let execucaoAnterior = {};
 
   new GerenciadorFila(null, 1).consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
     let logger = new Logger('info', 'logs/TJSC/processo.log', {
-      nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSC}`,
+      nomeRobo: `${enums.tipoConsulta.Processo}${enums.nomesRobos.TJSC}`,
       NumeroDoProcesso: message.NumeroProcesso,
     });
     console.table(message);
@@ -40,8 +41,12 @@ const logarExecucao = async (execucao) => {
         message.NumeroProcesso,
         message.NumeroOab,
         message.Instancia,
-        message
+        message,
+        execucaoAnterior
       );
+
+      execucaoAnterior = resultadoExtracao.execucaoAnterior;
+
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(
@@ -51,20 +56,7 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      console.log({
-        execucao: {
-          LogConsultaId: message.LogConsultaId,
-          Mensagem: message,
-          DataInicio: dataInicio,
-          DataTermino: new Date(),
-          Status: 'OK',
-          Logs: logger.logs,
-          NomeRobo: enums.nomesRobos.TJSC,
-        },
-      });
-
       await logarExecucao({
-        LogConsultaId: message.LogConsultaId,
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),

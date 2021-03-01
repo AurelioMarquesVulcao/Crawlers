@@ -208,6 +208,7 @@ class ExtratorTrtPje {
    * @returns Solução do captcha
    */
   async getSolveCaptcha(captcha) {
+    heartBeat = 0
     this.logger.info('Iniciado - Resolução do Captcha');
     try {
       let { refinador, imagem } = captcha;
@@ -233,6 +234,8 @@ class ExtratorTrtPje {
         }
         return texto;
       } else {
+        this.logger.info("O capcha possui menos de 6 caracteres");  
+        throw "O capcha possui menos de 6 caracteres"
         process.exit();
       }
     } catch (e) {

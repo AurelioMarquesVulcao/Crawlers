@@ -15,6 +15,7 @@ const cadastroOabSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  TipoConsulta: { type: String, required: false, default: 'oab' },
 });
 
 /**
@@ -25,6 +26,17 @@ const cadastroNumeroCnjSchema = new mongoose.Schema({
   NumeroProcesso: {
     type: String,
     required: true,
+    validate: {
+      validator: function (str) {
+        return str.length <= 20;
+      },
+      message: 'Numero do processo nao deve possuir mais do que 20 digitos.',
+    },
+  },
+  TipoConsulta: {
+    type: String,
+    required: false,
+    default: 'processo',
   },
 });
 

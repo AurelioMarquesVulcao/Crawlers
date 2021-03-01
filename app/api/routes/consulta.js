@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const schemas = require('../schema');
+const { Document } = require('mongoose');
 
 const {
   ConsultasCadastradas,
@@ -47,65 +48,13 @@ const _cadastrarConsulta = async (consulta, res) => {
       res.status(200).json({ detalhes: 'Consulta previamente cadastrada' });
       return;
     }
+    res
+      .status(500)
+      .json({ detalhes: `Falha durante registro da consulta: ${e}` });
   }
-
-  res.status(500).json({ detalhes: 'Falha durante registro da consulta.' + e });
 };
 
-router.post('/oab', async (req, res) => {
-  const consulta_oab = new schemas.cadastroOabSchema(req.body);
-  consulta_oab.ClienteId = req.cliente._id;
-
-  const errors = consulta_oab.validateSync();
-
-  let consulta = new ConsultasCadastradas(consulta_oab);
-
-  if (errors) {
-    res.status(400).json(errors);
-    return;
-  }
-
-  _cadastrarConsulta(consulta, res);
-});
-
-/**
- * Realiza o processo de cadastramento de uma consulta na aplicação.
- */
-router.post('/processo', async (req, res) => {
-  const consulta_processo = new schemas.cadastroNumeroCnjSchema(req.body);
-  consulta_processo.NumeroProcesso = normalizarNumProcesso(
-    consulta_processo.NumeroProcesso,
-    true
-  );
-  consulta_processo.ClienteId = req.cliente._id;
-
-  const errors = consulta_processo.validateSync();
-
-  let consulta = new ConsultasCadastradas(consulta_processo);
-
-  if (errors) {
-    res.status(400).json(errors);
-    return;
-  }
-
-  _cadastrarConsulta(consulta, res);
-});
-
-router.delete('', async (req, res) => {
-  const consulta = new ConsultasCadastradas(req.body);
-  consulta.NumeroProcesso = normalizarNumProcesso(
-    consulta.NumeroProcesso,
-    true
-  );
-  consulta.ClienteId = req.cliente._id;
-
-  const errors = consulta.validateSync();
-
-  if (errors) {
-    res.status(400).json(errors);
-    return;
-  }
-
+const _cancelarConsulta = async (consulta, res) => {
   try {
     await FluxoController.cancelarConsulta(consulta);
     res.status(200).json({ detalhes: 'Consulta cancelada com sucesso' });
@@ -118,6 +67,86 @@ router.delete('', async (req, res) => {
     res.status(500).json({ detalhes: e });
     return;
   }
+};
+
+/**
+ * Realiza o cadastro de uma oab na monitoria.
+ */
+router.post('/oab', async (req, res) => {
+  let consulta_oab = new Document(req.body, schemas.cadastroOabSchema);
+
+  const errors = consulta_oab.validateSync();
+
+  if (errors) {
+    res.status(400).json(errors);
+    return;
+  }
+
+  consulta_oab = consulta_oab.toObject();
+  consulta_oab.ClienteId = req.cliente._id;
+  let consulta = new ConsultasCadastradas(consulta_oab);
+  _cadastrarConsulta(consulta, res);
+});
+
+router.delete('/oab', async (req, res) => {
+  let consulta_oab = new Document(req.body, schemas.cadastroOabSchema);
+  const errors = consulta_oab.validateSync();
+
+  if (errors) {
+    res.status(400).json(errors);
+  }
+
+  consulta_oab = consulta_oab.toObject();
+  consulta_oab.ClienteId = req.cliente._id;
+  let consulta = new ConsultasCadastradas(consulta_oab);
+  _cancelarConsulta(consulta, res);
+});
+
+/**
+ * Realiza o cadastro de um processo na monitoria processual.
+ */
+router.post('/processo', async (req, res) => {
+  let consultaProcesso = new Document(
+    req.body,
+    schemas.cadastroNumeroCnjSchema
+  );
+  consultaProcesso.NumeroProcesso = normalizarNumProcesso(
+    consultaProcesso.NumeroProcesso,
+    true
+  );
+  const errors = consultaProcesso.validateSync();
+
+  if (errors) {
+    res.status(400).json(errors);
+    return;
+  }
+
+  consultaProcesso = consultaProcesso.toObject();
+  consultaProcesso.ClienteId = req.cliente._id;
+  let consulta = new ConsultasCadastradas(consultaProcesso);
+  _cadastrarConsulta(consulta, res);
+});
+
+router.delete('/processo', async (req, res) => {
+  let consultaProcesso = new Document(
+    req.body,
+    schemas.cadastroNumeroCnjSchema
+  );
+  consultaProcesso.NumeroProcesso = normalizarNumProcesso(
+    consultaProcesso.NumeroProcesso,
+    true
+  );
+  const errors = consultaProcesso.validateSync();
+
+  if (errors) {
+    res.status(400).json(errors);
+    return;
+  }
+
+  consultaProcesso = consultaProcesso.toObject();
+  consultaProcesso.ClienteId = req.cliente._id;
+  let consulta = new ConsultasCadastradas(consultaProcesso);
+  _cancelarConsulta(consulta, res);
 });
 
 module.exports = router;

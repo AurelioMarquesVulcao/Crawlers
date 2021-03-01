@@ -23,7 +23,7 @@ const HistoricoSchema = new mongoose.Schema(
 const ConsultaCadastroSchema = new mongoose.Schema(
   {
     NumeroOab: {
-      type: String,
+      type: Number,
       required: false,
       default: null,
     },

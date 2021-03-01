@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 /**@constant cadastroOabSchema Schema utilizado para validar uma requisição de cadastro de oab. */
 const cadastroOabSchema = new mongoose.Schema({
   NumeroOab: {
-    type: String,
+    type: Number,
     required: true,
   },
   TipoInscricao: {

@@ -57,6 +57,15 @@ services:
       dockerfile: dockerfile-node
     command: node workers/consumer_peticao.js
 
+  swagger: 
+    image: swaggerapi/swagger-ui
+    ports:
+      - ${SWAGGER_PORT}:8080
+    volumes:
+      - ./docs:/tmp
+    environment:
+      - SWAGGER_JSON=/tmp/openapi.yaml
+
   tjsc-oab:
     extends:
       file: common-services.yml

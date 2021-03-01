@@ -1,0 +1,173 @@
+openapi: 3.0.0
+
+info:
+  title: Crawlers Big Data API
+  version: 1.6.4
+
+servers:
+  - url: http://172.16.16.38:3033/api
+    description: Servidor de produção
+
+paths:
+  /consulta/cadastrarOab:
+    post:
+      summary: 'Cadastro (ou ativação) de uma OAB na monitoria'
+      tags:
+        - Consultas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultaOab'
+      responses:
+        200:
+          description: 'Cadastro da consulta realizado com sucesso'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultaCadastroSucesso'
+
+        400:
+          description: 'Identificada uma falha na requisição. Verifique se todos os campos foram preenchidos'
+          content:
+            application/json:
+              schema:
+                type: object
+        500:
+          description: 'Ocorreu uma falha durante o cadastro da consulta. Informações a respeito do ocorrido estarão disponíveis no campo <b>Detalhes</b> do objeto retornado.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultaCadastroFalha'
+
+  /consulta/excluirOab:
+    post:
+      tags:
+        - Consultas
+      summary: 'Cancelamento de uma OAB na monitoria'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultaOab'
+      responses:
+        200:
+          description: 'Consulta de OAB excluída com sucesso'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultaExclusaoSucesso'
+        404:
+          description: 'Consulta de OAB não localizada na aplicação.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultaCadastroNaoLocalizada'
+
+  /consulta/cadastrarProcesso:
+    post:
+      tags:
+        - Consultas
+      summary: 'Cadastro (ativação) de um número de processo na monitoria'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultaProcesso'
+      responses:
+        200:
+          description: 'Cadastro realizado com sucesso.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultaCadastroSucesso'
+        400:
+          description: 'Identificada uma falha na requisição. Verifique se todos os campos foram preenchidos'
+          content:
+            application/json:
+              schema:
+                type: object
+        500:
+          description: 'Ocorreu uma falha durante o cadastro da consulta. Informações a respeito do ocorrido estarão disponíveis no campo <b>Detalhes</b> do objeto retornado.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultaCadastroFalha'
+
+  /consulta/excluirProcesso:
+    post:
+      tags:
+        - Consultas
+      summary: 'Cancelamento de um processo na monitoria.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsultaProcesso'
+      responses:
+        200:
+          description: 'Consulta de OAB excluída com sucesso'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultaExclusaoSucesso'
+        404:
+          description: 'Consulta de OAB não localizada na aplicação.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsultaCadastroNaoLocalizada'
+
+components:
+  schemas:
+    ConsultaExclusaoSucesso:
+      type: object
+      properties:
+        Detalhes:
+          type: string
+          example: 'Consulta cancelada com sucesso'
+    ConsultaCadastroFalha:
+      type: object
+      properties:
+        Detalhes:
+          type: string
+          example: 'Falha durante registro da consulta: $DESCRICAO_FALHA'
+    ConsultaCadastroSucesso:
+      type: object
+      properties:
+        Detalhes:
+          type: string
+          example: 'Consulta cadastrada com sucesso'
+    ConsultaCadastroNaoLocalizada:
+      type: object
+      properties:
+        Detalhes:
+          type: string
+          example: 'Consulta não localizada'
+
+    ConsultaProcesso:
+      type: object
+      properties:
+        NumeroProcesso:
+          type: string
+          description: 'Número do Processo'
+          example: '55555555555555555555'
+
+    ConsultaOab:
+      type: object
+      properties:
+        NumeroOab:
+          type: integer
+          example: 11112
+          description: 'Número da inscrição do advogado na OAB'
+        SeccionalOab:
+          type: string
+          example: 'SP'
+          description: 'Estado da inscrição OAB'
+        TipoInscricao:
+          type: string
+          nullable: true
+          example: 'N'
+          description: 'Tipo da inscrição OAB'
+          default: null
+          enum: ['B', 'A', 'P', 'E', 'N', 'S', 'D', null]

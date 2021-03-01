@@ -23,7 +23,7 @@ const HistoricoSchema = new mongoose.Schema(
 const ConsultaCadastroSchema = new mongoose.Schema(
   {
     NumeroOab: {
-      type: String,
+      type: Number,
       required: false,
       default: null,
     },
@@ -82,8 +82,15 @@ const ConsultaCadastroSchema = new mongoose.Schema(
 );
 
 ConsultaCadastroSchema.index(
-  { ClienteId: 1, Instancia: 1, TipoConsulta: 1, NumeroProcesso: 1 },
-  { unique: true }
+  {
+    ClienteId: 1,
+    Instancia: 1,
+    TipoConsulta: 1,
+    NumeroProcesso: 1,
+    NumeroOab: 1,
+    SeccionalOab: 1,
+  },
+  { unique: true, name: 'controleUnicidade' }
 );
 
 const ConsultasCadastradas = mongoose.model(

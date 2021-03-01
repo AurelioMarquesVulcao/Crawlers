@@ -41,8 +41,15 @@ const logarExecucao = async (execucao) => {
       const extrator = ExtratorFactory.getExtrator(nomeFila, true);
       let resposta;
 
+      let nProcessoRegex = /(\d{7})(\d{2})(\d{4})(\d)(\d{2})(\d{4})/;
+      let numeroProcesso = message.NumeroProcesso;
+      if (nProcessoRegex.test(message.NumeroProcesso)){
+        numeroProcesso = message.NumeroProcesso.replace(nProcessoRegex, '$1-$2.$3.$4.$5.$6')
+      }
+
       logger.info('Iniciando processo de extração');
-      const resultadoExtracao = await extrator.extrair(message.NumeroProcesso);
+
+      const resultadoExtracao = await extrator.extrair(numeroProcesso);
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       await Extracao.criarExtracao(

@@ -9,7 +9,7 @@ const parsers = require('../parsers');
 const { TJCEParser } = require('../parsers/TJCEParser'); // Usando o parser antigo pq a pagina é completamente diferente
 const sleep = require('await-sleep');
 
-const proxy = true;
+const proxy = false;
 
 class ProcessoESAJ extends ExtratorBase {
   constructor(url, isDebug) {
@@ -29,15 +29,25 @@ class ProcessoESAJ extends ExtratorBase {
    * @param {string} numeroOab
    * @param {number} instancia
    * @param {Object} mensagem
+   * @param {Object} execucaoAnterior
    * @return {Promise<*|{}>}
    */
-  async extrair(numeroProcesso, numeroOab, instancia = 1, mensagem) {
+  async extrair(
+    numeroProcesso,
+    numeroOab,
+    instancia = 1,
+    mensagem,
+    execucaoAnterior = {}
+  ) {
     this.numeroProcesso = numeroProcesso;
     this.mensagem = mensagem;
 
     this.resposta = { numeroProcesso: this.numeroProcesso };
     this.detalhes = this.dividirNumeroProcesso(this.numeroProcesso);
-
+    this.resposta.execucaoAnterior = {
+      cookies: '',
+      captchaSettings: '',
+    };
     this.setLogger();
 
     try {
@@ -45,19 +55,39 @@ class ProcessoESAJ extends ExtratorBase {
       let resultado;
       let extracao;
       let paginaReturn;
+      let erroCaptcha = false;
 
       await this.fazerPrimeiroAcesso();
-      objResponse = await this.acessarPaginaConsulta();
+      objResponse = await this.acessarPaginaConsulta(execucaoAnterior);
 
       let captchaExiste = this.verificaCaptcha(objResponse.responseBody);
 
       if (captchaExiste) {
         this.logger.info('Captcha detectado');
         do {
+          let uuidCaptcha;
+          let gResponse;
+
           this.logger.info(`Tentativa de acesso [${this.tentativa}]`);
 
-          let uuidCaptcha = await this.getUuidCaptcha();
-          let gResponse = await this.resolverCaptcha();
+          if (
+            Object.keys(execucaoAnterior).length &&
+            execucaoAnterior.captchaSettings.uuidCaptcha &&
+            execucaoAnterior.captchaSettings.gResponse &&
+            !erroCaptcha
+          ) {
+            this.logger.info('Variaveis de execução anterior foram detectadas');
+            uuidCaptcha = execucaoAnterior.captchaSettings.uuidCaptcha;
+            gResponse = execucaoAnterior.captchaSettings.gResponse;
+          } else {
+            this.logger.info(
+              'Variaveis de execução anterior não foram detectadas'
+            );
+            uuidCaptcha = await this.getUuidCaptcha();
+            gResponse = await this.resolverCaptcha();
+          }
+
+          this.captchaSettings = { uuidCaptcha, gResponse };
 
           objResponse = await this.acessandoPaginaProcesso(
             uuidCaptcha,
@@ -68,6 +98,7 @@ class ProcessoESAJ extends ExtratorBase {
 
           if (paginaReturn.sucesso) {
             this.tentativa++;
+            erroCaptcha = true;
             continue;
           }
 
@@ -78,7 +109,9 @@ class ProcessoESAJ extends ExtratorBase {
       if (this.limite === this.tentativa)
         throw new Error('Limite de tentativas excedidos');
 
-      this.avaliaPagina(objResponse.responseBody);
+      let avaliacao = this.avaliaPagina(objResponse.responseBody);
+
+      if (!avaliacao.sucesso) throw new Error(avaliacao.detalhes);
 
       extracao = this.parser.parse(objResponse.responseBody);
 
@@ -96,10 +129,15 @@ class ProcessoESAJ extends ExtratorBase {
       this.resposta.resultado = resultado;
       this.resposta.sucesso = true;
     } catch (e) {
+      console.log(e);
       this.logger.log('error', `${e}`);
       this.resposta.sucesso = false;
       this.resposta.detalhes = e.message;
     } finally {
+      this.resposta.execucaoAnterior = {
+        cookies: this.robo.cookies,
+        captchaSettings: this.captchaSettings,
+      };
       this.resposta.logs = this.logger.logs;
       return this.resposta;
     }
@@ -125,8 +163,15 @@ class ProcessoESAJ extends ExtratorBase {
     return await this.robo.acessar(options);
   }
 
-  async acessarPaginaConsulta() {
+  async acessarPaginaConsulta(execucaoAnterior) {
+    let cookies;
+
+    if (Object.keys(execucaoAnterior).length && execucaoAnterior.cookies)
+      cookies = execucaoAnterior.cookies;
+
     this.logger.info('Entrando na pagina de consulta');
+
+    if (cookies && Object.keys(cookies).length) this.robo.cookies = cookies;
 
     let options = {
       url: `${this.url}/search.do`,
@@ -167,10 +212,17 @@ class ProcessoESAJ extends ExtratorBase {
    * @returns {Promise<String>}
    */
   async resolverCaptcha() {
-    const ch = new CaptchaHandler(5, 10000, this.constructor.name, {
-      numeroDoProcesso: this.detalhes.numeroProcessoMascara,
-      numeroDaOab: null,
-    });
+    const ch = new CaptchaHandler(
+      5,
+      10000,
+      this.constructor.name,
+      {
+        numeroDoProcesso: this.detalhes.numeroProcessoMascara,
+        numeroDaOab: null,
+      },
+      'Processo',
+      this.uf
+    );
 
     this.logger.info('Tentando resolver captcha');
     /**
@@ -229,8 +281,8 @@ class ProcessoESAJ extends ExtratorBase {
     const $ = cheerio.load(body);
     const mensagemRetornoSelector = '#mensagemRetorno';
     let mensagemRetornoText = $(mensagemRetornoSelector).text();
-    const tabelaMovimentacoesSelector = '#tabelaTodasMovimentacoes'; //TODO checar selector
-    const senhaProcessoSelector = '#senhaProcesso'; //TODO checar selector
+    const tabelaMovimentacoesSelector = '#tabelaTodasMovimentacoes';
+    const senhaProcessoSelector = '#senhaProcesso';
 
     let regex = /Não\sexistem\sinformações\sdisponíveis\spara\sos\sparâmetros\sinformados/;
 
@@ -248,7 +300,11 @@ class ProcessoESAJ extends ExtratorBase {
       this.logger.info(
         'Se for uma parte ou interessado, digite a senha do processo'
       );
-      throw new Error('Senha necessaria');
+      return {
+        sucesso: false,
+        causa: 'Senha necessaria',
+        detalhes: 'Senha necessaria'
+      }
     }
 
     if ($(tabelaMovimentacoesSelector).length === 0) {
@@ -290,6 +346,7 @@ class ProcessoTJMS extends ProcessoESAJ {
   constructor() {
     super('https://esaj.tjms.jus.br/cpopg5', false);
     this.parser = new parsers.TJMSParser();
+    this.uf = 'MS';
   }
 
   setLogger(tribunal = '') {
@@ -302,6 +359,7 @@ class ProcessoTJSP extends ProcessoESAJ {
     super('https://esaj.tjsp.jus.br/cpopg', false);
     this.parser = new parsers.TJSPParser();
     this.dataSiteKey = '6LcX22AUAAAAABvrd9PDOqsE2Rlj0h3AijenXoft';
+    this.uf = 'SP';
   }
 
   setLogger(tribunal = '') {
@@ -314,6 +372,7 @@ class ProcessoTJSC extends ProcessoESAJ {
     super('https://esaj.tjsc.jus.br/cpopg', false);
     this.parser = new parsers.TJSCParser();
     this.dataSiteKey = '6LfzsTMUAAAAAOj49QyP0k-jzSkGmhFVlTtmPTGL';
+    this.uf = 'SC';
   }
 
   setLogger(tribunal) {
@@ -323,9 +382,10 @@ class ProcessoTJSC extends ProcessoESAJ {
 
 class ProcessoTJCE extends ProcessoESAJ {
   constructor() {
-    super('http://esaj.tjce.jus.br/cpopg');
+    super('http://esaj.tjce.jus.br/cpopg', false);
     this.dataSiteKey = '6LeME0QUAAAAAPy7yj7hh7kKDLjuIc6P1Vs96wW3';
     this.parser = new TJCEParser(); // TODO quando o site mudar (provavelmente em breve) aplicar o novo parser
+    this.uf = 'CE';
   }
 
   setLogger(tribunal) {

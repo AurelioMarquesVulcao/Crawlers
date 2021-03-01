@@ -23,6 +23,8 @@ const logarExecucao = async (execucao) => {
 
   const nomeFila = `${enums.tipoConsulta.Oab}.${enums.nomesRobos.TJCE}.extracao.novos`;
 
+  let execucaoAnterior = {};
+
   new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
@@ -39,8 +41,11 @@ const logarExecucao = async (execucao) => {
       const resultadoExtracao = await extrator.extrair(
         message.NumeroOab,
         message.ConsultaCadastradaId,
-        message.Instancia
+        execucaoAnterior
       );
+
+      execucaoAnterior = resultadoExtracao.execucaoAnterior;
+
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Oab extraida');
       let extracao = await ExtracaoOab.criarExtracao(
@@ -60,6 +65,7 @@ const logarExecucao = async (execucao) => {
         NomeRobo: enums.nomesRobos.TJRS,
       });
     } catch (e) {
+      console.log(e);
       logger.info('Encontrado erro durante a execução');
       logger.log('error', e);
       logger.info('Finalizando proceso');

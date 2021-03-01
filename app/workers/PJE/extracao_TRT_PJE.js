@@ -87,7 +87,7 @@ var erro = '';
       // Valida o numero de tentativas
       let id = message.ExecucaoConsultaId;
       let find = await ExecucaoConsulta.findOne({ _id: id });
-      if (find.Tentativas > 4 && message.NovosProcessos == true) {
+      if (find.Tentativas > 4 && message.NovosProcessos === true) {
         // console.log("matei a mensagem");
         ch.ack(msg);
       }

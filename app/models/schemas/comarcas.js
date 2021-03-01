@@ -4,29 +4,35 @@ const Schema = mongoose.Schema;
 
 const { Helper } = require('../../lib/util');
 
-const DataBuscaSchema = new Schema({
-  dia: {type: Number, required: true},
-  mes: {type: Number, required: true}
-},{ _id: false, versionKey: false })
+const DataBuscaSchema = new Schema(
+  {
+    dia: { type: Number, required: true },
+    mes: { type: Number, required: true },
+  },
+  { _id: false, versionKey: false }
+);
 
-const ComarcaSchema = new Schema({
-  Hash: {type: String, required: true, unique: true},
-  Estado: {type: String, required: true},
-  Comarca: {type: String, required: true},
-  Nome: String,
-  Tribunal: {type: Number, required: true},
-  Orgao: {type: Number, required: true},
-  Status: { type: String, default: 'Criada' },
-  DataBusca: DataBuscaSchema,
-  UltimoProcesso: String,
-  TempoDecorrido: String,
-  ProcessosFeitos: Number,
-  Metadados: Object
-}, {
-  versionKey: false,
-  timestamps: { createdAt: 'DataCriacao', updatedAt: 'DataAtualizacao' },
-  autoIndex: true,
-});
+const ComarcaSchema = new Schema(
+  {
+    Hash: { type: String, required: true, unique: true },
+    Estado: { type: String, required: true },
+    Comarca: { type: String, required: true },
+    Nome: String,
+    Tribunal: { type: Number, required: true },
+    Orgao: { type: Number, required: true },
+    Status: { type: String, default: 'Criada' },
+    DataBusca: DataBuscaSchema,
+    UltimoProcesso: String,
+    TempoDecorrido: String,
+    ProcessosFeitos: Number,
+    Metadados: Object,
+  },
+  {
+    versionKey: false,
+    timestamps: { createdAt: 'DataCriacao', updatedAt: 'DataAtualizacao' },
+    autoIndex: true,
+  }
+);
 
 ComarcaSchema.methods.salvar = async function salvar() {
   let preHash = `${this.Estado}${this.Comarca}`;
@@ -34,12 +40,16 @@ ComarcaSchema.methods.salvar = async function salvar() {
   let objeto = this.toObject();
   delete objeto._id;
   this.Hash = hash;
-  return Comarca.updateOne({Hash: this.Hash}, objeto , {upsert: true})
-}
+  return Comarca.updateOne(
+    { Hash: this.Hash },
+    { $set: objeto },
+    { upsert: true }
+  );
+};
 
 ComarcaSchema.statics.retornaComarcas = async function retornaComarcas(estado) {
-  return await Comarca.find({Estado: estado, Status: {$nin: ['Inválida']}});
-}
+  return await Comarca.find({ Estado: estado, Status: { $nin: ['Inválida'] } });
+};
 
 /**
  * 0 - Invalido
@@ -66,11 +76,14 @@ ComarcaSchema.methods.setStatus = async function setStatus(statusNumber) {
       break;
   }
 
-  return await Comarca.updateOne({Hash: this.Hash}, {$set: {Status: status}});
-}
+  return await Comarca.updateOne(
+    { Hash: this.Hash },
+    { $set: { Status: status } }
+  );
+};
 
-ComarcaSchema.index({Estado: 1, type: -1})
+ComarcaSchema.index({ Estado: 1, type: -1 });
 
 const Comarca = mongoose.model('Comarca', ComarcaSchema, 'comarcas');
 
-module.exports = Comarca;
+module.exports.Comarca = Comarca;

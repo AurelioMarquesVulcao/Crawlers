@@ -121,7 +121,7 @@ class GetCookies {
     try {
       this.key = "6LfRfkIUAAAAAIXuT_GrTfak46Mm6TTvUWAaDYfQ";
       let url = "https://pje.trt15.jus.br/consultaprocessual/";
-      let response = await new CaptchaHandler(5, 15000, `PJE-${estado}`, { numeroDoProcesso: cnj }).resolveRecaptchaV2(url, this.key, "/");
+      let response = await new CaptchaHandler(5, 15000, `PJE-${estado}`, { numeroDoProcesso: cnj }, "Peticao", "SP").resolveRecaptchaV2(url, this.key, "/");
       return response.gResponse
     } catch (e) {
       console.log(e);

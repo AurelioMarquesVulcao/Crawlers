@@ -329,6 +329,21 @@ services:
       dockerfile: dockerfile-puppeteer
     command: node workers/TJMS/extracaoPeticao.js
 
+  peticao.jte.extracao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/JTE_DOC/Filas/GeraFila.js --no-daemon
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '2'
+
+
   processo.jte.extracao.novos.fila.1:
     extends:
       file: common-services.yml

@@ -33,6 +33,11 @@ const cadastroNumeroCnjSchema = new mongoose.Schema({
       message: 'Numero do processo nao deve possuir mais do que 20 digitos.',
     },
   },
+  Instancia: {
+    type: String,
+    required: false,
+    default: '1',
+  },
   TipoConsulta: {
     type: String,
     required: false,

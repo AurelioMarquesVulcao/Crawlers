@@ -1,6 +1,16 @@
-const { Robo } = require('../lib/robo');
 const puppeteer = require('puppeteer');
+const re = require('xregexp');
+const { Robo } = require('../lib/robo');
 
+/**
+ * @typedef cnjDividido
+ * @property {string} sequencial 7 digitos, marcando a ordem sequencial do cnj
+ * @property {string} digito 2 digitos, numero de validação
+ * @property {string} ano 4 digitos, ano do cnj
+ * @property {string} tribunal 1 digito, codigo do tribunal em que o cnj de sencontra
+ * @property {string} orgao 2 digitos, codigo indicativo do estado
+ * @property {string} comarca 4 digitos, codigo indicativo da comarca do estado
+ */
 
 class ExtratorBase {
   /**
@@ -19,7 +29,16 @@ class ExtratorBase {
       console.log(`DEBUG: ${msg}`);
     }
   }
-  
+
+  dividirNumeroProcesso(cnj) {
+    let cnjRegex = re(
+      `(?<sequencial>\\d{7})\\D?(?<digito>\\d{2})\\D?(?<ano>\\d{4})\\D?(?<tribunal>\\d{1})\\D?(?<orgao>\\d{1,2})\\D?(?<comarca>\\d{4})`
+    );
+
+    /**@type cnjDividido*/
+    let cnjDividido = re.exec(cnj, cnjRegex);
+    return cnjDividido;
+  }
 }
 
 class ExtratorPuppeteer extends ExtratorBase {
@@ -63,8 +82,8 @@ class ExtratorPuppeteer extends ExtratorBase {
   async fecharOutrasPaginas() {
     const pages = await this.browser.pages();
 
-    for (let i = 0; i < pages.length; i++){
-      if (!(pages[i] == this.page)){
+    for (let i = 0; i < pages.length; i++) {
+      if (!(pages[i] == this.page)) {
         await pages[i].close();
       }
     }

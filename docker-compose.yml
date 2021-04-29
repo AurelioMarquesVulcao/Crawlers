@@ -1,4 +1,4 @@
-version: "2.4"
+version: '2.4'
 services:
   web:
     extends:
@@ -7,7 +7,7 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: "node server.js"
+    command: 'node server.js'
     ports:
       - ${API_PORT}:3300
     restart: always
@@ -57,6 +57,15 @@ services:
       dockerfile: dockerfile-node
     command: node workers/consumer_peticao.js
 
+  swagger: 
+    image: swaggerapi/swagger-ui
+    ports:
+      - ${SWAGGER_PORT}:8080
+    volumes:
+      - ./docs:/tmp
+    environment:
+      - SWAGGER_JSON=/tmp/openapi.yaml
+
   tjsc-oab:
     extends:
       file: common-services.yml
@@ -102,7 +111,42 @@ services:
       dockerfile: dockerfile-node
     command: node workers/TJSC/extracaoComarcas.js
 
-  
+  # worker-tjmg-oab:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/TJMG/extracaoNovos.js
+
+  cadastro-consulta:
+    extends:
+      file: common-services.yml
+      service: base_node
+    command: node workers/consumer_cadastro_consulta.js
+
+  # novos-processos-jte-sp-2:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/JTE/criaFilaNovos_SP_2
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
+
+  # novos-processos-jte-sp-15:
+  #   extends:
+  #     file: common-services.yml
+  #     service: base_node
+  #   command: node workers/JTE/criaFilaNovos_SP_15
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
+
   worker-tjba-portal:
     extends:
       file: common-services.yml
@@ -113,7 +157,6 @@ services:
     mem_limit: 1000M
     mem_reservation: 1000M
     command: pm2-runtime workers/TJBAPortal/processDocker01.yml --no-daemon
-    
 
   worker-tjsp-oab:
     extends:
@@ -250,6 +293,66 @@ services:
       dockerfile: dockerfile-puppeteer
     command: node workers/TJCE/extracaoPeticao.js
 
+  tjms-oab:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJMS/extracaoOab.js
+
+  tjms-processo-novo:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJMS/processoNovos.js
+
+  tjms-processo-atualizacao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJMS/processoAtualizacao.js
+
+  tjms-comarcas:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/TJMS/extracaoComarcas.js
+
+  tjms-peticao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-puppeteer
+    command: node workers/TJMS/extracaoPeticao.js
+
+  peticao.jte.extracao:
+    extends:
+      file: common-services.yml
+      service: base_node
+    build:
+      context: ./
+      dockerfile: dockerfile-node
+    command: node workers/JTE_DOC/Filas/GeraFila.js --no-daemon
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '2'
+
+
   processo.jte.extracao.novos.fila.1:
     extends:
       file: common-services.yml
@@ -259,10 +362,10 @@ services:
       dockerfile: dockerfile-node
     command: node workers/JTE/criadoresFila/3.0_criaFila01.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   processo.jte.extracao.novos.fila.2:
     extends:
@@ -273,10 +376,10 @@ services:
       dockerfile: dockerfile-node
     command: node workers/JTE/criadoresFila/3.0_criaFila02.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   processo.jte.extracao.novos.fila.3:
     extends:
@@ -287,10 +390,10 @@ services:
       dockerfile: dockerfile-node
     command: node workers/JTE/criadoresFila/3.0_criaFila03.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   processo.jte.extracao.novos.fila.4:
     extends:
@@ -301,10 +404,10 @@ services:
       dockerfile: dockerfile-node
     command: node workers/JTE/criadoresFila/3.0_criaFila04.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   processo.pje.atualizacao.fila.01:
     extends:
@@ -315,10 +418,10 @@ services:
       dockerfile: dockerfile-node
     command: node workers/PJE/criaFilaTRT_PJE.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"
+        max-size: '5m'
+        max-file: '2'
 
   peticao.jte.extracao.links.01:
     extends:
@@ -329,10 +432,10 @@ services:
       dockerfile: dockerfile-node
     command: pm2-runtime workers/JTE_DOC/downloadDoc.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "5m"
-        max-file: "2"       
+        max-size: '5m'
+        max-file: '2'
 
   processo.jte.extracao.novos.1:
     extends:
@@ -346,10 +449,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2-runtime workers/JTE/processDocker01.yml
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   processo.jte.extracao.novos.2:
     extends:
@@ -361,13 +464,12 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE/processDocker02.yml --no-daemon 
+    command: pm2-runtime workers/JTE/processDocker02.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
-
+        max-size: '10m'
+        max-file: '5'
 
   processo.jte.extracao.novos.3:
     extends:
@@ -381,10 +483,10 @@ services:
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
     command: pm2-runtime workers/JTE/processDocker03.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   processo.jte.extracao.novos.4:
     extends:
@@ -395,12 +497,12 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE/processDocker04.yml --no-daemon 
+    command: pm2-runtime workers/JTE/processDocker04.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   processo.jte.reprocessamento.01:
     extends:
@@ -411,13 +513,12 @@ services:
       dockerfile: dockerfile-puppeteer
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE/reprocessamento.yml --no-daemon 
+    command: pm2-runtime workers/JTE/reprocessamento.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
-
+        max-size: '10m'
+        max-file: '5'
 
   processo.pje.atualizacao.01:
     extends:
@@ -426,12 +527,12 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/PJE/processDocker01.yml --no-daemon 
+    command: pm2-runtime workers/PJE/processDocker01.yml --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   processo.jte.reprocessamento.verifica-novos:
     extends:
@@ -440,12 +541,12 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jteMonitoria/verificaUltimoProcesso.js --no-daemon 
+    command: pm2-runtime workers/jteMonitoria/verificaUltimoProcesso.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   processo.jte.reprocessamento.verifica-sequencial:
     extends:
@@ -454,12 +555,12 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jteMonitoria/workerCnjSequencial.js --no-daemon 
+    command: pm2-runtime workers/JTEMonitoria/workerCnjSequencial.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   monitoria-jte-1:
     extends:
@@ -468,12 +569,12 @@ services:
     build:
       context: ./
       dockerfile: dockerfile-node
-    command: pm2-runtime workers/jteMonitoria/comcarcas7dias.js --no-daemon 
+    command: pm2-runtime workers/jteMonitoria/comcarcas7dias.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   limpa-core:
     extends:
@@ -482,12 +583,12 @@ services:
     build:
       dockerfile: Dockerfile
     restart: always
-    command: pm2-runtime bin/js/limpaCoreDocker.js --no-daemon 
+    command: pm2-runtime bin/js/limpaCoreDocker.js --no-daemon
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   peticao.jte.extracao.01:
     extends:
@@ -497,12 +598,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 01
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 01
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   peticao.jte.extracao.02:
     extends:
@@ -512,13 +613,13 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 02
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 02
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
-  
+        max-size: '10m'
+        max-file: '5'
+
   peticao.jte.extracao.03:
     extends:
       file: common-servicesDoc.yml
@@ -527,12 +628,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 03
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 03
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   peticao.jte.extracao.04:
     extends:
@@ -542,12 +643,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 04
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 04
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
 
   peticao.jte.extracao.05:
     extends:
@@ -557,12 +658,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 05
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 05
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.06:
     extends:
       file: common-servicesDoc.yml
@@ -571,12 +672,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 06
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 06
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.07:
     extends:
       file: common-servicesDoc.yml
@@ -585,12 +686,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 07
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 07
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.08:
     extends:
       file: common-servicesDoc.yml
@@ -599,12 +700,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 08
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 08
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.09:
     extends:
       file: common-servicesDoc.yml
@@ -613,12 +714,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 09
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 09
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.10:
     extends:
       file: common-servicesDoc.yml
@@ -627,12 +728,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 10
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 10
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.11:
     extends:
       file: common-servicesDoc.yml
@@ -641,12 +742,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 11
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 11
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.12:
     extends:
       file: common-servicesDoc.yml
@@ -655,12 +756,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 12
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 12
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.13:
     extends:
       file: common-servicesDoc.yml
@@ -669,12 +770,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 13
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 13
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.14:
     extends:
       file: common-servicesDoc.yml
@@ -683,12 +784,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 14
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 14
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.15:
     extends:
       file: common-servicesDoc.yml
@@ -697,12 +798,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 15
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 15
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.16:
     extends:
       file: common-servicesDoc.yml
@@ -711,12 +812,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 16
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 16
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.17:
     extends:
       file: common-servicesDoc.yml
@@ -725,12 +826,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 17
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 17
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.18:
     extends:
       file: common-servicesDoc.yml
@@ -739,12 +840,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 18
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 18
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.19:
     extends:
       file: common-servicesDoc.yml
@@ -753,12 +854,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 19
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 19
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.21:
     extends:
       file: common-servicesDoc.yml
@@ -767,12 +868,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 21
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 21
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.20:
     extends:
       file: common-servicesDoc.yml
@@ -781,12 +882,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 20
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 20
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.22:
     extends:
       file: common-servicesDoc.yml
@@ -795,12 +896,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 22
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 22
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.23:
     extends:
       file: common-servicesDoc.yml
@@ -809,12 +910,12 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 23
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 23
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'
   peticao.jte.extracao.24:
     extends:
       file: common-servicesDoc.yml
@@ -823,9 +924,9 @@ services:
       dockerfile: Dockerfile
     mem_limit: ${PUPPETEER_MEMORIA_MAX}
     mem_reservation: ${PUPPETEER_MEMORIA_MIN}
-    command: pm2-runtime workers/JTE_DOC/Worker/extracao_jte_5doc.js --no-daemon -- 24
+    command: pm2-runtime workers/JTE_DOC/Worker/extracaoLinkAudiencia.js --no-daemon -- 24
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "5"
+        max-size: '10m'
+        max-file: '5'

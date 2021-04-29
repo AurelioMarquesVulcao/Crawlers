@@ -1,12 +1,22 @@
-require('../bootstrap');
+const mongoose = require('mongoose');
 const moment = require('moment');
+const sleep = require('await-sleep');
+require('../bootstrap');
+
 const { ExecucaoConsulta } = require('../models/schemas/execucao_consulta');
 const {
   ConsultasCadastradas,
 } = require('../models/schemas/consultas_cadastradas');
 const { LogExecucao } = require('../lib/logExecucao');
 const { GerenciadorFila } = require('../lib/filaHandler');
-const sleep = require('await-sleep');
+
+class ConsultaNaoExistenteError extends Error {
+  constructor(consulta) {
+    super(consulta);
+    this.name = this.constructor.name;
+    this.consulta = consulta;
+  }
+}
 
 /**
  * Mensagem que é recebida pela fila cadastro_consulta
@@ -49,6 +59,7 @@ class FluxoController {
    */
   static async cadastrarConsulta(msg) {
     let tribunal;
+    let consulta;
 
     const query = {
       NumeroOab: msg.NumeroOab,
@@ -56,6 +67,7 @@ class FluxoController {
       TipoConsulta: msg.TipoConsulta,
       SeccionalOab: msg.SeccionalOab,
       Instancia: msg.Instancia,
+      ClienteId: msg.ClienteId,
     };
 
     if (msg.NumeroProcesso) tribunal = identificarDetalhes(msg.NumeroProcesso);
@@ -64,12 +76,61 @@ class FluxoController {
       msg.Detalhes = tribunal;
     }
 
-    const consulta = await ConsultasCadastradas.findOne(query);
+    consulta = await ConsultasCadastradas.findOne(query);
+
+    if (consulta) {
+      if (!consulta.AtivoParaAtualizacao) {
+        consulta.Historico.push({ Acao: 'Ativar' });
+        consulta.AtivoParaAtualizacao = true;
+        await consulta.save();
+      }
+
+      return consulta;
+    }
+
+    msg.Historico = [{ Acao: 'Ativar' }];
+    consulta = await new ConsultasCadastradas(msg).save();
+
+    return consulta;
+  }
+
+  /**
+   * Realiza o processo de cancelamento da consulta processual (ou de oab) de um cliente.
+   *
+   * @param {MensagemCadastroConsulta} msg Objeto com as informações da consulta sendo cadastrada.
+   *
+   * @returns {Promise<Object>} Registro da consultaCadastrada no Mongo.
+   * @throws {ConsultaNaoExistenteError}
+   */
+  static async cancelarConsulta(msg) {
+    let tribunal;
+    let consulta;
+
+    const query = {
+      NumeroOab: msg.NumeroOab,
+      NumeroProcesso: msg.NumeroProcesso,
+      TipoConsulta: msg.TipoConsulta,
+      SeccionalOab: msg.SeccionalOab,
+      Instancia: msg.Instancia,
+      ClienteId: msg.ClienteId,
+    };
+
+    if (msg.NumeroProcesso) tribunal = identificarDetalhes(msg.NumeroProcesso);
+
+    if (tribunal) {
+      msg.Detalhes = tribunal;
+    }
+
+    consulta = await ConsultasCadastradas.findOne(query);
 
     if (!consulta) {
-      const consultaSalva = await new ConsultasCadastradas(msg).save();
-      msg.CadastroConsultaId = consultaSalva._id;
-      console.log(`Criado documento com _id ${msg.CadastroConsultaId}`);
+      throw new ConsultaNaoExistenteError(query);
+    }
+
+    if (consulta.AtivoParaAtualizacao) {
+      consulta.Historico.push({ Acao: 'Cancelar' });
+      consulta.AtivoParaAtualizacao = false;
+      await consulta.save();
     }
 
     return consulta;
@@ -139,39 +200,116 @@ class FluxoController {
    * @return {Promise<boolean>}
    */
   static async cadastrarExecucao(nomeRobo, nomeFila, msg) {
-    let gf = GerenciadorFila();
-    let execucao = {
-      NomeRobo: nomeRobo,
-      Log: [
-        {
-          status: `Execução do robô ${nomeRobo} para consulta ${msg.NumeroProcesso} foi cadastrada com sucesso!`,
-        },
-      ],
-      Instancia: msg.Instancia,
-      Mensagem: [msg],
-    };
+    // Foi necessario criar verificador de ARRAY para enfileriar em lotes
+    // os worker's de busca de processos novos.
+    // não há alterações no else.
+    if (Array.isArray(msg)) {
+      let gf = new GerenciadorFila();
+      let lote = [];
+      for (let i = 0; i < msg.length; i++) {
+        try {
+          msg[i]['Tentativas'] = 0;
+          let execucao = new ExecucaoConsulta({
+            DataInicio: null,
+            DataTermino: null,
+            Tentativas: 0,
+            NomeRobo: nomeRobo,
+            Log: [
+              {
+                status: `Execução do robô ${nomeRobo} para consulta ${msg[i].NumeroProcesso} foi cadastrada com sucesso!`,
+              },
+            ],
+            Instancia: msg[i].Instancia,
+            Mensagem: [msg[i]],
+          });
+          let pendentes = await ExecucaoConsulta.findOne({
+            NomeRobo: nomeRobo,
+            'Mensagem.Instancia': msg[i].Instancia,
+            'Mensagem.NumeroProcesso': msg[i].NumeroProcesso,
+            DataTermino: null,
+          }).countDocuments();
 
-    let pendentes = await ExecucaoConsulta.find({
-      'mensagem.NomeRobo': nomeRobo,
-      'mensagem.Instancia': msg.Instancia,
-      'mensagem.NumeroProcesso': msg.NumeroProcesso,
-      DataTermino: null,
-    })
-      .limit(1)
-      .countDocuments();
+          if (pendentes !== 0) {
+            console.log(
+              `O processo ${nomeRobo} - ${msg[i].NumeroProcesso} já cadastrada`
+            );
 
-    if (pendentes) {
-      console.log(
-        `O processo ${nomeRobo} - ${msg.NumeroProcesso} já cadastrada`
-      );
-      return false;
+            if (execucao.Mensagem[0].NovosProcessos == true) {
+              let pendentes = await ExecucaoConsulta.findOne({
+                NomeRobo: nomeRobo,
+                'Mensagem.Instancia': msg[i].Instancia,
+                'Mensagem.NumeroProcesso': msg[i].NumeroProcesso,
+                DataTermino: null,
+              });
+              // console.log(pendentes);
+              lote.push(pendentes.Mensagem[0]);
+            }
+          } else {
+            execucao.Mensagem[0]['ExecucaoConsultaId'] = execucao._id;
+            execucao.Mensagem[0]['DataEnfileiramento'] =
+              execucao.DataEnfileiramento;
+            await new ExecucaoConsulta(execucao).save();
+            lote.push(execucao.Mensagem[0]);
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      await gf.enfileirarLote(nomeFila, lote);
+    } else {
+      try {
+        let gf = new GerenciadorFila();
+        msg['Tentativas'] = 0;
+        let execucao = new ExecucaoConsulta({
+          DataInicio: null,
+          DataTermino: null,
+          Tentativas: 0,
+          NomeRobo: nomeRobo,
+          Log: [
+            {
+              status: `Execução do robô ${nomeRobo} para consulta ${msg.NumeroProcesso} foi cadastrada com sucesso!`,
+            },
+          ],
+          Instancia: msg.Instancia,
+          Mensagem: [msg],
+        });
+
+        let pendentes = await ExecucaoConsulta.findOne({
+          NomeRobo: nomeRobo,
+          'Mensagem.Instancia': msg.Instancia,
+          'Mensagem.NumeroProcesso': msg.NumeroProcesso,
+          DataTermino: null,
+        })
+          // .limit(1)
+          .countDocuments();
+
+        if (pendentes !== 0) {
+          console.log(
+            `O processo ${nomeRobo} - ${msg.NumeroProcesso} já cadastrada`
+          );
+          if (execucao.Mensagem[0].NovosProcessos == true) {
+            let pendentes = await ExecucaoConsulta.findOne({
+              NomeRobo: nomeRobo,
+              'Mensagem.Instancia': msg.Instancia,
+              'Mensagem.NumeroProcesso': msg.NumeroProcesso,
+              DataTermino: null,
+            });
+            await gf.enviar(nomeFila, pendentes.Mensagem[0]);
+          }
+          return false;
+        }
+
+        execucao.Mensagem[0]['ExecucaoConsultaId'] = execucao._id;
+        // execucao.Mensagem[0]['ConsultaCadastradaId'] = null;
+        execucao.Mensagem[0]['DataEnfileiramento'] =
+          execucao.DataEnfileiramento;
+        await new ExecucaoConsulta(execucao).save();
+        await gf.enviar(nomeFila, execucao.Mensagem[0]);
+        return true;
+      } catch (e) {
+        console.log(e);
+      }
     }
-
-    gf.enviar(nomeFila, msg);
-
-    await new ExecucaoConsulta(execucao).save();
-
-    return true;
   }
 
   /**
@@ -209,8 +347,6 @@ class FluxoController {
   }
 }
 
-module.exports.FluxoController = FluxoController;
-
 const identificarDetalhes = (cnj) => {
   let tribunal;
 
@@ -235,3 +371,6 @@ const identificarDetalhes = (cnj) => {
 
   return tribunal;
 };
+
+module.exports.FluxoController = FluxoController;
+module.exports.ConsultaNaoExistenteError = ConsultaNaoExistenteError;

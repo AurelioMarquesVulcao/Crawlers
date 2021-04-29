@@ -108,6 +108,9 @@ dist/
 tmp/
 temp/
 
+# Download folder
+downloads/*
+
 ### VisualStudioCode ###
 .vscode/
 

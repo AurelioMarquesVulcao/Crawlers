@@ -102,6 +102,7 @@ class GerenciadorFila {
         channel.sendToQueue(fila, Buffer.from(JSON.stringify(lote[i]), {
 
         }));
+        await sleep(1);
       }
   
     } catch (e) {

@@ -22,6 +22,25 @@ module.exports.enums = Object.freeze({
     TRTSP: 'PJE',
     PJE: 'PJE',
     TJCE: 'TJCE',
+    TJMS: 'TJMS',
+  },
+  tribunalFactory: {
+    TJRS: {
+      tribunal: 21,
+      orgao: 8,
+    },
+    TJSP: {
+      tribunal: 26,
+      orgao: 8,
+    },
+    TJMS: {
+      tribunal: 12,
+      orgao: 8,
+    },
+    TJSC: {
+      tribunal: 24,
+      orgao: 8,
+    },
   },
   tipoConsulta: {
     Oab: 'oab',
@@ -29,10 +48,10 @@ module.exports.enums = Object.freeze({
     Peticao: 'peticao',
   },
   tipoFila: {
-    Novos: "novos",
-    Atualizacao: "atualizacao",
-    Extracao: "extracao",
-    Reprocessamento: "reprocessamento"
+    Novos: 'novos',
+    Atualizacao: 'atualizacao',
+    Extracao: 'extracao',
+    Reprocessamento: 'reprocessamento',
   },
   bigdataUrls: {
     captchaDecoder: 'http://172.16.16.8:5000/api/solve',

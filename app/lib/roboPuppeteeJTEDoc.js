@@ -5,14 +5,15 @@ const shell = require('shelljs');
 require('dotenv/config');
 
 const { JTEParser } = require('../parsers/JTEParser');
-const { Logger } = require('./util');
+const { Logger, Helper } = require('./util');
 const { enums } = require('../configs/enums');
+const { localeData } = require('moment');
 
 var heartBeat = 0; // Verifica se a aplicação esta consumindo a fila, caso não ele reinicia o worker
 setInterval(function () {
   heartBeat++;
   // if (logadoParaIniciais == false) {
-  if (heartBeat > 60) {
+  if (heartBeat > 120) {
     console.log(
       '----------------- Fechando o processo por inatividade -------------------'
     );
@@ -20,14 +21,14 @@ setInterval(function () {
     process.exit();
   }
   // }
-  console.log(heartBeat, "Segundos");
+  // console.log(heartBeat, "Segundos");
 }, 1000);
 
 // Senhas de login no tribunal
 // const login = '11270311719';
 // const senha = 'Impact@2020';
-const login = "11167978790";
-const senha = "Impact@2020";
+const login = '11167978790';
+const senha = 'Impact@2020';
 // 00011028820205090872
 // const login = "08673849721";
 // const senha = "ma221079";
@@ -37,14 +38,12 @@ const senha = "Impact@2020";
 
 // Variavel para controle da quantidade de arquivos a serem baixados
 var numeroDocumentosTotal = 0;
-// Variavel para controlar 
+// Variavel para controlar
 var controlaLink = [];
 var valorLinkTeste = [];
 var links = [];
 
-
 const ajustes = new JTEParser();
-
 
 var timerSleep = 300;
 var timerSleep1 = 1000;
@@ -55,15 +54,44 @@ var timerSleep5 = 5000;
 var timeOut = 40000;
 
 class RoboPuppeteer3 {
-  constructor() {
+  constructor(find) {
     this.logger = new Logger('info', 'logs/ProcessoJTE/ProcessoJTEInfo.log', {
       nomeRobo: enums.nomesRobos.JTE,
-      // NumeroDoProcesso: cnj,
-      // this.
+      NumeroDoProcesso: 'Puppeteer',
     });
+    
+    Helper.geraLoginSenha(find).then((x) => {
+      this.login = x.login;
+      this.senha = x.senha;
+      this.objLogin = x;
+    });
+  }
+  async geralogin() {
+    try {
+      let senhas = await Helper.getCredencialAdvogado({ portal: 'JTE' });
+      let senhasValidas = senhas
+        .filter((x) => {
+          try {
+            return x.status.errosDoDia == 0;
+          } catch (e) {}
+        })
+        .sort((a, b) => a.utilizado - b.utilizado);
+      return senhasValidas[0];
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  allLogs() {
+    return this.logger.allLog();
+  }
+  resetLogs() {
+    this.logger.resetLog();
   }
 
   async iniciar() {
+    // console.log(await this.geralogin());
+    // console.log(this.senha, this.login);
+    // process.exit();
     // para abrir o navegador use o headless: false
     this.browser = await puppeteer.launch({
       // headless: false,
@@ -74,8 +102,16 @@ class RoboPuppeteer3 {
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu', '--proxy-server=http://proxy-proadv.7lan.net:8181']
       // args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--disable-gpu']
-      // args: ['--ignore-certificate-errors', '--proxy-server=http://proxy-proadv.7lan.net:8182']
-      args: ['--ignore-certificate-errors', '--no-sandbox', '--headless', '--proxy-server=http://proxy-proadv.7lan.net:8182'],
+      // args: [
+      //   '--ignore-certificate-errors',
+      //   '--proxy-server=http://proxy-proadv.7lan.net:8182',
+      // ],
+      args: [
+        '--ignore-certificate-errors',
+        '--no-sandbox',
+        '--headless',
+        '--proxy-server=http://proxy-proadv.7lan.net:8182',
+      ],
     });
     this.page = await this.browser.newPage();
     await this.page.authenticate({
@@ -89,14 +125,12 @@ class RoboPuppeteer3 {
   }
 
   async extrair(numero, contador) {
-    await this.preencheProcesso(numero, contador)
-    heartBeat = 0;;
+    await this.preencheProcesso(numero, contador);
+    heartBeat = 0;
     return await this.pegaHtml(contador, numero);
   }
 
-  async extrairIniciais() {
-
-  }
+  async extrairIniciais() {}
 
   async acessar(url) {
     let content;
@@ -135,12 +169,13 @@ class RoboPuppeteer3 {
       'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
     );
     await sleep(timerSleep5);
-    await sleep(timerSleep2);
+    await sleep(10000);
     // await this.page.waitFor('#consultaProcessual')
     await this.page.click('#consultaProcessual');
     await sleep(timerSleep);
     //await console.log("Logado ao tribunal desejado");
     heartBeat = 0;
+    this.logger.info('Tribunal Logado com sucesso.');
   }
   async preencheTribunal1(numero) {
     heartBeat = 0;
@@ -148,15 +183,16 @@ class RoboPuppeteer3 {
     if (escolha == 25) {
       escolha = 2;
     }
-    console.log("clianco no elemento button");
-
+    console.log('clianco no elemento button');
 
     await this.page.evaluate(() => {
-      document.querySelector(
-        `#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button > i`).click();
-      console.log("estou tentando abrir o elemento");
+      document
+        .querySelector(
+          `#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button > i`
+        )
+        .click();
+      console.log('estou tentando abrir o elemento');
     });
-
 
     // await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(3)');
     // await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(3)');
@@ -165,45 +201,48 @@ class RoboPuppeteer3 {
 
     // await this.page.waitFor('mat-form-field');
     await sleep(timerSleep);
-    await this.page.waitFor(
-      '#mat-dialog-1'
-    );
+    await this.page.waitFor('#mat-dialog-1');
     await sleep(timerSleep);
     // console.log(!! await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper'));
     await this.page.evaluate(() => {
-      document.querySelector(
-        `#mat-select-3`).click();
-      console.log("estou tentando abrir o elemento");
+      document.querySelector(`#mat-select-3`).click();
+      console.log('estou tentando abrir o elemento');
     });
     // await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper');
     await sleep(timerSleep);
     await this.page.evaluate((escolha) => {
-      document.querySelector(
-        `#cdk-overlay-3 > div > div :nth-child(${escolha})`).click();
-      console.log("estou tentando abrir o elemento");
+      document
+        .querySelector(`#cdk-overlay-3 > div > div :nth-child(${escolha})`)
+        .click();
+      console.log('estou tentando abrir o elemento');
     }, escolha);
     // await this.page.click(`#mat-option-${escolha}`);
     await sleep(timerSleep1);
 
     await this.page.evaluate(() => {
-      document.querySelector(
-        `ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span`).click();
-      console.log("estou tentando abrir o elemento");
+      document
+        .querySelector(
+          `ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span`
+        )
+        .click();
+      console.log('estou tentando abrir o elemento');
     });
     // await this.page.click(
     //   'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
     // );
     await sleep(timerSleep5);
     await this.page.evaluate(() => {
-      document.querySelector("#tituloLogin > ion-item:nth-child(5) > ion-label").click();
-      console.log("estou tentando abrir o elemento");
+      document
+        .querySelector('#tituloLogin > ion-item:nth-child(5) > ion-label')
+        .click();
+      console.log('estou tentando abrir o elemento');
     });
     await sleep(timerSleep5);
     await this.page.type('#senha > input', senha);
     await sleep(timerSleep5);
     await this.page.evaluate(() => {
-      document.querySelector("#formLogin > ion-toolbar > ion-button").click();
-      console.log("estou tentando abrir o elemento");
+      document.querySelector('#formLogin > ion-toolbar > ion-button').click();
+      console.log('estou tentando abrir o elemento');
     });
     await sleep(10000);
     // await this.page.waitFor('#consultaProcessual')
@@ -221,21 +260,21 @@ class RoboPuppeteer3 {
     heartBeat = 0;
   }
 
-
   async preencheTribunal2(numero) {
     let escolha = escolheEstado(numero);
     // if (escolha == 25) {
     //   escolha = 2;
     // }
-    console.log("clianco no elemento button");
-
+    console.log('clianco no elemento button');
 
     await this.page.evaluate(() => {
-      document.querySelector(
-        `#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button > i`).click();
-      console.log("estou tentando abrir o elemento");
+      document
+        .querySelector(
+          `#inner > ion-toolbar > ion-buttons:nth-child(3) > ion-tab-button > i`
+        )
+        .click();
+      console.log('estou tentando abrir o elemento');
     });
-
 
     // await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(3)');
     // await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(3)');
@@ -244,29 +283,26 @@ class RoboPuppeteer3 {
 
     // await this.page.waitFor('mat-form-field');
     await sleep(30000);
-    await this.page.waitFor(
-      '#mat-dialog-2'
-
-    );
+    await this.page.waitFor('#mat-dialog-2');
     await sleep(timerSleep);
     // console.log(!! await this.page.waitFor('#mat-select-1 > div > div.mat-select-arrow-wrapper'));
     await this.page.evaluate(() => {
-      document.querySelector(
-        `#mat-select-5`).click();
-      console.log("estou tentando abrir o elemento");
+      document.querySelector(`#mat-select-5`).click();
+      console.log('estou tentando abrir o elemento');
     });
     // await this.page.click('#mat-select-1 > div > div.mat-select-arrow-wrapper');
     await sleep(timerSleep);
     if (escolha == 2) {
       await this.page.evaluate(() => {
-        document.querySelector("#mat-option-54").click();
-        console.log("estou tentando abrir o elemento");
+        document.querySelector('#mat-option-54').click();
+        console.log('estou tentando abrir o elemento');
       });
     } else {
       await this.page.evaluate((escolha) => {
-        document.querySelector(
-          `#cdk-overlay-5 > div > div :nth-child(${escolha})`).click();
-        console.log("estou tentando abrir o elemento");
+        document
+          .querySelector(`#cdk-overlay-5 > div > div :nth-child(${escolha})`)
+          .click();
+        console.log('estou tentando abrir o elemento');
       }, escolha);
     }
 
@@ -274,9 +310,12 @@ class RoboPuppeteer3 {
     await sleep(timerSleep1);
 
     await this.page.evaluate(() => {
-      document.querySelector(
-        `ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span`).click();
-      console.log("estou tentando abrir o elemento");
+      document
+        .querySelector(
+          `ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span`
+        )
+        .click();
+      console.log('estou tentando abrir o elemento');
     });
     // await this.page.click(
     //   'ng-component > div.botoesAcao.mat-dialog-actions > button:nth-child(2) > span'
@@ -297,10 +336,14 @@ class RoboPuppeteer3 {
     // await this.page.waitFor('#consultaProcessual')
     // await this.page.click('#consultaProcessual');
     // await sleep(timerSleep);
-    await console.log("Logado ao tribunal desejado");
+    await console.log('Logado ao tribunal desejado');
     await this.page.evaluate(() => {
-      document.querySelector("body > app-root > ion-app > ion-menu > ion-content > ion-list > ion-item:nth-child(2)").click();
-      console.log("estou tentando abrir o elemento");
+      document
+        .querySelector(
+          'body > app-root > ion-app > ion-menu > ion-content > ion-list > ion-item:nth-child(2)'
+        )
+        .click();
+      console.log('estou tentando abrir o elemento');
     });
     heartBeat = 0;
     await sleep(10000);
@@ -313,32 +356,87 @@ class RoboPuppeteer3 {
     heartBeat = 0;
   }
 
-  async loga() {
-
-    console.log('Login iniciado');
-    await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(5)');
-    console.log('clicado no item de login');
-    await sleep(3500);
-    await this.page.type('#formLogin > ion-item > ion-input > input', login);
-    console.log('digitando login');
-    await sleep(2500);
-    await this.page.click('#formLogin > ion-toolbar > ion-button');
-    console.log('clicado no primeiro botão');
-    await sleep(2500);
-    try {
-      await this.page.type('#senha > input', senha);
-      console.log('digitando senha');
-    } catch (e) {
-      // Devo salvar no banco um contador de falhas e parar a aplicação.
+  async loga(robo) {
+    if (!this.login || !this.senha) {
+      await Helper.erroMonitorado({ origem: robo }, true);
+      process.exit()
     }
-
+    this.logger.info('Login iniciado');
+    // console.log('Login iniciado');
+    await this.page.click('#inner > ion-toolbar > ion-buttons:nth-child(5)');
+    // this.logger.info('');
+    // console.log('clicado no item de login');
     await sleep(3500);
-    await this.page.click('#formLogin > ion-toolbar > ion-button');
-    console.log('confirmando senha');
-    await sleep(9000);
-    await this.page.click('#consultaProcessual > ion-card');
-    console.log('clicado no botão de busca');
-    heartBeat = 0;
+    try {
+      await this.page.type(
+        '#formLogin > ion-item > ion-input > input',
+        this.login
+      );
+      this.logger.info('Digitando login');
+      // console.log('digitando login');
+      await sleep(2500);
+      await this.page.click('#formLogin > ion-toolbar > ion-button');
+      // console.log('clicado no primeiro botão');
+      await sleep(2500);
+      await this.page.type('#senha > input', this.senha);
+      this.logger.info('Digitando Senha');
+
+      await sleep(3500);
+      await this.page.click('#formLogin > ion-toolbar > ion-button');
+      this.logger.info('Confirmando Senha');
+      // console.log('confirmando senha');
+      await sleep(19000);
+
+      // Testando a existencia do elemento antes de clicar nele.
+      // if ((await this.page.$('#consultaProcessual > ion-card')) !== null) {
+      //   await this.page.click('#consultaProcessual > ion-card');
+      //   // await this.page.evaluate(() => {
+      //   //   document.querySelector('#consultaProcessual > ion-card').click();
+      //   //   console.log('estou tentando abrir o elemento');
+      //   // });
+      // } else {
+      //   throw "Falha no Loggin Elemento '#consultaProcessual' não foi encontrado"
+      // }
+
+      await this.page.click('#consultaProcessual > ion-card');
+      // await this.page.evaluate(() => {
+      //   document.querySelector('#consultaProcessual > ion-card').click();
+      //   console.log('estou tentando abrir o elemento');
+      // });
+      this.logger.info('Clicando na no botão de Busca');
+      // console.log('clicado no botão de busca');
+      heartBeat = 0;
+      let datas = {
+        status: {
+          ultimoUso: new Date(),
+          robo: robo,
+          status: true,
+          erro: null,
+          errosDoDia: 0,
+        },
+        utilizado: this.objLogin.utilizado + 1,
+      };
+      await Helper.updateCredencialAdvogado(datas, this.objLogin._id);
+    } catch (e) {
+      // if (/Node.is.either.not.visible.or.not.an.HTMLElement/.test(e.message)){
+      //   e = "Erro no Loggin de usuario!"
+      // }
+      e = e.stack.replace(/\n+/, ' ').trim();
+      console.log(e);
+      // Devo salvar no banco um contador de falhas e parar a aplicação.
+      let datas = {
+        status: {
+          ultimoUso: new Date(),
+          robo: robo,
+          status: false,
+          erro: `${e}`,
+          errosDoDia: this.objLogin.status.errosDoDia + 1,
+        },
+        utilizado: this.objLogin.utilizado + 1,
+      };
+      await Helper.updateCredencialAdvogado(datas, this.objLogin._id);
+      await Helper.erroMonitorado({ origem: robo });
+    }
   }
 
   async preencheProcesso(numero, contador) {
@@ -354,7 +452,6 @@ class RoboPuppeteer3 {
     // const input1 = await this.page.$('#campoNumeroProcesso');
     await this.page.click('#campoNumeroProcesso', { clickCount: 3 });
     await this.page.type('#campoNumeroProcesso', `${entrada.numeroprocesso}`);
-
 
     const input2 = await this.page.$('#campoAno');
     await input2.click({ clickCount: 3 });
@@ -385,7 +482,6 @@ class RoboPuppeteer3 {
 
     //await page.waitFor('#mat-tab-content-0-0 > div > detalhes-aba-geral > div')
     await sleep(timerSleep);
-
   }
 
   async pegaHtml(contador, numero) {
@@ -453,21 +549,25 @@ class RoboPuppeteer3 {
   }
 
   /**
- * Cern da extração de documentos. È aqui que será aberto cada documento e capturado cada link
- */
+   * Cern da extração de documentos. È aqui que será aberto cada documento e capturado cada link
+   */
   async pegaInicial() {
+    // this.logger.info('');
+    this.logger.info('Iniciando extração dos links de documentos');
     try {
       let iniciaisArray = await (await this.numerosIniciaisLaco()).numero2;
       let iniciaisMultiplas = await (await this.numerosIniciaisLaco()).numero3;
-      console.log('Arquivos simples ' + iniciaisArray);
+      this.logger.info(`Arquivos simples ${iniciaisArray}`);
+      // console.log('Arquivos simples ' + iniciaisArray);
       numeroDocumentosTotal + iniciaisArray.length;
-      console.log('Arquivos paginados ' + iniciaisMultiplas);
+      this.logger.info(`Arquivos paginados ${iniciaisMultiplas}`);
+      // console.log('Arquivos paginados ' + iniciaisMultiplas);
 
       this.logger.info(`Iniciando captura de documentos Multiplos`);
       // entra na terceira forma de apresentação de documentos.
       // documentos multiplus.
       for (let j = 0; j < (await iniciaisMultiplas).length; j++) {
-        // this.logger.info(`Cliquei no documento numero ${iniciaisArray[j]}`);
+        this.logger.info(`Cliquei no documento numero ${iniciaisArray[j]}`);
         await sleep(1500);
         let dataEProcesso = await this.page.evaluate(
           async (j, iniciaisMultiplas) => {
@@ -488,15 +588,25 @@ class RoboPuppeteer3 {
 
         let buttonRun = null;
         while (buttonRun != 'Lista de documentos') {
-          console.log(buttonRun);
-          console.log('tentando click');
+          // console.log(buttonRun);
+          // console.log('tentando click');
+          this.logger.info(
+            'Tentando click para abrir janela dos documentos multiplos'
+          );
           await sleep(2000);
 
-          await this.page.evaluate((j, iniciaisMultiplas) => {
-            document.querySelector(
-              `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`).click();
-            console.log("estou tentando abrir o elemento");
-          }, j, iniciaisMultiplas);
+          await this.page.evaluate(
+            (j, iniciaisMultiplas) => {
+              document
+                .querySelector(
+                  `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
+                )
+                .click();
+              console.log('estou tentando abrir o elemento');
+            },
+            j,
+            iniciaisMultiplas
+          );
 
           // await this.page.click(
           //   `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
@@ -506,11 +616,11 @@ class RoboPuppeteer3 {
           //   `#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`
           // );
 
-          this.logger.info(
-            `Cliquei no documento numero ${iniciaisMultiplas[j]}`
-          );
+          // this.logger.info(
+          //   `Cliquei no documento numero ${iniciaisMultiplas[j]}`
+          // );
 
-          console.log('tentei');
+          this.logger.info('Finalizado tentativa');
 
           buttonRun = await this.page.evaluate(async () => {
             await new Promise(function (resolve) {
@@ -529,12 +639,12 @@ class RoboPuppeteer3 {
             }
           });
 
-          console.log(buttonRun);
-          console.log('tentei novamente');
+          // console.log(buttonRun);
+          // console.log('tentei novamente');
           await sleep(1000);
         }
-
-        console.log('Sai do while ');
+        this.logger.info('Consegui abrir a aba de documentos multiplos');
+        // console.log('Sai do while ');
 
         // await this.page.click(`#divMovBrowser1 > ion-grid > ion-row > ion-col.coluna-movimentos.ng-star-inserted.md.hydrated > ion-item:nth-child(${iniciaisMultiplas[j]}) > ion-icon`)
 
@@ -546,8 +656,8 @@ class RoboPuppeteer3 {
             '#popover-marcador-filtro > ion-item'
           ).length;
         });
-
-        console.log(quantidadeDocumentos);
+        this.logger.info(`A aba possui ${quantidadeDocumentos} documentos`);
+        // console.log(quantidadeDocumentos);
         numeroDocumentosTotal + quantidadeDocumentos;
         // let testeK = document.querySelector('#linkPDF').href;
 
@@ -556,7 +666,10 @@ class RoboPuppeteer3 {
           // this.logger.info(
           //   `Cliquei no documento numero ${iniciaisArray[j]}-${iniciaisArray[k]}`
           // );
-          console.log(`Cliquei no documento numero ${iniciaisArray[j]}-${k}`);
+          this.logger.info(
+            `Cliquei no documento numero ${iniciaisArray[j]}-${k}`
+          );
+          // console.log(`Cliquei no documento numero ${iniciaisArray[j]}-${k}`);
           await sleep(1500);
           // abro o popup e abro o link do documento
 
@@ -577,20 +690,13 @@ class RoboPuppeteer3 {
 
       this.logger.info(`Finalizado captura de documentos Multiplos`);
 
-
-
-
-
-
-
       this.logger.info(`Iniciando captura de documentos Simples`);
 
       for (let i = 0; i < (await iniciaisArray).length; i++) {
-        await this.baixaLinkSimples(i, iniciaisArray)
+        await this.baixaLinkSimples(i, iniciaisArray);
         heartBeat = 0;
       }
       this.logger.info(`Finalizado captura de documentos Simples`);
-
 
       // console.log(links);
       let resultado = links;
@@ -606,21 +712,21 @@ class RoboPuppeteer3 {
     }
   }
 
-
   async baixaLink(k, dataEProcesso) {
     // while (1==2) {
-    console.log("Entrei no while do click do documento da inicial");
-    console.log("erro");
+    this.logger.info(`Abrindo documento numero ${k}`);
+    // console.log("Entrei no while do click do documento da inicial");
+    // console.log("erro");
     await this.page.click(
       `#popover-marcador-filtro > ion-item:nth-child(${k})> span`
     );
-
+    this.logger.info(`Documeto ${k} aberto com sucesso`);
     // await this.page.evaluate((k) => {
     //   document.querySelector(
     //     `#popover-marcador-filtro > ion-item:nth-child(${k})> span`).click();
     // }, k);
 
-    console.log('Abri documento');
+    // console.log('Abri documento');
     await sleep(200);
     let link = await this.page.evaluate(
       async (k, dataEProcesso) => {
@@ -637,7 +743,7 @@ class RoboPuppeteer3 {
         let data = dataEProcesso.data;
         let numeroProcesso = dataEProcesso.numeroProcesso;
         let tipo = 'PDF';
-        let numero = numeroProcesso.replace(/\-|\./gmi, "");
+        let numero = numeroProcesso.replace(/\-|\./gim, '');
         // console.log({ numeroProcesso, data, movimentacao, link, tipo })
         return { numeroProcesso, data, movimentacao, link, tipo };
         // passar as variaveis como argumento ao fim do codigo faz com que elas sejam passada coretamente para dentro do navegador
@@ -645,17 +751,18 @@ class RoboPuppeteer3 {
       k,
       dataEProcesso
     );
-
-    console.log('Capturei Link');
+    this.logger.info(`Link numero ${k} capturado`);
+    // console.log('Capturei Link');
     // codigo que fecha a ultima aba do puppeteer.
     // com esse codigo consigo fechar os popup
     await sleep(300);
-    console.log(" vou rodar o fechador de link");
+    this.logger.info(`Tentando fechar aba do Link`);
+    // console.log(" vou rodar o fechador de link");
     let pages = await this.browser.pages();
-    console.log("cravei page como page");
+    // console.log("cravei page como page");
     await sleep(300);
     let quebraLoop = 0;
-    console.log("abaixo desse codigo é que da errro");
+    console.log('abaixo desse codigo é que da errro');
     // loop de tentativas de marcar a aba a ser desativada
     // while (pages.length == 2) {
     //   console.log("entrei no loop de identificação de pagina");
@@ -676,9 +783,11 @@ class RoboPuppeteer3 {
     //   }
     // }
 
-    console.log("vou fechar a pagina");
-    console.log(pages.length)
+    // console.log("vou fechar a pagina");
+
+    // console.log(pages.length)
     if (pages.length != 2) {
+      this.logger.info(`A Aba do documento ainda está aberta`);
       const popup = pages[pages.length - 1];
       console.log('Fechando popup');
       await popup.close();
@@ -687,30 +796,36 @@ class RoboPuppeteer3 {
     // teste validade link;
     try {
       if (link.link) {
-        console.log("O numero de links capturados é...", controlaLink.length);
-        console.log(" O Link é válido e foi capturado");
+        this.logger.info(
+          `O numero de links capturados é... ${controlaLink.length}`
+        );
+        // console.log("O numero de links capturados é...", controlaLink.length);
+        this.logger.info(`O Link capturado é válido`);
+        // console.log(" O Link é válido e foi capturado");
         if (controlaLink.length == 0) {
-          console.log("primeiro link capturado com sucesso");
+          console.log('primeiro link capturado com sucesso');
           controlaLink.push(link.link);
           // console.log(link);
           heartBeat = 0;
-          return link
+          return link;
         } else if (controlaLink.length > 0) {
-          console.log("Estou verificando demais links");
+          // console.log("Estou verificando demais links");
           if (controlaLink.indexOf(link.link) < 0) {
-            console.log(" ------------------- O link é único, verificação concluida ------------------- ");
+            this.logger.info(`O link é único, verificação concluida`);
+            console.log(
+              ' ------------------- O link é único, verificação concluida ------------------- '
+            );
             controlaLink.push(link.link);
             // console.log(link);
             heartBeat = 0;
-            return link
+            return link;
           } else {
-            console.log("já peguei esse documento, vou repetir o processo.");
+            this.logger.info(`Já capturei esse link, vou repetir o processo.`);
+            // console.log("já peguei esse documento, vou repetir o processo.");
 
-            throw "O Link do Documento é repetido"
-
+            throw 'O Link do Documento é repetido';
           }
         }
-
       }
     } catch (e) {
       heartBeat = 0;
@@ -796,28 +911,33 @@ class RoboPuppeteer3 {
     // teste validade link;
     try {
       if (link.link) {
-        console.log("O numero de links capturados é...", controlaLink.length);
-        console.log(" O Link é válido e foi capturado");
+        // console.log(heartBeat);
+        this.logger.info(`Já capturamos  ${controlaLink.length} Links válidos`);
+        heartBeat = 0;
+        // console.log(heartBeat);
+        // console.log('O numero de links capturados é...', controlaLink.length);
+        // console.log(' O Link é válido e foi capturado');
         if (controlaLink.length == 0) {
-          console.log("primeiro link capturado com sucesso");
+          console.log('primeiro link capturado com sucesso');
           controlaLink.push(link.link);
           // console.log(link);
           links.push(link);
-          return link
+          return link;
         } else if (controlaLink.length > 0) {
-          console.log("Estou verificando demais links");
+          // console.log('Estou verificando demais links');
           if (controlaLink.indexOf(link.link) < 0) {
-            console.log(" ------------------- O link é único, verificação concluida ------------------- ");
+            this.logger.info(`O link é único, verificação concluida`);
+            console.log(
+              ' ------------------- O link é único, verificação concluida ------------------- '
+            );
             controlaLink.push(link.link);
             // console.log(link);
             links.push(link);
           } else {
-            console.log("já peguei esse documento, vou repetir o processo.");
-            throw "O Link do Documento é repetido"
-
+            console.log('já peguei esse documento, vou repetir o processo.');
+            throw 'O Link do Documento é repetido';
           }
         }
-
       }
     } catch (e) {
       await this.baixaLinkSimples(i, iniciaisArray);
@@ -829,8 +949,6 @@ class RoboPuppeteer3 {
 
     await sleep(1000);
   }
-
-
 
   /**
    * Tenta entrar nos documentos multiplos para baixar seus links
@@ -919,7 +1037,6 @@ class RoboPuppeteer3 {
     return numeros;
   }
 
-
   processaNumero(numero) {
     let numeroProcesso = numero.trim().slice(0, 7);
     let ano = numero.trim().slice(9, 13);
@@ -940,15 +1057,12 @@ class RoboPuppeteer3 {
     // https://www.codota.com/code/javascript/functions/puppeteer/Browser/close
   }
 
-  async finalizar() {
-
-  }
+  async finalizar() {}
   async mudaTribunal(estado) {
     console.log('iniciando troca de estado');
     await shell.exec('pkill chrome');
     process.exit();
   }
-
 }
 
 function escolheEstado(numero) {
@@ -965,8 +1079,5 @@ function processaNumero(numero) {
     vara: vara,
   };
 }
-
-
-
 
 module.exports.RoboPuppeteer3 = RoboPuppeteer3;

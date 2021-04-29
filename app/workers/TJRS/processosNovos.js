@@ -50,13 +50,13 @@ const logarExecucao = async (execucao) => {
         message.SeccionalOab
       );
       logger.info('Resultado da extracao salva');
-      
+
       await logarExecucao({
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: 'OK',
-        logs: logger.logs,
+        Status: 'OK',
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJRS,
       });
     } catch (e) {
@@ -70,9 +70,9 @@ const logarExecucao = async (execucao) => {
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: e.message,
-        error: e.stack.replace(/\n+/, ' ').trim(),
-        logs: logger.logs,
+        Status: e.message,
+        Error: e.stack.replace(/\n+/, ' ').trim(),
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJRS,
       });
     } finally {
@@ -82,7 +82,6 @@ const logarExecucao = async (execucao) => {
       logger.info('Finalizando proceso');
       console.log('\n\n\n\n');
       await sleep(2000);
-
     }
   });
 })();

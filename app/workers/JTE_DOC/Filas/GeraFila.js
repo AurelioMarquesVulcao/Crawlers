@@ -1,94 +1,227 @@
 const mongoose = require('mongoose');
-const cheerio = require('cheerio');
-const shell = require('shelljs');
 const sleep = require('await-sleep');
 
 const { enums } = require('../../../configs/enums');
 const { GerenciadorFila } = require('../../../lib/filaHandler');
-// const { ExtratorFactory } = require('../../extratores/extratorFactory');
-const { Extracao } = require('../../../models/schemas/extracao');
 const { Logger, Cnj, Helper } = require('../../../lib/util');
-const { LogExecucao } = require('../../../lib/logExecucao');
-const { Andamento } = require('../../../models/schemas/andamento');
-// const { ExtratorBase } = require('../../extratores/extratores');
-const { JTEParser } = require('../../../parsers/JTEParser');
-const { RoboPuppeteer3 } = require('../../../lib/roboPuppeteeJTEDoc');
-const { CriaFilaJTE } = require('../../../lib/criaFilaJTE');
-const { downloadFiles } = require('../../../lib/downloadFiles');
+const {
+  ExecucaoConsulta,
+} = require('../../../models/schemas/execucao_consulta');
 const { Log } = require('../../../models/schemas/logsEnvioAWS');
-const desligado = require('../../../assets/jte/horarioRoboJTE.json');
 const { Processo } = require('../../../models/schemas/processo');
-
-
-/**
- * Logger para console e arquivo
- */
+const { FluxoController } = require('../../../lib/fluxoController');
+const { Fila } = require('./getFila');
+const { util } = require('chai');
 
 const nomeFila = `peticao.JTE.extracao`;
-const nomeFilaPJE = `processo.PJE.extracao.novos.1`;
-const Estados = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", '21', "22", "23", "24"];
+const nomeFilaPJE = `processo.PJE.atualizacao.01`;
+
 var Processos = [];
 (async () => {
-
   await worker();
-
 })();
 
 async function worker() {
-
-  // liga ao banco de dados
-  mongoose.connect(enums.mongo.connString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.connection.on('error', (e) => {
+  let contador = (await Fila.getFila(`peticao\\.JTE\\.extracao\.\\d`)).map(
+    (x) => {
+      x['contador'] = 0;
+      return x;
+    }
+  );
+  try {
+    // liga ao banco de dados
+    mongoose.connect(enums.mongo.connString, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    mongoose.connection.on('error', (e) => {
+      console.log(e);
+    });
+  } catch (e) {
     console.log(e);
-  });
+    process.exit();
+  }
 
+  // await verificaFilaParada(contador);
+  // process.exit();
+  try {
+    // tudo que está abaixo é acionado para cada consumer na fila.
+    await new GerenciadorFila(false, 1).consumir(nomeFila, async (ch, msg) => {
+      // Observa se a quantidade de mensagens nas filas de iniciais está dentro dos parâmetros para
+      // enifileirar mais processos
+      let filasQtd = 3000;
+      let linksQtd = 3000;
+      while (filasQtd >= 14 || linksQtd > 60) {
+        filasQtd = (await Fila.getFila(`peticao\\.JTE\\.extracao\.\\d`))
+          .map((x) => x.qtd)
+          .reduce((x, y) => x + y);
+        linksQtd = (await Fila.getFila(`peticao.jte.extracao.links`))
+          .map((x) => x.qtd)
+          .reduce((x, y) => x + y);
 
-  // tudo que está abaixo é acionado para cada consumer na fila.
-  await new GerenciadorFila(false, 10).consumir(nomeFila, async (ch, msg) => {
-    try {
+        console.log('A fila não consumiu, Qtd:', filasQtd);
+        console.log('O link não consumiu, Qtd:', linksQtd);
+
+        let verifica = await Fila.getFila(`peticao\\.JTE\\.extracao\.\\d`);
+        for (let i = 0; i < contador.length; i++) {
+          if (
+            verifica[i].qtd != 0 &&
+            verifica[i].qtdConsumo == 0 &&
+            verifica[i].status == 'Aguardando'
+          ) {
+            contador[i].contador++;
+            // console.log(contador[i]);
+          } else {
+            contador[i].contador = 0;
+            // console.log(contador[i]);
+          }
+          if (contador[i].contador >= 30) {
+            console.log(contador[i].qtd);
+            filasQtd = filasQtd - contador[i].qtd;
+            console.log('A fila não consumiu, Qtd:', filasQtd);
+          }
+        }
+        console.log(contador.filter((x) => x.contador != 0));
+        console.log('A fila não consumiu, Qtd:', filasQtd);
+        console.log('O link não consumiu, Qtd:', linksQtd);
+        await sleep(10000);
+      }
+      console.log('a');
 
       let message = JSON.parse(msg.content.toString());
-      let numeroProcesso = message.NumeroProcesso;
 
-      
-      // função de processamento PJE
-      let estadoProcesso = Cnj.processoSlice(numeroProcesso).estado
-      // função de divisão de filas
-      new GerenciadorFila().enviar(`peticao.JTE.extracao.${estadoProcesso}`, message);
+      message['Instancia'] = message.instancia;
+      delete message['instancia'];
 
-      let message2 = await geraPje(message)
+      console.table(message);
+      // tratamento provisório do numeor de processo.
+      let cnj = Cnj.processoSlice(message.NumeroProcesso);
+      if (cnj.estado != 15) {
+        // Cria Fila PJE
+        await PJE(message);
+        console.log('ok');
+      }
+      // Cria Fila JTE
+      await JTE(message);
 
-      new GerenciadorFila().enviar(nomeFilaPJE, message2);
-      console.log("envio para fila ok");
-      // console.log(message);
+      await sleep(5000);
 
+      // process.exit();
       ch.ack(msg);
-      await sleep(20000);
-      process.exit();
 
-
-      
-    } catch (e) {
-
-      console.log(e);
-
-
-      new GerenciadorFila().enviar(nomeFila, message);
-
-      // ch.ack(msg);
-    }
-  });
-
+      // await sleep(20000);
+      // await sleep(1000);
+    });
+  } catch (e) {
+    console.log(e);
+    // await sleep(3000);
+    process.exit();
+    // Não feche a mensagem em caso de erro !
+    // ch.ack(msg);
+  }
 }
 
 async function geraPje(message) {
-  let processo = await Processo.findOne({ "detalhes.numeroProcesso": message.NumeroProcesso });
+  let processo = await Processo.findOne({
+    'detalhes.numeroProcesso': message.NumeroProcesso,
+  });
   let id = processo._id;
   let message2 = {
-    "NumeroProcesso" : message.NumeroProcesso,"NovosProcessos" : true, "_id" : id
+    NumeroProcesso: message.NumeroProcesso,
+    NovosProcessos: true,
+    _id: id,
+    Instancia: message.Instancia,
+    NomeRobo: nomeFilaPJE.toLowerCase(),
+  };
+  // console.log(message2);
+  return message2;
+}
+
+async function PJE(message) {
+  try {
+    let message2 = await geraPje(message);
+    let execucao = await FluxoController.cadastrarExecucao(
+      nomeFilaPJE.toLowerCase(),
+      nomeFilaPJE,
+      message2
+    );
+    if (!execucao) {
+      let log = await ExecucaoConsulta.findOne({
+        NomeRobo: message2.NomeRobo,
+        'Mensagem.Instancia': message2.Instancia,
+        'Mensagem.NumeroProcesso': message2.NumeroProcesso,
+        DataTermino: null,
+      });
+      if (Array.isArray(log.Mensagem)) {
+        log.Mensagem = log.Mensagem[0];
+      }
+      console.log('Reenfileirado a força');
+      await new GerenciadorFila().enviar(nomeFilaPJE, log.Mensagem);
+    }
+  } catch (e) {
+    console.log(e);
   }
-  return message2
+}
+
+async function JTE(message) {
+  try {
+    let numeroProcesso = message.NumeroProcesso;
+    let estadoProcesso = Cnj.processoSlice(numeroProcesso).estado;
+    let fila = `peticao.JTE.extracao.${estadoProcesso}`;
+    // Incluido dados obrigatórios na mensgem
+    // message['Instancia'] = null;
+    message['NomeRobo'] = fila.toLowerCase();
+    let execucao = await FluxoController.cadastrarExecucao(
+      fila.toLowerCase(),
+      fila,
+      message
+    );
+    if (!execucao) {
+      let log = await ExecucaoConsulta.findOne({
+        NomeRobo: message.NomeRobo,
+        'Mensagem.Instancia': message.Instancia,
+        'Mensagem.NumeroProcesso': message.NumeroProcesso,
+        DataTermino: null,
+      });
+      console.log('Reenfileirado a força');
+      await new GerenciadorFila().enviar(nomeFilaPJE, log.Mensagem);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+async function verificaFilaParada(contador) {
+  // console.log(contador);
+  let verifica = await Fila.getFila(`peticao\\.JTE\\.extracao\.\\d`);
+  for (let i = 0; i < contador.length; i++) {
+    if (
+      verifica[i].qtd != 0 &&
+      verifica[i].qtdConsumo == 0 &&
+      verifica[i].status == 'Aguardando'
+    ) {
+      contador[i].contador++;
+      console.log(contador[i]);
+    } else {
+      contador[i].contador = 0;
+      console.log(contador[i]);
+    }
+    if (contador[i].contador >= 10) {
+      filasQtd = filasQtd - contador[i].qtd;
+    }
+  }
+
+  // verifica.map((x) => {
+  //   if (x.qtd != 0 && x.qtdConsumo == 0 && x.status == 'Aguardando') {
+  //     let obj = x
+  //     let filtro = contador.filter((x) => x.nome==obj.nome)
+  //     // let posicao = contador.indexOf(filtro.nome)
+  //     console.log(filtro);
+  //     // console.log(posicao);
+
+  //     process.exit();
+  //     // contador.indexOf(x.nome)
+  //     // contador[x.nome] =
+  //   }
+  // });
 }

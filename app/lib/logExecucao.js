@@ -1,10 +1,12 @@
 require('../bootstrap');
+const mongoose = require('mongoose');
 const ExecucaoConsulta = require('../models/schemas/execucao_consulta')
   .ExecucaoConsulta;
 const GerenciadorFila = require('../lib/filaHandler').GerenciadorFila;
 const { enums } = require('../configs/enums');
 
 let mapaEstadoRobo = {
+  MS: enums.nomesRobos.TJMS,
   BA: enums.nomesRobos.TJBAPortal,
   SP: enums.nomesRobos.TJSP,
   SC: enums.nomesRobos.TJSC,
@@ -13,6 +15,18 @@ let mapaEstadoRobo = {
 };
 const gf = new GerenciadorFila();
 module.exports.LogExecucao = class LogExecucao {
+  /**
+   * @param {Object} execucao
+   * @param {String} execucao.LogConsultaId
+   * @param {Object} execucao.Mensagem
+   * @param {Date} execucao.DataInicio
+   * @param {Date} execucao.DataTermino
+   * @param {String} execucao.Status
+   * @param {String|null} execucao.Error
+   * @param {[String]} execucao.Logs
+   * @param {String} execucao.NomeRobo
+   * @return {Promise<void>}
+   */
   static async salvar(execucao) {
     const log = {
       status: execucao.Status,
@@ -23,8 +37,17 @@ module.exports.LogExecucao = class LogExecucao {
     delete execucao['status'];
     delete execucao['error'];
     delete execucao['logs'];
+    
+    let id = execucao.Mensagem.ExecucaoConsultaId
+    let find = await ExecucaoConsulta.findOne({ _id: id });
+    if (!find.Tentativas){
+      execucao["Tentativas"]=0;
+    }
+    if(find.Tentativas >=0){
+      execucao["Tentativas"]=find.Tentativas+1
+    }
     await ExecucaoConsulta.updateOne(
-      { _id: execucao.Mensagem.ExecucaoConsultaId },
+      { _id: id },
       {
         ...execucao,
         Log: log,
@@ -43,7 +66,6 @@ module.exports.LogExecucao = class LogExecucao {
    */
   static async cadastrarConsultaPendente(consultaPendente, nomeFila) {
     const nomeRobo = mapaEstadoRobo[consultaPendente.SeccionalOab];
-
     let mensagem = {
       DataEnfileiramento: new Date(),
       NumeroProcesso: consultaPendente.NumeroProcesso,
@@ -61,15 +83,12 @@ module.exports.LogExecucao = class LogExecucao {
         'Mensagem.NumeroProcesso': 1,
       })
       .countDocuments();
-    console.log('vai0');
     if (nomeRobo && !consultasCadastradas) {
-      console.log('vai1');
       nomeFila = nomeFila
         ? nomeFila
         : `${consultaPendente.TipoConsulta}.${nomeRobo}.extracao.novos`;
 
       const execucao = {
-        ConsultaCadastradaId: consultaPendente._id,
         NomeRobo: nomeRobo,
         Log: [
           {
@@ -79,10 +98,18 @@ module.exports.LogExecucao = class LogExecucao {
         Instancia: mensagem.Instancia,
         Mensagem: [mensagem],
       };
+
+      if (consultaPendente._id) {
+        execucao.ConsultaCadastradaId = mongoose.Types.ObjectId(
+          consultaPendente._id
+        );
+        mensagem.ConsultaCadastradaId = consultaPendente._id;
+      }
+
       const execucaoConsulta = new ExecucaoConsulta(execucao);
       const ex = await execucaoConsulta.save();
       mensagem.ExecucaoConsultaId = ex._id;
-      mensagem.ConsultaCadastradaId = consultaPendente._id;
+
       gf.enviar(nomeFila, mensagem);
 
       return {
@@ -91,7 +118,6 @@ module.exports.LogExecucao = class LogExecucao {
         mensagem: `Processo ${mensagem.NumeroProcesso} enviado para a fila.`,
       };
     }
-    console.log('vai2');
     if (!nomeRobo) {
       return {
         sucesso: false,

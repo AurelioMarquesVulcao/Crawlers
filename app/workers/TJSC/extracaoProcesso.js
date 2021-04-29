@@ -5,6 +5,7 @@ const { ExtratorFactory } = require('../../extratores/extratorFactory');
 const { Extracao } = require('../../models/schemas/extracao');
 const { Helper, Logger } = require('../../lib/util');
 const { LogExecucao } = require('../../lib/logExecucao');
+const sleep = require('await-sleep');
 
 const logarExecucao = async (execucao) => {
   await LogExecucao.salvar(execucao);
@@ -21,13 +22,14 @@ const logarExecucao = async (execucao) => {
   });
 
   const nomeFila = `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSC}.extracao.novos`;
+  let execucaoAnterior = {};
 
-  new GerenciadorFila().consumir(nomeFila, async (ch, msg) => {
+  new GerenciadorFila(null, 1).consumir(nomeFila, async (ch, msg) => {
     const dataInicio = new Date();
     let message = JSON.parse(msg.content.toString());
-    let logger = new Logger('info', 'logs/ProcessoTJSC/ProcessoTJSCInfo.log', {
-      nomeRobo: `${enums.tipoConsulta.Processo}.${enums.nomesRobos.TJSC}`,
-      NumeroOab: message.NumeroProcesso,
+    let logger = new Logger('info', 'logs/TJSC/processo.log', {
+      nomeRobo: `${enums.tipoConsulta.Processo}${enums.nomesRobos.TJSC}`,
+      NumeroDoProcesso: message.NumeroProcesso,
     });
     console.table(message);
     try {
@@ -38,8 +40,13 @@ const logarExecucao = async (execucao) => {
       const resultadoExtracao = await extrator.extrair(
         message.NumeroProcesso,
         message.NumeroOab,
-        message.Instancia
+        message.Instancia,
+        message,
+        execucaoAnterior
       );
+
+      execucaoAnterior = resultadoExtracao.execucaoAnterior;
+
       logger.logs = [...logger.logs, ...resultadoExtracao.logs];
       logger.info('Processo extraido');
       let extracao = await Extracao.criarExtracao(
@@ -49,37 +56,18 @@ const logarExecucao = async (execucao) => {
       );
       logger.info('Resultado da extracao salva');
 
-      logger.info('Enviando resposta ao BigData');
-      // const resposta = await Helper.enviarFeedback(
-      //   extracao.prepararEnvio()
-      // ).catch((err) => {
-      //   console.log(err);
-      //   throw new Error(
-      //     `ProcessoTJSC - Erro ao enviar resposta ao BigData - Oab: ${message.NumeroOab}`
-      //   );
-      // });
-      // logger.info('Resposta enviada ao BigData');
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
-      logger.info('Mensagem reconhecida');
-      logger.info('Finalizando processo');
-      console.log('\n\n');
       await logarExecucao({
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: 'OK',
-        logs: logger.logs,
+        Status: 'OK',
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSC,
       });
     } catch (e) {
-      console.log('ERRO', e.code, e.message, '\n\n', e);
+      console.log('ERRU', e.code, e.message, '\n\n', e);
       logger.info('Encontrado erro durante a execução');
       logger.info(`Error: ${e.message}`);
-      logger.info('Reconhecendo mensagem ao RabbitMQ');
-      ch.ack(msg);
-      logger.info('Mensagem reconhecida');
-      logger.info('Finalizando proceso');
       console.log('\n\n');
 
       await logarExecucao({
@@ -87,11 +75,18 @@ const logarExecucao = async (execucao) => {
         Mensagem: message,
         DataInicio: dataInicio,
         DataTermino: new Date(),
-        status: e.message,
-        error: e.stack.replace(/\n+/, ' ').trim(),
-        logs: logger.logs,
+        Status: e.message,
+        Error: e.stack.replace(/\n+/, ' ').trim(),
+        Logs: logger.logs,
         NomeRobo: enums.nomesRobos.TJSC,
       });
+    } finally {
+      logger.info('Reconhecendo mensagem ao RabbitMQ');
+      ch.ack(msg);
+      logger.info('Mensagem reconhecida');
+      logger.info('Finalizando proceso');
+      console.log('\n\n\n\n');
+      await sleep(2000);
     }
   });
 })();

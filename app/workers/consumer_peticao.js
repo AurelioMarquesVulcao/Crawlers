@@ -1,4 +1,5 @@
 const sleep = require('await-sleep')
+const { FluxoController } = require('../lib/fluxoController');
 const { enums } = require('../configs/enums');
 const { GerenciadorFila } = require('../lib/filaHandler');
 const { Cnj } = require('../lib/util');
@@ -43,7 +44,9 @@ const { Cnj } = require('../lib/util');
         inicial: message.inicial
       }
 
-      new GerenciadorFila().enviarMensagem(ch, fila, JSON.stringify(novaMensagem));
+      await FluxoController.cadastrarExecucao(`Peticao${tribunalFila}`, fila, novaMensagem)
+
+      // new GerenciadorFila().enviarMensagem(ch, fila, JSON.stringify(novaMensagem));
 
       console.log(`${numeroProcesso} => ${fila}`);
     } catch(e) {
